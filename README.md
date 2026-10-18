@@ -58,7 +58,9 @@ checkpoints cover the **Game Night Edition**, living characters, connected
 worlds, the Session Scribe, player contributions, a visual GM studio, local
 creative AI, portable campaigns and the road to **QuestKeeper 2.0**.
 The [Game Night Edition product brief](docs/GAME-NIGHT-EDITION-GOALS.md) defines
-its audiences, measurable goals, boundaries and release bar.
+its audiences, measurable goals, boundaries and release bar. The companion
+[player and GM acceptance journeys](docs/GAME-NIGHT-ACCEPTANCE-JOURNEYS.md)
+make every promised outcome testable.
 
 Want to help build it? Start with [Contributing](CONTRIBUTING.md), then use the
 [working agreement](docs/WORKING-AGREEMENT.md) and

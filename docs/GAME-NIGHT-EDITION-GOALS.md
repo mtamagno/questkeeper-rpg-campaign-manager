@@ -10,6 +10,9 @@
 
 **Related plan:** [60-day delivery plan](ROADMAP-60-DAYS.md)
 
+**Acceptance contract:**
+[Player and GM acceptance journeys](GAME-NIGHT-ACCEPTANCE-JOURNEYS.md)
+
 ## Product promise
 
 > When game night begins, any returning player or Game Master can open
@@ -171,7 +174,8 @@ The 1.5 label may be published only when:
 
 - GN-01 through GN-07 meet their thresholds or have a documented release
   decision with an owner and follow-up date;
-- the player and GM acceptance journeys pass on desktop and a 360 px viewport;
+- the [player and GM acceptance journeys](GAME-NIGHT-ACCEPTANCE-JOURNEYS.md)
+  pass on desktop and a 360 px viewport;
 - the production build, lint, formatting, type checks and automated tests pass;
 - the public demo contains no credential, personal transcript or unlicensed
   campaign material;

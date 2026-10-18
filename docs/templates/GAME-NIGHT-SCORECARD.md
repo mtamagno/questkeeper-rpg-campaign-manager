@@ -11,6 +11,9 @@ include private campaign material.
 
 **Campaign fixture:** _Public demo or original consented fixture_
 
+**Acceptance contract:**
+[Player and GM journeys](../GAME-NIGHT-ACCEPTANCE-JOURNEYS.md)
+
 ## Participants and environments
 
 | Label | Perspective | Familiarity     | Device/viewport | Input                      | Notes |
@@ -41,6 +44,25 @@ Record behavior before interpretation.
 | Participant | Expected outcome | Observed result | Time/actions | Assistance                   | Confusion or quote |
 | ----------- | ---------------- | --------------- | ------------ | ---------------------------- | ------------------ |
 |             |                  |                 |              | None / prompt / intervention |                    |
+
+## Journey results
+
+| Journey | Environment                       | Time/actions | Assistance | Status     | Evidence/follow-up |
+| ------- | --------------------------------- | ------------ | ---------- | ---------- | ------------------ |
+| P-01    | First visit / desktop             |              |            | NOT TESTED |                    |
+| P-02    | Desktop and 360 px                |              |            | NOT TESTED |                    |
+| P-03    | Returning visit                   |              |            | NOT TESTED |                    |
+| P-04    | Desktop keyboard and pointer      |              |            | NOT TESTED |                    |
+| P-05    | Returning visit                   |              |            | NOT TESTED |                    |
+| P-06    | 360 px / offline                  |              |            | NOT TESTED |                    |
+| P-07    | First visit                       |              |            | NOT TESTED |                    |
+| GM-01   | First visit / desktop             |              |            | NOT TESTED |                    |
+| GM-02   | Local manager                     |              |            | NOT TESTED |                    |
+| GM-03   | Local manager / preview           |              |            | NOT TESTED |                    |
+| GM-04   | Local manager                     |              |            | NOT TESTED |                    |
+| GM-05   | Manual and Scribe paths           |              |            | NOT TESTED |                    |
+| GM-06   | Clean export/import target        |              |            | NOT TESTED |                    |
+| E2E-01  | Mixed desktop, 360 px and offline |              |            | NOT TESTED |                    |
 
 ## Accessibility and resilience checks
 
