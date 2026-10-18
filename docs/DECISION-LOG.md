@@ -323,6 +323,35 @@ content or provider configuration.
 **Revisit when:** A third complete Manager interface catalog is ready or the
 project adopts a framework-level internationalization system.
 
+### QK-013 — The README is a doorway, not the rulebook
+
+**Date:** 19 October 2026
+
+**Status:** Active
+
+**Decision:** The root README presents QuestKeeper's value, live experiences
+and shortest setup path. Installation, player-facing Companion behavior and
+Game Master workflows each live in a focused guide with clear cross-links.
+Original high-fantasy guide characters identify those paths consistently.
+
+**Why:** A single exhaustive README made the project feel difficult before a
+new player or GM understood what it offered. Task-oriented guides preserve the
+detail while giving the repository landing page a fast, inviting reading path.
+
+**Consequences:** New detailed instructions belong in the appropriate guide or
+specialist reference rather than accumulating in the README. README changes
+must keep the live Companion, Manager demo, installation and roadmap visible
+without requiring a long scroll. Guide art must remain original, readable on
+light and dark GitHub themes, optimized for the web and decorative rather than
+instruction-bearing.
+
+**Source:** [Project README](../README.md) and the
+[Installation](INSTALLATION-GUIDE.md), [Companion](COMPANION-GUIDE.md) and
+[Manager](MANAGER-GUIDE.md) guides.
+
+**Revisit when:** User testing shows that an essential first-run question is
+not reachable from the landing page in one obvious choice.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD

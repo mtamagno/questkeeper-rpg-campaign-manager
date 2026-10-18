@@ -1,27 +1,17 @@
 <p align="center">
-  <img src="docs/images/questkeeper-wordmark.svg" alt="QuestKeeper — The self-hosted RPG Campaign Companion" width="860">
+  <img src="docs/images/questkeeper-wordmark.svg" alt="QuestKeeper — The self-hosted RPG Campaign Companion" width="820">
 </p>
 
-<p align="center"><strong>Your character. Your party. Every legendary session.</strong></p>
+<p align="center"><strong>Turn every campaign into a living chronicle your whole party can revisit.</strong></p>
 
 <p align="center">
-  <a href="https://mtamagno.github.io/questkeeper-rpg-campaign-manager/"><strong>⚔️ LIVE COMPANION</strong></a>
-  &nbsp;•&nbsp;
-  <a href="https://mtamagno.github.io/questkeeper-rpg-campaign-manager/manager-demo/"><strong>🗺️ MANAGER DEMO</strong></a>
-  &nbsp;•&nbsp;
-  <a href="#quick-start"><strong>🕯️ QUICK START</strong></a>
-  &nbsp;•&nbsp;
-  <a href="ROADMAP.md"><strong>🧭 ROADMAP</strong></a>
-  &nbsp;•&nbsp;
-  <a href="docs/CONTENT-GUIDE.md"><strong>📜 CONTENT GUIDE</strong></a>
-</p>
-
-<p align="center">
-  <a href="https://mtamagno.github.io/questkeeper-rpg-campaign-manager/example-campaign/party/mira-thorn"><strong>⚔️ TRY A CHARACTER</strong></a>
+  <a href="https://mtamagno.github.io/questkeeper-rpg-campaign-manager/"><strong>⚔️ Live Companion</strong></a>
   &nbsp;·&nbsp;
-  <a href="https://mtamagno.github.io/questkeeper-rpg-campaign-manager/example-campaign/campaign/story/session-2"><strong>📖 READ A SESSION</strong></a>
+  <a href="https://mtamagno.github.io/questkeeper-rpg-campaign-manager/manager-demo/"><strong>🗺️ Manager Demo</strong></a>
   &nbsp;·&nbsp;
-  <a href="https://mtamagno.github.io/questkeeper-rpg-campaign-manager/example-campaign/party/relationships"><strong>✨ EXPLORE PARTY BONDS</strong></a>
+  <a href="docs/INSTALLATION-GUIDE.md"><strong>🧭 Install</strong></a>
+  &nbsp;·&nbsp;
+  <a href="ROADMAP.md"><strong>✨ Roadmap</strong></a>
 </p>
 
 <p align="center">
@@ -29,337 +19,107 @@
   <img alt="Local first" src="https://img.shields.io/badge/data-local--first-486b63?style=flat-square">
   <img alt="Any campaign language" src="https://img.shields.io/badge/languages-any-805d93?style=flat-square">
   <img alt="GitHub Pages ready" src="https://img.shields.io/badge/deploy-GitHub%20Pages-333?style=flat-square&logo=github">
-  <img alt="Made for D&D parties" src="https://img.shields.io/badge/made%20for-D%26D%20parties-7f1d1d?style=flat-square">
 </p>
-
-<p align="center">
-  <img src="docs/images/campaign-companion-hero.webp" alt="A lantern-lit game master's table with dice, maps, a compass and an open campaign journal" width="100%">
-</p>
-
-QuestKeeper gives your **D&D party a home between sessions**. It turns
-characters, private notes, NPCs, relationships, session chronicles, locations
-and artwork into a beautiful website the whole table can revisit—on desktop or
-on the phone someone inevitably checks five minutes before initiative.
-
-The included local Campaign Manager handles the files behind the screen. You
-write through friendly forms; it handles JSON, folders, indexes, images,
-validation and backups. No subscription. No player account. No mimic hiding in
-the installer.
-
-> **System-friendly by design.** The optional sheet uses a familiar
-> six-ability fantasy-RPG structure, while the campaign archive works for any
-> tabletop system. No commercial rules, published adventures or third-party
-> artwork are bundled.
-
-See where the journey is headed in the public
-**[QuestKeeper 2026–2027 roadmap](ROADMAP.md)**—written for players and Game
-Masters, without a wall of technical implementation details. Monthly
-checkpoints cover the **Game Night Edition**, living characters, connected
-worlds, the Session Scribe, player contributions, a visual GM studio, local
-or opt-in remote creative AI, native Android and iOS apps, final Campaign Books
-and the road to **QuestKeeper 2.0**.
-The [Game Night Edition product brief](docs/GAME-NIGHT-EDITION-GOALS.md) defines
-its audiences, measurable goals, boundaries and release bar. The companion
-[player and GM acceptance journeys](docs/GAME-NIGHT-ACCEPTANCE-JOURNEYS.md)
-make every promised outcome testable.
-
-Want to help build it? Start with [Contributing](CONTRIBUTING.md), then use the
-[working agreement](docs/WORKING-AGREEMENT.md) and
-[design and art guide](docs/DESIGN-AND-ART-GUIDE.md). The team reviews plans
-weekly with a reusable [weekly review template](docs/templates/WEEKLY-REVIEW.md),
-so fast iteration stays deliberate, testable and player-focused.
-
-<p align="center">◆ ───────────── ✦ ───────────── ◆</p>
-
-## Take the 90-second player tour
-
-You do not need to install anything to see the finished experience:
-
-1. **[Meet Mira Thorn](https://mtamagno.github.io/questkeeper-rpg-campaign-manager/example-campaign/party/mira-thorn)** — open a public profile, then unlock the sample sheet with `cambiami` to see progression and PDF export.
-2. **[Read the latest chapter](https://mtamagno.github.io/questkeeper-rpg-campaign-manager/example-campaign/campaign/story/session-2)** — see how raw table notes become a readable campaign memory.
-3. **[Inspect the party bonds](https://mtamagno.github.io/questkeeper-rpg-campaign-manager/example-campaign/party/relationships)** — remember who trusts whom, and why.
-4. **[Return to the map](https://mtamagno.github.io/questkeeper-rpg-campaign-manager/example-campaign/maps)** — revisit discovered places without searching last month’s chat.
-
-> **Player promise:** QuestKeeper helps you remember your character, your
-> choices and your companions. It never asks every player to learn another
-> campaign-management tool.
-
-<p align="center">◆ ───────────── ✦ ───────────── ◆</p>
-
-## See the Companion in action
-
-The published Companion is the party-facing archive: choose a chronicle, revisit
-the campaign and open a character without digging through chat history. The
-original **Lantern Road** demo now includes two adventurers, two sessions, two
-locations, NPC connections and a level-history example. Click any screenshot to
-enter the live sample.
 
 <a href="https://mtamagno.github.io/questkeeper-rpg-campaign-manager/">
-  <img src="docs/images/companion-campaigns.jpg" alt="QuestKeeper campaign selector showing The Lantern Road sample campaign" width="100%">
+  <img src="docs/images/campaign-companion-hero.webp" alt="A lantern-lit game master's table with dice, maps, a compass and an open campaign journal" width="100%">
 </a>
 
+QuestKeeper is a **self-hosted campaign home for tabletop RPG groups**. It
+collects characters, NPCs, relationships, maps, artwork and session stories in
+one polished website—while a friendly local Manager handles the files behind
+the screen.
+
+No subscription. No player accounts. No required AI. Your campaign remains a
+portable folder you control.
+
+<p align="center">◆ ───────────── ✦ ───────────── ◆</p>
+
+## One quest, two experiences
+
 <table>
   <tr>
-    <td width="50%">
-      <a href="https://mtamagno.github.io/questkeeper-rpg-campaign-manager/example-campaign">
-        <img src="docs/images/companion-overview.jpg" alt="The Lantern Road campaign overview in QuestKeeper" width="100%">
-      </a>
+    <td width="50%" valign="top">
+      <a href="https://mtamagno.github.io/questkeeper-rpg-campaign-manager/"><img src="docs/images/companion-overview.jpg" alt="A QuestKeeper campaign overview" width="100%"></a>
+      <h3>For the party · Companion</h3>
+      <p>Revisit the story, explore the cast, follow relationships, open private character sheets and remember what matters before the next session.</p>
+      <p><strong><a href="docs/COMPANION-GUIDE.md">Explore the Companion guide →</a></strong></p>
     </td>
-    <td width="50%">
-      <a href="https://mtamagno.github.io/questkeeper-rpg-campaign-manager/example-campaign/party/aria-vale">
-        <img src="docs/images/companion-character.jpg" alt="Aria Vale public character profile in QuestKeeper" width="100%">
-      </a>
+    <td width="50%" valign="top">
+      <a href="https://mtamagno.github.io/questkeeper-rpg-campaign-manager/manager-demo/"><img src="docs/images/campaign-manager-dashboard.webp" alt="QuestKeeper Campaign Manager dashboard" width="100%"></a>
+      <h3>For the GM · Manager</h3>
+      <p>Create campaigns through guided forms, import characters, turn notes into editable drafts, preview changes and publish when they are ready.</p>
+      <p><strong><a href="docs/MANAGER-GUIDE.md">Open the Manager guide →</a></strong></p>
     </td>
-  </tr>
-  <tr>
-    <td align="center"><em>Campaign overview</em></td>
-    <td align="center"><em>Character profile</em></td>
   </tr>
 </table>
+
+## What travels with your campaign
+
+- Character and NPC profiles, private notes and level-by-level sheet history
+- Session recaps, illustrated chapters, maps, locations and relationship webs
+- Manual writing first, with optional local or explicitly configured remote AI
+- Sheet-photo and shared Roll20 print-view imports that always produce editable drafts
+- Discord Session Scribe or ordinary handwritten notes—the archive accepts both
+- GitHub Pages publishing or direct FTPS from the Manager
+- Any campaign language, with an English/Italian Manager interface
+
+## Start in a few minutes
+
+1. Download or clone this repository and install **Node.js 24**.
+2. Open `setup.bat` on Windows, `setup.command` on macOS, or `./setup.sh` on Linux.
+3. Follow the guided Manager, preview your Companion, then publish when ready.
+
+The installer explains every choice and never downloads an AI model without
+asking. See the **[Installation Guide](docs/INSTALLATION-GUIDE.md)** for the
+complete platform walkthrough and troubleshooting.
+
+<p align="center">◆ ───────────── ✦ ───────────── ◆</p>
+
+## Meet your guides
+
+<table>
+  <tr>
+    <td width="25%" align="center" valign="bottom"><img src="docs/images/companions/lyra-pathfinder.webp" alt="Lyra, an elven ranger and installation guide" height="240"></td>
+    <td width="25%" align="center" valign="bottom"><img src="docs/images/companions/quill-lorekeeper.webp" alt="Quill, a dragon archivist and Companion guide" height="240"></td>
+    <td width="25%" align="center" valign="bottom"><img src="docs/images/companions/brannik-guardian.webp" alt="Brannik, a dwarven paladin and Manager guide" height="240"></td>
+    <td width="25%" align="center" valign="bottom"><img src="docs/images/companions/nyx-storyweaver.webp" alt="Nyx, a tiefling bard and storytelling guide" height="240"></td>
+  </tr>
+  <tr>
+    <td align="center"><strong>Lyra</strong><br><a href="docs/INSTALLATION-GUIDE.md">Installation</a></td>
+    <td align="center"><strong>Quill</strong><br><a href="docs/COMPANION-GUIDE.md">Reading & play</a></td>
+    <td align="center"><strong>Brannik</strong><br><a href="docs/MANAGER-GUIDE.md">Campaign Manager</a></td>
+    <td align="center"><strong>Nyx</strong><br><a href="docs/MANAGER-GUIDE.md#turn-notes-into-a-session">Stories & AI</a></td>
+  </tr>
+</table>
+
+They are original QuestKeeper companions: a small high-fantasy party that
+points readers toward the right guide without turning this page into a manual.
+
+## Choose your path
+
+| I want to…                                             | Read…                                                |
+| ------------------------------------------------------ | ---------------------------------------------------- |
+| Install, update or troubleshoot QuestKeeper            | **[Installation Guide](docs/INSTALLATION-GUIDE.md)** |
+| Understand the player-facing campaign website          | **[Companion Guide](docs/COMPANION-GUIDE.md)**       |
+| Create content, use optional AI, transcribe or publish | **[Manager Guide](docs/MANAGER-GUIDE.md)**           |
+| Edit campaign JSON directly                            | [Content Guide](docs/CONTENT-GUIDE.md)               |
+| See what comes next                                    | [Public Roadmap](ROADMAP.md)                         |
+| Contribute code or design                              | [Contributing](CONTRIBUTING.md)                      |
+
+## Built for trust
+
+QuestKeeper bundles no commercial rulebook text, published adventures or
+third-party artwork. Use only material you wrote, created or are licensed to
+redistribute. Remote AI and plain FTP are opt-in; generated content remains a
+draft until the GM reviews and saves it.
+
+<p align="center"><em>Keep the lore. Share the legend. Own the archive.</em></p>
 
 <p align="center">
-  <a href="https://mtamagno.github.io/questkeeper-rpg-campaign-manager/"><strong>Enter the live Companion →</strong></a>
+  <a href="LICENSE">MIT License</a>
+  &nbsp;·&nbsp;
+  <a href="SECURITY.md">Security</a>
+  &nbsp;·&nbsp;
+  <a href="CONTRIBUTING.md">Contributing</a>
 </p>
-
-<p align="center">◆ ───────────── ✦ ───────────── ◆</p>
-
-## Why your party will want it
-
-<table>
-  <tr>
-    <td width="180" align="center"><img src="docs/images/quill-welcome.webp" alt="Quill the dragon archivist welcoming the reader with a map" width="165"></td>
-    <td>
-      <strong>One archive. Two sides of the screen.</strong><br><br>
-      The Game Master gets searchable lore, NPCs, maps, spoilers and validation. Players get beautiful profiles, journals, relationships, galleries and a campaign history that does not vanish into last month's chat.
-    </td>
-  </tr>
-</table>
-
-| For the Game Master                                    | For the players                                        |
-| ------------------------------------------------------ | ------------------------------------------------------ |
-| One searchable home for lore, NPCs and session history | A beautiful place to revisit the adventure             |
-| Public profiles plus spoiler-protected private notes   | Character journals and level-by-level progression      |
-| Visual campaign editor with recoverable deletion       | Styled character-sheet PDF exports                     |
-| Backups, build validation and original-image uploads   | Mobile-friendly maps, galleries and relationship views |
-| Optional local Discord transcription                   | A remembered language and spoiler-warning choice       |
-| Reviewable AI drafts from typed or transcribed notes   | Human-approved prose and illustrations only            |
-
-Character profiles also keep a canonical height, everyday interests and two
-independent pieces of art: a square face/profile image and a full 2:3 portrait.
-The manager preserves each image separately, so refining one never erases the
-other.
-
-And yes, the site remembers when a visitor accepts the spoiler warning—because
-defeating the same modal every session is not a heroic quest.
-
-### Built for the questions every party asks
-
-| Right before the session…          | QuestKeeper opens…                                   |
-| ---------------------------------- | ---------------------------------------------------- |
-| “What did we do last time?”        | A short catch-up and the complete session chronicle  |
-| “What changed when I levelled up?” | Every saved version of the character sheet           |
-| “Why do we distrust that NPC?”     | Relationship history and private notes               |
-| “Can you send me your sheet?”      | A styled, printable PDF with profile artwork         |
-| “Where did we find that clue?”     | Searchable places, maps, galleries and session links |
-
-<p align="center">◆ ───────────── ✦ ───────────── ◆</p>
-
-## The Campaign Manager
-
-The manager is your local GM screen. It writes portable campaign files behind
-the scenes while you work through a visual interface. Its online demo includes
-both the guided visual tour and a hands-on browser sandbox: rename the sample
-campaign, add adventurers and record session beats without installing anything.
-
-<p align="center">
-  <a href="https://mtamagno.github.io/questkeeper-rpg-campaign-manager/manager-demo/"><strong>🗺️ Open the interactive Campaign Manager demo →</strong></a>
-</p>
-
-![Interactive Manager demo with a locally simulated, reviewable character-sheet import](docs/images/manager-demo-ai-tour.jpg)
-
-### 1 · Gather the party
-
-Create a campaign, restore a backup or inspect the entire archive at a glance.
-
-![Campaign Manager dashboard showing campaign totals and navigation](docs/images/campaign-manager-dashboard.webp)
-
-### 2 · Write in every tongue
-
-Choose any campaign languages with standard codes such as `en`, `es`, `de`,
-`ja`, `pt-BR` or `fr-CA`. Translation fields appear automatically; visitors
-choose their preferred language from the published site.
-
-![Campaign editor showing language settings, table details and campaign fields](docs/images/campaign-manager-editor.webp)
-
-### 3 · Chronicle the world
-
-Add characters, NPCs, session recaps, locations and original artwork. IDs,
-image placement and campaign indexes are kept in sync for you.
-
-![Character archive with controls to add, edit and remove entries](docs/images/campaign-manager-content.webp)
-
-### 4 · Scout ahead, then publish
-
-Prepare dependencies, preview the real site and run a production check from
-one guided screen. Then publish with GitHub Actions or send the finished static
-site directly to an FTPS host—without copying files by hand.
-
-![Direct publishing screen with build validation and FTPS destination controls](docs/images/campaign-manager-publish.jpg)
-
-### 5 · Let automation assist—not decide
-
-The AI panel detects the computer's resources and lets the Game Master choose
-manual authoring, local Ollama and ComfyUI models, or an explicitly configured
-OpenAI API. It remains available after onboarding for new keys and models. In a
-session editor, the GM independently selects the prose writer, visual-prompt
-writer and image renderer; generated art is placed after a reviewed prose
-scene instead of being dumped into a gallery. Nothing publishes until the Game
-Master edits and saves.
-
-Character and NPC editors use the same review-first approach: extract an
-editable draft from up to four sheet photos or screenshots, or use a public
-Roll20 print-view URL with a browser-capable remote model. Private sheets stay
-private—screenshots are supplied deliberately, and manual entry always remains
-available.
-
-![Permanent AI provider and model library with separate prose and image controls](docs/images/campaign-manager-ai-models.jpg)
-
-![Italian interface showing the three-step guided AI setup](docs/images/campaign-manager-ai-setup-it.jpg)
-
-![Character editor offering a reviewable AI import from sheet images or a shared URL](docs/images/campaign-manager-ai-import.jpg)
-
-Read the [AI setup and privacy guide](docs/AI-SETUP.md).
-
-<p align="center">◆ ───────────── ✦ ───────────── ◆</p>
-
-## Session notes: Discord bot or trusty notebook
-
-<table>
-  <tr>
-    <td>
-      <strong>If you play on Discord</strong>, the optional local Session Scribe can join voice, identify speakers by their Discord display name and write a timestamped Markdown transcript. Start and stop it directly from the Campaign Manager.<br><br>
-      <strong>If you play around a table—or simply prefer writing</strong>, handwritten notes and any notes app work perfectly. After the game, add your summary and key events in the Sessions tab. The Companion never requires the bot.
-    </td>
-    <td width="190" align="center"><img src="docs/images/quill-notes.webp" alt="Quill the dragon archivist taking notes in a campaign journal" width="175"></td>
-  </tr>
-</table>
-
-![Discord Session Scribe screen with bot status, launch controls and a handwritten-notes alternative](docs/images/campaign-manager-scribe.webp)
-
-The Scribe processes speech locally with faster-whisper. Temporary audio stays
-in memory, saved output remains on the machine running the bot, and the bot
-does **not** keep an audio recording. Always obtain informed consent from every
-participant and follow local law.
-
-Read the [Discord Session Scribe setup guide](discord-transcriber/README.md).
-
-<p align="center">◆ ───────────── ✦ ───────────── ◆</p>
-
-## Quick start
-
-<table>
-  <tr>
-    <td width="180" align="center"><img src="docs/images/quill-guide.webp" alt="Quill the dragon archivist holding a lantern and pointing onward" width="165"></td>
-    <td>
-      <ol>
-        <li>Install <a href="https://nodejs.org/">Node.js 24</a>.</li>
-        <li>Download this repository as a ZIP or clone it.</li>
-        <li><strong>Windows:</strong> double-click <code>setup.bat</code>.</li>
-        <li><strong>macOS:</strong> double-click <code>setup.command</code>.</li>
-        <li><strong>Linux:</strong> run <code>./setup.sh</code>.</li>
-      </ol>
-      Your browser opens the local Campaign Manager. Create a campaign and begin the chronicle.
-    </td>
-  </tr>
-</table>
-
-The manager listens only on `127.0.0.1`, requires no account and stores your
-campaign as ordinary files under `src/campaigns/`. Removed content goes to
-`.campaign-manager/trash/` whenever possible, so a misplaced click is not a
-permanent disintegration spell.
-
-The included original demo, **The Lantern Road**, is safe to explore, copy or
-delete. Its protected example character uses the temporary password
-`cambiami`; change or remove it before publishing real notes. This is a
-client-side spoiler curtain, not strong security.
-
-For advanced editing, see the [campaign content guide](docs/CONTENT-GUIDE.md).
-
-## Language support
-
-Campaign content supports any language or regional language code configured by
-the author. The selector displays native language names when supported by the
-browser, remembers each visitor's choice and falls back to English—or the first
-available translation—when a field is incomplete.
-
-The published Companion and the local Campaign Manager have polished English
-and Italian interface copy. The Manager detects the browser language, exposes
-an always-visible **Interface** selector and remembers the choice. Campaign
-content remains independent: other selected languages receive the English
-interface with fully localized campaign text while additional UI catalogs are
-added.
-
-<p align="center">◆ ───────────── ✦ ───────────── ◆</p>
-
-## Publish
-
-### GitHub Pages
-
-Push your copy to GitHub, open **Settings → Pages**, select **GitHub Actions**
-and run the included **Deploy to GitHub Pages** workflow. The base path is
-calculated automatically.
-
-### Direct FTPS from Campaign Manager
-
-GitHub is optional. In **Preview & publish**, save the FTPS destination supplied
-by your host, test the connection, then choose **Build & publish now**. The
-Manager performs a fresh production build and uploads it to the chosen remote
-folder. Credentials stay in the Git-ignored local manager directory and are
-never written to campaign content.
-
-Plain FTP is supported only for legacy hosting and requires a fresh warning
-acknowledgement because it does not encrypt credentials or files. Prefer FTPS.
-
-### Any static web server
-
-```bash
-npm ci
-npm run build
-```
-
-Upload `dist/campaign-companion/browser/` to your web root and configure SPA
-fallback to `index.html`. Apache and Nginx examples live in
-[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
-
-## Optional AI, one permanent control room
-
-Open **AI setup** in Campaign Manager at any time to choose manual creation, local
-[Ollama](https://ollama.com/) prose and [ComfyUI](https://www.comfy.org/)
-illustrations, or a remote OpenAI API. Hardware-aware recommendations explain
-the trade-offs and model sizes before any download. Discover installed local
-models, add custom model IDs and choose a different prose, prompt-planning or
-image model for each session. The older command-line
-helpers remain available for advanced workflows, but they are no longer
-required for ordinary session recaps.
-
-Every result is an editable draft, remote tasks require per-action consent and
-there is no silent local-to-cloud fallback. See the
-[AI setup and privacy guide](docs/AI-SETUP.md) and the optional
-[command-line helper guide](tools/local-ai/README.md). You are responsible for
-the licenses of the models, inputs and generated output you use.
-
-## Safety, secrets and dragons
-
-- Never commit `.env`, bot tokens, passwords, API keys or private transcripts.
-- Client-side protected notes ship to the browser; do not store genuine secrets.
-- Publish only text and images you created or may legally redistribute.
-- Do not add scanned books, copied rule text, published maps or adventure prose.
-- This independent project is not affiliated with or endorsed by any tabletop publisher.
-
-Code is released under the [MIT License](LICENSE). The sample campaign,
-placeholders, hero artwork and Quill illustrations were created specifically
-for this project and may be reused under the same license.
-
-<p align="center">◆ ───────────── ✦ ───────────── ◆</p>
-
-<p align="center"><em>May your recaps be accurate, your secrets stay hidden, and your scheduling checks roll high.</em></p>
