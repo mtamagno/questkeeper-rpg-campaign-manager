@@ -6,6 +6,8 @@
 
 **Related roadmap checkpoint:** _TBD_
 
+**Delivery targets:** _Public template / production Companion / both_
+
 ## Inherited context
 
 List completed work and active decisions that shape this week. A previous task
@@ -14,6 +16,9 @@ remains relevant whenever its output changes scope, constraints or acceptance.
 | Artifact/decision | What it established | Effect on this week |
 | ----------------- | ------------------- | ------------------- |
 |                   |                     |                     |
+
+For maintainer work marked `both`, include the current commit or release
+baseline of each repository and any known compatibility difference.
 
 ## Last week in one minute
 
@@ -85,6 +90,8 @@ more important than filling the list.
 - [ ] Updated completed items in `docs/ROADMAP-60-DAYS.md`.
 - [ ] Reviewed every affected future task against this week's evidence.
 - [ ] Updated `docs/DECISION-LOG.md` for durable cross-task decisions.
+- [ ] Recorded public/production commit pairs and intentional differences for
+      shared maintainer work.
 - [ ] Updated `ROADMAP.md` only if a public checkpoint materially changed.
 - [ ] Carried, reduced or removed every unfinished item deliberately.
 - [ ] Recorded the next weekly outcome.

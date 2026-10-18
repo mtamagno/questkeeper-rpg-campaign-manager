@@ -58,6 +58,36 @@ Before closing a task:
 Avoid duplicating requirements into several documents. Keep one source of truth
 and link to it, so future work inherits the decision without creating drift.
 
+### Maintainer dual-target rule
+
+QuestKeeper's maintainers also operate a production Campaign Companion with
+existing campaigns. This public repository remains the source for reusable,
+redistributable product behavior; the production repository is the compatibility
+target that proves the behavior against real campaign structures.
+
+Classify every maintainer task before implementation:
+
+| Classification  | Delivery expectation                                                                                                                                                                        |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `shared`        | Implement and validate compatible behavior in both repositories. Record both commits.                                                                                                       |
+| `public-only`   | Keep only generic demo, onboarding, packaging or community material here. Record why production is unaffected.                                                                              |
+| `campaign-only` | Keep campaign canon, licensed/private content, credentials and deployment-specific integrations out of the public template. Record whether a generic capability should later move upstream. |
+
+For shared work:
+
+1. inspect both repositories before choosing an implementation;
+2. define the reusable contract without copying campaign-specific content;
+3. adapt the implementation to each repository instead of overwriting local
+   extensions;
+4. validate the public sample and every existing production campaign affected
+   by the schema, route, component or workflow;
+5. record corresponding commit IDs and any intentional difference in the
+   production sync ledger.
+
+Community contributors are not expected to access a maintainer's production
+repository. The maintainer reviewing their contribution owns classification,
+downstream adaptation and compatibility validation.
+
 ## 3. Weekly operating rhythm
 
 ### Monday: choose the week's outcome
@@ -128,6 +158,8 @@ A change is done only when all relevant statements are true:
   reviewed, not assumed unchanged;
 - durable decisions and their authoritative sources are added to the decision
   log when relevant.
+- maintainer-owned shared work is implemented and validated in both delivery
+  targets, or its explicit target exception is recorded.
 
 ## 6. Code structure and ownership
 

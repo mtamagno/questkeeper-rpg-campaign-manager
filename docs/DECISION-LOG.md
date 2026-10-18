@@ -107,6 +107,33 @@ content or participant identity.
 **Revisit when:** A privacy-preserving measurement approach offers meaningful
 new evidence and users can make an informed choice.
 
+### QK-005 — Shared product work has two delivery targets
+
+**Date:** 18 October 2026
+
+**Status:** Active
+
+**Decision:** Maintainer work on reusable QuestKeeper behavior is evaluated for
+both this public template and the maintained production Campaign Companion that
+hosts existing campaigns. A shared change is complete only after compatible
+implementations are verified in both repositories, or an explicit target-specific
+exception is recorded.
+
+**Why:** The public template and the real campaign site must inform each other.
+Otherwise the template can promise unproven behavior while active campaigns
+miss improvements or break when changes eventually arrive.
+
+**Consequences:** Every maintainer task is classified as `shared`, `public-only`
+or `campaign-only`. Shared work records the corresponding commits and validation
+in both repositories. Campaign data, credentials, transcripts, licensed content
+and private integrations never flow into the public template.
+
+**Source:** Maintainer continuity rule in the
+[working agreement](WORKING-AGREEMENT.md)
+
+**Revisit when:** The repositories adopt an automated, privacy-safe upstream
+and downstream release process with equivalent compatibility evidence.
+
 ## New decision template
 
 ### QK-XXX — Short decision title

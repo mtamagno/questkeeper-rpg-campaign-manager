@@ -28,6 +28,10 @@
 - [ ] Affected roadmap tasks and acceptance criteria were updated
 - [ ] New durable decisions were recorded or “No new durable decision” is stated
 
+**Maintainer delivery classification:** `shared / public-only / campaign-only / not applicable`
+
+<!-- For shared work, link the production Companion commit or tracking item. -->
+
 ## Safety and continuity
 
 - [ ] No secrets, private transcripts or personal campaign data
