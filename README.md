@@ -80,10 +80,10 @@ complete platform walkthrough and troubleshooting.
 
 <table>
   <tr>
-    <td width="25%" align="center" valign="bottom"><img src="docs/images/companions/lyra-pathfinder.webp" alt="Lyra, an elven ranger and installation guide" height="240"></td>
-    <td width="25%" align="center" valign="bottom"><img src="docs/images/companions/quill-lorekeeper.webp" alt="Quill, a dragon archivist and Companion guide" height="240"></td>
-    <td width="25%" align="center" valign="bottom"><img src="docs/images/companions/brannik-guardian.webp" alt="Brannik, a dwarven paladin and Manager guide" height="240"></td>
-    <td width="25%" align="center" valign="bottom"><img src="docs/images/companions/nyx-storyweaver.webp" alt="Nyx, a tiefling bard and storytelling guide" height="240"></td>
+    <td width="25%" align="center" valign="bottom"><a href="docs/INSTALLATION-GUIDE.md" aria-label="Open the Installation Guide"><img src="docs/images/companions/lyra-pathfinder.webp" alt="Lyra, an elven ranger and installation guide" height="240"></a></td>
+    <td width="25%" align="center" valign="bottom"><a href="docs/COMPANION-GUIDE.md" aria-label="Open the Companion Guide"><img src="docs/images/companions/quill-lorekeeper.webp" alt="Quill, a dragon archivist and Companion guide" height="240"></a></td>
+    <td width="25%" align="center" valign="bottom"><a href="docs/MANAGER-GUIDE.md" aria-label="Open the Campaign Manager Guide"><img src="docs/images/companions/brannik-guardian.webp" alt="Brannik, a dwarven paladin and Manager guide" height="240"></a></td>
+    <td width="25%" align="center" valign="bottom"><a href="docs/MANAGER-GUIDE.md#turn-notes-into-a-session" aria-label="Open the storytelling and AI section"><img src="docs/images/companions/nyx-storyweaver.webp" alt="Nyx, a tiefling bard and storytelling guide" height="240"></a></td>
   </tr>
   <tr>
     <td align="center"><strong>Lyra</strong><br><a href="docs/INSTALLATION-GUIDE.md">Installation</a></td>
