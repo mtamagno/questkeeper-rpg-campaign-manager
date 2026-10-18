@@ -56,7 +56,8 @@ See where the journey is headed in the public
 Masters, without a wall of technical implementation details. Monthly
 checkpoints cover the **Game Night Edition**, living characters, connected
 worlds, the Session Scribe, player contributions, a visual GM studio, local
-creative AI, portable campaigns and the road to **QuestKeeper 2.0**.
+or opt-in remote creative AI, native Android and iOS apps, final Campaign Books
+and the road to **QuestKeeper 2.0**.
 The [Game Night Edition product brief](docs/GAME-NIGHT-EDITION-GOALS.md) defines
 its audiences, measurable goals, boundaries and release bar. The companion
 [player and GM acceptance journeys](docs/GAME-NIGHT-ACCEPTANCE-JOURNEYS.md)

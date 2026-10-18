@@ -85,10 +85,20 @@ Session notes evolve into an illustrated history of decisions and consequences.
 - Session chapters connected directly to relevant maps, NPCs and relationships.
 - “Previously on…” presentations for the beginning of a session.
 - Story collections for arcs, chapters and completed quests.
-- A closing-book experience for finished campaigns and epilogues.
+- A guided Campaign Book studio for finished adventures, with a cover, title
+  page, cast, table of contents, chapters, artwork, appendices, epilogues and
+  credits.
+- Four authoring paths for the final book: fully manual, semi-automatic with
+  review checkpoints, automatic with local AI, or automatic with an explicitly
+  configured remote AI provider.
+- Page-by-page editing, selective regeneration and visible source notes before
+  the Game Master approves the final text.
+- A print-ready PDF and a screen-friendly digital edition that remain part of
+  the portable campaign archive.
 
 **Checkpoint:** reading the chronicle feels like revisiting the campaign rather
-than browsing a folder of summaries.
+than browsing a folder of summaries, and a completed adventure can become a
+book the group is proud to keep.
 
 ---
 
@@ -197,10 +207,11 @@ remaining equally readable and easy to use.
 
 ---
 
-## August 2027 · A creative local companion
+## August 2027 · A creative companion on your terms
 
-Optional local AI tools help with repetitive creative work without taking
-authorship away from the group.
+Optional AI tools help with repetitive creative work without taking authorship
+away from the group. Every workflow can remain manual, run privately on local
+models or use a remote provider chosen explicitly by the campaign owner.
 
 - Draft summaries generated from reviewed notes or transcripts.
 - Suggestions for connections between characters, clues and earlier sessions.
@@ -209,27 +220,42 @@ authorship away from the group.
 - Private campaign questions answered from the group's own archive.
 - Multiple writing tones that preserve the chosen narrator's voice.
 - A visible source trail showing which notes supported each suggestion.
+- Clear previews of what will leave the device before any remote AI request,
+  with per-task consent and no silent provider fallback.
 
 **Checkpoint:** AI saves preparation time while every published word remains a
-deliberate choice by the group.
+deliberate choice by the group, and every group controls where processing
+happens.
 
 ---
 
-## September 2027 · Portable, resilient and shareable
+## September 2027 · QuestKeeper goes everywhere
 
 A chronicle containing years of memories should feel safe and remain useful
-beyond one computer.
+beyond one computer. QuestKeeper also becomes a first-class mobile companion
+instead of merely a desktop page that happens to shrink.
 
+- Released Android and iOS apps for phones and tablets.
+- A purpose-designed portrait experience for phones: fast character access,
+  session catch-up, bookmarks, notes and reading without cramped desktop UI.
+- A purpose-designed landscape experience for tablets: split navigation,
+  readable character sheets, maps and a game-night dashboard suited to the
+  table.
+- Smooth hand-off between phone portrait, tablet landscape and desktop without
+  losing the current campaign, character or reading position.
 - Understandable backups with visible dates and contents.
 - Preview-before-restore and recovery from accidental changes.
 - Smooth upgrades from older QuestKeeper campaign formats.
 - Complete campaign transfer between computers and hosting providers.
-- Offline reading for saved characters, recaps and game-night material.
+- Offline reading for saved characters, recaps and game-night material on every
+  supported device.
 - Shareable original campaign structures, themes and templates.
 - A community showcase for legally redistributable examples and inspiration.
 
-**Checkpoint:** groups trust QuestKeeper with a long-running campaign because
-they can always understand, move and recover their archive.
+**Checkpoint:** players can rely on the released Android or iOS app at the
+table—whether they carry a portrait phone or a landscape tablet—and groups
+trust QuestKeeper because they can always understand, move and recover their
+archive.
 
 ---
 
@@ -246,6 +272,9 @@ The release is ready when:
 - player contributions are welcome without surrendering editorial control;
 - campaigns remain useful online, on mobile, in print and during limited connectivity;
 - backup, restoration and upgrades feel safe;
+- Android and iOS feel intentional on portrait phones and landscape tablets;
+- a finished campaign can become an editable, illustrated Campaign Book through
+  manual, semi-automatic, local-AI or opt-in remote-AI authoring;
 - the live demo honestly shows the complete journey before installation;
 - the project remains self-hosted, account-free and respectful of copyrighted work.
 

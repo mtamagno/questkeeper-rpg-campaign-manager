@@ -134,6 +134,56 @@ and private integrations never flow into the public template.
 **Revisit when:** The repositories adopt an automated, privacy-safe upstream
 and downstream release process with equivalent compatibility evidence.
 
+### QK-006 — Mobile releases are first-class QuestKeeper experiences
+
+**Date:** 18 October 2026
+
+**Status:** Active
+
+**Decision:** QuestKeeper will release on Android and iOS for both phones and
+tablets. Portrait phone and landscape tablet use are separate first-class
+layouts, not accidental adaptations of the desktop interface.
+
+**Why:** Players reach for different devices during preparation, at the table
+and while reading between sessions. A usable mobile release must respect those
+contexts instead of merely fitting within the viewport.
+
+**Consequences:** Shared navigation, offline, persistence, touch targets and
+content layouts must anticipate native packaging. Release validation will
+cover portrait phones and landscape tablets on both platforms while preserving
+the self-hosted, portable campaign model.
+
+**Source:** [QuestKeeper annual roadmap](../ROADMAP.md)
+
+**Revisit when:** Device testing or distribution constraints require a revised
+platform scope without weakening the two layout experiences.
+
+### QK-007 — A finished campaign can become an owned Campaign Book
+
+**Date:** 18 October 2026
+
+**Status:** Active
+
+**Decision:** At campaign closure, QuestKeeper will offer a Campaign Book
+studio with cover, chapters and supporting material. Groups can author it
+manually, semi-automatically, automatically with local AI or automatically with
+an explicitly chosen remote AI provider.
+
+**Why:** The lasting value of a completed campaign is its shared memory. The
+group should be able to turn that memory into an editable keepsake without
+surrendering authorship, privacy or control of the archive.
+
+**Consequences:** Session data, artwork and credits need book-ready provenance.
+Generated prose remains editable and requires approval. Remote processing is
+opt-in with a clear preview of shared data; local AI remains available; manual
+authoring never becomes a second-class path.
+
+**Source:** [QuestKeeper annual roadmap](../ROADMAP.md)
+
+**Revisit when:** Real completed campaigns reveal that the authoring modes,
+book structure or export formats do not support how groups preserve their
+stories.
+
 ## New decision template
 
 ### QK-XXX — Short decision title
