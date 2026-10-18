@@ -18,6 +18,16 @@
 
 <!-- Add screenshots for visual work and concise test notes for behavior. -->
 
+## Continuity and downstream impact
+
+<!-- Which prior decisions or acceptance journeys constrain this change? -->
+
+<!-- Which future tasks does this enable, constrain, reorder, split or remove? -->
+
+- [ ] Relevant completed artifacts and `docs/DECISION-LOG.md` were reviewed
+- [ ] Affected roadmap tasks and acceptance criteria were updated
+- [ ] New durable decisions were recorded or “No new durable decision” is stated
+
 ## Safety and continuity
 
 - [ ] No secrets, private transcripts or personal campaign data

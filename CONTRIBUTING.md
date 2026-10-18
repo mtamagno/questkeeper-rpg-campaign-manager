@@ -7,14 +7,17 @@ private by default and legally redistributable.
 ## Start here
 
 1. Read the [working agreement](docs/WORKING-AGREEMENT.md).
-2. For interface or illustration work, also read the
+2. Review the [decision log](docs/DECISION-LOG.md) and completed artifacts that
+   affect the task; a checked item remains project context.
+3. For interface or illustration work, also read the
    [design and art guide](docs/DESIGN-AND-ART-GUIDE.md).
-3. Create a focused branch, run `npm ci`, then install the lightweight Session
+4. Create a focused branch, run `npm ci`, then install the lightweight Session
    Scribe test dependencies with
    `python -m pip install -r discord-transcriber/requirements-test.txt`.
-4. Make the smallest complete change that creates a visible user benefit.
-5. Run `npm run verify` before opening a pull request.
-6. Use the pull request template and include screenshots for visual changes.
+5. Make the smallest complete change that creates a visible user benefit.
+6. Record how its outcome affects future work and update durable decisions.
+7. Run `npm run verify` before opening a pull request.
+8. Use the pull request template and include screenshots for visual changes.
 
 The [60-day delivery plan](docs/ROADMAP-60-DAYS.md) describes the current
 execution order. The [public roadmap](ROADMAP.md) describes the longer-term

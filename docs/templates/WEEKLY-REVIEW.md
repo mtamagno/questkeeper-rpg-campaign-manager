@@ -6,6 +6,15 @@
 
 **Related roadmap checkpoint:** _TBD_
 
+## Inherited context
+
+List completed work and active decisions that shape this week. A previous task
+remains relevant whenever its output changes scope, constraints or acceptance.
+
+| Artifact/decision | What it established | Effect on this week |
+| ----------------- | ------------------- | ------------------- |
+|                   |                     |                     |
+
 ## Last week in one minute
 
 - **Shipped:**
@@ -29,6 +38,12 @@
 | Decision | Evidence | Consequence | Revisit when |
 | -------- | -------- | ----------- | ------------ |
 |          |          |             |              |
+
+## Downstream effects of shipped work
+
+| Completed work | Future task or decision affected | Effect                                             | Required update |
+| -------------- | -------------------------------- | -------------------------------------------------- | --------------- |
+|                |                                  | Enables / constrains / reorders / splits / removes |                 |
 
 ## This week's commitment
 
@@ -60,6 +75,7 @@ more important than filling the list.
 - **Removed:**
 - **Reordered:**
 - **Why:**
+- **Prior assumptions confirmed or invalidated:**
 
 ## End-of-week closeout
 
@@ -67,6 +83,8 @@ more important than filling the list.
 - [ ] Ran `npm run verify` successfully.
 - [ ] Reviewed live deployment and primary demo links.
 - [ ] Updated completed items in `docs/ROADMAP-60-DAYS.md`.
+- [ ] Reviewed every affected future task against this week's evidence.
+- [ ] Updated `docs/DECISION-LOG.md` for durable cross-task decisions.
 - [ ] Updated `ROADMAP.md` only if a public checkpoint materially changed.
 - [ ] Carried, reduced or removed every unfinished item deliberately.
 - [ ] Recorded the next weekly outcome.

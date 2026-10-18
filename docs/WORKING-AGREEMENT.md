@@ -26,10 +26,37 @@ action, but must never obscure it.
 | Sixty days | [`ROADMAP-60-DAYS.md`](ROADMAP-60-DAYS.md) | Delivery sequence and two daily commits |
 | One week   | Weekly review                              | Seven-day commitment and risks          |
 | One change | Issue or pull request                      | Acceptance criteria and proof           |
+| Continuous | [`DECISION-LOG.md`](DECISION-LOG.md)       | Durable reasoning and constraints       |
 
 The roadmap is a direction, not a promise to preserve an outdated order. A
 weekly review may reorder future work when user evidence, risk or dependency
 changes justify it. Never silently rewrite completed history.
+
+### Continuity rule: completed does not mean forgotten
+
+A task is a chapter in the project, not a disposable instruction. Its output,
+evidence and decisions remain active context for future planning and work.
+
+Before starting a task:
+
+1. read the relevant completed roadmap artifacts and
+   [decision log](DECISION-LOG.md);
+2. identify which existing goals, journeys, schemas, design rules and decisions
+   constrain the work;
+3. check whether earlier evidence changes the task's scope, priority or
+   acceptance criteria.
+
+Before closing a task:
+
+1. update the authoritative artifact rather than leaving knowledge only in a
+   commit message or conversation;
+2. record durable cross-task decisions in the decision log;
+3. state which future tasks are enabled, constrained, reordered, split or made
+   unnecessary;
+4. update affected acceptance criteria, roadmap links and weekly review notes.
+
+Avoid duplicating requirements into several documents. Keep one source of truth
+and link to it, so future work inherits the decision without creating drift.
 
 ## 3. Weekly operating rhythm
 
@@ -37,8 +64,8 @@ changes justify it. Never silently rewrite completed history.
 
 1. Copy [`templates/WEEKLY-REVIEW.md`](templates/WEEKLY-REVIEW.md) into a new
    dated issue or project note.
-2. Review the live Companion, open feedback, failed workflows and unfinished
-   work from the previous week.
+2. Review the live Companion, the decision log, completed artifacts, open
+   feedback, failed workflows and unfinished work from the previous week.
 3. Select one player-facing weekly outcome and up to fourteen candidate atomic
    commits from the 60-day plan.
 4. Mark dependencies, risky migrations and work needing visual review.
@@ -60,9 +87,12 @@ changes justify it. Never silently rewrite completed history.
 2. Compare planned versus shipped outcomes, not raw commit count.
 3. Check CI, accessibility, mobile layout, demo paths and known regressions.
 4. Capture user feedback, decisions, metrics and unfinished work.
-5. Update the 60-day plan checkboxes and only change the annual roadmap when a
+5. Audit how shipped work changes the assumptions, dependencies and acceptance
+   criteria of every affected future task.
+6. Update the decision log and link each durable choice to its source.
+7. Update the 60-day plan checkboxes and only change the annual roadmap when a
    user-visible checkpoint has materially changed.
-6. Carry work forward deliberately, reduce it, or remove it; never let it
+8. Carry work forward deliberately, reduce it, or remove it; never let it
    remain ambiguous.
 
 ## 4. Definition of Ready
@@ -70,6 +100,7 @@ changes justify it. Never silently rewrite completed history.
 A change is ready to begin when:
 
 - the user and problem are identifiable;
+- relevant prior artifacts and active decisions have been reviewed;
 - the desired outcome can be demonstrated;
 - scope and explicit non-goals are clear;
 - affected data, privacy, accessibility and copyright risks are known;
@@ -93,6 +124,10 @@ A change is done only when all relevant statements are true:
   added;
 - a visual change includes before/after or final screenshots in its pull request;
 - the commit and pull request explain user impact, not merely filenames.
+- downstream effects on planned work are recorded and affected tasks are
+  reviewed, not assumed unchanged;
+- durable decisions and their authoritative sources are added to the decision
+  log when relevant.
 
 ## 6. Code structure and ownership
 
@@ -196,6 +231,8 @@ Every pull request must state:
 - accessibility, privacy and content-license impact;
 - screenshots for visual changes;
 - migration or rollback notes when data can change.
+- inherited decisions and acceptance journeys affected;
+- downstream tasks enabled, constrained, reordered or made unnecessary.
 
 Review the behavior first, then data safety, accessibility, tests, architecture
 and style. Prefer concrete examples over taste-based comments.
@@ -236,9 +273,14 @@ licenses, privacy, consistency and accessibility.
 - Generated campaign prose must not invent player choices and generated recaps
   must distinguish table facts from interpretation.
 
-## 13. Decisions and exceptions
+## 13. Decisions, memory and exceptions
+
+The [decision log](DECISION-LOG.md) preserves choices whose effect outlives one
+task. Each entry records the reason, consequences, source and revisit trigger.
+If evidence changes a decision, supersede it explicitly instead of erasing the
+old reasoning.
 
 An exception is acceptable when it produces a safer or clearer outcome than
-the default rule. Record the reason, affected scope, owner and removal condition
-in the pull request or weekly review. Repeated exceptions signal that this
-agreement should be revised during the next weekly review.
+the default rule. Record the reason, affected scope, owner, downstream impact
+and removal condition in the pull request or weekly review. Repeated exceptions
+signal that this agreement should be revised during the next weekly review.
