@@ -134,6 +134,68 @@ body::before {
   background: #69c185;
   box-shadow: 0 0 12px #69c185;
 }
+.ui-language {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: center;
+  margin: -0.6rem 0 1.3rem;
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+.ui-language select {
+  min-width: 108px;
+  padding: 0.45rem 1.8rem 0.45rem 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  background: var(--surface-2);
+  font: inherit;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.guided-setup {
+  grid-column: 1 / -1;
+}
+.guided-setup ol {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 20px 0 14px;
+  padding: 0;
+  counter-reset: setup-step;
+  list-style: none;
+}
+.guided-setup li {
+  position: relative;
+  min-height: 94px;
+  padding: 16px 16px 16px 54px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.025);
+  counter-increment: setup-step;
+}
+.guided-setup li::before {
+  content: counter(setup-step);
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--gold);
+  border-radius: 50%;
+  color: var(--gold-bright);
+  font-weight: 800;
+}
+.guided-setup > small {
+  display: block;
+  color: #86c997;
+}
 .sidebar__heading {
   display: flex;
   justify-content: space-between;
@@ -1094,6 +1156,9 @@ code {
 }
 
 @media (max-width: 900px) {
+  .guided-setup ol {
+    grid-template-columns: 1fr;
+  }
   .shell {
     grid-template-columns: 1fr;
   }

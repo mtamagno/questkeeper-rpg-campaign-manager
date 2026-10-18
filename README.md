@@ -224,6 +224,8 @@ available.
 
 ![Permanent AI provider and model library with separate prose and image controls](docs/images/campaign-manager-ai-models.jpg)
 
+![Italian interface showing the three-step guided AI setup](docs/images/campaign-manager-ai-setup-it.jpg)
+
 ![Character editor offering a reviewable AI import from sheet images or a shared URL](docs/images/campaign-manager-ai-import.jpg)
 
 Read the [AI setup and privacy guide](docs/AI-SETUP.md).
@@ -290,9 +292,12 @@ the author. The selector displays native language names when supported by the
 browser, remembers each visitor's choice and falls back to English—or the first
 available translation—when a field is incomplete.
 
-The built-in interface currently has polished English and Italian copy. Other
-selected languages receive the English interface with fully localized campaign
-content, keeping every archive usable while additional UI catalogs are added.
+The published Companion and the local Campaign Manager have polished English
+and Italian interface copy. The Manager detects the browser language, exposes
+an always-visible **Interface** selector and remembers the choice. Campaign
+content remains independent: other selected languages receive the English
+interface with fully localized campaign text while additional UI catalogs are
+added.
 
 <p align="center">◆ ───────────── ✦ ───────────── ◆</p>
 

@@ -12,6 +12,11 @@ is not a one-time wizard: **AI setup** remains in the sidebar as the permanent
 provider and model library, so API keys, local endpoints and models can be
 added or changed later.
 
+Use the **Interface** selector in the Manager sidebar to switch instantly
+between English and Italian. The choice is saved in the browser and is applied
+to the guided steps, provider explanations, sheet import and publishing
+controls. It does not change the languages of the campaign being edited.
+
 The installer reports the detected processor, logical CPU cores, RAM and—when
 the operating system exposes it—graphics memory. It then recommends a prose
 model and explains whether local image generation looks practical. A

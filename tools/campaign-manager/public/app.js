@@ -1118,6 +1118,7 @@ function renderAiSetup() {
     : 'No dedicated GPU memory detected';
   content.innerHTML = `
     <form id="ai-setup-form" class="ai-setup">
+      <section class="project-panel guided-setup"><span class="eyebrow">Guided setup · about five minutes</span><h2>Three choices, always editable</h2><ol><li>Choose manual, local or remote creation.</li><li>Register or discover the models available to each provider.</li><li>Save the defaults; every session can still choose different models.</li></ol><small>Nothing is downloaded, uploaded or billed until you explicitly start that action.</small></section>
       <section class="ai-hero"><div class="ai-hero__sigil" aria-hidden="true">✧</div><div><span class="eyebrow">${config.setupComplete ? 'Permanent provider & model library' : 'Interactive first-run guide'}</span><h2>Your table, your choice of intelligence</h2><p>Keep everything local, connect a remote API, or leave AI off. Return here whenever you want to add a key, discover a newly installed model or change the defaults.</p></div></section>
       <section class="hardware-strip"><div><span>Processor</span><strong>${escapeHtml(hardware.cpu)}</strong><small>${hardware.logicalCores} logical cores</small></div><div><span>Memory</span><strong>${hardware.ramGb} GB RAM</strong><small>${hardware.freeRamGb} GB currently free</small></div><div><span>Graphics</span><strong>${escapeHtml(gpuText)}</strong><small>${escapeHtml(recommendations.imageReason)}</small></div></section>
       <div class="choice-grid ai-provider-grid">

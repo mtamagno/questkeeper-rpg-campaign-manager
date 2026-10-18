@@ -297,6 +297,32 @@ same draft-and-review contract.
 **Revisit when:** A provider-independent browser connector or structured VTT
 export format can supply stronger source attribution.
 
+### QK-012 — Every Manager workflow ships in English and Italian
+
+**Date:** 19 October 2026
+
+**Status:** Active
+
+**Decision:** The local Campaign Manager exposes an always-visible English /
+Italian interface selector, detects the browser language on first use and
+remembers the choice. New Manager screens and guidance must add both languages
+in the same delivery. Campaign-content languages remain an independent choice.
+
+**Why:** Installation, AI consent and publishing are the moments in which
+unclear copy creates the greatest risk. A translated README is not enough when
+the actual controls still require technical English.
+
+**Consequences:** Every future Manager feature must include translated labels,
+help text, warnings, empty states and action feedback. Automated checks protect
+the catalog and script order; Chrome review covers language switching and the
+critical guided journeys. Switching the interface must never rewrite campaign
+content or provider configuration.
+
+**Source:** [AI setup guide](AI-SETUP.md#open-the-interactive-installer)
+
+**Revisit when:** A third complete Manager interface catalog is ready or the
+project adopts a framework-level internationalization system.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD
