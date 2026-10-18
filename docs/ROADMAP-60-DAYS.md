@@ -90,10 +90,13 @@ never a reason to split broken work or bypass `npm run verify`.
 
 ## Week 7 — Session Scribe and local creative AI
 
-The October foundation already supplies hardware-aware provider setup,
-user-approved Ollama/ComfyUI downloads and typed-notes-to-session drafts. Week
-7 therefore builds on that shipped path: it improves evidence, correction and
-multi-source review rather than introducing a second AI workflow.
+The October foundation already supplies a permanent provider/model catalog,
+local-model discovery, independent prose/prompt/image engine selection,
+scene-aware typed-notes-to-session drafts and reviewable character/NPC imports
+from sheet images or public/shared Roll20 print views. It also provides direct
+FTPS publishing after a clean production build. Week 7 therefore builds on
+that shipped path: it improves evidence, correction and multi-source review
+rather than introducing a second AI workflow.
 
 | Day         | Commit 1                                                          | Commit 2                                                                     |
 | ----------- | ----------------------------------------------------------------- | ---------------------------------------------------------------------------- |

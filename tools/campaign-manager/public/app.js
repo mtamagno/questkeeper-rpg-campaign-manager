@@ -82,6 +82,7 @@ async function loadState({ selectFirst = false } = {}) {
     transcriber: result.transcriber,
     jobs: result.jobs,
     ai: result.ai,
+    publishing: result.publishing,
   };
   if (selectFirst && !state.selectedId && result.campaigns.length) {
     state.selectedId = result.campaigns[0].id;
@@ -320,6 +321,74 @@ function localizedFields(prefix, label, value, languages, options = {}) {
   );
 }
 
+function engineValue(provider, model) {
+  return `${provider}::${model}`;
+}
+
+function parseEngineValue(value) {
+  const separator = String(value || '').indexOf('::');
+  if (separator < 1) return null;
+  return { provider: value.slice(0, separator), model: value.slice(separator + 2) };
+}
+
+function engineChoices(kind) {
+  const config = state.project.ai?.config;
+  if (!config) return [];
+  if (kind === 'text') {
+    return [
+      ...(config.text.ollamaModels ?? []).map((model) => ({
+        value: engineValue('ollama', model),
+        label: `Local · Ollama · ${model}`,
+      })),
+      ...(config.text.openaiKeyConfigured ? config.text.openaiModels : []).map((model) => ({
+        value: engineValue('openai', model),
+        label: `Remote · OpenAI · ${model}`,
+      })),
+    ];
+  }
+  return [
+    ...(config.image.comfyCheckpoints ?? []).map((model) => ({
+      value: engineValue('comfyui', model),
+      label: `Local · ComfyUI · ${model}`,
+    })),
+    ...(config.text.openaiKeyConfigured ? config.image.openaiModels : []).map((model) => ({
+      value: engineValue('openai', model),
+      label: `Remote · OpenAI · ${model}`,
+    })),
+  ];
+}
+
+function defaultEngineValue(kind) {
+  const config = state.project.ai?.config;
+  if (!config) return '';
+  const provider = kind === 'text' ? config.text.provider : config.image.provider;
+  if (provider === 'off') {
+    return kind === 'text'
+      ? engineValue('ollama', config.text.ollamaModel)
+      : engineValue('comfyui', config.image.comfyCheckpoint);
+  }
+  const model =
+    kind === 'text'
+      ? provider === 'ollama'
+        ? config.text.ollamaModel
+        : config.text.openaiModel
+      : provider === 'comfyui'
+        ? config.image.comfyCheckpoint
+        : config.image.openaiModel;
+  return engineValue(provider, model);
+}
+
+function engineSelect(name, label, kind, hint) {
+  const choices = engineChoices(kind);
+  const selected = defaultEngineValue(kind);
+  return `<label class="field"><span>${escapeHtml(label)}</span><select name="${name}">${choices.length ? choices.map((item) => `<option value="${escapeHtml(item.value)}" ${item.value === selected ? 'selected' : ''}>${escapeHtml(item.label)}</option>`).join('') : '<option value="">Configure a model first</option>'}</select><small>${escapeHtml(hint)}</small></label>`;
+}
+
+function entityAiImportPanel(type, languages) {
+  const label = type === 'characters' ? 'player character' : 'NPC';
+  return `<div class="ai-compose entity-ai-import field--wide"><div><strong>Import this ${label} with AI</strong><small>Use photos or screenshots of a sheet, or a public/shared Roll20 print-view URL. Every extracted field stays editable.</small></div><div class="ai-source-grid">${engineSelect('entityEngine', 'Extraction model', 'text', 'Vision support is required for sheet images. Browser-capable remote models can inspect public URLs.')}<label class="field"><span>Draft language</span><select name="entityLanguage">${languages.map((language) => `<option value="${escapeHtml(language)}">${escapeHtml(languageName(language))} (${escapeHtml(language)})</option>`).join('')}</select></label><label class="field field--wide"><span>Sheet photos or screenshots</span><input name="aiSourceImages" type="file" accept="image/png,image/jpeg,image/webp" multiple /><small>Up to four images. Private/authenticated Roll20 sheets should be imported this way.</small></label><label class="field field--wide"><span>Public Roll20 print view or source URL</span><input name="aiSourceUrl" type="url" placeholder="https://app.roll20.net/…" /><small>Optional. Signed-in pages cannot be read remotely; use screenshots instead.</small></label></div><label class="consent-check"><input name="entityRemoteConsent" type="checkbox" /> I consent to sending these sources to the selected engine when it is labelled <strong>Remote</strong>.</label><div class="action-row"><button class="primary-button" type="button" data-ai-entity="${type}">Extract editable draft</button></div><div class="ai-review" data-ai-entity-review hidden></div></div>`;
+}
+
 function openDialog({ title, eyebrow, html, editor }) {
   document.querySelector('#dialog-title').textContent = title;
   document.querySelector('#dialog-eyebrow').textContent = eyebrow;
@@ -413,6 +482,7 @@ function entityForm(type, item = {}) {
   if (type === 'characters') {
     return [
       ...common,
+      entityAiImportPanel(type, languages),
       field('name', 'Name', item.name, { required: true }),
       field('playerName', 'Player', item.playerName),
       ...localizedFields('sex', 'Gender', item.sex, languages),
@@ -426,6 +496,57 @@ function entityForm(type, item = {}) {
       field('race', 'Species / ancestry', item.sheet?.race),
       field('background', 'Background', item.sheet?.background),
       field('alignment', 'Alignment / outlook', item.sheet?.alignment),
+      field('hitPoints', 'Current hit points', item.sheet?.hitPoints ?? 10, {
+        type: 'number',
+        min: 0,
+      }),
+      field('maxHitPoints', 'Maximum hit points', item.sheet?.maxHitPoints ?? 10, {
+        type: 'number',
+        min: 1,
+      }),
+      field('armorClass', 'Armor class', item.sheet?.armorClass ?? 10, {
+        type: 'number',
+        min: 0,
+      }),
+      field('speed', 'Speed', item.sheet?.speed ?? 30, { type: 'number', min: 0 }),
+      field('proficiencyBonus', 'Proficiency bonus', item.sheet?.proficiencyBonus ?? 2, {
+        type: 'number',
+        min: 0,
+      }),
+      ...['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'].map(
+        (ability) =>
+          field(
+            `ability__${ability}`,
+            ability.charAt(0).toUpperCase() + ability.slice(1),
+            item.sheet?.abilityScores?.[ability] ?? 10,
+            { type: 'number', min: 1 },
+          ),
+      ),
+      field(
+        'savingThrows',
+        'Saving throw proficiencies',
+        (item.sheet?.savingThrows ?? []).join('\n'),
+        {
+          type: 'textarea',
+          hint: 'One per line.',
+        },
+      ),
+      field('skills', 'Skill proficiencies', (item.sheet?.skills ?? []).join('\n'), {
+        type: 'textarea',
+        hint: 'One per line.',
+      }),
+      field('languages', 'Languages', (item.sheet?.languages ?? []).join('\n'), {
+        type: 'textarea',
+        hint: 'One per line.',
+      }),
+      field('equipment', 'Equipment', (item.sheet?.equipment ?? []).join('\n'), {
+        type: 'textarea',
+        hint: 'One item per line.',
+      }),
+      field('features', 'Features and traits', (item.sheet?.features ?? []).join('\n'), {
+        type: 'textarea',
+        hint: 'One per line.',
+      }),
       field('password', 'Spoiler password', item.password ?? 'cambiami', {
         hint: 'Discourages casual spoilers; this is not encryption.',
       }),
@@ -478,6 +599,7 @@ function entityForm(type, item = {}) {
   if (type === 'npcs') {
     return [
       ...common,
+      entityAiImportPanel(type, languages),
       field('name', 'Name', item.name, { required: true }),
       field('title', 'Title', item.title),
       field('category', 'Group / location', item.category),
@@ -506,8 +628,6 @@ function entityForm(type, item = {}) {
     ].join('');
   }
   if (type === 'sessions') {
-    const remoteText = state.project.ai?.config?.text?.provider === 'openai';
-    const remoteImage = state.project.ai?.config?.image?.provider === 'openai';
     return [
       ...common,
       field(
@@ -536,7 +656,7 @@ function entityForm(type, item = {}) {
           hint: 'The chosen translation is populated; the others remain available for review or later translation.',
         },
       ),
-      `<div class="ai-compose field--wide"><div><strong>Turn notes into a reviewable draft</strong><small>${escapeHtml(state.project.ai?.config?.text?.provider === 'off' ? 'Choose a prose provider in AI setup first.' : `Using ${state.project.ai?.config?.text?.provider}. Nothing is saved until you review and choose Save.`)}</small></div><div class="action-row"><button class="secondary-button" type="button" data-ai-notes="text">Process notes</button><button class="primary-button" type="button" data-ai-notes="images">Process notes with images</button></div>${remoteText || remoteImage ? '<label class="consent-check"><input name="remoteConsent" type="checkbox" /> I understand that this task sends the notes to the configured remote provider.</label>' : ''}<div class="ai-review" data-ai-review hidden></div></div>`,
+      `<div class="ai-compose field--wide"><div><strong>Turn notes into a reviewable draft</strong><small>Choose the engine for each job. Nothing is saved until you review and choose Save.</small></div><div class="ai-engine-grid">${engineSelect('proseEngine', 'Prose writer', 'text', 'Turns raw notes into the editable chronicle.')}${engineSelect('imagePromptEngine', 'Visual prompt writer', 'text', 'Plans what to illustrate and where it belongs.')}${engineSelect('imageEngine', 'Image renderer', 'image', 'Renders the approved visual prompts.')}</div><div class="action-row"><button class="secondary-button" type="button" data-ai-notes="text">Process notes</button><button class="primary-button" type="button" data-ai-notes="images">Process notes with images</button></div><label class="consent-check"><input name="remoteConsent" type="checkbox" /> I consent to sending these notes to any selected engine labelled <strong>Remote</strong>. Local-only tasks do not require this.</label><div class="ai-review" data-ai-review hidden></div></div>`,
       section('Review and edit the draft'),
       ...localizedFields('title', 'Title', item.title, languages, { required: true }),
       ...localizedFields('location', 'Location', item.location, languages),
@@ -622,6 +742,15 @@ async function uploadSelectedImage(inputName, category) {
   return api(`/api/campaigns/${encodeURIComponent(state.selectedId)}/images`, {
     method: 'POST',
     body: JSON.stringify({ category, fileName: file.name, dataUrl }),
+  });
+}
+
+function fileDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
   });
 }
 
@@ -820,6 +949,27 @@ async function buildEntity(type, form, original = {}) {
       race: form.get('race').toString(),
       background: form.get('background').toString(),
       alignment: form.get('alignment').toString(),
+      hitPoints: Number(form.get('hitPoints')) || 0,
+      maxHitPoints: Number(form.get('maxHitPoints')) || 1,
+      armorClass: Number(form.get('armorClass')) || 0,
+      speed: Number(form.get('speed')) || 0,
+      proficiencyBonus: Number(form.get('proficiencyBonus')) || 0,
+      abilityScores: Object.fromEntries(
+        ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'].map(
+          (ability) => [ability, Number(form.get(`ability__${ability}`)) || 10],
+        ),
+      ),
+      ...Object.fromEntries(
+        ['savingThrows', 'skills', 'languages', 'equipment', 'features'].map((key) => [
+          key,
+          form
+            .get(key)
+            .toString()
+            .split('\n')
+            .map((value) => value.trim())
+            .filter(Boolean),
+        ]),
+      ),
     };
     return item;
   }
@@ -880,6 +1030,11 @@ async function buildEntity(type, form, original = {}) {
       ]),
     );
     const eventCount = Math.max(0, ...Object.values(events).map((entries) => entries.length));
+    const placementLanguage = form.get('aiLanguage')?.toString() || languages[0];
+    const sceneCount = Math.max(
+      1,
+      splitProseScenes(form.get(`loc__prose__${placementLanguage}`)?.toString()).length,
+    );
     return {
       ...original,
       id,
@@ -901,7 +1056,7 @@ async function buildEntity(type, form, original = {}) {
           url: image.path,
           alt: Object.fromEntries(languages.map((language) => [language, image.alt])),
           caption: Object.fromEntries(languages.map((language) => [language, image.caption])),
-          afterSection: image.afterSection,
+          afterSection: Math.min(sceneCount - 1, Math.max(0, Number(image.afterSection) || 0)),
         })),
       ],
     };
@@ -935,6 +1090,15 @@ function optionList(items, selected) {
     .join('');
 }
 
+function modelNameOptions(items, selected) {
+  return [...new Set(items ?? [])]
+    .map(
+      (item) =>
+        `<option value="${escapeHtml(item)}" ${item === selected ? 'selected' : ''}>${escapeHtml(item)}</option>`,
+    )
+    .join('');
+}
+
 function renderAiSetup() {
   document.querySelector('#page-title').textContent = 'AI setup';
   const ai = state.project.ai;
@@ -954,37 +1118,43 @@ function renderAiSetup() {
     : 'No dedicated GPU memory detected';
   content.innerHTML = `
     <form id="ai-setup-form" class="ai-setup">
-      <section class="ai-hero"><div class="ai-hero__sigil" aria-hidden="true">✧</div><div><span class="eyebrow">Interactive first-run guide</span><h2>Your table, your choice of intelligence</h2><p>Keep everything local, connect a remote API, or leave AI off. Recommendations use this computer's detected resources; you remain in control of every download and every draft.</p></div></section>
+      <section class="ai-hero"><div class="ai-hero__sigil" aria-hidden="true">✧</div><div><span class="eyebrow">${config.setupComplete ? 'Permanent provider & model library' : 'Interactive first-run guide'}</span><h2>Your table, your choice of intelligence</h2><p>Keep everything local, connect a remote API, or leave AI off. Return here whenever you want to add a key, discover a newly installed model or change the defaults.</p></div></section>
       <section class="hardware-strip"><div><span>Processor</span><strong>${escapeHtml(hardware.cpu)}</strong><small>${hardware.logicalCores} logical cores</small></div><div><span>Memory</span><strong>${hardware.ramGb} GB RAM</strong><small>${hardware.freeRamGb} GB currently free</small></div><div><span>Graphics</span><strong>${escapeHtml(gpuText)}</strong><small>${escapeHtml(recommendations.imageReason)}</small></div></section>
       <div class="choice-grid ai-provider-grid">
-        <section class="project-panel"><span class="eyebrow">The chronicler · prose</span><h3>How should notes become chapters?</h3><label class="field"><span>Provider</span><select name="textProvider"><option value="off" ${config.text.provider === 'off' ? 'selected' : ''}>Off · write manually</option><option value="ollama" ${config.text.provider === 'ollama' ? 'selected' : ''}>Local · Ollama</option><option value="openai" ${config.text.provider === 'openai' ? 'selected' : ''}>Remote · OpenAI API</option></select></label><label class="field"><span>Recommended local model</span><select name="ollamaModel">${optionList(models.text, config.setupComplete ? config.text.ollamaModel : recommendations.textModelId)}</select><small>Suggested for this machine: ${escapeHtml(recommendations.textModelId)}. You can choose another.</small></label><label class="field"><span>Ollama address</span><input name="ollamaUrl" value="${escapeHtml(config.text.ollamaUrl)}" /></label><div class="provider-help"><a href="https://ollama.com/download" target="_blank" rel="noreferrer">Install Ollama first ↗</a><span>Then return here to download the selected model.</span></div><div class="action-row"><button class="secondary-button" type="button" data-ai-action="download-text">Download selected model</button><button class="secondary-button" type="button" data-ai-action="test-text">Test prose provider</button></div><hr /><label class="field"><span>OpenAI model</span><input name="openaiTextModel" value="${escapeHtml(config.text.openaiModel)}" /></label><label class="field"><span>OpenAI API key</span><input name="openaiApiKey" type="password" autocomplete="off" placeholder="${config.text.openaiKeyConfigured ? 'Saved locally · leave blank to keep it' : 'sk-…'}" /></label></section>
-        <section class="project-panel"><span class="eyebrow">The illustrator · images</span><h3>How should scenes be illustrated?</h3><label class="field"><span>Provider</span><select name="imageProvider"><option value="off" ${config.image.provider === 'off' ? 'selected' : ''}>Off · add images manually</option><option value="comfyui" ${config.image.provider === 'comfyui' ? 'selected' : ''}>Local · ComfyUI</option><option value="openai" ${config.image.provider === 'openai' ? 'selected' : ''}>Remote · OpenAI Images</option></select></label><div class="recommendation ${recommendations.localImageRecommended ? 'is-good' : 'is-caution'}"><strong>${recommendations.localImageRecommended ? 'Local generation looks viable' : 'Remote or manual art recommended'}</strong><span>${escapeHtml(recommendations.imageReason)}</span></div><label class="field"><span>ComfyUI address</span><input name="comfyUrl" value="${escapeHtml(config.image.comfyUrl)}" /></label><label class="field"><span>ComfyUI installation folder</span><input name="comfyRoot" value="${escapeHtml(config.image.comfyRoot)}" placeholder="C:\\ComfyUI" /><small>The folder must contain models/checkpoints.</small></label><div class="provider-help"><a href="https://docs.comfy.org/installation/desktop" target="_blank" rel="noreferrer">Install ComfyUI first ↗</a><span>Keep it running while QuestKeeper illustrates a session.</span></div><label class="field"><span>Checkpoint</span><select name="imageModel">${optionList(models.image, recommendations.imageModelId)}</select></label><label class="consent-check"><input name="licenseAccepted" type="checkbox" /> I reviewed and accept the <a href="${escapeHtml(selectedImageModel.licenseUrl)}" target="_blank" rel="noreferrer">${escapeHtml(selectedImageModel.license)}</a>.</label><div class="action-row"><button class="secondary-button" type="button" data-ai-action="download-image">Download checkpoint</button><button class="secondary-button" type="button" data-ai-action="test-image">Test image provider</button></div><hr /><label class="field"><span>OpenAI image model</span><input name="openaiImageModel" value="${escapeHtml(config.image.openaiModel)}" /></label></section>
+        <section class="project-panel"><span class="eyebrow">The chronicler · prose & prompts</span><h3>Manage text engines</h3><label class="field"><span>Default provider</span><select name="textProvider"><option value="off" ${config.text.provider === 'off' ? 'selected' : ''}>Off · write manually</option><option value="ollama" ${config.text.provider === 'ollama' ? 'selected' : ''}>Local · Ollama</option><option value="openai" ${config.text.provider === 'openai' ? 'selected' : ''}>Remote · OpenAI API</option></select></label><label class="field"><span>Default Ollama model</span><select name="ollamaModel">${modelNameOptions(config.text.ollamaModels, config.setupComplete ? config.text.ollamaModel : recommendations.textModelId)}</select><small>Suggested for this machine: ${escapeHtml(recommendations.textModelId)}.</small></label><label class="field"><span>Ollama model catalog</span><textarea name="ollamaModels">${escapeHtml(config.text.ollamaModels.join('\n'))}</textarea><small>One model per line. You can add any model supported by your Ollama installation.</small></label><label class="field"><span>Ollama address</span><input name="ollamaUrl" value="${escapeHtml(config.text.ollamaUrl)}" /></label><div class="provider-help"><a href="https://ollama.com/download" target="_blank" rel="noreferrer">Install Ollama first ↗</a><span>Discover installed models or download the selected default.</span></div><div class="action-row"><button class="secondary-button" type="button" data-ai-action="discover-text">Discover installed</button><button class="secondary-button" type="button" data-ai-action="download-text">Download default</button><button class="secondary-button" type="button" data-ai-action="test-text">Test provider</button></div><hr /><label class="field"><span>Default OpenAI text model</span><select name="openaiTextModel">${modelNameOptions(config.text.openaiModels, config.text.openaiModel)}</select></label><label class="field"><span>OpenAI text-model catalog</span><textarea name="openaiTextModels">${escapeHtml(config.text.openaiModels.join('\n'))}</textarea><small>One model ID per line. These models become selectable per session.</small></label><label class="field"><span>OpenAI API key</span><input name="openaiApiKey" type="password" autocomplete="off" placeholder="${config.text.openaiKeyConfigured ? 'Saved locally · leave blank to keep it' : 'sk-…'}" /></label></section>
+        <section class="project-panel"><span class="eyebrow">The illustrator · images</span><h3>Manage image engines</h3><label class="field"><span>Default provider</span><select name="imageProvider"><option value="off" ${config.image.provider === 'off' ? 'selected' : ''}>Off · add images manually</option><option value="comfyui" ${config.image.provider === 'comfyui' ? 'selected' : ''}>Local · ComfyUI</option><option value="openai" ${config.image.provider === 'openai' ? 'selected' : ''}>Remote · OpenAI Images</option></select></label><div class="recommendation ${recommendations.localImageRecommended ? 'is-good' : 'is-caution'}"><strong>${recommendations.localImageRecommended ? 'Local generation looks viable' : 'Remote or manual art recommended'}</strong><span>${escapeHtml(recommendations.imageReason)}</span></div><label class="field"><span>ComfyUI address</span><input name="comfyUrl" value="${escapeHtml(config.image.comfyUrl)}" /></label><label class="field"><span>ComfyUI installation folder</span><input name="comfyRoot" value="${escapeHtml(config.image.comfyRoot)}" placeholder="C:\\ComfyUI" /><small>The folder must contain models/checkpoints.</small></label><label class="field"><span>Default ComfyUI checkpoint</span><select name="comfyCheckpoint">${modelNameOptions(config.image.comfyCheckpoints, config.image.comfyCheckpoint)}</select></label><label class="field"><span>ComfyUI checkpoint catalog</span><textarea name="comfyCheckpoints">${escapeHtml(config.image.comfyCheckpoints.join('\n'))}</textarea><small>Discover from a running ComfyUI instance or add a filename manually.</small></label><div class="provider-help"><a href="https://docs.comfy.org/installation/desktop" target="_blank" rel="noreferrer">Install ComfyUI first ↗</a><span>Keep it running while QuestKeeper illustrates a session.</span></div><div class="action-row"><button class="secondary-button" type="button" data-ai-action="discover-image">Discover installed</button><button class="secondary-button" type="button" data-ai-action="test-image">Test provider</button></div><hr /><label class="field"><span>Recommended checkpoint download</span><select name="imageModel">${optionList(models.image, recommendations.imageModelId)}</select></label><label class="consent-check"><input name="licenseAccepted" type="checkbox" /> I reviewed and accept the <a href="${escapeHtml(selectedImageModel.licenseUrl)}" target="_blank" rel="noreferrer">${escapeHtml(selectedImageModel.license)}</a>.</label><button class="secondary-button" type="button" data-ai-action="download-image">Download recommended checkpoint</button><hr /><label class="field"><span>Default OpenAI image model</span><select name="openaiImageModel">${modelNameOptions(config.image.openaiModels, config.image.openaiModel)}</select></label><label class="field"><span>OpenAI image-model catalog</span><textarea name="openaiImageModels">${escapeHtml(config.image.openaiModels.join('\n'))}</textarea><small>One model ID per line. The selected ID is sent on each image request.</small></label></section>
       </div>
       <section class="privacy-panel"><strong>No silent cloud fallback.</strong><p>Local endpoints are restricted to this computer. API keys stay in the ignored <code>.campaign-manager/</code> folder and are never returned to the browser. Before a remote task, the Manager asks for consent again.</p></section>
-      <div class="setup-footer"><button class="primary-button" type="submit">Save choices and continue</button><span>All generated content opens as an editable draft.</span></div>
+      <div class="setup-footer"><button class="primary-button" type="submit">${config.setupComplete ? 'Save provider & model library' : 'Save choices and continue'}</button><span>All generated content opens as an editable draft.</span></div>
       ${activeLog ? `<pre class="job-log">${escapeHtml(activeLog.logs)}</pre>` : ''}
     </form>`;
 }
 
 function aiSetupPayload(form, complete = true) {
-  const imageModel = state.project.ai.models.image.find(
-    (model) => model.id === form.get('imageModel'),
-  );
+  const lines = (name) =>
+    String(form.get(name) || '')
+      .split(/[\n,]/)
+      .map((item) => item.trim())
+      .filter(Boolean);
   return {
     setupComplete: complete,
     text: {
       provider: form.get('textProvider'),
       ollamaUrl: form.get('ollamaUrl'),
       ollamaModel: form.get('ollamaModel'),
+      ollamaModels: lines('ollamaModels'),
       openaiModel: form.get('openaiTextModel'),
+      openaiModels: lines('openaiTextModels'),
       openaiApiKey: form.get('openaiApiKey'),
     },
     image: {
       provider: form.get('imageProvider'),
       comfyUrl: form.get('comfyUrl'),
       comfyRoot: form.get('comfyRoot'),
-      comfyCheckpoint: imageModel?.fileName,
+      comfyCheckpoint: form.get('comfyCheckpoint'),
+      comfyCheckpoints: lines('comfyCheckpoints'),
       openaiModel: form.get('openaiImageModel'),
+      openaiModels: lines('openaiImageModels'),
     },
   };
 }
@@ -1008,6 +1178,22 @@ async function runAiSetupAction(action) {
     method: 'PUT',
     body: JSON.stringify(aiSetupPayload(form, state.project.ai.config.setupComplete)),
   });
+  if (action === 'discover-text' || action === 'discover-image') {
+    const kind = action === 'discover-text' ? 'text' : 'image';
+    const result = await api('/api/ai/models/discover', {
+      method: 'POST',
+      body: JSON.stringify({ kind }),
+    });
+    await loadState();
+    state.aiMode = true;
+    renderAiSetup();
+    toast(
+      result.discovered.length
+        ? `Added ${result.discovered.length} installed ${kind} model${result.discovered.length === 1 ? '' : 's'}.`
+        : `No additional ${kind} models found.`,
+    );
+    return;
+  }
   if (action === 'download-text') {
     await api('/api/ai/models/text', {
       method: 'POST',
@@ -1041,6 +1227,128 @@ function setLocalizedDraftField(prefix, language, value) {
   if (target) target.value = value ?? '';
 }
 
+function splitProseScenes(value) {
+  return String(value || '')
+    .split(/<hr\s*\/?>/i)
+    .map((scene) => scene.trim())
+    .filter(Boolean);
+}
+
+function imagePlacementOptions(language, selected) {
+  const prose = fields.querySelector(`[name="loc__prose__${CSS.escape(language)}"]`)?.value ?? '';
+  const scenes = splitProseScenes(prose);
+  return (scenes.length ? scenes : ['Current chronicle'])
+    .map((scene, index) => {
+      const excerpt = scene
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .slice(0, 72);
+      return `<option value="${index}" ${index === Number(selected) ? 'selected' : ''}>After scene ${index + 1} · ${escapeHtml(excerpt || 'Untitled scene')}</option>`;
+    })
+    .join('');
+}
+
+function renderAiReview(draft, language) {
+  const review = fields.querySelector('[data-ai-review]');
+  if (!review) return;
+  review.hidden = false;
+  const images = state.editor.aiImages ?? [];
+  review.innerHTML = `<strong>Draft ready for the Game Master</strong><p>${escapeHtml(draft.summary)}</p>${images.length ? `<div class="ai-image-review"><div class="ai-image-review__intro"><strong>Place the illustrations in the chronicle</strong><small>Each image is attached immediately after the scene you select. Captions and accessibility text remain editable.</small></div>${images.map((image, index) => `<article class="ai-image-card"><img src="${escapeHtml(campaignAsset(image.path))}" alt="" /><div><label class="field"><span>Insert position</span><select data-ai-image-field="afterSection" data-ai-image-index="${index}">${imagePlacementOptions(language, image.afterSection)}</select></label><label class="field"><span>Caption</span><input value="${escapeHtml(image.caption)}" data-ai-image-field="caption" data-ai-image-index="${index}" /></label><label class="field"><span>Accessibility text</span><textarea data-ai-image-field="alt" data-ai-image-index="${index}">${escapeHtml(image.alt)}</textarea></label></div></article>`).join('')}</div>` : ''}${draft.suggestions.length ? `<details><summary>${draft.suggestions.length} optional archive suggestion${draft.suggestions.length === 1 ? '' : 's'}</summary><ul>${draft.suggestions.map((item) => `<li><strong>${escapeHtml(item.kind)} · ${escapeHtml(item.subject)}</strong><br />${escapeHtml(item.proposal)}<small>Evidence: ${escapeHtml(item.evidence)}</small></li>`).join('')}</ul></details>` : ''}<small>Review the fields below. Suggestions are never applied automatically.</small>`;
+}
+
+function setFormValue(name, value) {
+  const target = fields.querySelector(`[name="${CSS.escape(name)}"]`);
+  if (target && value !== undefined && value !== null) target.value = value;
+}
+
+async function processEntityImport(type) {
+  if (!['characters', 'npcs'].includes(type)) return;
+  const form = new FormData(editorForm);
+  const language = form.get('entityLanguage') || campaignLanguages()[0];
+  const files = [...(fields.querySelector('[name="aiSourceImages"]')?.files ?? [])].slice(0, 4);
+  const oversized = files.find((file) => file.size > 3 * 1024 * 1024);
+  if (oversized) throw new Error(`${oversized.name} is larger than 3 MB. Resize it and try again.`);
+  const totalBytes = files.reduce((sum, file) => sum + file.size, 0);
+  if (totalBytes > 10 * 1024 * 1024)
+    throw new Error('The selected images exceed 10 MB in total. Resize them and try again.');
+  const button = fields.querySelector(`[data-ai-entity="${type}"]`);
+  button.disabled = true;
+  button.textContent = 'Reading sources…';
+  try {
+    const result = await api(
+      `/api/campaigns/${encodeURIComponent(state.selectedId)}/ai/import-entity`,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          entityType: type,
+          language,
+          engine: parseEngineValue(form.get('entityEngine')),
+          images: await Promise.all(files.map(fileDataUrl)),
+          sourceUrl: form.get('aiSourceUrl'),
+          remoteConsent: form.get('entityRemoteConsent') === 'on',
+        }),
+      },
+    );
+    const draft = result.draft;
+    for (const [name, value] of Object.entries({
+      name: draft.name,
+      title: draft.title,
+      heightCm: draft.heightCm || '',
+      level: draft.level || 1,
+      classType: draft.classType,
+      race: draft.race,
+      background: draft.background,
+      alignment: draft.alignment,
+      hitPoints: draft.hitPoints,
+      maxHitPoints: draft.maxHitPoints,
+      armorClass: draft.armorClass,
+      speed: draft.speed,
+      proficiencyBonus: draft.proficiencyBonus,
+      category: draft.category,
+      allegiance: draft.allegiance,
+    }))
+      setFormValue(name, value);
+    const id = fields.querySelector('[name="id"]');
+    if (id && !id.value) id.value = slugify(draft.name);
+    const localizedValues =
+      type === 'characters'
+        ? {
+            sex: draft.gender,
+            backstory: draft.backstory,
+            traits: draft.traits,
+            ideals: draft.ideals,
+            bonds: draft.bonds,
+            flaws: draft.flaws,
+            known: draft.knownHistory,
+            hobbies: draft.hobbies,
+            secret: draft.secretBackstory,
+          }
+        : {
+            description: draft.description,
+            role: draft.role,
+            personality: draft.personality,
+            location: draft.location,
+            history: draft.knownHistory,
+          };
+    for (const [prefix, value] of Object.entries(localizedValues))
+      setFormValue(`loc__${prefix}__${language}`, value);
+    if (type === 'characters') {
+      for (const [ability, value] of Object.entries(draft.abilityScores ?? {}))
+        setFormValue(`ability__${ability}`, value || 10);
+      for (const key of ['savingThrows', 'skills', 'languages', 'equipment', 'features'])
+        setFormValue(key, (draft[key] ?? []).join('\n'));
+    }
+    const review = fields.querySelector('[data-ai-entity-review]');
+    review.hidden = false;
+    review.innerHTML = `<strong>Editable import ready</strong><p>QuestKeeper filled the form from ${files.length ? `${files.length} image${files.length === 1 ? '' : 's'}` : 'the shared page'}. Check every value before saving.</p>${draft.reviewNotes?.length ? `<ul>${draft.reviewNotes.map((note) => `<li>${escapeHtml(note)}</li>`).join('')}</ul>` : '<small>No extraction warnings were returned; manual review is still required.</small>'}`;
+    toast('Character draft extracted. Review the form before saving.');
+  } finally {
+    button.disabled = false;
+    button.textContent = 'Extract editable draft';
+  }
+}
+
 async function processSessionNotes(includeImages) {
   if (state.editor?.type !== 'sessions') return;
   const form = new FormData(editorForm);
@@ -1059,6 +1367,11 @@ async function processSessionNotes(includeImages) {
           sessionNumber: form.get('sessionNumber'),
           includeImages,
           remoteConsent: form.get('remoteConsent') === 'on',
+          engines: {
+            prose: parseEngineValue(form.get('proseEngine')),
+            imagePrompt: parseEngineValue(form.get('imagePromptEngine')),
+            image: parseEngineValue(form.get('imageEngine')),
+          },
         }),
       },
     );
@@ -1069,9 +1382,9 @@ async function processSessionNotes(includeImages) {
     const events = fields.querySelector(`[name="events__${language}"]`);
     if (events) events.value = draft.keyEvents.join('\n');
     state.editor.aiImages = draft.generatedImages ?? [];
-    const review = fields.querySelector('[data-ai-review]');
-    review.hidden = false;
-    review.innerHTML = `<strong>Draft ready for the Game Master</strong><p>${escapeHtml(draft.summary)}</p>${state.editor.aiImages.length ? `<span>${state.editor.aiImages.length} illustration${state.editor.aiImages.length === 1 ? '' : 's'} generated and attached.</span>` : ''}${draft.suggestions.length ? `<details><summary>${draft.suggestions.length} optional archive suggestion${draft.suggestions.length === 1 ? '' : 's'}</summary><ul>${draft.suggestions.map((item) => `<li><strong>${escapeHtml(item.kind)} · ${escapeHtml(item.subject)}</strong><br />${escapeHtml(item.proposal)}<small>Evidence: ${escapeHtml(item.evidence)}</small></li>`).join('')}</ul></details>` : ''}<small>Review the fields below. Suggestions are never applied automatically.</small>`;
+    state.editor.aiDraft = draft;
+    state.editor.aiLanguage = language;
+    renderAiReview(draft, language);
     toast('Editable draft created. Review it before saving.');
   } finally {
     button.disabled = false;
@@ -1104,8 +1417,11 @@ function renderProject() {
   const install = state.project.jobs.install;
   const build = state.project.jobs.build;
   const preview = state.project.jobs.preview;
+  const ftpJob = state.project.jobs['ftp-publish'];
+  const publishing = state.project.publishing ?? {};
   const activeLog =
-    [preview, build, install].find((job) => job?.status === 'running') ||
+    [ftpJob, preview, build, install].find((job) => job?.status === 'running') ||
+    ftpJob ||
     preview ||
     build ||
     install;
@@ -1114,9 +1430,46 @@ function renderProject() {
       <section class="project-panel"><span class="eyebrow">1 · Preparation</span><h2>Prepare the project</h2><p>${state.project.dependenciesReady ? 'Dependencies are installed. You can preview or validate your Companion.' : 'On first use, install everything the project needs. An internet connection is required.'}</p><div class="action-row"><button class="primary-button" data-project-action="install" ${install?.status === 'running' ? 'disabled' : ''}>${state.project.dependenciesReady ? 'Reinstall dependencies' : 'Prepare automatically'}</button><span class="job-status ${install?.status || ''}">${install ? escapeHtml(install.status) : state.project.dependenciesReady ? 'Ready' : 'Not prepared'}</span></div></section>
       <section class="project-panel"><span class="eyebrow">2 · Preview</span><h2>Open your Companion</h2><p>Launch the local site with the campaign data you just entered.</p><div class="action-row"><button class="primary-button" data-project-action="preview" ${!state.project.dependenciesReady || preview?.status === 'running' ? 'disabled' : ''}>Launch site</button>${preview?.status === 'running' ? '<a class="secondary-button" href="http://127.0.0.1:4200" target="_blank" rel="noreferrer">Open now</a>' : ''}<span class="job-status ${preview?.status || ''}">${preview ? escapeHtml(preview.status) : 'Not started'}</span></div></section>
       <section class="project-panel"><span class="eyebrow">3 · Validation</span><h2>Check before publishing</h2><p>The production build catches invalid data or components before you push to GitHub.</p><div class="action-row"><button class="secondary-button" data-project-action="build" ${!state.project.dependenciesReady || build?.status === 'running' ? 'disabled' : ''}>Check and build site</button><span class="job-status ${build?.status || ''}">${build ? escapeHtml(build.status) : 'Not run'}</span></div></section>
-      <section class="project-panel"><span class="eyebrow">4 · Publishing</span><h2>Send it to the realm</h2><p>After a successful check, commit and push. The included workflow deploys the site to GitHub Pages automatically.</p><a class="secondary-button" href="https://github.com/mtamagno/questkeeper-rpg-campaign-manager#publish" target="_blank" rel="noreferrer">Open the guide</a></section>
+      <section class="project-panel"><span class="eyebrow">4 · Publishing</span><h2>Choose how the archive reaches the realm</h2><p>GitHub Pages remains available through the included workflow. If your hosting provides FTP, configure it once and publish directly from this computer without GitHub Actions.</p><a class="secondary-button" href="https://github.com/mtamagno/questkeeper-rpg-campaign-manager#publish" target="_blank" rel="noreferrer">Open the publishing guide</a></section>
+      <form id="publishing-form" class="project-panel publishing-panel"><span class="eyebrow">Direct hosting · FTP / FTPS</span><h2>Publish from Campaign Manager</h2><div class="publishing-grid"><label class="field"><span>Protocol</span><select name="protocol"><option value="ftps" ${publishing.protocol !== 'ftp' ? 'selected' : ''}>FTPS · encrypted (recommended)</option><option value="ftp" ${publishing.protocol === 'ftp' ? 'selected' : ''}>FTP · unencrypted</option></select></label><label class="field"><span>Host</span><input name="host" value="${escapeHtml(publishing.host)}" placeholder="ftp.example.com" /></label><label class="field"><span>Port</span><input name="port" type="number" min="1" value="${publishing.port || 21}" /></label><label class="field"><span>Remote folder</span><input name="remotePath" value="${escapeHtml(publishing.remotePath || '/')}" placeholder="/public_html/questkeeper" /></label><label class="field"><span>Username</span><input name="username" autocomplete="username" value="${escapeHtml(publishing.username)}" /></label><label class="field"><span>Password</span><input name="password" type="password" autocomplete="new-password" placeholder="${publishing.passwordConfigured ? 'Saved locally · leave blank to keep it' : 'Hosting password'}" /></label></div><label class="consent-check"><input name="insecureConsent" type="checkbox" /> I understand that plain FTP sends credentials and files without encryption. This is required only when FTP is selected instead of FTPS.</label><div class="action-row"><button class="secondary-button" type="button" data-publish-action="save">Save destination</button><button class="secondary-button" type="button" data-publish-action="test">Test connection</button><button class="primary-button" type="button" data-publish-action="publish" ${!state.project.dependenciesReady || ftpJob?.status === 'running' ? 'disabled' : ''}>Build & publish now</button><span class="job-status ${ftpJob?.status || ''}">${ftpJob ? escapeHtml(ftpJob.status) : publishing.host ? 'Configured' : 'Not configured'}</span></div><small>Credentials stay in the Git-ignored <code>.campaign-manager/</code> folder and are never returned to the browser.</small></form>
       ${activeLog ? `<pre class="job-log">${escapeHtml(activeLog.logs)}</pre>` : ''}
     </div>`;
+}
+
+function publishingPayload(form) {
+  return {
+    protocol: form.get('protocol'),
+    host: form.get('host'),
+    port: Number(form.get('port')),
+    remotePath: form.get('remotePath'),
+    username: form.get('username'),
+    password: form.get('password'),
+  };
+}
+
+async function runPublishingAction(action) {
+  const formElement = document.querySelector('#publishing-form');
+  const form = new FormData(formElement);
+  await api('/api/publishing/setup', {
+    method: 'PUT',
+    body: JSON.stringify(publishingPayload(form)),
+  });
+  if (action === 'save') {
+    await loadState();
+    state.projectMode = true;
+    renderProject();
+    toast('Publishing destination saved locally.');
+    return;
+  }
+  const body = JSON.stringify({ insecureConsent: form.get('insecureConsent') === 'on' });
+  if (action === 'test') {
+    const result = await api('/api/publishing/test', { method: 'POST', body });
+    toast(result.message);
+    return;
+  }
+  await api('/api/publishing/publish', { method: 'POST', body });
+  toast('Production build and upload started.');
+  void refreshJobs();
 }
 
 function renderScribe() {
@@ -1312,6 +1665,11 @@ content.addEventListener('click', async (event) => {
     runProjectAction(projectAction.dataset.projectAction).catch((error) =>
       toast(error.message, true),
     );
+  const publishAction = event.target.closest('[data-publish-action]');
+  if (publishAction)
+    runPublishingAction(publishAction.dataset.publishAction).catch((error) =>
+      toast(error.message, true),
+    );
   const scribeAction = event.target.closest('[data-scribe-action]');
   if (scribeAction) {
     const kind = scribeAction.dataset.scribeAction === 'stop' ? 'transcriber-stop' : 'transcriber';
@@ -1326,11 +1684,36 @@ content.addEventListener('submit', (event) => {
 });
 
 fields.addEventListener('click', (event) => {
+  const entityButton = event.target.closest('[data-ai-entity]');
+  if (entityButton) {
+    processEntityImport(entityButton.dataset.aiEntity).catch((error) => toast(error.message, true));
+    return;
+  }
   const button = event.target.closest('[data-ai-notes]');
   if (!button) return;
   processSessionNotes(button.dataset.aiNotes === 'images').catch((error) =>
     toast(error.message, true),
   );
+});
+
+fields.addEventListener('change', (event) => {
+  const imageField = event.target.closest('[data-ai-image-field]');
+  if (imageField && state.editor?.aiImages) {
+    const image = state.editor.aiImages[Number(imageField.dataset.aiImageIndex)];
+    if (!image) return;
+    image[imageField.dataset.aiImageField] =
+      imageField.dataset.aiImageField === 'afterSection'
+        ? Number(imageField.value)
+        : imageField.value;
+    return;
+  }
+  if (
+    event.target.name?.startsWith('loc__prose__') &&
+    state.editor?.aiDraft &&
+    state.editor.aiLanguage
+  ) {
+    renderAiReview(state.editor.aiDraft, state.editor.aiLanguage);
+  }
 });
 
 editorForm.addEventListener('submit', (event) => {

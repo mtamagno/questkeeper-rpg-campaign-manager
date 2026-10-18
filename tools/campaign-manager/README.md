@@ -36,10 +36,12 @@ automatically tries the next available port up to 4183.
 6. Choose **Launch site**, then **Open now** to view the real Companion at
    `http://127.0.0.1:4200`.
 
-On the first launch, the Manager also opens an interactive **AI setup** guide.
-It detects CPU, RAM and available graphics memory, then recommends optional
-local prose and image models. Nothing is downloaded until you choose a model;
-manual authoring remains a first-class option. See the complete
+On the first launch, the Manager also opens **AI setup**. It detects CPU, RAM
+and available graphics memory, then recommends optional local prose and image
+models. The panel remains available afterward: add API keys, discover local
+Ollama and ComfyUI models, maintain custom model catalogs and change defaults
+at any time. Nothing is downloaded until you choose a model; manual authoring
+remains a first-class option. See the complete
 [AI setup guide](../../docs/AI-SETUP.md).
 
 All edits are ordinary files under `src/campaigns/`, so they remain portable
@@ -60,6 +62,17 @@ produce the same campaign archive. In either case, the session editor can turn
 reviewed notes into a fully editable draft with **Process notes**, or add
 illustrations with **Process notes with images**. Local Ollama and ComfyUI
 providers and an opt-in OpenAI API provider share the same guided setup.
+Every processing run exposes separate choices for the prose writer, the text
+model that plans visual prompts and the model that renders the images. Before
+saving, the Game Master chooses the precise chronicle scene where each image
+appears and can edit its caption and accessibility text.
+
+The same review-first workflow can create Characters and NPCs from up to four
+sheet photos/screenshots, or from a public/shared Roll20 print-view URL when a
+browser-capable remote model is selected. Private Roll20 sheets are never
+scraped through the user's signed-in browser: use screenshots for those. Core
+statistics, proficiencies, equipment and profile prose remain normal editable
+fields after extraction.
 
 The Scribe writes a local Markdown transcript and does not retain an audio
 recording. Read the [Discord Scribe guide](../../discord-transcriber/README.md)
@@ -78,12 +91,18 @@ are moved to `.campaign-manager/trash/` whenever possible instead of being
 permanently erased. Locations stored in the shared `maps.json` file are removed
 from that file and remain recoverable through Git history or a backup.
 
-## Publish on GitHub Pages
+## Publish on GitHub Pages or direct hosting
 
 The panel prepares and validates the project locally. To publish, push the
 changed files to your GitHub repository and enable **Settings → Pages → GitHub
 Actions**. The included workflow builds and deploys the static site. See the
 main [README](../../README.md#publish) for details.
+
+If your web host provides FTP access, open **Preview & publish**, configure the
+host, remote folder, username and password, then choose **Build & publish
+now**. FTPS is the secure default; plain FTP requires an explicit warning
+acknowledgement. Credentials stay in the ignored `.campaign-manager/` folder.
+See the [deployment guide](../../docs/DEPLOYMENT.md) for the complete flow.
 
 ## Troubleshooting
 

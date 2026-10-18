@@ -760,13 +760,16 @@
             <span class="step-number">II</span><span>World & languages</span>
           </button>
           <button class="step" role="tab" aria-selected="false" data-step="2">
-            <span class="step-number">III</span><span>Characters & lore</span>
+            <span class="step-number">III</span><span>AI control room</span>
           </button>
           <button class="step" role="tab" aria-selected="false" data-step="3">
-            <span class="step-number">IV</span><span>Discord Scribe</span>
+            <span class="step-number">IV</span><span>Sheet import</span>
           </button>
           <button class="step" role="tab" aria-selected="false" data-step="4">
-            <span class="step-number">V</span><span>Preview & publish</span>
+            <span class="step-number">V</span><span>Discord Scribe</span>
+          </button>
+          <button class="step" role="tab" aria-selected="false" data-step="5">
+            <span class="step-number">VI</span><span>Preview & publish</span>
           </button>
         </div>
 
@@ -848,7 +851,14 @@
             </div>
             <div class="form-actions">
               <button class="button" type="button" id="add-character">Add adventurer</button>
+              <button class="button" type="button" id="try-ai-import">
+                Preview AI sheet import
+              </button>
             </div>
+            <p class="sandbox-note">
+              The preview button simulates a reviewed extraction locally. The installed Manager can
+              read sheet images or a public/shared Roll20 print view with your chosen model.
+            </p>
             <hr class="form-divider" />
             <h3>Record a session beat</h3>
             <label class="demo-field"
@@ -959,15 +969,24 @@
         },
         {
           eyebrow: 'Chapter III',
-          title: 'Chronicle the world',
+          title: 'Choose every creative tool',
           description:
-            'Add characters, NPCs, sessions, maps and original artwork. QuestKeeper keeps IDs and indexes synchronized.',
-          image: 'images/campaign-manager-content.webp',
-          alt: 'QuestKeeper character and campaign content archive',
-          points: ['Separate profile art', 'Private lore', 'Height & hobbies'],
+            'Keep API keys and local models in one permanent control room, then choose the prose writer, prompt planner and image renderer for each task.',
+          image: 'images/campaign-manager-ai-models.jpg',
+          alt: 'QuestKeeper AI setup with separate model catalogs and local provider controls',
+          points: ['Local or remote', 'Models stay editable', 'No silent fallback'],
         },
         {
           eyebrow: 'Chapter IV',
+          title: 'Turn a sheet into a draft',
+          description:
+            'Start a character or NPC from sheet photos, screenshots or a public Roll20 print view. Every extracted field remains editable and unsaved.',
+          image: 'images/campaign-manager-ai-import.jpg',
+          alt: 'QuestKeeper character editor with reviewable AI sheet-import controls',
+          points: ['Up to four images', 'Public URLs optional', 'Review before save'],
+        },
+        {
+          eyebrow: 'Chapter V',
           title: 'Let the Scribe remember',
           description:
             'Launch the optional local Discord transcription bot—or skip it entirely and bring your handwritten notes.',
@@ -976,13 +995,13 @@
           points: ['Speaker names', 'Local transcription', 'Handwritten notes welcome'],
         },
         {
-          eyebrow: 'Chapter V',
+          eyebrow: 'Chapter VI',
           title: 'Scout ahead, then publish',
           description:
-            'Prepare dependencies, preview the real Companion and validate a production build before GitHub Pages deploys it.',
-          image: 'images/campaign-manager-publish.webp',
-          alt: 'QuestKeeper preview and publishing screen',
-          points: ['Production check', 'Local preview', 'GitHub Pages ready'],
+            'Preview and validate the real Companion, then use GitHub Pages or publish the fresh build directly to your FTPS host.',
+          image: 'images/campaign-manager-publish.jpg',
+          alt: 'QuestKeeper publishing screen with production checks and direct FTPS hosting',
+          points: ['Fresh production build', 'FTPS by default', 'GitHub remains optional'],
         },
       ];
 
@@ -1132,6 +1151,16 @@
         role.value = '';
         persistDemo('Adventurer added to the local demo roster.');
         renderSandbox();
+      });
+
+      document.querySelector('#try-ai-import').addEventListener('click', () => {
+        const name = document.querySelector('#demo-character');
+        const role = document.querySelector('#demo-class');
+        name.value = 'Elowen Vale';
+        role.value = 'Half-elf Chronomancer · Level 1';
+        sandboxStatus.textContent =
+          'Editable draft extracted for the demo. Review the two fields, then choose Add adventurer.';
+        name.focus();
       });
 
       document.querySelector('#add-note').addEventListener('click', () => {

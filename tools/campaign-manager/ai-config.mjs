@@ -64,6 +64,8 @@ const DEFAULT_CONFIG = Object.freeze({
     ollamaUrl: 'http://127.0.0.1:11434',
     ollamaModel: 'qwen3:4b',
     openaiModel: 'gpt-5-mini',
+    ollamaModels: TEXT_MODELS.map((model) => model.id),
+    openaiModels: ['gpt-5-mini'],
     openaiApiKey: '',
   },
   image: {
@@ -72,6 +74,8 @@ const DEFAULT_CONFIG = Object.freeze({
     comfyRoot: '',
     comfyCheckpoint: 'sd_xl_turbo_1.0_fp16.safetensors',
     openaiModel: 'gpt-image-2.5-flare',
+    comfyCheckpoints: IMAGE_MODELS.map((model) => model.fileName),
+    openaiModels: ['gpt-image-2.5-flare', 'gpt-image-2.5-sunburst'],
   },
 });
 
@@ -94,6 +98,18 @@ function httpLocalhost(value, fallback) {
   }
 }
 
+function modelCatalog(value, defaults, selected) {
+  const entries = Array.isArray(value)
+    ? value
+    : String(value ?? '')
+        .split(/[\n,]/)
+        .map((item) => item.trim());
+  return [...new Set([...defaults, ...entries, selected].map((item) => String(item || '').trim()))]
+    .filter(Boolean)
+    .map((item) => item.slice(0, 180))
+    .slice(0, 50);
+}
+
 export function normalizeAiConfig(input = {}, previous = cloneDefaults()) {
   const textProvider = ['off', 'ollama', 'openai'].includes(input.text?.provider)
     ? input.text.provider
@@ -103,25 +119,54 @@ export function normalizeAiConfig(input = {}, previous = cloneDefaults()) {
     : 'off';
   const requestedKey = String(input.text?.openaiApiKey ?? '').trim();
   const currentKey = String(previous.text?.openaiApiKey ?? '').trim();
+  const ollamaModel = String(input.text?.ollamaModel || DEFAULT_CONFIG.text.ollamaModel).slice(
+    0,
+    100,
+  );
+  const openaiTextModel = String(input.text?.openaiModel || DEFAULT_CONFIG.text.openaiModel).slice(
+    0,
+    100,
+  );
+  const comfyCheckpoint = String(
+    input.image?.comfyCheckpoint || DEFAULT_CONFIG.image.comfyCheckpoint,
+  ).slice(0, 180);
+  const openaiImageModel = String(
+    input.image?.openaiModel || DEFAULT_CONFIG.image.openaiModel,
+  ).slice(0, 100);
   return {
     setupComplete: Boolean(input.setupComplete),
     text: {
       provider: textProvider,
       ollamaUrl: httpLocalhost(input.text?.ollamaUrl, DEFAULT_CONFIG.text.ollamaUrl),
-      ollamaModel: String(input.text?.ollamaModel || DEFAULT_CONFIG.text.ollamaModel).slice(0, 100),
-      openaiModel: String(input.text?.openaiModel || DEFAULT_CONFIG.text.openaiModel).slice(0, 100),
+      ollamaModel,
+      openaiModel: openaiTextModel,
+      ollamaModels: modelCatalog(
+        input.text?.ollamaModels ?? previous.text?.ollamaModels,
+        DEFAULT_CONFIG.text.ollamaModels,
+        ollamaModel,
+      ),
+      openaiModels: modelCatalog(
+        input.text?.openaiModels ?? previous.text?.openaiModels,
+        DEFAULT_CONFIG.text.openaiModels,
+        openaiTextModel,
+      ),
       openaiApiKey: requestedKey || currentKey,
     },
     image: {
       provider: imageProvider,
       comfyUrl: httpLocalhost(input.image?.comfyUrl, DEFAULT_CONFIG.image.comfyUrl),
       comfyRoot: String(input.image?.comfyRoot ?? previous.image?.comfyRoot ?? '').trim(),
-      comfyCheckpoint: String(
-        input.image?.comfyCheckpoint || DEFAULT_CONFIG.image.comfyCheckpoint,
-      ).slice(0, 180),
-      openaiModel: String(input.image?.openaiModel || DEFAULT_CONFIG.image.openaiModel).slice(
-        0,
-        100,
+      comfyCheckpoint,
+      openaiModel: openaiImageModel,
+      comfyCheckpoints: modelCatalog(
+        input.image?.comfyCheckpoints ?? previous.image?.comfyCheckpoints,
+        DEFAULT_CONFIG.image.comfyCheckpoints,
+        comfyCheckpoint,
+      ),
+      openaiModels: modelCatalog(
+        input.image?.openaiModels ?? previous.image?.openaiModels,
+        DEFAULT_CONFIG.image.openaiModels,
+        openaiImageModel,
       ),
     },
   };

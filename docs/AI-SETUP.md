@@ -7,8 +7,10 @@ every campaign and generated material is never published automatically.
 ## Open the interactive installer
 
 Launch `setup.bat` on Windows, `setup.command` on macOS or `./setup.sh` on
-Linux. On first launch, Campaign Manager opens **AI setup** automatically. You
-can return to it from the sidebar at any time.
+Linux. On first launch, Campaign Manager opens **AI setup** automatically. It
+is not a one-time wizard: **AI setup** remains in the sidebar as the permanent
+provider and model library, so API keys, local endpoints and models can be
+added or changed later.
 
 The installer reports the detected processor, logical CPU cores, RAM and—when
 the operating system exposes it—graphics memory. It then recommends a prose
@@ -16,6 +18,12 @@ model and explains whether local image generation looks practical. A
 recommendation is not an automatic installation: the Game Master chooses the
 provider and model, accepts any applicable model license and starts each
 download.
+
+Each provider has an editable model catalog. Enter additional model IDs one
+per line, or choose **Discover installed** while Ollama or ComfyUI is running.
+Discovered models are added to the local catalog and become available in every
+session editor. The defaults selected here are conveniences, not locked
+choices.
 
 ## Prose choices
 
@@ -82,18 +90,48 @@ session task still requires explicit remote consent.
 1. Open a campaign and choose **Sessions**.
 2. Add or edit a session.
 3. Paste typed notes or a reviewed Discord Scribe transcript into **Raw notes**.
-4. Choose **Process notes** or **Process notes with images**.
-5. Review the populated title, location, summary, chronicle, cumulative recap
+4. Choose the model that will write the prose. For an illustrated draft, also
+   choose the text model that will plan the visual prompts and the image model
+   that will render them. These three choices are independent for every run.
+5. Choose **Process notes** or **Process notes with images**.
+6. Review the populated title, location, summary, chronicle, cumulative recap
    and key events. Expand optional archive suggestions to inspect their source
    evidence.
-6. Edit anything that is incomplete, interpretive or wrong, then choose
+7. For each generated illustration, review its caption and accessibility text,
+   then select the exact chronicle scene after which it should appear. If the
+   prose changes, QuestKeeper revalidates the placement before saving.
+8. Edit anything that is incomplete, interpretive or wrong, then choose
    **Save**.
 
 Raw notes are working material and are not copied into the public session JSON.
 Profile, location and relationship suggestions are not applied automatically.
-Generated images are stored in the campaign only when requested and are
-attached to the draft; the Game Master remains responsible for licenses,
-continuity, accessibility text and publication.
+Generated images are stored in the campaign only when requested. Prompt
+planning happens separately from prose writing, image positions are clamped to
+real `<hr>`-separated scenes, and the resulting structured image entries are
+rendered inside the prose instead of collected in an unrelated gallery. The
+Game Master remains responsible for licenses, continuity, accessibility text
+and publication.
+
+## Import player characters and NPCs
+
+Manual entry remains available, but it is no longer required for every field.
+Open **Characters** or **NPCs**, add an entry and use the AI import panel at the
+top of the form.
+
+- Add up to four PNG, JPEG or WebP photos/screenshots of a character sheet. The
+  selected text model must support vision.
+- Or paste an HTTPS URL for a public/shared Roll20 print view or another public
+  sheet page. URL import requires a remote model with web access.
+- Authenticated Roll20 pages are not silently scraped and browser sessions are
+  never handed to a model. Take screenshots of a private sheet instead.
+- Choose the extraction model and language for this import. Remote sources
+  require the same explicit consent used by session processing.
+
+QuestKeeper fills identity, ancestry, class, background, profile prose, core
+statistics, abilities, proficiencies, languages, equipment and features when
+the source contains them. Missing or ambiguous facts stay empty or are listed
+as review notes. The normal form remains open afterward: nothing enters the
+campaign until the Game Master reviews and saves it.
 
 ## Security and privacy boundaries
 

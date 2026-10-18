@@ -27,7 +27,21 @@ import {
   validateComfyRoot,
   writeAiConfig,
 } from './ai-config.mjs';
-import { generateDraftImages, processNotesWithText, testAiProvider } from './ai-service.mjs';
+import {
+  discoverLocalModels,
+  generateDraftImages,
+  generateImagePromptsWithText,
+  importEntityWithAi,
+  processNotesWithText,
+  testAiProvider,
+} from './ai-service.mjs';
+import {
+  publicPublishingConfig,
+  readPublishingConfig,
+  testPublishingConnection,
+  uploadBuild,
+  writePublishingConfig,
+} from './publishing.mjs';
 
 const MANAGER_ROOT = dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = resolve(MANAGER_ROOT, '..', '..');
@@ -108,10 +122,34 @@ function startBackgroundJob(kind, work) {
   return job;
 }
 
+async function runLoggedCommand(command, args, cwd, job) {
+  await new Promise((resolveRun, rejectRun) => {
+    const child = spawn(command, args, { cwd, windowsHide: true, env: { ...process.env } });
+    child.stdout.on('data', (data) => appendLog(job, data.toString()));
+    child.stderr.on('data', (data) => appendLog(job, data.toString()));
+    child.once('error', rejectRun);
+    child.once('close', (code) =>
+      code === 0 ? resolveRun() : rejectRun(new Error(`Build exited with code ${code}.`)),
+    );
+  });
+}
+
+async function buildOutputDirectory() {
+  const workspace = JSON.parse(await readFile(join(PROJECT_ROOT, 'angular.json'), 'utf8'));
+  const projectName = Object.keys(workspace.projects ?? {})[0];
+  if (!projectName) throw new Error('No Angular project was found.');
+  return join(PROJECT_ROOT, 'dist', projectName, 'browser');
+}
+
 async function pullOllamaModel(modelId) {
   const config = await readAiConfig(PROJECT_ROOT);
-  const model = TEXT_MODELS.find((item) => item.id === modelId);
-  if (!model) throw new Error('Unknown or unsupported text model.');
+  if (!config.text.ollamaModels.includes(modelId))
+    throw new Error('Add this model to the Ollama catalog before downloading it.');
+  const model = TEXT_MODELS.find((item) => item.id === modelId) ?? {
+    id: modelId,
+    label: modelId,
+    sizeGb: 'unknown size',
+  };
   return startBackgroundJob('ai-text-model', async (job) => {
     appendLog(job, `Requesting ${model.label} (${model.sizeGb} GB) from Ollama…\n`);
     const response = await fetch(`${config.text.ollamaUrl}/api/pull`, {
@@ -138,6 +176,33 @@ async function pullOllamaModel(modelId) {
     }
     appendLog(job, `${model.label} is ready.\n`);
   });
+}
+
+function taskEngine(input, config, kind) {
+  const isText = kind !== 'image';
+  const fallbackProvider = isText ? config.text.provider : config.image.provider;
+  const provider = String(input?.provider || fallbackProvider);
+  const allowedProviders = isText ? ['ollama', 'openai'] : ['comfyui', 'openai'];
+  if (!allowedProviders.includes(provider))
+    throw new Error(`Choose a ${kind} model for this task.`);
+  const fallbackModel = isText
+    ? provider === 'ollama'
+      ? config.text.ollamaModel
+      : config.text.openaiModel
+    : provider === 'comfyui'
+      ? config.image.comfyCheckpoint
+      : config.image.openaiModel;
+  const model = String(input?.model || fallbackModel).trim();
+  const catalog = isText
+    ? provider === 'ollama'
+      ? config.text.ollamaModels
+      : config.text.openaiModels
+    : provider === 'comfyui'
+      ? config.image.comfyCheckpoints
+      : config.image.openaiModels;
+  if (!model || !catalog.includes(model))
+    throw new Error(`The selected ${kind} model is not in the saved AI model catalog.`);
+  return { provider, model };
 }
 
 async function downloadImageModel(input) {
@@ -328,6 +393,7 @@ async function projectStatus() {
   }
   const hardware = await hardwarePromise;
   const aiConfig = await readAiConfig(PROJECT_ROOT);
+  const publishingConfig = await readPublishingConfig(PROJECT_ROOT);
   return {
     dependenciesReady,
     transcriber: await transcriberStatus(),
@@ -338,6 +404,7 @@ async function projectStatus() {
       recommendations: recommendModels(hardware),
       models: { text: TEXT_MODELS, image: IMAGE_MODELS },
     },
+    publishing: publicPublishingConfig(publishingConfig),
   };
 }
 
@@ -435,6 +502,48 @@ async function routeApi(request, response, url) {
     sendJson(response, 202, { job: { ...job, process: undefined } });
     return;
   }
+  if (request.method === 'POST' && url.pathname === '/api/ai/models/discover') {
+    const input = await readBody(request);
+    const config = await readAiConfig(PROJECT_ROOT);
+    const discovered = await discoverLocalModels(config, input.kind);
+    const next = structuredClone(config);
+    if (input.kind === 'text') next.text.ollamaModels = [...next.text.ollamaModels, ...discovered];
+    else if (input.kind === 'image')
+      next.image.comfyCheckpoints = [...next.image.comfyCheckpoints, ...discovered];
+    else throw new Error('Unknown model discovery kind.');
+    const saved = await writeAiConfig(PROJECT_ROOT, next);
+    sendJson(response, 200, { discovered, config: publicAiConfig(saved) });
+    return;
+  }
+  if (request.method === 'PUT' && url.pathname === '/api/publishing/setup') {
+    const config = await writePublishingConfig(PROJECT_ROOT, await readBody(request));
+    sendJson(response, 200, { config: publicPublishingConfig(config) });
+    return;
+  }
+  if (request.method === 'POST' && url.pathname === '/api/publishing/test') {
+    const input = await readBody(request);
+    const config = await readPublishingConfig(PROJECT_ROOT);
+    if (config.protocol === 'ftp' && input.insecureConsent !== true)
+      throw new Error('Confirm the unencrypted FTP warning, or choose FTPS.');
+    sendJson(response, 200, { message: await testPublishingConnection(config) });
+    return;
+  }
+  if (request.method === 'POST' && url.pathname === '/api/publishing/publish') {
+    const input = await readBody(request);
+    const config = await readPublishingConfig(PROJECT_ROOT);
+    if (config.protocol === 'ftp' && input.insecureConsent !== true)
+      throw new Error('Confirm the unencrypted FTP warning, or choose FTPS.');
+    const job = startBackgroundJob('ftp-publish', async (currentJob) => {
+      const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+      appendLog(currentJob, 'Building and validating the production site…\n');
+      await runLoggedCommand(npm, ['run', 'build'], PROJECT_ROOT, currentJob);
+      const output = await buildOutputDirectory();
+      await stat(output);
+      await uploadBuild(config, output, (message) => appendLog(currentJob, message));
+    });
+    sendJson(response, 202, { job: { ...job, process: undefined } });
+    return;
+  }
 
   if (request.method === 'POST' && url.pathname === '/api/campaigns') {
     sendJson(response, 201, await createCampaign(PROJECT_ROOT, await readBody(request)));
@@ -459,29 +568,77 @@ async function routeApi(request, response, url) {
   if (
     request.method === 'POST' &&
     parts[3] === 'ai' &&
+    parts[4] === 'import-entity' &&
+    parts.length === 5
+  ) {
+    const input = await readBody(request);
+    const config = await readAiConfig(PROJECT_ROOT);
+    const engine = taskEngine(input.engine, config, 'entity');
+    if (engine.provider === 'openai' && input.remoteConsent !== true)
+      throw new Error('Confirm that these sheet sources may be sent to the remote provider.');
+    const campaign = await getCampaign(PROJECT_ROOT, campaignId);
+    const result = await importEntityWithAi({
+      config,
+      campaign,
+      entityType: input.entityType,
+      language: input.language || campaign.manifestEntry.defaultLanguage || 'en',
+      selection: engine,
+      images: input.images,
+      sourceUrl: input.sourceUrl,
+    });
+    sendJson(response, 200, {
+      ...result,
+      notice: 'Draft only. Review every imported field before saving.',
+    });
+    return;
+  }
+  if (
+    request.method === 'POST' &&
+    parts[3] === 'ai' &&
     parts[4] === 'process-notes' &&
     parts.length === 5
   ) {
     const input = await readBody(request);
     const config = await readAiConfig(PROJECT_ROOT);
-    const usesRemote =
-      config.text.provider === 'openai' ||
-      (input.includeImages && config.image.provider === 'openai');
+    const proseEngine = taskEngine(input.engines?.prose, config, 'prose');
+    const promptEngine = input.includeImages
+      ? taskEngine(input.engines?.imagePrompt, config, 'image prompt')
+      : null;
+    const imageEngine = input.includeImages
+      ? taskEngine(input.engines?.image, config, 'image')
+      : null;
+    const usesRemote = [proseEngine, promptEngine, imageEngine].some(
+      (engine) => engine?.provider === 'openai',
+    );
     if (usesRemote && input.remoteConsent !== true) {
       throw new Error('Confirm that these notes may be sent to the configured remote provider.');
     }
     const campaign = await getCampaign(PROJECT_ROOT, campaignId);
-    const draft = await processNotesWithText({
+    const proseResult = await processNotesWithText({
       config,
       campaign,
       notes: input.notes,
       language: input.language || campaign.manifestEntry.defaultLanguage || 'en',
-      includeImages: Boolean(input.includeImages),
+      selection: proseEngine,
     });
+    const draft = proseResult.draft;
     const images = [];
     if (input.includeImages) {
-      const generated = await generateDraftImages({ config, prompts: draft.imagePrompts });
-      for (const [index, image] of generated.entries()) {
+      const plan = await generateImagePromptsWithText({
+        config,
+        campaign,
+        draft,
+        notes: input.notes,
+        language: input.language || campaign.manifestEntry.defaultLanguage || 'en',
+        selection: promptEngine,
+      });
+      draft.imagePrompts = plan.prompts;
+      const rendered = await generateDraftImages({
+        config,
+        prompts: plan.prompts,
+        selection: imageEngine,
+      });
+      for (const [index, image] of rendered.images.entries()) {
         const saved = await saveImage(PROJECT_ROOT, campaignId, {
           category: 'sessions',
           fileName: `ai-session-${input.sessionNumber || 'draft'}-${index + 1}.webp`,
@@ -493,8 +650,9 @@ async function routeApi(request, response, url) {
     sendJson(response, 200, {
       draft: { ...draft, generatedImages: images },
       provider: {
-        text: config.text.provider,
-        image: input.includeImages ? config.image.provider : null,
+        prose: proseEngine,
+        imagePrompt: promptEngine,
+        image: imageEngine,
       },
       notice: 'Draft only. Review every field before saving.',
     });

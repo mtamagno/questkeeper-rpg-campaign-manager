@@ -228,10 +228,15 @@ deliberate choice by the group, and every group controls where processing
 happens.
 
 > **Foundation shipped early · October 2026:** the Campaign Manager now has a
-> hardware-aware AI setup, user-approved Ollama and ComfyUI model downloads,
-> optional OpenAI providers and notes-to-session drafts with a mandatory GM
-> review. August's remaining work deepens provenance, continuity checks,
-> narrator voices and archive-wide assistance instead of rebuilding this base.
+> permanent hardware-aware provider/model library, discovery of installed
+> Ollama and ComfyUI models, optional OpenAI providers and independent choices
+> for prose, visual-prompt planning and image rendering. Notes-to-session
+> drafts include reviewable scene-level image placement. Sheet screenshots and
+> public/shared Roll20 print views can also seed editable character and NPC
+> drafts. Direct FTPS publishing provides a GitHub-optional path from reviewed
+> draft to live archive. August's remaining work deepens provenance,
+> continuity checks, narrator voices and archive-wide assistance instead of
+> rebuilding this base.
 
 ---
 

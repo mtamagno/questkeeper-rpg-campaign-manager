@@ -175,6 +175,8 @@ campaign, add adventurers and record session beats without installing anything.
   <a href="https://mtamagno.github.io/questkeeper-rpg-campaign-manager/manager-demo/"><strong>🗺️ Open the interactive Campaign Manager demo →</strong></a>
 </p>
 
+![Interactive Manager demo with a locally simulated, reviewable character-sheet import](docs/images/manager-demo-ai-tour.jpg)
+
 ### 1 · Gather the party
 
 Create a campaign, restore a backup or inspect the entire archive at a glance.
@@ -199,17 +201,30 @@ image placement and campaign indexes are kept in sync for you.
 ### 4 · Scout ahead, then publish
 
 Prepare dependencies, preview the real site and run a production check from
-one guided screen. When the omens are favorable, GitHub Actions deploys it.
+one guided screen. Then publish with GitHub Actions or send the finished static
+site directly to an FTPS host—without copying files by hand.
 
-![Setup and publishing screen with preparation, preview and validation actions](docs/images/campaign-manager-publish.webp)
+![Direct publishing screen with build validation and FTPS destination controls](docs/images/campaign-manager-publish.jpg)
 
-### 5 · Let the scribe assist—not decide
+### 5 · Let automation assist—not decide
 
-The first-run guide detects the computer's resources and lets the Game Master
-choose manual authoring, local Ollama and ComfyUI models, or an explicitly
-configured OpenAI API. In a session editor, **Process notes** fills every
-chapter field as a reviewable draft; **Process notes with images** also creates
-scene illustrations. Nothing publishes until the Game Master edits and saves.
+The AI panel detects the computer's resources and lets the Game Master choose
+manual authoring, local Ollama and ComfyUI models, or an explicitly configured
+OpenAI API. It remains available after onboarding for new keys and models. In a
+session editor, the GM independently selects the prose writer, visual-prompt
+writer and image renderer; generated art is placed after a reviewed prose
+scene instead of being dumped into a gallery. Nothing publishes until the Game
+Master edits and saves.
+
+Character and NPC editors use the same review-first approach: extract an
+editable draft from up to four sheet photos or screenshots, or use a public
+Roll20 print-view URL with a browser-capable remote model. Private sheets stay
+private—screenshots are supplied deliberately, and manual entry always remains
+available.
+
+![Permanent AI provider and model library with separate prose and image controls](docs/images/campaign-manager-ai-models.jpg)
+
+![Character editor offering a reviewable AI import from sheet images or a shared URL](docs/images/campaign-manager-ai-import.jpg)
 
 Read the [AI setup and privacy guide](docs/AI-SETUP.md).
 
@@ -289,6 +304,17 @@ Push your copy to GitHub, open **Settings → Pages**, select **GitHub Actions**
 and run the included **Deploy to GitHub Pages** workflow. The base path is
 calculated automatically.
 
+### Direct FTPS from Campaign Manager
+
+GitHub is optional. In **Preview & publish**, save the FTPS destination supplied
+by your host, test the connection, then choose **Build & publish now**. The
+Manager performs a fresh production build and uploads it to the chosen remote
+folder. Credentials stay in the Git-ignored local manager directory and are
+never written to campaign content.
+
+Plain FTP is supported only for legacy hosting and requires a fresh warning
+acknowledgement because it does not encrypt credentials or files. Prefer FTPS.
+
 ### Any static web server
 
 ```bash
@@ -300,12 +326,14 @@ Upload `dist/campaign-companion/browser/` to your web root and configure SPA
 fallback to `index.html`. Apache and Nginx examples live in
 [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
-## Optional AI, one guided setup
+## Optional AI, one permanent control room
 
-Open **AI setup** in Campaign Manager to choose manual creation, local
+Open **AI setup** in Campaign Manager at any time to choose manual creation, local
 [Ollama](https://ollama.com/) prose and [ComfyUI](https://www.comfy.org/)
 illustrations, or a remote OpenAI API. Hardware-aware recommendations explain
-the trade-offs and model sizes before any download. The older command-line
+the trade-offs and model sizes before any download. Discover installed local
+models, add custom model IDs and choose a different prose, prompt-planning or
+image model for each session. The older command-line
 helpers remain available for advanced workflows, but they are no longer
 required for ordinary session recaps.
 

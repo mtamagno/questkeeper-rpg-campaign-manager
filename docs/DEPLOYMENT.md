@@ -12,6 +12,24 @@ repository settings:
 The workflow builds with `/<repository-name>/` as the Angular base path and
 adds `404.html` for client-side routing.
 
+## Direct FTPS from Campaign Manager
+
+GitHub Actions is optional. Open **Preview & publish** in Campaign Manager and
+enter the host, port, remote folder, username and password supplied by your web
+host. Choose **FTPS** whenever the host supports it, save the destination and
+use **Test connection** before the first release.
+
+**Build & publish now** performs a fresh production build and uploads the
+generated browser files to the chosen remote folder. It overwrites matching
+files but does not delete unrelated remote files. The password is stored only
+in `.campaign-manager/publishing.json`, which is ignored by Git and never
+returned to the browser after saving.
+
+Plain FTP is also available for legacy hosts, but it sends both credentials
+and site files without encryption. QuestKeeper displays a warning and requires
+an explicit acknowledgement for every test or upload. Prefer FTPS or your
+host's HTTPS/SFTP tooling whenever possible.
+
 ## Apache
 
 Build with the path where the app will live:

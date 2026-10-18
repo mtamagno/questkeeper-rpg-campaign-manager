@@ -228,16 +228,74 @@ technical and encourage inconsistent privacy behavior. A visible installer can
 recommend models from hardware, explain image-generation constraints and keep
 the same consent boundary from setup through every processing task.
 
-**Consequences:** Secrets remain in the Git-ignored local manager directory;
-local endpoints are restricted to localhost; remote tasks require per-action
-consent; local failure never triggers cloud fallback. Future AI features must
-extend the same draft, evidence and review model. Downloaded checkpoints are
-never committed and their licenses remain the user's responsibility.
+**Consequences:** AI setup remains a permanent provider and model library after
+onboarding. A session run independently selects its prose model, its text model
+for visual prompts and its image-rendering model. Secrets remain in the
+Git-ignored local manager directory; local endpoints are restricted to
+localhost; remote tasks require per-action consent; local failure never
+triggers cloud fallback. Image placement is explicit, reviewable and bound to
+real prose scenes. Future AI features must extend the same draft, evidence and
+review model. Downloaded checkpoints are never committed and their licenses
+remain the user's responsibility.
 
 **Source:** [AI setup and session-draft workflow](AI-SETUP.md)
 
 **Revisit when:** A second remote provider, cross-device secret storage or
 archive-wide automatic edits require a broader provider and approval model.
+
+### QK-010 — Publishing may bypass GitHub without bypassing safeguards
+
+**Date:** 18 October 2026
+
+**Status:** Active
+
+**Decision:** Campaign Manager can publish a fresh production build directly
+to a configured FTPS destination. GitHub Pages remains supported but is not a
+required intermediary. Plain FTP is a deliberately discouraged compatibility
+option that requires explicit acknowledgement before each connection or
+upload.
+
+**Why:** Many Game Masters already pay for ordinary web hosting and should not
+need to understand GitHub Actions or copy build artifacts manually to keep a
+chronicle current.
+
+**Consequences:** Host, remote folder and credentials live only in the
+Git-ignored local manager directory. The browser never receives a saved
+password. Every upload starts with a validated production build, overwrites
+matching files and leaves unrelated remote files untouched. Future publishing
+providers must preserve this local-secret and build-before-upload boundary.
+
+**Source:** [Deployment guide](DEPLOYMENT.md#direct-ftps-from-campaign-manager)
+
+**Revisit when:** SFTP, managed hosting or encrypted OS-level secret storage is
+added.
+
+### QK-011 — AI imports evidence into an editable character draft
+
+**Date:** 18 October 2026
+
+**Status:** Active
+
+**Decision:** Character and NPC creation can begin from sheet photos,
+screenshots or a public/shared Roll20 print-view URL when the selected provider
+supports browsing. Extraction populates the normal editor but never saves the
+entry automatically. Manual authoring remains a complete first-class path.
+
+**Why:** Re-entering existing sheets is slow and error-prone, while direct
+automation without review can silently invent statistics, identities or secret
+history.
+
+**Consequences:** The GM chooses the extraction model and language, reviews
+uncertainties and edits every field before saving. Private or signed-in Roll20
+sheets use deliberately supplied screenshots; QuestKeeper does not borrow the
+user's authenticated browser session. Visual appearance is not evidence for
+sensitive character facts. Future imports from PDFs or other VTTs extend this
+same draft-and-review contract.
+
+**Source:** [AI setup and privacy guide](AI-SETUP.md#import-player-characters-and-npcs)
+
+**Revisit when:** A provider-independent browser connector or structured VTT
+export format can supply stronger source attribution.
 
 ### QK-XXX — Short decision title
 
