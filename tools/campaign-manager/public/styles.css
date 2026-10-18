@@ -622,6 +622,191 @@ button:disabled {
   gap: 1rem;
   max-width: 1100px;
 }
+.ai-setup {
+  display: grid;
+  gap: 1rem;
+  max-width: 1180px;
+}
+.ai-hero {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 1.4rem;
+  padding: clamp(1.4rem, 4vw, 2.5rem);
+  overflow: hidden;
+  border: 1px solid rgba(214, 182, 111, 0.28);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 10% 50%, rgba(104, 139, 122, 0.24), transparent 19rem),
+    linear-gradient(135deg, rgba(31, 45, 41, 0.98), rgba(13, 18, 17, 0.98));
+  box-shadow: var(--shadow);
+}
+.ai-hero h2 {
+  margin: 0.3rem 0;
+}
+.ai-hero p,
+.privacy-panel p,
+.recommendation span {
+  color: var(--muted);
+  line-height: 1.6;
+}
+.ai-hero__sigil {
+  width: 86px;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(214, 182, 111, 0.38);
+  border-radius: 50%;
+  color: var(--gold-bright);
+  font:
+    2.2rem Georgia,
+    serif;
+  box-shadow: inset 0 0 34px rgba(214, 182, 111, 0.1);
+}
+.hardware-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--line);
+}
+.hardware-strip > div {
+  min-width: 0;
+  padding: 1rem;
+  background: var(--surface);
+}
+.hardware-strip span,
+.hardware-strip strong,
+.hardware-strip small {
+  display: block;
+}
+.hardware-strip span {
+  color: var(--gold);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.hardware-strip strong {
+  margin: 0.35rem 0;
+  overflow-wrap: anywhere;
+}
+.hardware-strip small {
+  color: var(--muted);
+}
+.ai-provider-grid .project-panel {
+  gap: 0.85rem;
+}
+.ai-provider-grid hr {
+  width: 100%;
+  margin: 0.25rem 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+}
+.recommendation {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.025);
+}
+.recommendation.is-good strong {
+  color: #8fc89d;
+}
+.recommendation.is-caution strong {
+  color: #e1bb70;
+}
+.consent-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+.consent-check input {
+  margin-top: 0.2rem;
+  accent-color: var(--gold);
+}
+.consent-check a,
+.provider-help a {
+  color: var(--gold-bright);
+}
+.provider-help {
+  display: grid;
+  gap: 0.2rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+.provider-help a {
+  width: fit-content;
+  font-weight: 700;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+.privacy-panel,
+.setup-footer {
+  padding: 1rem 1.2rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(18, 25, 23, 0.9);
+}
+.privacy-panel p {
+  margin: 0.35rem 0 0;
+}
+.setup-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.setup-footer span {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+.ai-compose {
+  display: grid;
+  gap: 0.8rem;
+  padding: 1rem;
+  border: 1px solid rgba(214, 182, 111, 0.26);
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(214, 182, 111, 0.07), rgba(71, 104, 90, 0.08));
+}
+.ai-compose > div:first-child {
+  display: grid;
+  gap: 0.25rem;
+}
+.ai-compose small,
+.ai-review p,
+.ai-review span {
+  color: var(--muted);
+  line-height: 1.5;
+}
+.ai-review {
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--line);
+}
+.ai-review p {
+  margin: 0.35rem 0;
+}
+.ai-review details {
+  margin: 0.7rem 0;
+}
+.ai-review summary {
+  color: var(--gold);
+  cursor: pointer;
+}
+.ai-review li {
+  margin: 0.65rem 0;
+  color: var(--muted);
+}
+.ai-review li small {
+  display: block;
+  margin-top: 0.2rem;
+}
 .scribe-hero {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -890,6 +1075,9 @@ code {
   .choice-grid {
     grid-template-columns: 1fr;
   }
+  .hardware-strip {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 620px) {
@@ -926,6 +1114,16 @@ code {
   }
   .scribe-hero {
     grid-template-columns: 1fr;
+  }
+  .ai-hero {
+    grid-template-columns: 1fr;
+  }
+  .ai-hero__sigil {
+    width: 64px;
+  }
+  .setup-footer {
+    align-items: stretch;
+    flex-direction: column;
   }
 }
 

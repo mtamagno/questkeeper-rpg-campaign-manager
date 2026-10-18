@@ -13,10 +13,12 @@ const state = {
   tab: 'overview',
   projectMode: false,
   scribeMode: false,
+  aiMode: false,
   project: {
     dependenciesReady: false,
     transcriber: { configured: false, environmentReady: false },
     jobs: {},
+    ai: null,
   },
   editor: null,
 };
@@ -79,11 +81,13 @@ async function loadState({ selectFirst = false } = {}) {
     dependenciesReady: result.dependenciesReady,
     transcriber: result.transcriber,
     jobs: result.jobs,
+    ai: result.ai,
   };
   if (selectFirst && !state.selectedId && result.campaigns.length) {
-    await selectCampaign(result.campaigns[0].id);
-    return;
+    state.selectedId = result.campaigns[0].id;
+    state.campaign = await api(`/api/campaigns/${encodeURIComponent(state.selectedId)}`);
   }
+  if (!result.ai?.config?.setupComplete) state.aiMode = true;
   renderSidebar();
   render();
 }
@@ -92,6 +96,7 @@ async function selectCampaign(id) {
   state.selectedId = id;
   state.projectMode = false;
   state.scribeMode = false;
+  state.aiMode = false;
   state.campaign = await api(`/api/campaigns/${encodeURIComponent(id)}`);
   state.tab = 'overview';
   setMenuOpen(false);
@@ -119,6 +124,10 @@ function renderSidebar() {
 }
 
 function render() {
+  if (state.aiMode) {
+    renderAiSetup();
+    return;
+  }
   if (state.scribeMode) {
     renderScribe();
     return;
@@ -497,6 +506,8 @@ function entityForm(type, item = {}) {
     ].join('');
   }
   if (type === 'sessions') {
+    const remoteText = state.project.ai?.config?.text?.provider === 'openai';
+    const remoteImage = state.project.ai?.config?.image?.provider === 'openai';
     return [
       ...common,
       field(
@@ -506,10 +517,34 @@ function entityForm(type, item = {}) {
         { type: 'number', min: 1 },
       ),
       field('date', 'Date', item.date ?? new Date().toISOString().slice(0, 10), { type: 'date' }),
+      section('Raw notes · private working material'),
+      field('rawNotes', 'Paste or write the session notes', '', {
+        type: 'textarea',
+        wide: true,
+        hint: 'These notes are sent only when you choose a processing button and are not saved in the public campaign file.',
+      }),
+      field(
+        'aiLanguage',
+        'Draft language',
+        state.campaign.manifestEntry.defaultLanguage ?? languages[0],
+        {
+          type: 'select',
+          values: languages.map((language) => [
+            language,
+            `${languageName(language)} (${language})`,
+          ]),
+          hint: 'The chosen translation is populated; the others remain available for review or later translation.',
+        },
+      ),
+      `<div class="ai-compose field--wide"><div><strong>Turn notes into a reviewable draft</strong><small>${escapeHtml(state.project.ai?.config?.text?.provider === 'off' ? 'Choose a prose provider in AI setup first.' : `Using ${state.project.ai?.config?.text?.provider}. Nothing is saved until you review and choose Save.`)}</small></div><div class="action-row"><button class="secondary-button" type="button" data-ai-notes="text">Process notes</button><button class="primary-button" type="button" data-ai-notes="images">Process notes with images</button></div>${remoteText || remoteImage ? '<label class="consent-check"><input name="remoteConsent" type="checkbox" /> I understand that this task sends the notes to the configured remote provider.</label>' : ''}<div class="ai-review" data-ai-review hidden></div></div>`,
+      section('Review and edit the draft'),
       ...localizedFields('title', 'Title', item.title, languages, { required: true }),
       ...localizedFields('location', 'Location', item.location, languages),
       ...localizedFields('summary', 'Summary', item.summary, languages, { type: 'textarea' }),
       ...localizedFields('prose', 'Chronicle', item.prose, languages, { type: 'textarea' }),
+      ...localizedFields('story', 'Story so far', item.storySoFar, languages, {
+        type: 'textarea',
+      }),
       ...languages.map((language) =>
         field(
           `events__${language}`,
@@ -548,7 +583,7 @@ function openEntityEditor(type, item) {
     title: `${item ? 'Edit' : 'New'} ${labels[type].toLowerCase()}`,
     eyebrow: labels[type],
     html: entityForm(type, item),
-    editor: { kind: 'entity', type, previousId: item?.id, original: item },
+    editor: { kind: 'entity', type, previousId: item?.id, original: item, aiImages: [] },
   });
   const nameInput = fields.querySelector(
     '[name="name"], [name^="loc__title__"], [name^="loc__name__"]',
@@ -854,12 +889,21 @@ async function buildEntity(type, form, original = {}) {
       summary: localizedFormValue(form, 'summary', '', languages),
       location: localizedFormValue(form, 'location', '', languages),
       prose: localizedFormValue(form, 'prose', '', languages),
-      storySoFar: localizedFormValue(form, 'summary', '', languages),
+      storySoFar: localizedFormValue(form, 'story', '', languages),
       keyEvents: Array.from({ length: eventCount }, (_, index) => ({
         description: Object.fromEntries(
           languages.map((language) => [language, events[language][index] ?? '']),
         ),
       })),
+      images: [
+        ...(original.images ?? []),
+        ...(state.editor.aiImages ?? []).map((image) => ({
+          url: image.path,
+          alt: Object.fromEntries(languages.map((language) => [language, image.alt])),
+          caption: Object.fromEntries(languages.map((language) => [language, image.caption])),
+          afterSection: image.afterSection,
+        })),
+      ],
     };
   }
   const image = await uploadSelectedImage('image', 'maps');
@@ -880,6 +924,159 @@ async function buildEntity(type, form, original = {}) {
       : (original.images ?? []),
     discoveries: original.discoveries ?? [],
   };
+}
+
+function optionList(items, selected) {
+  return items
+    .map(
+      (item) =>
+        `<option value="${escapeHtml(item.id)}" ${item.id === selected ? 'selected' : ''}>${escapeHtml(item.label)} · ${item.sizeGb} GB</option>`,
+    )
+    .join('');
+}
+
+function renderAiSetup() {
+  document.querySelector('#page-title').textContent = 'AI setup';
+  const ai = state.project.ai;
+  if (!ai) {
+    content.innerHTML = '<div class="empty">Loading the local AI profile…</div>';
+    return;
+  }
+  const { config, hardware, recommendations, models } = ai;
+  const selectedImageModel =
+    models.image.find((model) => model.id === recommendations.imageModelId) ?? models.image[0];
+  const textJob = state.project.jobs['ai-text-model'];
+  const imageJob = state.project.jobs['ai-image-model'];
+  const activeLog =
+    [textJob, imageJob].find((job) => job?.status === 'running') || imageJob || textJob;
+  const gpuText = hardware.gpus?.length
+    ? hardware.gpus.map((gpu) => `${gpu.name}${gpu.vramGb ? ` · ${gpu.vramGb} GB` : ''}`).join(', ')
+    : 'No dedicated GPU memory detected';
+  content.innerHTML = `
+    <form id="ai-setup-form" class="ai-setup">
+      <section class="ai-hero"><div class="ai-hero__sigil" aria-hidden="true">✧</div><div><span class="eyebrow">Interactive first-run guide</span><h2>Your table, your choice of intelligence</h2><p>Keep everything local, connect a remote API, or leave AI off. Recommendations use this computer's detected resources; you remain in control of every download and every draft.</p></div></section>
+      <section class="hardware-strip"><div><span>Processor</span><strong>${escapeHtml(hardware.cpu)}</strong><small>${hardware.logicalCores} logical cores</small></div><div><span>Memory</span><strong>${hardware.ramGb} GB RAM</strong><small>${hardware.freeRamGb} GB currently free</small></div><div><span>Graphics</span><strong>${escapeHtml(gpuText)}</strong><small>${escapeHtml(recommendations.imageReason)}</small></div></section>
+      <div class="choice-grid ai-provider-grid">
+        <section class="project-panel"><span class="eyebrow">The chronicler · prose</span><h3>How should notes become chapters?</h3><label class="field"><span>Provider</span><select name="textProvider"><option value="off" ${config.text.provider === 'off' ? 'selected' : ''}>Off · write manually</option><option value="ollama" ${config.text.provider === 'ollama' ? 'selected' : ''}>Local · Ollama</option><option value="openai" ${config.text.provider === 'openai' ? 'selected' : ''}>Remote · OpenAI API</option></select></label><label class="field"><span>Recommended local model</span><select name="ollamaModel">${optionList(models.text, config.setupComplete ? config.text.ollamaModel : recommendations.textModelId)}</select><small>Suggested for this machine: ${escapeHtml(recommendations.textModelId)}. You can choose another.</small></label><label class="field"><span>Ollama address</span><input name="ollamaUrl" value="${escapeHtml(config.text.ollamaUrl)}" /></label><div class="provider-help"><a href="https://ollama.com/download" target="_blank" rel="noreferrer">Install Ollama first ↗</a><span>Then return here to download the selected model.</span></div><div class="action-row"><button class="secondary-button" type="button" data-ai-action="download-text">Download selected model</button><button class="secondary-button" type="button" data-ai-action="test-text">Test prose provider</button></div><hr /><label class="field"><span>OpenAI model</span><input name="openaiTextModel" value="${escapeHtml(config.text.openaiModel)}" /></label><label class="field"><span>OpenAI API key</span><input name="openaiApiKey" type="password" autocomplete="off" placeholder="${config.text.openaiKeyConfigured ? 'Saved locally · leave blank to keep it' : 'sk-…'}" /></label></section>
+        <section class="project-panel"><span class="eyebrow">The illustrator · images</span><h3>How should scenes be illustrated?</h3><label class="field"><span>Provider</span><select name="imageProvider"><option value="off" ${config.image.provider === 'off' ? 'selected' : ''}>Off · add images manually</option><option value="comfyui" ${config.image.provider === 'comfyui' ? 'selected' : ''}>Local · ComfyUI</option><option value="openai" ${config.image.provider === 'openai' ? 'selected' : ''}>Remote · OpenAI Images</option></select></label><div class="recommendation ${recommendations.localImageRecommended ? 'is-good' : 'is-caution'}"><strong>${recommendations.localImageRecommended ? 'Local generation looks viable' : 'Remote or manual art recommended'}</strong><span>${escapeHtml(recommendations.imageReason)}</span></div><label class="field"><span>ComfyUI address</span><input name="comfyUrl" value="${escapeHtml(config.image.comfyUrl)}" /></label><label class="field"><span>ComfyUI installation folder</span><input name="comfyRoot" value="${escapeHtml(config.image.comfyRoot)}" placeholder="C:\\ComfyUI" /><small>The folder must contain models/checkpoints.</small></label><div class="provider-help"><a href="https://docs.comfy.org/installation/desktop" target="_blank" rel="noreferrer">Install ComfyUI first ↗</a><span>Keep it running while QuestKeeper illustrates a session.</span></div><label class="field"><span>Checkpoint</span><select name="imageModel">${optionList(models.image, recommendations.imageModelId)}</select></label><label class="consent-check"><input name="licenseAccepted" type="checkbox" /> I reviewed and accept the <a href="${escapeHtml(selectedImageModel.licenseUrl)}" target="_blank" rel="noreferrer">${escapeHtml(selectedImageModel.license)}</a>.</label><div class="action-row"><button class="secondary-button" type="button" data-ai-action="download-image">Download checkpoint</button><button class="secondary-button" type="button" data-ai-action="test-image">Test image provider</button></div><hr /><label class="field"><span>OpenAI image model</span><input name="openaiImageModel" value="${escapeHtml(config.image.openaiModel)}" /></label></section>
+      </div>
+      <section class="privacy-panel"><strong>No silent cloud fallback.</strong><p>Local endpoints are restricted to this computer. API keys stay in the ignored <code>.campaign-manager/</code> folder and are never returned to the browser. Before a remote task, the Manager asks for consent again.</p></section>
+      <div class="setup-footer"><button class="primary-button" type="submit">Save choices and continue</button><span>All generated content opens as an editable draft.</span></div>
+      ${activeLog ? `<pre class="job-log">${escapeHtml(activeLog.logs)}</pre>` : ''}
+    </form>`;
+}
+
+function aiSetupPayload(form, complete = true) {
+  const imageModel = state.project.ai.models.image.find(
+    (model) => model.id === form.get('imageModel'),
+  );
+  return {
+    setupComplete: complete,
+    text: {
+      provider: form.get('textProvider'),
+      ollamaUrl: form.get('ollamaUrl'),
+      ollamaModel: form.get('ollamaModel'),
+      openaiModel: form.get('openaiTextModel'),
+      openaiApiKey: form.get('openaiApiKey'),
+    },
+    image: {
+      provider: form.get('imageProvider'),
+      comfyUrl: form.get('comfyUrl'),
+      comfyRoot: form.get('comfyRoot'),
+      comfyCheckpoint: imageModel?.fileName,
+      openaiModel: form.get('openaiImageModel'),
+    },
+  };
+}
+
+async function saveAiSetup(complete = true) {
+  const formElement = document.querySelector('#ai-setup-form');
+  const form = new FormData(formElement);
+  await api('/api/ai/setup', {
+    method: 'PUT',
+    body: JSON.stringify(aiSetupPayload(form, complete)),
+  });
+  await loadState();
+  if (complete) state.aiMode = false;
+  render();
+  toast('AI choices saved locally.');
+}
+
+async function runAiSetupAction(action) {
+  const form = new FormData(document.querySelector('#ai-setup-form'));
+  await api('/api/ai/setup', {
+    method: 'PUT',
+    body: JSON.stringify(aiSetupPayload(form, state.project.ai.config.setupComplete)),
+  });
+  if (action === 'download-text') {
+    await api('/api/ai/models/text', {
+      method: 'POST',
+      body: JSON.stringify({ modelId: form.get('ollamaModel') }),
+    });
+    toast('Text model download started.');
+    void refreshJobs();
+    return;
+  }
+  if (action === 'download-image') {
+    await api('/api/ai/models/image', {
+      method: 'POST',
+      body: JSON.stringify({
+        modelId: form.get('imageModel'),
+        comfyRoot: form.get('comfyRoot'),
+        licenseAccepted: form.get('licenseAccepted') === 'on',
+      }),
+    });
+    toast('Image checkpoint download started.');
+    void refreshJobs();
+    return;
+  }
+  const kind = action === 'test-image' ? 'image' : 'text';
+  const result = await api('/api/ai/test', { method: 'POST', body: JSON.stringify({ kind }) });
+  toast(result.message);
+  await loadState();
+}
+
+function setLocalizedDraftField(prefix, language, value) {
+  const target = fields.querySelector(`[name="loc__${prefix}__${language}"]`);
+  if (target) target.value = value ?? '';
+}
+
+async function processSessionNotes(includeImages) {
+  if (state.editor?.type !== 'sessions') return;
+  const form = new FormData(editorForm);
+  const language = form.get('aiLanguage') ?? state.campaign.manifestEntry.defaultLanguage ?? 'en';
+  const button = fields.querySelector(`[data-ai-notes="${includeImages ? 'images' : 'text'}"]`);
+  button.disabled = true;
+  button.textContent = includeImages ? 'Writing and illustrating…' : 'Writing draft…';
+  try {
+    const result = await api(
+      `/api/campaigns/${encodeURIComponent(state.selectedId)}/ai/process-notes`,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          notes: form.get('rawNotes'),
+          language,
+          sessionNumber: form.get('sessionNumber'),
+          includeImages,
+          remoteConsent: form.get('remoteConsent') === 'on',
+        }),
+      },
+    );
+    const draft = result.draft;
+    for (const key of ['title', 'location', 'summary', 'prose', 'storySoFar']) {
+      setLocalizedDraftField(key === 'storySoFar' ? 'story' : key, language, draft[key]);
+    }
+    const events = fields.querySelector(`[name="events__${language}"]`);
+    if (events) events.value = draft.keyEvents.join('\n');
+    state.editor.aiImages = draft.generatedImages ?? [];
+    const review = fields.querySelector('[data-ai-review]');
+    review.hidden = false;
+    review.innerHTML = `<strong>Draft ready for the Game Master</strong><p>${escapeHtml(draft.summary)}</p>${state.editor.aiImages.length ? `<span>${state.editor.aiImages.length} illustration${state.editor.aiImages.length === 1 ? '' : 's'} generated and attached.</span>` : ''}${draft.suggestions.length ? `<details><summary>${draft.suggestions.length} optional archive suggestion${draft.suggestions.length === 1 ? '' : 's'}</summary><ul>${draft.suggestions.map((item) => `<li><strong>${escapeHtml(item.kind)} · ${escapeHtml(item.subject)}</strong><br />${escapeHtml(item.proposal)}<small>Evidence: ${escapeHtml(item.evidence)}</small></li>`).join('')}</ul></details>` : ''}<small>Review the fields below. Suggestions are never applied automatically.</small>`;
+    toast('Editable draft created. Review it before saving.');
+  } finally {
+    button.disabled = false;
+    button.textContent = includeImages ? 'Process notes with images' : 'Process notes';
+  }
 }
 
 async function saveEditor() {
@@ -956,6 +1153,7 @@ async function refreshJobs() {
   state.project = result;
   if (state.projectMode) renderProject();
   if (state.scribeMode) renderScribe();
+  if (state.aiMode) renderAiSetup();
   if (Object.values(result.jobs).some((job) => ['running', 'stopping'].includes(job.status))) {
     setTimeout(() => refreshJobs().catch((error) => toast(error.message, true)), 1200);
   } else await loadState();
@@ -965,6 +1163,7 @@ async function runProjectAction(kind, view = 'project') {
   await api(`/api/actions/${kind}`, { method: 'POST', body: '{}' });
   state.projectMode = view === 'project';
   state.scribeMode = view === 'scribe';
+  state.aiMode = false;
   renderSidebar();
   void refreshJobs();
 }
@@ -1004,12 +1203,22 @@ document.addEventListener('keydown', (event) => {
 document.querySelector('#show-project').addEventListener('click', () => {
   state.projectMode = true;
   state.scribeMode = false;
+  state.aiMode = false;
   setMenuOpen(false);
   renderSidebar();
   render();
 });
 document.querySelector('#show-scribe').addEventListener('click', () => {
   state.scribeMode = true;
+  state.projectMode = false;
+  state.aiMode = false;
+  setMenuOpen(false);
+  renderSidebar();
+  render();
+});
+document.querySelector('#show-ai-setup').addEventListener('click', () => {
+  state.aiMode = true;
+  state.scribeMode = false;
   state.projectMode = false;
   setMenuOpen(false);
   renderSidebar();
@@ -1036,6 +1245,11 @@ document.querySelector('#open-companion').addEventListener('click', () => {
 });
 
 content.addEventListener('click', async (event) => {
+  const aiAction = event.target.closest('[data-ai-action]');
+  if (aiAction) {
+    runAiSetupAction(aiAction.dataset.aiAction).catch((error) => toast(error.message, true));
+    return;
+  }
   const tab = event.target.closest('[data-tab]');
   if (tab) {
     state.tab = tab.dataset.tab;
@@ -1103,6 +1317,20 @@ content.addEventListener('click', async (event) => {
     const kind = scribeAction.dataset.scribeAction === 'stop' ? 'transcriber-stop' : 'transcriber';
     runProjectAction(kind, 'scribe').catch((error) => toast(error.message, true));
   }
+});
+
+content.addEventListener('submit', (event) => {
+  if (event.target.id !== 'ai-setup-form') return;
+  event.preventDefault();
+  saveAiSetup(true).catch((error) => toast(error.message, true));
+});
+
+fields.addEventListener('click', (event) => {
+  const button = event.target.closest('[data-ai-notes]');
+  if (!button) return;
+  processSessionNotes(button.dataset.aiNotes === 'images').catch((error) =>
+    toast(error.message, true),
+  );
 });
 
 editorForm.addEventListener('submit', (event) => {

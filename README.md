@@ -142,6 +142,7 @@ enter the live sample.
 | Visual campaign editor with recoverable deletion       | Styled character-sheet PDF exports                     |
 | Backups, build validation and original-image uploads   | Mobile-friendly maps, galleries and relationship views |
 | Optional local Discord transcription                   | A remembered language and spoiler-warning choice       |
+| Reviewable AI drafts from typed or transcribed notes   | Human-approved prose and illustrations only            |
 
 Character profiles also keep a canonical height, everyday interests and two
 independent pieces of art: a square face/profile image and a full 2:3 portrait.
@@ -201,6 +202,16 @@ Prepare dependencies, preview the real site and run a production check from
 one guided screen. When the omens are favorable, GitHub Actions deploys it.
 
 ![Setup and publishing screen with preparation, preview and validation actions](docs/images/campaign-manager-publish.webp)
+
+### 5 · Let the scribe assist—not decide
+
+The first-run guide detects the computer's resources and lets the Game Master
+choose manual authoring, local Ollama and ComfyUI models, or an explicitly
+configured OpenAI API. In a session editor, **Process notes** fills every
+chapter field as a reviewable draft; **Process notes with images** also creates
+scene illustrations. Nothing publishes until the Game Master edits and saves.
+
+Read the [AI setup and privacy guide](docs/AI-SETUP.md).
 
 <p align="center">◆ ───────────── ✦ ───────────── ◆</p>
 
@@ -289,15 +300,20 @@ Upload `dist/campaign-companion/browser/` to your web root and configure SPA
 fallback to `index.html`. Apache and Nginx examples live in
 [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
-## Optional local AI helpers
+## Optional AI, one guided setup
 
-`tools/local-ai/` can ask a local [Ollama](https://ollama.com/) model for an
-original structured campaign draft and prepare prompts for a local
-[ComfyUI](https://www.comfy.org/) installation. Nothing overwrites campaign
-data automatically: the GM reviews every draft first.
+Open **AI setup** in Campaign Manager to choose manual creation, local
+[Ollama](https://ollama.com/) prose and [ComfyUI](https://www.comfy.org/)
+illustrations, or a remote OpenAI API. Hardware-aware recommendations explain
+the trade-offs and model sizes before any download. The older command-line
+helpers remain available for advanced workflows, but they are no longer
+required for ordinary session recaps.
 
-See the [local AI guide](tools/local-ai/README.md). You are responsible for the
-licenses of the models, inputs and generated output you use.
+Every result is an editable draft, remote tasks require per-action consent and
+there is no silent local-to-cloud fallback. See the
+[AI setup and privacy guide](docs/AI-SETUP.md) and the optional
+[command-line helper guide](tools/local-ai/README.md). You are responsible for
+the licenses of the models, inputs and generated output you use.
 
 ## Safety, secrets and dragons
 

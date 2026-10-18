@@ -1,6 +1,6 @@
 import { createServer } from 'node:http';
 import { randomBytes } from 'node:crypto';
-import { readFile, stat } from 'node:fs/promises';
+import { open, readFile, rename, rm, stat } from 'node:fs/promises';
 import { dirname, extname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawn } from 'node:child_process';
@@ -17,6 +17,17 @@ import {
   saveImage,
   updateCampaign,
 } from './store.mjs';
+import {
+  detectHardware,
+  IMAGE_MODELS,
+  publicAiConfig,
+  readAiConfig,
+  recommendModels,
+  TEXT_MODELS,
+  validateComfyRoot,
+  writeAiConfig,
+} from './ai-config.mjs';
+import { generateDraftImages, processNotesWithText, testAiProvider } from './ai-service.mjs';
 
 const MANAGER_ROOT = dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = resolve(MANAGER_ROOT, '..', '..');
@@ -26,6 +37,7 @@ const TOKEN = randomBytes(24).toString('hex');
 const MAX_BODY_BYTES = 12 * 1024 * 1024;
 const jobs = new Map();
 const children = new Set();
+const hardwarePromise = detectHardware();
 
 const TYPES = {
   '.css': 'text/css; charset=utf-8',
@@ -70,6 +82,113 @@ function jobSnapshot() {
 function appendLog(job, text) {
   job.logs = `${job.logs}${text}`.slice(-20_000);
   job.updatedAt = new Date().toISOString();
+}
+
+function startBackgroundJob(kind, work) {
+  const current = jobs.get(kind);
+  if (current && current.status === 'running') return current;
+  const job = {
+    kind,
+    status: 'running',
+    logs: '',
+    startedAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+  jobs.set(kind, job);
+  Promise.resolve()
+    .then(() => work(job))
+    .then(() => {
+      job.status = 'success';
+      job.updatedAt = new Date().toISOString();
+    })
+    .catch((error) => {
+      appendLog(job, `\n${error instanceof Error ? error.message : 'Unknown error'}\n`);
+      job.status = 'failed';
+    });
+  return job;
+}
+
+async function pullOllamaModel(modelId) {
+  const config = await readAiConfig(PROJECT_ROOT);
+  const model = TEXT_MODELS.find((item) => item.id === modelId);
+  if (!model) throw new Error('Unknown or unsupported text model.');
+  return startBackgroundJob('ai-text-model', async (job) => {
+    appendLog(job, `Requesting ${model.label} (${model.sizeGb} GB) from Ollama…\n`);
+    const response = await fetch(`${config.text.ollamaUrl}/api/pull`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: model.id, stream: true }),
+      signal: AbortSignal.timeout(3_600_000),
+    });
+    if (!response.ok || !response.body) {
+      throw new Error(`Ollama download failed: ${response.statusText}`);
+    }
+    let pending = '';
+    for await (const chunk of response.body) {
+      pending += Buffer.from(chunk).toString('utf8');
+      const lines = pending.split('\n');
+      pending = lines.pop() ?? '';
+      for (const line of lines.filter(Boolean)) {
+        const update = JSON.parse(line);
+        const progress = update.total
+          ? ` ${Math.round((Number(update.completed || 0) / Number(update.total)) * 100)}%`
+          : '';
+        appendLog(job, `${update.status || 'Downloading'}${progress}\n`);
+      }
+    }
+    appendLog(job, `${model.label} is ready.\n`);
+  });
+}
+
+async function downloadImageModel(input) {
+  const model = IMAGE_MODELS.find((item) => item.id === input.modelId);
+  if (!model) throw new Error('Unknown or unsupported image model.');
+  if (input.licenseAccepted !== true)
+    throw new Error('Accept the model license before downloading.');
+  const comfyRoot = await validateComfyRoot(input.comfyRoot);
+  const target = join(comfyRoot, 'models', 'checkpoints', model.fileName);
+  return startBackgroundJob('ai-image-model', async (job) => {
+    try {
+      await stat(target);
+      appendLog(job, `${model.fileName} is already installed.\n`);
+      return;
+    } catch {
+      // Download it below.
+    }
+    const partial = `${target}.questkeeper-partial`;
+    appendLog(job, `Downloading ${model.label} (${model.sizeGb} GB)…\n`);
+    const response = await fetch(model.sourceUrl, { signal: AbortSignal.timeout(3_600_000) });
+    if (!response.ok || !response.body)
+      throw new Error(`Model download failed: ${response.statusText}`);
+    const expected = Number(response.headers.get('content-length') || 0);
+    const file = await open(partial, 'w', 0o600);
+    let received = 0;
+    let lastProgress = -1;
+    try {
+      for await (const chunk of response.body) {
+        const buffer = Buffer.from(chunk);
+        await file.write(buffer);
+        received += buffer.length;
+        const progress = expected ? Math.floor((received / expected) * 100) : 0;
+        if (progress >= lastProgress + 5) {
+          lastProgress = progress;
+          appendLog(
+            job,
+            expected
+              ? `${progress}% downloaded\n`
+              : `${Math.round(received / 1024 ** 2)} MB downloaded\n`,
+          );
+        }
+      }
+    } finally {
+      await file.close();
+    }
+    await rename(partial, target).catch(async (error) => {
+      await rm(partial, { force: true });
+      throw error;
+    });
+    appendLog(job, `${model.fileName} is ready in ComfyUI.\n`);
+  });
 }
 
 function commandForJob(kind) {
@@ -207,7 +326,19 @@ async function projectStatus() {
   } catch {
     // Expected on a fresh clone.
   }
-  return { dependenciesReady, transcriber: await transcriberStatus(), jobs: jobSnapshot() };
+  const hardware = await hardwarePromise;
+  const aiConfig = await readAiConfig(PROJECT_ROOT);
+  return {
+    dependenciesReady,
+    transcriber: await transcriberStatus(),
+    jobs: jobSnapshot(),
+    ai: {
+      config: publicAiConfig(aiConfig),
+      hardware,
+      recommendations: recommendModels(hardware),
+      models: { text: TEXT_MODELS, image: IMAGE_MODELS },
+    },
+  };
 }
 
 async function serveStatic(response, pathname) {
@@ -272,6 +403,39 @@ async function routeApi(request, response, url) {
   if (request.method === 'PUT') assertToken(request);
   if (request.method === 'DELETE') assertToken(request);
 
+  if (request.method === 'GET' && url.pathname === '/api/ai/setup') {
+    const hardware = await hardwarePromise;
+    const config = await readAiConfig(PROJECT_ROOT);
+    sendJson(response, 200, {
+      config: publicAiConfig(config),
+      hardware,
+      recommendations: recommendModels(hardware),
+      models: { text: TEXT_MODELS, image: IMAGE_MODELS },
+    });
+    return;
+  }
+  if (request.method === 'PUT' && url.pathname === '/api/ai/setup') {
+    const config = await writeAiConfig(PROJECT_ROOT, await readBody(request));
+    sendJson(response, 200, { config: publicAiConfig(config) });
+    return;
+  }
+  if (request.method === 'POST' && url.pathname === '/api/ai/test') {
+    const body = await readBody(request);
+    const config = await readAiConfig(PROJECT_ROOT);
+    sendJson(response, 200, { message: await testAiProvider(config, body.kind) });
+    return;
+  }
+  if (request.method === 'POST' && url.pathname === '/api/ai/models/text') {
+    const job = await pullOllamaModel((await readBody(request)).modelId);
+    sendJson(response, 202, { job: { ...job, process: undefined } });
+    return;
+  }
+  if (request.method === 'POST' && url.pathname === '/api/ai/models/image') {
+    const job = await downloadImageModel(await readBody(request));
+    sendJson(response, 202, { job: { ...job, process: undefined } });
+    return;
+  }
+
   if (request.method === 'POST' && url.pathname === '/api/campaigns') {
     sendJson(response, 201, await createCampaign(PROJECT_ROOT, await readBody(request)));
     return;
@@ -292,6 +456,50 @@ async function routeApi(request, response, url) {
   }
 
   const campaignId = parts[2];
+  if (
+    request.method === 'POST' &&
+    parts[3] === 'ai' &&
+    parts[4] === 'process-notes' &&
+    parts.length === 5
+  ) {
+    const input = await readBody(request);
+    const config = await readAiConfig(PROJECT_ROOT);
+    const usesRemote =
+      config.text.provider === 'openai' ||
+      (input.includeImages && config.image.provider === 'openai');
+    if (usesRemote && input.remoteConsent !== true) {
+      throw new Error('Confirm that these notes may be sent to the configured remote provider.');
+    }
+    const campaign = await getCampaign(PROJECT_ROOT, campaignId);
+    const draft = await processNotesWithText({
+      config,
+      campaign,
+      notes: input.notes,
+      language: input.language || campaign.manifestEntry.defaultLanguage || 'en',
+      includeImages: Boolean(input.includeImages),
+    });
+    const images = [];
+    if (input.includeImages) {
+      const generated = await generateDraftImages({ config, prompts: draft.imagePrompts });
+      for (const [index, image] of generated.entries()) {
+        const saved = await saveImage(PROJECT_ROOT, campaignId, {
+          category: 'sessions',
+          fileName: `ai-session-${input.sessionNumber || 'draft'}-${index + 1}.webp`,
+          dataUrl: image.dataUrl,
+        });
+        images.push({ ...image, path: saved.path, dataUrl: undefined });
+      }
+    }
+    sendJson(response, 200, {
+      draft: { ...draft, generatedImages: images },
+      provider: {
+        text: config.text.provider,
+        image: input.includeImages ? config.image.provider : null,
+      },
+      notice: 'Draft only. Review every field before saving.',
+    });
+    return;
+  }
   if (request.method === 'GET' && parts.length === 3) {
     sendJson(response, 200, await getCampaign(PROJECT_ROOT, campaignId));
     return;

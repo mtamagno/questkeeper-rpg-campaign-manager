@@ -211,6 +211,34 @@ reordering tools or chapter-level visibility controls.
 
 ## New decision template
 
+### QK-009 — One consent-first AI setup and one reviewable draft path
+
+**Date:** 18 October 2026
+
+**Status:** Active
+
+**Decision:** Campaign Manager owns a single AI configuration for manual,
+local and remote creation. Ollama provides local structured prose, ComfyUI
+provides local images and OpenAI is the initial opt-in remote provider. Raw
+notes become an editable session draft; no prose, suggestion or relationship
+change is published without the Game Master's explicit save.
+
+**Why:** Separate scripts and hidden configuration make a useful workflow feel
+technical and encourage inconsistent privacy behavior. A visible installer can
+recommend models from hardware, explain image-generation constraints and keep
+the same consent boundary from setup through every processing task.
+
+**Consequences:** Secrets remain in the Git-ignored local manager directory;
+local endpoints are restricted to localhost; remote tasks require per-action
+consent; local failure never triggers cloud fallback. Future AI features must
+extend the same draft, evidence and review model. Downloaded checkpoints are
+never committed and their licenses remain the user's responsibility.
+
+**Source:** [AI setup and session-draft workflow](AI-SETUP.md)
+
+**Revisit when:** A second remote provider, cross-device secret storage or
+archive-wide automatic edits require a broader provider and approval model.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD

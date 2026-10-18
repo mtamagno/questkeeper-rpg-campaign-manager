@@ -36,6 +36,12 @@ automatically tries the next available port up to 4183.
 6. Choose **Launch site**, then **Open now** to view the real Companion at
    `http://127.0.0.1:4200`.
 
+On the first launch, the Manager also opens an interactive **AI setup** guide.
+It detects CPU, RAM and available graphics memory, then recommends optional
+local prose and image models. Nothing is downloaded until you choose a model;
+manual authoring remains a first-class option. See the complete
+[AI setup guide](../../docs/AI-SETUP.md).
+
 All edits are ordinary files under `src/campaigns/`, so they remain portable
 and versionable. The manager itself works before project dependencies are
 installed because it uses only Node.js built-ins.
@@ -50,7 +56,10 @@ output folder are shown on the same screen.
 The bot is entirely optional. For an in-person table—or whenever the group
 prefers not to transcribe voice—take handwritten notes or use any notes app,
 then enter the summary and key events in the **Sessions** tab. Both workflows
-produce the same campaign archive.
+produce the same campaign archive. In either case, the session editor can turn
+reviewed notes into a fully editable draft with **Process notes**, or add
+illustrations with **Process notes with images**. Local Ollama and ComfyUI
+providers and an opt-in OpenAI API provider share the same guided setup.
 
 The Scribe writes a local Markdown transcript and does not retain an audio
 recording. Read the [Discord Scribe guide](../../discord-transcriber/README.md)

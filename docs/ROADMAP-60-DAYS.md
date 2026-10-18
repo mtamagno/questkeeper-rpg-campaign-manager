@@ -90,15 +90,20 @@ never a reason to split broken work or bypass `npm run verify`.
 
 ## Week 7 — Session Scribe and local creative AI
 
-| Day         | Commit 1                                                       | Commit 2                                                                     |
-| ----------- | -------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| 43 · 29 Nov | [ ] `feat: ship guided Discord Scribe setup and consent flow`  | [ ] `feat: add reliable launch status diagnostics and recovery`              |
-| 44 · 30 Nov | [ ] `feat: improve speaker identity and party-name mapping`    | [ ] `fix: filter silence repetition and common transcription hallucinations` |
-| 45 · 01 Dec | [ ] `feat: build transcript review desk with fast corrections` | [ ] `feat: add speaker merge search highlights and chapter markers`          |
-| 46 · 02 Dec | [ ] `feat: suggest key moments quotes NPCs places and clues`   | [ ] `feat: show transcript evidence behind every suggestion`                 |
-| 47 · 03 Dec | [ ] `feat: draft quick full and GM-only recap variants`        | [ ] `feat: preserve narrator voice with reviewable tone profiles`            |
-| 48 · 04 Dec | [ ] `feat: import typed notes and photos of handwritten pages` | [ ] `feat: merge multiple note sources into one review queue`                |
-| 49 · 05 Dec | [ ] `feat: convert approved notes into linked session content` | [ ] `feat: require explicit GM review before publication`                    |
+The October foundation already supplies hardware-aware provider setup,
+user-approved Ollama/ComfyUI downloads and typed-notes-to-session drafts. Week
+7 therefore builds on that shipped path: it improves evidence, correction and
+multi-source review rather than introducing a second AI workflow.
+
+| Day         | Commit 1                                                          | Commit 2                                                                     |
+| ----------- | ----------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| 43 · 29 Nov | [ ] `feat: ship guided Discord Scribe setup and consent flow`     | [ ] `feat: add reliable launch status diagnostics and recovery`              |
+| 44 · 30 Nov | [ ] `feat: improve speaker identity and party-name mapping`       | [ ] `fix: filter silence repetition and common transcription hallucinations` |
+| 45 · 01 Dec | [ ] `feat: build transcript review desk with fast corrections`    | [ ] `feat: add speaker merge search highlights and chapter markers`          |
+| 46 · 02 Dec | [ ] `feat: suggest key moments quotes NPCs places and clues`      | [ ] `feat: show transcript evidence behind every suggestion`                 |
+| 47 · 03 Dec | [ ] `feat: draft quick full and GM-only recap variants`           | [ ] `feat: preserve narrator voice with reviewable tone profiles`            |
+| 48 · 04 Dec | [ ] `feat: import typed notes and photos of handwritten pages`    | [ ] `feat: merge multiple note sources into one review queue`                |
+| 49 · 05 Dec | [ ] `feat: apply approved archive suggestions as an atomic batch` | [ ] `feat: add draft discard cleanup and complete provenance history`        |
 
 ## Week 8 — Collaboration, languages and longevity
 

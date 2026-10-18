@@ -227,6 +227,12 @@ models or use a remote provider chosen explicitly by the campaign owner.
 deliberate choice by the group, and every group controls where processing
 happens.
 
+> **Foundation shipped early · October 2026:** the Campaign Manager now has a
+> hardware-aware AI setup, user-approved Ollama and ComfyUI model downloads,
+> optional OpenAI providers and notes-to-session drafts with a mandatory GM
+> review. August's remaining work deepens provenance, continuity checks,
+> narrator voices and archive-wide assistance instead of rebuilding this base.
+
 ---
 
 ## September 2027 · QuestKeeper goes everywhere
