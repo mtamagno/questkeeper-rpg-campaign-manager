@@ -79,8 +79,43 @@ Each character JSON contains:
 - diary, session knowledge and quotes;
 - optional standing height in centimetres (`heightCm`), useful for consistent
   party-art proportions;
+- optional `loreChapters`, an ordered illustrated chronicle of the character's
+  public background. Each chapter has an `id`, localized `title` and `body`, an
+  optional localized `period`, and an optional image with localized `alt` and
+  `caption` text;
 - separate square `profileImageUrl` and 2:3 `portraitImageUrl` artwork (the
   manager accepts both independently), plus a temporary spoiler password.
+
+Use `publicProfile.backstory` as the concise summary used by compact views and
+exports. When `loreChapters` is present, the character page turns the longer
+background into a visual sequence instead of repeating that summary as one
+large block. Keep secrets, unrevealed motives and GM-only facts in
+`privateProfile`; image content, alt text and captions in public chapters must
+not reveal them.
+
+```json
+{
+  "loreChapters": [
+    {
+      "id": "first-road",
+      "title": { "en": "The First Road", "it": "La prima strada" },
+      "period": { "en": "Before the party", "it": "Prima del party" },
+      "body": {
+        "en": "A focused chapter of the public character history.",
+        "it": "Un capitolo mirato della storia pubblica del personaggio."
+      },
+      "image": {
+        "url": "images/characters/hero-lore-01.webp",
+        "alt": {
+          "en": "Accessible scene description",
+          "it": "Descrizione accessibile della scena"
+        },
+        "caption": { "en": "A short emotional coda.", "it": "Una breve chiusa emotiva." }
+      }
+    }
+  ]
+}
+```
 
 The local manager is the recommended way to maintain these fields. Existing
 art is preserved when editing a character; uploading a new square profile no

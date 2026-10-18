@@ -30,6 +30,7 @@ import { AccordionComponent } from '@guild/components/accordion/accordion.compon
 import { PrivateProfileComponent } from '../../components/private-profile/private-profile.component';
 import { CharacterSheetComponent } from '../../components/character-sheet/character-sheet.component';
 import { SessionDiaryComponent } from '../../components/session-diary/session-diary.component';
+import { CharacterLoreChaptersComponent } from '../../components/character-lore-chapters/character-lore-chapters.component';
 
 /**
  * Full character detail page.
@@ -46,6 +47,7 @@ import { SessionDiaryComponent } from '../../components/session-diary/session-di
     PrivateProfileComponent,
     CharacterSheetComponent,
     SessionDiaryComponent,
+    CharacterLoreChaptersComponent,
     RouterLink,
     DiceLoaderComponent,
   ],

@@ -1,0 +1,193 @@
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+
+:host {
+  display: block;
+}
+
+.lore-chapters {
+  @include flex-column;
+  gap: $spacing-xl;
+
+  &__introduction {
+    max-width: 760px;
+    padding-left: $spacing-lg;
+    border-left: $border-width-thick solid $color-gold-dark;
+
+    p {
+      margin: $spacing-xs 0 0;
+      color: $color-text-secondary;
+      font-size: $font-size-base;
+      line-height: $line-height-relaxed;
+    }
+  }
+
+  &__kicker,
+  &__chapter-label,
+  &__period {
+    font-family: $font-family-heading;
+    font-size: $font-size-xs;
+    letter-spacing: $letter-spacing-wider;
+    text-transform: uppercase;
+  }
+
+  &__kicker,
+  &__chapter-label {
+    color: $color-gold;
+  }
+
+  &__list {
+    @include flex-column;
+    gap: $spacing-2xl;
+  }
+
+  &__chapter {
+    display: grid;
+    grid-template-columns: minmax(0, 1.16fr) minmax(280px, 0.84fr);
+    gap: clamp($spacing-lg, 4vw, $spacing-3xl);
+    align-items: center;
+    position: relative;
+
+    &--reverse {
+      grid-template-columns: minmax(280px, 0.84fr) minmax(0, 1.16fr);
+
+      .lore-chapters__figure {
+        order: 2;
+      }
+
+      .lore-chapters__copy {
+        order: 1;
+      }
+    }
+
+    & + & {
+      padding-top: $spacing-2xl;
+      border-top: $border-width-thin solid $color-border-subtle;
+    }
+
+    @include respond-below(md) {
+      grid-template-columns: 1fr;
+      gap: $spacing-lg;
+
+      &--reverse {
+        grid-template-columns: 1fr;
+
+        .lore-chapters__figure,
+        .lore-chapters__copy {
+          order: initial;
+        }
+      }
+    }
+  }
+
+  &__figure {
+    min-width: 0;
+    margin: 0;
+
+    figcaption {
+      margin-top: $spacing-sm;
+      color: $color-text-muted;
+      font-size: $font-size-sm;
+      font-style: italic;
+      line-height: $line-height-base;
+    }
+  }
+
+  &__image-frame {
+    position: relative;
+    aspect-ratio: 3 / 2;
+    overflow: hidden;
+    border: $border-width-default solid $color-border-accent;
+    border-radius: $border-radius-lg;
+    background: $color-bg-deep;
+    box-shadow: $shadow-lg;
+    isolation: isolate;
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      border: 1px solid rgba($color-parchment-light, 0.12);
+      border-radius: inherit;
+      box-shadow: inset 0 -72px 80px rgba($color-bg-void, 0.2);
+    }
+  }
+
+  &__image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform $transition-slow;
+
+    @media (hover: hover) {
+      .lore-chapters__chapter:hover & {
+        transform: scale(1.015);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
+  }
+
+  &__number {
+    position: absolute;
+    right: $spacing-md;
+    bottom: $spacing-md;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    border: $border-width-thin solid rgba($color-gold-light, 0.55);
+    border-radius: 50%;
+    background: rgba($color-bg-void, 0.82);
+    color: $color-gold-light;
+    font-family: $font-family-heading;
+    font-size: $font-size-sm;
+    letter-spacing: $letter-spacing-wide;
+    box-shadow: $shadow-md;
+  }
+
+  &__copy {
+    min-width: 0;
+
+    h3 {
+      margin: $spacing-sm 0 $spacing-md;
+      color: $color-gold-light;
+      font-family: $font-family-heading;
+      font-size: clamp($font-size-xl, 3vw, $font-size-2xl);
+      line-height: $line-height-tight;
+      letter-spacing: $letter-spacing-wide;
+    }
+
+    p {
+      margin: 0;
+      color: $color-text-primary;
+      font-size: $font-size-md;
+      line-height: $line-height-relaxed;
+      white-space: pre-line;
+    }
+  }
+
+  &__heading {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-sm $spacing-md;
+    align-items: center;
+  }
+
+  &__period {
+    color: $color-text-muted;
+
+    &::before {
+      content: '◆';
+      margin-right: $spacing-sm;
+      color: $color-gold-dark;
+      font-size: 0.65em;
+    }
+  }
+}

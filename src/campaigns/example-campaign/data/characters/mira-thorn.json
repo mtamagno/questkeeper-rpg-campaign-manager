@@ -8,6 +8,51 @@
   "gallery": [],
   "profileImageUrl": "images/characters/mira-profile.svg",
   "portraitImageUrl": "images/characters/mira-portrait.svg",
+  "loreChapters": [
+    {
+      "id": "the-north-road",
+      "title": { "en": "The North Road", "it": "La strada del nord" },
+      "period": { "en": "Before the Glass Beacon", "it": "Prima del Faro di Vetro" },
+      "body": {
+        "en": "Mira learned the valley one delivery at a time. She raced storms, crossed washed-out roads and remembered which isolated doors still waited for news. Carrying a message was never just work to her: it was a promise that distance would not have the final word.",
+        "it": "Mira imparò a conoscere la valle una consegna alla volta. Sfidava le tempeste, attraversava strade franate e ricordava quali porte isolate aspettassero ancora notizie. Portare un messaggio non era mai soltanto un lavoro: era la promessa che la distanza non avrebbe avuto l'ultima parola."
+      },
+      "image": {
+        "url": "images/characters/mira-portrait.svg",
+        "alt": {
+          "en": "Mira Thorn ready to carry a message along the old north road",
+          "it": "Mira Thorn pronta a portare un messaggio lungo la vecchia strada del nord"
+        },
+        "caption": {
+          "en": "A promise must arrive, even when the road does not.",
+          "it": "Una promessa deve arrivare, anche quando la strada non esiste più."
+        }
+      }
+    },
+    {
+      "id": "the-century-wet-letter",
+      "title": { "en": "The Century-Wet Letter", "it": "La lettera dall'inchiostro ancora fresco" },
+      "period": {
+        "en": "The delivery that changed the route",
+        "it": "La consegna che cambiò la rotta"
+      },
+      "body": {
+        "en": "One delivery refused every ordinary explanation: a letter written a century ago whose ink had never dried. Following its route brought Mira to Aria and toward the Glass Beacon, where an old duty became the beginning of a shared adventure.",
+        "it": "Una consegna rifiutava ogni spiegazione ordinaria: una lettera scritta un secolo prima il cui inchiostro non si era mai asciugato. Seguirne la rotta condusse Mira da Aria e verso il Faro di Vetro, dove un vecchio dovere divenne l'inizio di un'avventura condivisa."
+      },
+      "image": {
+        "url": "images/maps/glass-beacon.svg",
+        "alt": {
+          "en": "The mysterious Glass Beacon reached by following an impossible letter",
+          "it": "Il misterioso Faro di Vetro raggiunto seguendo una lettera impossibile"
+        },
+        "caption": {
+          "en": "Some messages do not end at the person who receives them.",
+          "it": "Alcuni messaggi non finiscono con la persona che li riceve."
+        }
+      }
+    }
+  ],
   "publicProfile": {
     "backstory": {
       "en": "Mira carried messages between isolated valley towns, racing storms and washed-out roads. She joined Aria after delivering a letter written in ink that had not dried in a century.",

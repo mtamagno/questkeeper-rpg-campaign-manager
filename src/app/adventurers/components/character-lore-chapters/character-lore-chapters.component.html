@@ -1,0 +1,65 @@
+<div
+  class="lore-chapters"
+  [attr.aria-label]="
+    lang() === 'it'
+      ? 'Capitoli personali di ' + characterName()
+      : characterName() + ' personal chapters'
+  "
+>
+  <header class="lore-chapters__introduction">
+    <span class="lore-chapters__kicker">
+      {{ lang() === 'it' ? 'Cronaca personale' : 'Personal chronicle' }}
+    </span>
+    <p>
+      {{
+        lang() === 'it'
+          ? 'Momenti scelti della vita precedente all’avventura, raccontati senza anticipare ciò che il personaggio custodisce ancora per sé.'
+          : 'Selected moments from the life before the adventure, told without revealing what the character still keeps private.'
+      }}
+    </p>
+  </header>
+
+  <div class="lore-chapters__list">
+    @for (chapter of chapters(); track chapter.id; let chapterIndex = $index) {
+      <article
+        class="lore-chapters__chapter"
+        [class.lore-chapters__chapter--reverse]="chapterIndex % 2 === 1"
+      >
+        @if (chapter.image; as chapterImage) {
+          <figure class="lore-chapters__figure">
+            <div class="lore-chapters__image-frame">
+              <img
+                class="lore-chapters__image"
+                [src]="displayImageUrl(chapter)"
+                [alt]="chapterImage.alt | bilingual"
+                loading="lazy"
+                decoding="async"
+                (error)="onImageError($event, chapterImage.url)"
+              />
+              <span class="lore-chapters__number" aria-hidden="true">
+                {{ (chapterIndex + 1).toString().padStart(2, '0') }}
+              </span>
+            </div>
+            @if (chapterImage.caption) {
+              <figcaption>{{ chapterImage.caption | bilingual }}</figcaption>
+            }
+          </figure>
+        }
+
+        <div class="lore-chapters__copy">
+          <div class="lore-chapters__heading">
+            <span class="lore-chapters__chapter-label">
+              {{ lang() === 'it' ? 'Capitolo' : 'Chapter' }}
+              {{ chapterIndex + 1 }}
+            </span>
+            @if (chapter.period) {
+              <span class="lore-chapters__period">{{ chapter.period | bilingual }}</span>
+            }
+          </div>
+          <h3>{{ chapter.title | bilingual }}</h3>
+          <p>{{ chapter.body | bilingual }}</p>
+        </div>
+      </article>
+    }
+  </div>
+</div>

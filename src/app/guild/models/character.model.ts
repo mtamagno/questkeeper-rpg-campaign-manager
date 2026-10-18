@@ -15,6 +15,22 @@ export interface ImageRef {
   readonly caption?: string;
 }
 
+/** Localized illustration attached to one public lore chapter. */
+export interface CharacterLoreImage {
+  readonly url: string;
+  readonly alt: BilingualText;
+  readonly caption?: BilingualText;
+}
+
+/** One illustrated, public chapter from a character's life before the adventure. */
+export interface CharacterLoreChapter {
+  readonly id: string;
+  readonly title: BilingualText;
+  readonly period?: BilingualText;
+  readonly body: BilingualText;
+  readonly image?: CharacterLoreImage;
+}
+
 /** Public profile — lore the party knows about this character. */
 export interface CharacterPublicProfile {
   readonly backstory: BilingualText;
@@ -143,6 +159,8 @@ export interface Character {
   readonly profileImageUrl: string;
   /** 2:3 full portrait shown on the right side of the profile header. */
   readonly portraitImageUrl: string;
+  /** Optional illustrated chapters that replace the single public backstory block. */
+  readonly loreChapters?: ReadonlyArray<CharacterLoreChapter>;
   readonly publicProfile: CharacterPublicProfile;
   readonly privateProfile: CharacterPrivateProfile;
   /** Older level snapshots. The current version always remains in `sheet`. */

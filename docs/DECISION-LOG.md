@@ -184,6 +184,31 @@ authoring never becomes a second-class path.
 book structure or export formats do not support how groups preserve their
 stories.
 
+### QK-008 — Character backgrounds are illustrated chapter sequences
+
+**Date:** 18 October 2026
+
+**Status:** Active
+
+**Decision:** A substantial public character background may be presented as an
+ordered sequence of illustrated `loreChapters`. The ordinary backstory remains
+a concise summary and fallback; private facts remain exclusively in the
+protected profile.
+
+**Why:** A long biography is difficult to scan and gives every memory the same
+visual weight. Chapters let players understand a character through distinct
+turning points while giving campaign art a narrative purpose.
+
+**Consequences:** Every chapter requires a focused public scene, localized
+title and body, accessible alt text and an optional emotional caption. Images,
+captions and alt text must be reviewed for accidental spoilers. Campaigns that
+do not define chapters keep the existing backstory presentation unchanged.
+
+**Source:** [Campaign content guide](CONTENT-GUIDE.md#characters)
+
+**Revisit when:** Character histories become large enough to need pagination,
+reordering tools or chapter-level visibility controls.
+
 ## New decision template
 
 ### QK-XXX — Short decision title
