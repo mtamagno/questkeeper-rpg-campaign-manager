@@ -19,6 +19,108 @@
     </div>
   </header>
 
+  <section class="campaign-selector__audience" aria-labelledby="first-visit-title">
+    @if (audience() === null) {
+      <div class="campaign-selector__audience-heading">
+        <span class="campaign-selector__section-kicker">{{
+          lang() === 'it' ? 'Il tuo ingresso' : 'Choose your path'
+        }}</span>
+        <h2 id="first-visit-title">
+          {{ lang() === 'it' ? 'Come userai QuestKeeper?' : 'How will you use QuestKeeper?' }}
+        </h2>
+        <p>
+          {{
+            lang() === 'it'
+              ? 'QuestKeeper è il compagno del tuo tavolo: non è un VTT né un negozio di regole. Scegli da dove iniziare; potrai cambiare idea in ogni momento.'
+              : 'QuestKeeper is your table companion—not a VTT or a rules store. Choose where to begin; you can change this at any time.'
+          }}
+        </p>
+      </div>
+      <div class="campaign-selector__audience-grid">
+        <a
+          class="campaign-selector__path-card campaign-selector__path-card--player"
+          href="#campaigns"
+          data-journey="player"
+          (click)="selectAudience('player')"
+        >
+          <span class="campaign-selector__path-icon" aria-hidden="true">⚔</span>
+          <span class="campaign-selector__path-copy">
+            <small>{{ lang() === 'it' ? 'Al tavolo' : 'At the table' }}</small>
+            <strong>{{ lang() === 'it' ? 'Sono un giocatore' : "I'm a player" }}</strong>
+            <span>{{
+              lang() === 'it'
+                ? 'Trova la tua campagna, riprendi il personaggio e ricorda cosa è successo.'
+                : 'Find your campaign, return to your character and remember what happened.'
+            }}</span>
+          </span>
+          <span class="campaign-selector__path-cta">
+            {{ lang() === 'it' ? 'Trova la mia campagna' : 'Find my campaign' }}
+            <span aria-hidden="true">↓</span>
+          </span>
+        </a>
+        <button
+          type="button"
+          class="campaign-selector__path-card campaign-selector__path-card--gm"
+          data-journey="gm"
+          (click)="selectAudience('gm')"
+        >
+          <span class="campaign-selector__path-icon" aria-hidden="true">✦</span>
+          <span class="campaign-selector__path-copy">
+            <small>{{ lang() === 'it' ? 'Dietro lo schermo' : 'Behind the screen' }}</small>
+            <strong>{{ lang() === 'it' ? 'Sono il Game Master' : "I'm the Game Master" }}</strong>
+            <span>{{
+              lang() === 'it'
+                ? 'Gestisci file locali con moduli guidati: nessun account cloud e niente JSON.'
+                : 'Manage local files with guided forms: no cloud account and no JSON editing.'
+            }}</span>
+          </span>
+          <span class="campaign-selector__path-cta">
+            {{ lang() === 'it' ? 'Apri la demo del Manager' : 'Open the Manager demo' }}
+            <span aria-hidden="true">→</span>
+          </span>
+        </button>
+      </div>
+      <p class="campaign-selector__audience-privacy">
+        {{
+          lang() === 'it'
+            ? 'La scelta resta solo in questo browser e non cambia i permessi della campagna.'
+            : 'This choice stays only in this browser and never changes campaign permissions.'
+        }}
+      </p>
+    } @else {
+      <div class="campaign-selector__audience-summary">
+        <span class="campaign-selector__path-icon" aria-hidden="true">{{
+          audience() === 'gm' ? '✦' : '⚔'
+        }}</span>
+        <div>
+          <span class="campaign-selector__section-kicker">{{ audienceLabel() }}</span>
+          <h2 id="first-visit-title">{{ audienceDescription() }}</h2>
+          <p>
+            {{
+              lang() === 'it'
+                ? 'Preferenza salvata soltanto su questo dispositivo.'
+                : 'Preference saved only on this device.'
+            }}
+          </p>
+        </div>
+        <div class="campaign-selector__audience-actions">
+          @if (audience() === 'gm') {
+            <a class="qk-button qk-button--primary" [href]="managerDemoUrl">
+              {{ lang() === 'it' ? 'Apri il Manager' : 'Open Manager' }}
+            </a>
+          } @else {
+            <a class="qk-button qk-button--primary" href="#campaigns">
+              {{ lang() === 'it' ? 'Continua alle campagne' : 'Continue to campaigns' }}
+            </a>
+          }
+          <button class="qk-button qk-button--ghost" type="button" (click)="resetAudience()">
+            {{ lang() === 'it' ? 'Cambia percorso' : 'Change path' }}
+          </button>
+        </div>
+      </div>
+    }
+  </section>
+
   @if (isLoaded() && campaigns().length > 0) {
     <dl class="campaign-selector__overview" aria-label="Campaign overview">
       <div class="campaign-selector__overview-item">
@@ -43,6 +145,8 @@
       </div>
     </dl>
   }
+
+  <div id="campaigns" class="campaign-selector__campaign-anchor" aria-hidden="true"></div>
 
   @if (!isLoaded()) {
     <app-dice-loader

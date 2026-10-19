@@ -141,10 +141,167 @@
     line-height: $line-height-base;
   }
 
+  &__audience {
+    position: relative;
+    z-index: 3;
+    margin: -$spacing-lg $spacing-lg $spacing-xl;
+    padding: $spacing-lg;
+    border: $border-width-thin solid var(--qk-color-border);
+    border-radius: $border-radius-lg;
+    background: var(--qk-color-canvas-deep);
+    box-shadow: $shadow-lg;
+  }
+
+  &__audience-heading {
+    max-width: 760px;
+    margin-bottom: $spacing-md;
+
+    h2 {
+      margin: $spacing-xs 0;
+      color: var(--qk-color-text);
+      font-size: $font-size-xl;
+    }
+
+    p {
+      margin: 0;
+      color: var(--qk-color-text-secondary);
+      line-height: $line-height-base;
+    }
+  }
+
+  &__audience-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: $spacing-md;
+  }
+
+  &__path-card {
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: $spacing-sm $spacing-md;
+    min-width: 0;
+    padding: $spacing-md;
+    border: $border-width-thin solid var(--qk-color-border-subtle);
+    border-radius: $border-radius-md;
+    background: linear-gradient(135deg, var(--qk-color-surface), var(--qk-color-canvas-deep));
+    color: var(--qk-color-text);
+    font: inherit;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+      border-color $transition-fast,
+      transform $transition-fast,
+      box-shadow $transition-fast;
+
+    &:hover {
+      border-color: var(--qk-color-accent);
+      box-shadow: var(--qk-shadow-accent);
+      transform: translateY(-2px);
+    }
+
+    &:focus-visible {
+      border-color: var(--qk-color-accent);
+      outline: 2px solid var(--qk-color-focus);
+      outline-offset: 3px;
+      box-shadow: var(--qk-shadow-accent);
+      transform: translateY(-2px);
+    }
+  }
+
+  &__path-icon {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: $border-width-thin solid var(--qk-color-border);
+    border-radius: 50%;
+    color: var(--qk-color-accent-text);
+    background: var(--qk-color-accent-soft);
+    font-size: $font-size-lg;
+  }
+
+  &__path-copy {
+    display: grid;
+    gap: $spacing-xs;
+
+    small {
+      color: var(--qk-color-accent-text);
+      font-family: $font-family-heading;
+      letter-spacing: $letter-spacing-wide;
+      text-transform: uppercase;
+    }
+
+    strong {
+      font-family: $font-family-heading;
+      font-size: $font-size-lg;
+    }
+
+    span {
+      color: var(--qk-color-text-secondary);
+      line-height: 1.5;
+    }
+  }
+
+  &__path-cta {
+    grid-column: 2;
+    display: flex;
+    justify-content: space-between;
+    gap: $spacing-md;
+    padding-top: $spacing-sm;
+    border-top: $border-width-thin solid var(--qk-color-border-subtle);
+    color: var(--qk-color-accent-text);
+    font-family: $font-family-heading;
+    font-size: $font-size-xs;
+    letter-spacing: $letter-spacing-wide;
+    text-transform: uppercase;
+  }
+
+  &__audience-privacy {
+    margin: $spacing-md 0 0;
+    color: var(--qk-color-text-muted);
+    font-size: $font-size-sm;
+    text-align: center;
+  }
+
+  &__audience-summary {
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: $spacing-md;
+
+    h2,
+    p {
+      margin: 0;
+    }
+
+    h2 {
+      color: var(--qk-color-text);
+      font-size: $font-size-md;
+    }
+
+    p {
+      margin-top: $spacing-xs;
+      color: var(--qk-color-text-muted);
+      font-size: $font-size-sm;
+    }
+  }
+
+  &__audience-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: $spacing-sm;
+  }
+
+  &__campaign-anchor {
+    scroll-margin-top: $spacing-xl;
+  }
+
   &__overview {
     display: grid;
     grid-template-columns: repeat(3, minmax(100px, 0.3fr)) minmax(260px, 1fr);
-    margin: -$spacing-lg $spacing-lg $spacing-2xl;
+    margin: 0 $spacing-lg $spacing-2xl;
     position: relative;
     z-index: 2;
     border: $border-width-thin solid $color-border-default;
@@ -516,9 +673,31 @@
       display: none;
     }
 
+    &__audience {
+      margin: -$spacing-md $spacing-sm $spacing-lg;
+      padding: $spacing-md;
+    }
+
+    &__audience-grid,
+    &__audience-summary {
+      grid-template-columns: 1fr;
+    }
+
+    &__audience-summary > .campaign-selector__path-icon {
+      display: none;
+    }
+
+    &__audience-actions {
+      justify-content: stretch;
+
+      .qk-button {
+        width: 100%;
+      }
+    }
+
     &__overview {
       grid-template-columns: repeat(3, 1fr);
-      margin: -$spacing-md $spacing-sm $spacing-xl;
+      margin: 0 $spacing-sm $spacing-xl;
     }
 
     &__overview-item {

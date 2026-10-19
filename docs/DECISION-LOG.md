@@ -406,6 +406,31 @@ for the later Theme Studio with automatic contrast guidance.
 **Revisit when:** Theme Studio can validate custom choices as reliably as the
 curated presets or a light color scheme becomes a committed product outcome.
 
+### QK-016 — First-visit roles orient; they never authorize
+
+**Date:** 19 October 2026
+
+**Status:** Active
+
+**Decision:** A first-time visitor may choose a Player or Game Master path.
+QuestKeeper remembers that preference only on the current device and uses it to
+offer a clearer next action. It never hides capabilities, grants campaign access
+or represents an authenticated identity.
+
+**Why:** Players and Game Masters arrive with different immediate questions,
+but forcing accounts or ambiguous role-based access would undermine the local,
+portable and self-hosted product promise.
+
+**Consequences:** Every role-aware surface must keep a visible reset, explain
+local storage and preserve the full product. Guided tours may personalize their
+opening from this preference, while protected content continues to use its own
+explicit access mechanism.
+
+**Source:** [First-visit paths](FIRST-VISIT-PATHS.md)
+
+**Revisit when:** QuestKeeper introduces optional multi-user accounts with a
+documented permission model.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD

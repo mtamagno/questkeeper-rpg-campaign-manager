@@ -19,6 +19,10 @@ import { Router } from '@angular/router';
 import { CampaignService } from '@guild/services/campaign.service';
 import { LanguageService } from '@guild/services/language.service';
 import { SpoilerConsentService } from '@guild/services/spoilerConsent.service';
+import {
+  AudiencePreferenceService,
+  type QuestKeeperAudience,
+} from '@guild/services/audiencePreference.service';
 import { LanguageToggleComponent } from '@guild/components/language-toggle/language-toggle.component';
 import { SfxHoverDirective } from '@guild/directives/sfxHover.directive';
 import { DiceLoaderComponent } from '@guild/components/dice-loader/dice-loader.component';
@@ -43,7 +47,11 @@ export class CampaignSelectorComponent {
   private readonly campaignService = inject(CampaignService);
   private readonly languageService = inject(LanguageService);
   private readonly consentService = inject(SpoilerConsentService);
+  private readonly audiencePreference = inject(AudiencePreferenceService);
   private readonly router = inject(Router);
+
+  /** Public interactive destination used by the first-visit GM journey. */
+  readonly managerDemoUrl = 'manager-demo/';
 
   /** All available campaigns from the manifest. */
   readonly campaigns: Signal<ReadonlyArray<CampaignManifestEntry>> = this.campaignService.manifest;
@@ -53,6 +61,29 @@ export class CampaignSelectorComponent {
 
   /** Current language code for bilingual display. */
   readonly lang = this.languageService.currentLanguage;
+
+  /** Locally remembered orientation path; never grants access or permissions. */
+  readonly audience = this.audiencePreference.audience;
+
+  readonly audienceLabel: Signal<string> = computed(() => {
+    const selected = this.audience();
+    if (selected === 'gm') {
+      return this.lang() === 'it' ? 'Percorso Game Master' : 'Game Master path';
+    }
+    return this.lang() === 'it' ? 'Percorso giocatore' : 'Player path';
+  });
+
+  readonly audienceDescription: Signal<string> = computed(() => {
+    const selected = this.audience();
+    if (selected === 'gm') {
+      return this.lang() === 'it'
+        ? 'Gestisci campagne locali con moduli guidati, anteprima e pubblicazione.'
+        : 'Manage local campaigns with guided forms, preview and publishing.';
+    }
+    return this.lang() === 'it'
+      ? 'Apri una cronaca per ritrovare personaggio, legami e ultima sessione.'
+      : 'Open a chronicle to recover your character, bonds and latest session.';
+  });
 
   /** The campaign the user clicked — drives the warning modal. */
   readonly pendingCampaign: WritableSignal<CampaignManifestEntry | undefined> = signal(undefined);
@@ -87,6 +118,16 @@ export class CampaignSelectorComponent {
   /** Resolves legacy manifests to the backward-compatible heroic palette. */
   campaignPalette(campaign: CampaignManifestEntry): CampaignPalette {
     return resolveCampaignPalette(campaign.palette);
+  }
+
+  /** Remembers an orientation path on this device without changing access. */
+  selectAudience(audience: QuestKeeperAudience): void {
+    this.audiencePreference.select(audience);
+  }
+
+  /** Makes the two first-visit paths visible again. */
+  resetAudience(): void {
+    this.audiencePreference.reset();
   }
 
   /** Warning modal message based on current language and selected campaign. */
