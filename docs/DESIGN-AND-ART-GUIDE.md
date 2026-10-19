@@ -115,6 +115,7 @@ while their content determines the emphasis.
 | Token              | Readable bust inside a deliberate ring | Virtual tabletop play      |
 | Session image      | Landscape narrative moment             | Chronicle chapter          |
 | Notebook page      | Paper page or spread                   | In-character memory        |
+| Release companion  | Full-body transparent silhouette       | Release notes and codex    |
 
 Keep important cover content inside a central safe zone so responsive cropping
 does not remove heads or identifying details. Export a purpose-built crop when
@@ -150,6 +151,16 @@ Before generating or accepting an illustration, record:
 Review the result for likeness, anatomy, hands, proportions, equipment,
 continuity, unwanted text, accidental logos, crop safety and tonal consistency.
 A beautiful image that contradicts the campaign reference is not finished.
+
+### Release companions
+
+Every tagged version introduces a new original companion according to the
+[Release Codex](../RELEASES.md). Keep the complete silhouette visible, preserve
+transparent breathing room and test the asset at approximately 240 px high on
+both light and dark surfaces. Its role and props should communicate the
+release's player-facing promise without embedded words, logos or copied
+franchise motifs. Guide companions remain stable; release companions are unique
+historical markers and are never reused for a later version.
 
 ## Visual change review
 

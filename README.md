@@ -14,6 +14,8 @@
   <a href="docs/INSTALLATION-GUIDE.md"><strong>🧭 Install</strong></a>
   &nbsp;·&nbsp;
   <a href="ROADMAP.md"><strong>✨ Roadmap</strong></a>
+  &nbsp;·&nbsp;
+  <a href="RELEASES.md"><strong>📖 Release Codex</strong></a>
 </p>
 
 <p align="center">
@@ -108,6 +110,7 @@ points readers toward the right guide without turning this page into a manual.
 | Create content, use optional AI, transcribe or publish | **[Manager Guide](docs/MANAGER-GUIDE.md)**           |
 | Edit campaign JSON directly                            | [Content Guide](docs/CONTENT-GUIDE.md)               |
 | See what comes next                                    | [Public Roadmap](ROADMAP.md)                         |
+| Meet each version's fantasy companion                  | [Release Codex](RELEASES.md)                         |
 | Contribute code or design                              | [Contributing](CONTRIBUTING.md)                      |
 
 ## Built for trust

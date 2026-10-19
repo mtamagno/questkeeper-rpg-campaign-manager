@@ -454,6 +454,33 @@ different code. Future roadmap versions advance from the 1.0.0 public baseline.
 **Revisit when:** Native installers replace source archives as the primary
 desktop distribution.
 
+### QK-018 — Every public version has a fantasy identity and companion
+
+**Date:** 19 October 2026
+
+**Status:** Active
+
+**Decision:** Every stable QuestKeeper tag receives a permanent fantasy
+codename, a plain-language chapter title and one new original release companion.
+This includes patch releases, whose companion may use a smaller familiar-scale
+presentation. The identity is recorded in the root Release Codex and that
+version's notes before tagging.
+
+**Why:** Version numbers are precise but forgettable. A consistent cast turns
+the project's evolution into an inviting journey that players and Game Masters
+can recognize without hiding the practical outcome of each release.
+
+**Consequences:** Release verification requires a codename, companion block and
+version-prefixed art asset. Published identities are never reused or renamed;
+art remains original, accessible and independent of commercial fantasy worlds.
+The already-published 1.0.0 archives and tag stay immutable while its companion
+is documented in the living release catalog.
+
+**Source:** [The QuestKeeper Release Codex](../RELEASES.md)
+
+**Revisit when:** The cast becomes difficult to distinguish at a glance or the
+project adopts a different public release cadence.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD

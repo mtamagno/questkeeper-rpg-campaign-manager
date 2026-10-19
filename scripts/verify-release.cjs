@@ -9,6 +9,8 @@ const packageLock = JSON.parse(read('package-lock.json'));
 const workflow = read('.github/workflows/release.yml');
 const setupFiles = ['setup.bat', 'setup.ps1', 'setup.sh'].map(read);
 const releaseNotes = `docs/releases/v${packageJson.version}.md`;
+const releaseCodex = 'RELEASES.md';
+const releaseAssetDirectory = 'docs/images/releases';
 const failures = [];
 
 if (
@@ -20,6 +22,44 @@ if (
 
 if (!fs.existsSync(path.join(root, releaseNotes))) {
   failures.push(`Missing release notes: ${releaseNotes}.`);
+}
+
+if (!fs.existsSync(path.join(root, releaseCodex))) {
+  failures.push(`Missing release identity registry: ${releaseCodex}.`);
+}
+
+const currentReleaseNotes = fs.existsSync(path.join(root, releaseNotes)) ? read(releaseNotes) : '';
+const currentReleaseAssets = fs.existsSync(path.join(root, releaseAssetDirectory))
+  ? fs
+      .readdirSync(path.join(root, releaseAssetDirectory))
+      .filter((file) => file.startsWith(`v${packageJson.version}-`))
+  : [];
+
+if (
+  !new RegExp(`^# QuestKeeper ${packageJson.version} · [^\\r\\n]+`, 'm').test(currentReleaseNotes)
+) {
+  failures.push(`Release notes must name the v${packageJson.version} codename.`);
+}
+
+if (!currentReleaseNotes.includes('Release companion ·')) {
+  failures.push(`Release notes must introduce the v${packageJson.version} release companion.`);
+}
+
+if (currentReleaseAssets.length === 0) {
+  failures.push(
+    `Missing companion art beginning with v${packageJson.version}- in ${releaseAssetDirectory}.`,
+  );
+}
+
+if (!currentReleaseAssets.some((file) => currentReleaseNotes.includes(file))) {
+  failures.push(`Release notes do not reference their v${packageJson.version} companion art.`);
+}
+
+if (
+  fs.existsSync(path.join(root, releaseCodex)) &&
+  !read(releaseCodex).includes(`**${packageJson.version}**`)
+) {
+  failures.push(`The Release Codex does not list v${packageJson.version}.`);
 }
 
 for (const marker of ['npm run verify', 'git archive', 'sha256sum', 'gh release create']) {
@@ -57,5 +97,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `Release contract verified for v${packageJson.version}: notes, archives, checksums, setup bootstrap and tracked-file privacy guard.`,
+  `Release contract verified for v${packageJson.version}: codename, companion, notes, archives, checksums, setup bootstrap and tracked-file privacy guard.`,
 );
