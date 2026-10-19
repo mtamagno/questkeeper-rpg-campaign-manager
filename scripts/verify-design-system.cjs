@@ -112,6 +112,10 @@ if (
   failures.push('The app shell is not wired to the manifest-driven palette contract.');
 }
 
+if (!campaignService.includes('?v=${CAMPAIGN_MANIFEST_REQUEST_VERSION}')) {
+  failures.push('The campaign manifest is not refreshed between application loads.');
+}
+
 if (
   !passwordDialog.includes('qk-panel') ||
   !passwordDialog.includes('qk-button--primary') ||

@@ -50,7 +50,9 @@ Product pages without an active campaign use `neutral`. A campaign without a
 `palette` keeps the original `heroic` appearance, so existing archives do not
 need an immediate migration. Palette rules live in `src/styles/_palettes.scss`
 and are activated with `data-qk-palette`; components must not branch on a
-campaign ID to obtain ordinary colors.
+campaign ID to obtain ordinary colors. Each application load requests a
+versioned manifest URL so a recent deployment cannot be hidden by a stale
+browser cache.
 
 The Campaign Manager exposes these presets when creating or editing a
 campaign. Custom palette editing belongs to the later Theme Studio milestone;

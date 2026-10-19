@@ -26,6 +26,11 @@ import {
 } from '@guild/models/campaignPalette.model';
 
 const CAMPAIGNS_MANIFEST_PATH = 'campaigns/campaigns.json';
+const CAMPAIGN_MANIFEST_REQUEST_VERSION = Date.now().toString(36);
+
+function versionedCampaignManifestUrl(): string {
+  return `${CAMPAIGNS_MANIFEST_PATH}?v=${CAMPAIGN_MANIFEST_REQUEST_VERSION}`;
+}
 
 /**
  * Extracts the `campaignId` param from the deepest route snapshot that has it.
@@ -127,7 +132,7 @@ export class CampaignService {
 
   /** Loads the global campaigns manifest from the assets. */
   private loadManifest(): void {
-    this.http.get<ReadonlyArray<CampaignManifestEntry>>(CAMPAIGNS_MANIFEST_PATH).subscribe({
+    this.http.get<ReadonlyArray<CampaignManifestEntry>>(versionedCampaignManifestUrl()).subscribe({
       next: (entries) => {
         this._manifest.set(entries);
         this._manifestLoaded.set(true);
