@@ -1,0 +1,269 @@
+// ============================================
+// QuestKeeper shared UI primitives
+// These classes are deliberately framework-agnostic so Angular templates,
+// static demos and future native shells can share the same visual language.
+// ============================================
+
+.qk-panel {
+  color: var(--qk-color-text);
+  background: var(--qk-color-surface);
+  border: 1px solid var(--qk-color-border-subtle);
+  border-radius: var(--qk-radius-md);
+  box-shadow: var(--qk-shadow-sm);
+
+  &--raised {
+    background: var(--qk-color-surface-raised);
+    border-color: var(--qk-color-border);
+    box-shadow: var(--qk-shadow-md);
+  }
+
+  &--accent {
+    border-color: var(--qk-color-accent-strong);
+    box-shadow: var(--qk-shadow-md), var(--qk-shadow-accent);
+  }
+
+  &--interactive {
+    transition:
+      transform var(--qk-duration-base) var(--qk-ease-standard),
+      border-color var(--qk-duration-fast) var(--qk-ease-standard),
+      box-shadow var(--qk-duration-base) var(--qk-ease-standard);
+
+    &:focus-within {
+      border-color: var(--qk-color-focus);
+      box-shadow:
+        var(--qk-shadow-md),
+        0 0 0 2px var(--qk-color-accent-soft);
+    }
+
+    @media (hover: hover) {
+      &:hover {
+        transform: translateY(-2px);
+        border-color: var(--qk-color-accent-strong);
+        box-shadow: var(--qk-shadow-lg), var(--qk-shadow-accent);
+      }
+    }
+  }
+}
+
+.qk-button {
+  display: inline-flex;
+  min-height: var(--qk-control-height);
+  align-items: center;
+  justify-content: center;
+  gap: var(--qk-space-2);
+  padding: var(--qk-space-2) var(--qk-space-4);
+  border: 1px solid transparent;
+  border-radius: var(--qk-radius-sm);
+  font-family: var(--qk-font-heading);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.05em;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    color var(--qk-duration-fast) var(--qk-ease-standard),
+    background-color var(--qk-duration-fast) var(--qk-ease-standard),
+    border-color var(--qk-duration-fast) var(--qk-ease-standard),
+    box-shadow var(--qk-duration-fast) var(--qk-ease-standard),
+    transform var(--qk-duration-fast) var(--qk-ease-standard);
+
+  &:focus-visible {
+    outline: 2px solid var(--qk-color-focus);
+    outline-offset: 3px;
+  }
+
+  &:active:not(:disabled, [aria-disabled='true']) {
+    transform: translateY(1px);
+  }
+
+  &:disabled,
+  &[aria-disabled='true'] {
+    opacity: 0.48;
+    cursor: not-allowed;
+  }
+
+  &--primary {
+    color: var(--qk-color-on-accent);
+    background: var(--qk-color-accent);
+    border-color: var(--qk-color-accent);
+
+    @media (hover: hover) {
+      &:hover:not(:disabled, [aria-disabled='true']) {
+        filter: brightness(1.12);
+        box-shadow: var(--qk-shadow-accent);
+      }
+    }
+  }
+
+  &--secondary {
+    color: var(--qk-color-accent-text);
+    background: var(--qk-color-canvas-deep);
+    border-color: var(--qk-color-border);
+
+    @media (hover: hover) {
+      &:hover:not(:disabled, [aria-disabled='true']) {
+        color: var(--qk-color-text);
+        border-color: var(--qk-color-accent-strong);
+        background: var(--qk-color-surface);
+      }
+    }
+  }
+
+  &--ghost {
+    color: var(--qk-color-text-secondary);
+    background: transparent;
+    border-color: transparent;
+
+    @media (hover: hover) {
+      &:hover:not(:disabled, [aria-disabled='true']) {
+        color: var(--qk-color-text);
+        background: var(--qk-color-accent-soft);
+      }
+    }
+  }
+
+  &--danger {
+    color: #fff;
+    background: var(--qk-color-danger);
+    border-color: var(--qk-color-danger);
+
+    @media (hover: hover) {
+      &:hover:not(:disabled, [aria-disabled='true']) {
+        filter: brightness(1.12);
+      }
+    }
+  }
+
+  &--compact {
+    min-height: 2.25rem;
+    padding: var(--qk-space-1) var(--qk-space-3);
+    font-size: 0.75rem;
+  }
+}
+
+.qk-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--qk-space-1);
+  width: fit-content;
+  padding: var(--qk-space-1) var(--qk-space-2);
+  border: 1px solid var(--qk-color-border);
+  border-radius: var(--qk-radius-pill);
+  color: var(--qk-color-text-secondary);
+  background: var(--qk-color-canvas-deep);
+  font-family: var(--qk-font-heading);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.05em;
+
+  &--accent {
+    color: var(--qk-color-accent-text);
+    border-color: var(--qk-color-accent-strong);
+    background: var(--qk-color-accent-soft);
+  }
+
+  &--success {
+    color: var(--qk-color-success);
+  }
+
+  &--warning {
+    color: var(--qk-color-warning);
+  }
+
+  &--danger {
+    color: var(--qk-color-danger);
+  }
+}
+
+.qk-callout {
+  --qk-callout-color: var(--qk-color-accent);
+
+  padding: var(--qk-space-4);
+  border: 1px solid var(--qk-color-border);
+  border-inline-start: 4px solid var(--qk-callout-color);
+  border-radius: var(--qk-radius-md);
+  color: var(--qk-color-text-secondary);
+  background: var(--qk-color-surface);
+  box-shadow: var(--qk-shadow-sm);
+
+  &__title {
+    margin: 0 0 var(--qk-space-1);
+    color: var(--qk-color-text);
+    font-family: var(--qk-font-heading);
+    font-size: 1rem;
+  }
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+
+  &--info {
+    --qk-callout-color: var(--qk-color-info);
+  }
+
+  &--success {
+    --qk-callout-color: var(--qk-color-success);
+  }
+
+  &--warning {
+    --qk-callout-color: var(--qk-color-warning);
+  }
+
+  &--danger {
+    --qk-callout-color: var(--qk-color-danger);
+  }
+}
+
+.qk-heading-group {
+  display: grid;
+  gap: var(--qk-space-1);
+
+  &__eyebrow {
+    color: var(--qk-color-accent-text);
+    font-family: var(--qk-font-heading);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  &__title,
+  &__description {
+    margin: 0;
+  }
+
+  &__title {
+    color: var(--qk-color-text);
+    font-family: var(--qk-font-heading);
+  }
+
+  &__description {
+    max-width: var(--qk-reading-width);
+    color: var(--qk-color-text-secondary);
+    line-height: var(--qk-leading-body);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qk-panel--interactive,
+  .qk-button {
+    transition: none;
+  }
+
+  .qk-panel--interactive:hover,
+  .qk-button:active:not(:disabled, [aria-disabled='true']) {
+    transform: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .qk-panel,
+  .qk-button,
+  .qk-badge,
+  .qk-callout {
+    border-color: CanvasText;
+  }
+}

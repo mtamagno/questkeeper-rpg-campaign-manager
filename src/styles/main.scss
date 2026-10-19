@@ -13,6 +13,9 @@
 // 3. Mixins (reusable patterns)
 @forward 'mixins';
 
+// 3b. Runtime semantic tokens (palette-ready CSS custom properties)
+@use 'tokens';
+
 // 4. Reset (browser normalization)
 @use 'reset';
 
@@ -30,3 +33,6 @@
 @use 'tables';
 @use 'spell-meta';
 @use 'item-meta';
+
+// 8. Framework-agnostic QuestKeeper UI primitives
+@use 'components';

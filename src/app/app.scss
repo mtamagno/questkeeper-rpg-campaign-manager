@@ -28,6 +28,7 @@
 
 .app-layout {
   --campaign-accent: #{$color-gold};
+  --campaign-accent-strong: #{$color-gold-dark};
   --campaign-accent-light: #{$color-gold-light};
   --campaign-glow: rgba(201, 166, 52, 0.12);
 
@@ -38,6 +39,7 @@
 
   &--gothic {
     --campaign-accent: #{$color-gothic-burgundy-light};
+    --campaign-accent-strong: #{$color-gothic-burgundy};
     --campaign-accent-light: #d2a2aa;
     --campaign-glow: rgba(125, 40, 56, 0.18);
   }

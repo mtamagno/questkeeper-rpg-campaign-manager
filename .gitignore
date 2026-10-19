@@ -72,6 +72,7 @@ __pycache__/
 !/scripts/README.md
 !/scripts/generate-thumbnails.cjs
 !/scripts/generate-display-images.cjs
+!/scripts/verify-design-system.cjs
 
 # Internal module notes from the private project
 /src/app/**/README.md

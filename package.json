@@ -11,11 +11,12 @@
     "test": "ng test",
     "test:manager": "node --test tools/campaign-manager/tests/*.test.mjs",
     "test:transcriber": "cd discord-transcriber && python -m unittest discover -s tests",
+    "test:design-system": "node scripts/verify-design-system.cjs",
     "lint": "eslint .",
     "format": "prettier --write . --ignore-unknown",
     "format:check": "prettier --check . --ignore-unknown",
     "typecheck": "tsc --noEmit -p tsconfig.app.json",
-    "verify": "npm run lint && npm run format:check && npm run typecheck && npm run test:manager && npm run test:transcriber && npm run build",
+    "verify": "npm run lint && npm run format:check && npm run typecheck && npm run test:design-system && npm run test:manager && npm run test:transcriber && npm run build",
     "generate:thumbs": "node scripts/generate-thumbnails.cjs",
     "generate:display": "node scripts/generate-display-images.cjs"
   },

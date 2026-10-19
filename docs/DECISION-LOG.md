@@ -352,6 +352,33 @@ instruction-bearing.
 **Revisit when:** User testing shows that an essential first-run question is
 not reachable from the landing page in one obvious choice.
 
+### QK-014 — Shared UI consumes a semantic runtime token layer
+
+**Date:** 19 October 2026
+
+**Status:** Active
+
+**Decision:** QuestKeeper separates raw SCSS values, semantic runtime `--qk-*`
+tokens and framework-agnostic UI primitives. Campaign identity changes the
+semantic accent tier; shared components do not acquire campaign-specific
+selectors for ordinary theming.
+
+**Why:** Compile-time color variables and repeated component styles cannot
+support multiple coherent campaign palettes without drift. A semantic runtime
+contract allows one accessible component implementation to serve the public
+demo, Phandelver, Curse of Strahd and future campaigns.
+
+**Consequences:** New reusable controls begin with the documented `qk-*`
+primitives or extend them. New tokens describe purpose rather than a particular
+color. Status colors, focus, touch size, contrast preferences and reduced motion
+remain stable across campaign palettes. Existing components migrate when they
+are changed rather than through an unsafe bulk rewrite.
+
+**Source:** [QuestKeeper Interface Foundations](DESIGN-SYSTEM.md)
+
+**Revisit when:** Native applications require a generated cross-platform token
+artifact or browser support allows a safer typed custom-property contract.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD

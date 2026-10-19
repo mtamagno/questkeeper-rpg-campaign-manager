@@ -21,7 +21,11 @@ that every campaign still feels part of one product.
 
 ### Color and contrast
 
-- Use the semantic tokens in `src/styles/_variables.scss`.
+- Use the layered contract in the
+  [Interface Foundations](DESIGN-SYSTEM.md): raw SCSS values, semantic
+  `--qk-*` tokens, then shared UI primitives.
+- Runtime campaign identity changes semantic accent tokens; components must not
+  need campaign-specific selectors to remain readable.
 - Gold is an accent, not body text or a universal outline.
 - Campaign colors may tint highlights and atmosphere, but not redefine status
   meaning or reduce readability.
@@ -39,7 +43,8 @@ that every campaign still feels part of one product.
 
 ### Space, shape and motion
 
-- Use the shared 4 px spacing scale and established radii/shadows.
+- Use the shared `--qk-space-*` 4 px rhythm and established
+  `--qk-radius-*`/`--qk-shadow-*` values for new reusable UI.
 - Group by proximity before adding another border or panel.
 - Maintain one obvious primary action per view.
 - Animation should explain state or place, complete quickly and respect

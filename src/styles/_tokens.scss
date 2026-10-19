@@ -1,0 +1,84 @@
+// ============================================
+// QuestKeeper semantic design tokens
+// Runtime CSS variables form the stable contract between campaign palettes
+// and reusable UI primitives. Raw SCSS values remain the source palette.
+// ============================================
+
+@use 'variables' as *;
+
+:root {
+  color-scheme: dark;
+
+  // Surfaces and readable content
+  --qk-color-canvas: #{$color-bg-void};
+  --qk-color-canvas-deep: #{$color-bg-deep};
+  --qk-color-surface: #{$color-bg-surface};
+  --qk-color-surface-raised: #{$color-bg-elevated};
+  --qk-color-overlay: #{$color-bg-overlay};
+  --qk-color-text: #{$color-text-primary};
+  --qk-color-text-secondary: #{$color-text-secondary};
+  --qk-color-text-muted: #{$color-text-muted};
+  --qk-color-text-inverse: #{$color-text-inverse};
+
+  // Campaign-aware accents. A future palette only needs to replace the
+  // campaign variables; components continue to consume this semantic tier.
+  --qk-color-accent: var(--campaign-accent, #{$color-gold});
+  --qk-color-accent-strong: var(--campaign-accent-strong, #{$color-gold-dark});
+  --qk-color-accent-text: var(--campaign-accent-light, #{$color-gold-light});
+  --qk-color-accent-soft: var(--campaign-glow, #{rgba($color-gold, 0.18)});
+  --qk-color-on-accent: #{$color-bg-void};
+  --qk-color-focus: var(--campaign-accent-light, #{$color-gold-light});
+
+  // Borders and states
+  --qk-color-border-subtle: #{$color-border-subtle};
+  --qk-color-border: #{$color-border-default};
+  --qk-color-border-strong: #{$color-border-strong};
+  --qk-color-success: #{$color-success-light};
+  --qk-color-warning: #{$color-warning-light};
+  --qk-color-danger: #{$color-danger-light};
+  --qk-color-info: #{$color-info-light};
+
+  // Type
+  --qk-font-heading: #{$font-family-heading};
+  --qk-font-body: #{$font-family-body};
+  --qk-font-mono: #{$font-family-mono};
+  --qk-leading-tight: #{$line-height-tight};
+  --qk-leading-body: #{$line-height-base};
+  --qk-leading-reading: #{$line-height-relaxed};
+
+  // Four-pixel spacing rhythm
+  --qk-space-1: #{$spacing-xs};
+  --qk-space-2: #{$spacing-sm};
+  --qk-space-3: 12px;
+  --qk-space-4: #{$spacing-md};
+  --qk-space-6: #{$spacing-lg};
+  --qk-space-8: #{$spacing-xl};
+  --qk-space-12: #{$spacing-2xl};
+  --qk-space-16: #{$spacing-3xl};
+
+  // Shape, depth and motion
+  --qk-radius-sm: #{$border-radius-sm};
+  --qk-radius-md: #{$border-radius-md};
+  --qk-radius-lg: #{$border-radius-lg};
+  --qk-radius-pill: #{$border-radius-pill};
+  --qk-shadow-sm: #{$shadow-sm};
+  --qk-shadow-md: #{$shadow-md};
+  --qk-shadow-lg: #{$shadow-lg};
+  --qk-shadow-accent: 0 0 18px var(--qk-color-accent-soft);
+  --qk-duration-fast: 150ms;
+  --qk-duration-base: 250ms;
+  --qk-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+
+  // Layout and controls
+  --qk-control-height: 2.75rem;
+  --qk-content-width: #{$content-max-width};
+  --qk-reading-width: 72ch;
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --qk-color-text-secondary: #{$color-text-primary};
+    --qk-color-text-muted: #{$color-text-secondary};
+    --qk-color-border: #{$color-border-strong};
+  }
+}

@@ -1,0 +1,106 @@
+# QuestKeeper Interface Foundations
+
+This is the implementation contract for QuestKeeper's shared interface. It
+keeps campaign pages recognizable while allowing restrained visual identity.
+The broader experience and illustration rules live in the
+[Design and Art Guide](DESIGN-AND-ART-GUIDE.md).
+
+## Three token levels
+
+1. **Raw SCSS values** in `src/styles/_variables.scss` define the base palette,
+   spacing scale, type, breakpoints and depth.
+2. **Semantic CSS tokens** in `src/styles/_tokens.scss` describe purpose rather
+   than a specific color: canvas, surface, text, accent, focus, status and
+   motion.
+3. **UI primitives** in `src/styles/_components.scss` consume only semantic
+   tokens wherever a runtime campaign palette may change their appearance.
+
+New application UI should prefer `--qk-*` variables and the shared primitives.
+Existing SCSS variables remain supported while older components migrate.
+
+## Stable semantic tokens
+
+| Group    | Examples                                                        | Meaning                                 |
+| -------- | --------------------------------------------------------------- | --------------------------------------- |
+| Surface  | `--qk-color-canvas`, `--qk-color-surface-raised`                | Page and panel layers                   |
+| Content  | `--qk-color-text`, `--qk-color-text-muted`                      | Readable text hierarchy                 |
+| Identity | `--qk-color-accent`, `--qk-color-accent-text`                   | Campaign-aware emphasis                 |
+| State    | `--qk-color-success`, `--qk-color-warning`, `--qk-color-danger` | Meaning that does not change with theme |
+| Rhythm   | `--qk-space-1` through `--qk-space-16`                          | Four-pixel spacing system               |
+| Shape    | `--qk-radius-*`, `--qk-shadow-*`                                | Consistent edges and depth              |
+| Motion   | `--qk-duration-*`, `--qk-ease-standard`                         | Short, predictable feedback             |
+| Layout   | `--qk-control-height`, `--qk-reading-width`                     | Touch and reading constraints           |
+
+Campaign themes may replace the `--campaign-*` accent variables. Shared
+components inherit those values through the semantic layer; status colors and
+readability rules stay stable.
+
+## UI primitives
+
+### Panels
+
+```html
+<section class="qk-panel qk-panel--raised">...</section>
+<a class="qk-panel qk-panel--interactive" href="...">...</a>
+```
+
+Available modifiers: `--raised`, `--accent`, `--interactive`.
+
+### Buttons
+
+```html
+<button class="qk-button qk-button--primary">Save</button>
+<button class="qk-button qk-button--secondary">Cancel</button>
+<button class="qk-button qk-button--ghost">More</button>
+```
+
+Available modifiers: `--primary`, `--secondary`, `--ghost`, `--danger` and
+`--compact`. The default control is at least 44 CSS pixels tall. Use a native
+button or link so keyboard behavior is not recreated with ARIA.
+
+### Badges
+
+```html
+<span class="qk-badge qk-badge--accent">In progress</span>
+```
+
+Available modifiers: `--accent`, `--success`, `--warning`, `--danger`.
+Never use a badge color without an accompanying text label.
+
+### Callouts
+
+```html
+<aside class="qk-callout qk-callout--warning">
+  <h3 class="qk-callout__title">Before publishing</h3>
+  <p>Review player-safe information and spoilers.</p>
+</aside>
+```
+
+Available modifiers: `--info`, `--success`, `--warning`, `--danger`.
+
+### Heading groups
+
+Use `qk-heading-group` with `__eyebrow`, `__title` and `__description` to keep
+page introductions consistent without forcing one heading level.
+
+## Accessibility contract
+
+- Primary controls retain a visible focus ring and a 44 px default height.
+- Hover effects never carry the only interaction cue.
+- `prefers-reduced-motion` removes transforms and primitive transitions.
+- `prefers-contrast: more` strengthens text and border tokens.
+- Forced-colors mode keeps component boundaries visible.
+- State meaning always includes text; campaign colors never replace status
+  colors.
+
+## Adding or changing a primitive
+
+1. Confirm the need appears in at least two workflows.
+2. Name the component for its function, not its current visual treatment.
+3. Use an existing semantic token or add one with a documented purpose.
+4. Test default, hover, focus, disabled, narrow and reduced-motion states.
+5. Verify both the public Lantern Road fixture and the production campaigns.
+6. Record any intentional product-specific difference in the sync ledger.
+
+The password dialog is the first production consumer of `qk-panel` and
+`qk-button`; it provides a compact regression surface for every palette.
