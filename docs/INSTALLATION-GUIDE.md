@@ -16,7 +16,13 @@ not required.
 
 ## 1. Download QuestKeeper
 
-Choose **Code → Download ZIP** on GitHub and extract the folder, or clone it:
+Download the recommended ZIP or TAR.GZ from the
+**[latest QuestKeeper release](https://github.com/mtamagno/questkeeper-rpg-campaign-manager/releases/latest)**
+and extract the complete versioned folder.
+
+Each release also provides `SHA256SUMS.txt` so you can verify the downloaded
+archive. Developers who want the newest unreleased changes can clone the
+repository instead:
 
 ```bash
 git clone https://github.com/mtamagno/questkeeper-rpg-campaign-manager.git
@@ -38,9 +44,9 @@ already available.
 On macOS, Control-click **setup.command**, choose **Open**, then confirm if
 Gatekeeper blocks the first launch.
 
-The setup checks prerequisites, opens Campaign Manager and guides you through
-the first campaign. The Manager normally uses `http://127.0.0.1:4173`; keep
-its terminal window open while working.
+On its first run, setup installs the locked project dependencies, opens Campaign
+Manager and guides you through the first campaign. The Manager normally uses
+`http://127.0.0.1:4173`; keep its terminal window open while working.
 
 ## 3. Choose only what you need
 

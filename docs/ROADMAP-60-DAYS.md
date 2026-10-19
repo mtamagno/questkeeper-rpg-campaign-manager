@@ -26,7 +26,7 @@ never a reason to split broken work or bypass `npm run verify`.
 | 04 · 21 Oct | [ ] `feat: make the Companion installable as a PWA`                                    | [ ] `feat: cache recent characters and recaps for offline reading`                                         |
 | 05 · 22 Oct | [ ] `feat: introduce global command palette navigation`                                | [ ] `feat: add recent pages favourites and continue-reading actions`                                       |
 | 06 · 23 Oct | [ ] `a11y: complete keyboard focus and landmark overhaul`                              | [ ] `perf: enforce image font and initial-load budgets`                                                    |
-| 07 · 24 Oct | [ ] `feat: publish a richer Lantern Road player journey`                               | [ ] `release: ship QuestKeeper 1.4 foundation release`                                                     |
+| 07 · 24 Oct | [ ] `feat: publish a richer Lantern Road player journey`                               | [ ] `release: ship QuestKeeper 1.1 foundation release`                                                     |
 
 ## Week 2 — Characters that grow with the story
 
@@ -50,7 +50,7 @@ never a reason to split broken work or bypass `npm run verify`.
 | 18 · 04 Nov | [ ] `feat: create notebook table of contents and chronology`  | [ ] `feat: add mood session character and secrecy filters`             |
 | 19 · 05 Nov | [ ] `feat: add letters sketches handouts and keepsakes`       | [ ] `feat: create accessible lightbox and print layouts for keepsakes` |
 | 20 · 06 Nov | [ ] `style: ship multiple parchment and handwriting moods`    | [ ] `feat: adapt journal styling to narrator and emotional state`      |
-| 21 · 07 Nov | [ ] `feat: add character epilogues and legacy pages`          | [ ] `release: ship QuestKeeper 1.4.1 character stories`                |
+| 21 · 07 Nov | [ ] `feat: add character epilogues and legacy pages`          | [ ] `release: ship QuestKeeper 1.2 character stories`                  |
 
 ## Week 4 — Game Night command centre
 
@@ -62,7 +62,7 @@ never a reason to split broken work or bypass `npm run verify`.
 | 25 · 11 Nov | [ ] `feat: add campaign timeline with arcs and turning points`       | [ ] `feat: connect timeline events to every related page`                  |
 | 26 · 12 Nov | [ ] `feat: introduce bookmarks and personal reading lists`           | [ ] `feat: add history-aware continue-reading recommendations`             |
 | 27 · 13 Nov | [ ] `feat: create printable game-night packet`                       | [ ] `feat: add compact mobile table mode with wake-lock guidance`          |
-| 28 · 14 Nov | [ ] `feat: add campaign ending and epilogue experience`              | [ ] `release: ship QuestKeeper 1.4.2 game-night preview`                   |
+| 28 · 14 Nov | [ ] `feat: add campaign ending and epilogue experience`              | [ ] `release: ship QuestKeeper 1.3 game-night preview`                     |
 
 ## Week 5 — A connected living world
 
@@ -74,7 +74,7 @@ never a reason to split broken work or bypass `npm run verify`.
 | 32 · 18 Nov | [ ] `feat: build clue board for evidence suspects and questions`    | [ ] `feat: add spoiler-aware connections and theory tracking`        |
 | 33 · 19 Nov | [ ] `feat: add quest promise and obligation tracker`                | [ ] `feat: show consequences and ownership without task-app clutter` |
 | 34 · 20 Nov | [ ] `feat: add story arcs chapter collections and completion state` | [ ] `feat: generate arc-level recaps and cast lists`                 |
-| 35 · 21 Nov | [ ] `feat: create world explorer linking every content type`        | [ ] `release: ship QuestKeeper 1.4.3 living-world preview`           |
+| 35 · 21 Nov | [ ] `feat: create world explorer linking every content type`        | [ ] `release: ship QuestKeeper 1.4 living-world preview`             |
 
 ## Week 6 — The Game Master's creative studio
 

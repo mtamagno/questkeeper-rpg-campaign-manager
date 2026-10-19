@@ -5,6 +5,8 @@
 <p align="center"><strong>Turn every campaign into a living chronicle your whole party can revisit.</strong></p>
 
 <p align="center">
+  <a href="https://github.com/mtamagno/questkeeper-rpg-campaign-manager/releases/latest"><strong>⬇️ Download QuestKeeper</strong></a>
+  &nbsp;·&nbsp;
   <a href="https://mtamagno.github.io/questkeeper-rpg-campaign-manager/"><strong>⚔️ Live Companion</strong></a>
   &nbsp;·&nbsp;
   <a href="https://mtamagno.github.io/questkeeper-rpg-campaign-manager/manager-demo/"><strong>🗺️ Manager Demo</strong></a>
@@ -15,6 +17,7 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/mtamagno/questkeeper-rpg-campaign-manager/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/mtamagno/questkeeper-rpg-campaign-manager?display_name=tag&style=flat-square&color=c9a35b"></a>
   <img alt="MIT licensed" src="https://img.shields.io/badge/license-MIT-c9a35b?style=flat-square">
   <img alt="Local first" src="https://img.shields.io/badge/data-local--first-486b63?style=flat-square">
   <img alt="Any campaign language" src="https://img.shields.io/badge/languages-any-805d93?style=flat-square">
@@ -66,7 +69,7 @@ portable folder you control.
 
 ## Start in a few minutes
 
-1. Download or clone this repository and install **Node.js 24**.
+1. Download the **[latest release](https://github.com/mtamagno/questkeeper-rpg-campaign-manager/releases/latest)** and install **Node.js 24**.
 2. Open `setup.bat` on Windows, `setup.command` on macOS, or `./setup.sh` on Linux.
 3. Follow the guided Manager, preview your Companion, then publish when ready.
 

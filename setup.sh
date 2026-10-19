@@ -9,4 +9,9 @@ if ! command -v node >/dev/null 2>&1; then
   exit 1
 fi
 
+if [[ ! -f node_modules/.package-lock.json ]]; then
+  echo "Preparing QuestKeeper for the first run..."
+  npm ci
+fi
+
 exec node tools/campaign-manager/server.mjs --open

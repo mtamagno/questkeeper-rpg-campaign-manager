@@ -431,6 +431,29 @@ explicit access mechanism.
 **Revisit when:** QuestKeeper introduces optional multi-user accounts with a
 documented permission model.
 
+### QK-017 — Stable releases are immutable verified archives
+
+**Date:** 19 October 2026
+
+**Status:** Active
+
+**Decision:** QuestKeeper stable tags match the package semantic version and
+produce versioned ZIP and TAR.GZ archives exclusively from tracked public files.
+Every release reruns the full verification suite and publishes SHA-256 checksums.
+
+**Why:** A downloadable release should start reliably without Git knowledge and
+must never inherit private campaigns, credentials or local workspace debris.
+Immutable tags keep bug reports, documentation and upgrades reproducible.
+
+**Consequences:** Release notes are committed before tagging, setup installs
+locked dependencies on first launch, and a published tag is never moved to
+different code. Future roadmap versions advance from the 1.0.0 public baseline.
+
+**Source:** [Releasing QuestKeeper](RELEASING.md)
+
+**Revisit when:** Native installers replace source archives as the primary
+desktop distribution.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD

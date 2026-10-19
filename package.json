@@ -1,6 +1,6 @@
 {
   "name": "questkeeper-rpg-campaign-manager",
-  "version": "1.3.0",
+  "version": "1.0.0",
   "description": "A self-hosted D&D and tabletop RPG companion for character sheets, session journals, party bonds, maps and campaign lore.",
   "scripts": {
     "ng": "ng",
@@ -13,11 +13,12 @@
     "test:transcriber": "cd discord-transcriber && python -m unittest discover -s tests",
     "test:design-system": "node scripts/verify-design-system.cjs",
     "test:first-visit": "node scripts/verify-first-visit.cjs",
+    "test:release": "node scripts/verify-release.cjs",
     "lint": "eslint .",
     "format": "prettier --write . --ignore-unknown",
     "format:check": "prettier --check . --ignore-unknown",
     "typecheck": "tsc --noEmit -p tsconfig.app.json",
-    "verify": "npm run lint && npm run format:check && npm run typecheck && npm run test:design-system && npm run test:first-visit && npm run test:manager && npm run test:transcriber && npm run build",
+    "verify": "npm run lint && npm run format:check && npm run typecheck && npm run test:design-system && npm run test:first-visit && npm run test:release && npm run test:manager && npm run test:transcriber && npm run build",
     "generate:thumbs": "node scripts/generate-thumbnails.cjs",
     "generate:display": "node scripts/generate-display-images.cjs"
   },
