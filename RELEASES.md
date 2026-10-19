@@ -61,8 +61,8 @@ smaller familiar or specialist, but it must still be a new original character.
 
 Every stable release follows this identity:
 
-> **QuestKeeper X.Y.Z · Codename — Chapter title**  
-> _Release companion · role_  
+> **QuestKeeper X.Y.Z · Codename — Chapter title**<br>
+> _Release companion · role_<br>
 > “One short line that captures the player-facing promise.”
 
 - The codename is one short, pronounceable fantasy word, preferably an original
