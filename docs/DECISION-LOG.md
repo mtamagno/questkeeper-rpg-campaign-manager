@@ -481,6 +481,35 @@ is documented in the living release catalog.
 **Revisit when:** The cast becomes difficult to distinguish at a glance or the
 project adopts a different public release cadence.
 
+### QK-019 — The demo tour guides without taking control
+
+**Date:** 20 October 2026
+
+**Status:** Active
+
+**Decision:** The live-demo tour is a five-stop, non-modal guide whose progress
+is validated and remembered only in the current browser. It may personalize
+copy from the first-visit Player/GM preference, but the visitor chooses the
+campaign, grants spoiler consent normally and can pause, deviate or restart at
+any time.
+
+**Why:** A useful tour should shorten the path to understanding without
+replacing exploration, hiding the real interface or implying permissions that
+do not exist. Remembered progress prevents an interrupted introduction from
+becoming repeated friction.
+
+**Consequences:** Tour steps use stable product destinations rather than brittle
+element spotlights. Route deviations offer recovery instead of forced
+navigation. PWA and offline work must preserve the versioned state and handle
+unavailable stops honestly; future navigation remains usable without completing
+the tour.
+
+**Source:** [Guided live-demo tour](GUIDED-DEMO-TOUR.md)
+
+**Revisit when:** Moderated first-visit sessions show that the five stops do not
+help at least four of five visitors explain and navigate the Companion within
+two minutes.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD

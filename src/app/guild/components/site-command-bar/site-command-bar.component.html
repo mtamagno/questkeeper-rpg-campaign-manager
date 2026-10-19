@@ -16,6 +16,26 @@
   </nav>
 
   <div class="command-bar__actions">
+    <button
+      class="command-bar__tour"
+      type="button"
+      (click)="openTour()"
+      [attr.aria-label]="
+        isItalian()
+          ? tourStatus() === 'paused'
+            ? 'Riprendi il tour guidato'
+            : 'Apri il tour guidato'
+          : tourStatus() === 'paused'
+            ? 'Resume guided tour'
+            : 'Open guided tour'
+      "
+    >
+      <span aria-hidden="true">&#10022;</span>
+      <span class="command-bar__tour-label">{{ isItalian() ? 'Tour' : 'Tour' }}</span>
+      @if (tourStatus() === 'paused') {
+        <span class="command-bar__tour-state" aria-hidden="true"></span>
+      }
+    </button>
     @if (activeCampaignName(); as campaignName) {
       <a class="command-bar__campaign-switch" routerLink="/">
         <span class="command-bar__campaign-dot" aria-hidden="true"></span>

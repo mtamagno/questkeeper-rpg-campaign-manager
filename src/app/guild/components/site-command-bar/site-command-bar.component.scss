@@ -63,6 +63,7 @@
   }
 
   &__campaign-switch,
+  &__tour,
   &__search {
     display: inline-flex;
     align-items: center;
@@ -86,6 +87,21 @@
       border-color: var(--campaign-accent, #{$color-gold});
       background: $color-bg-surface;
     }
+  }
+
+  &__tour {
+    position: relative;
+  }
+
+  &__tour-state {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--qk-color-accent-text);
+    box-shadow: 0 0 8px var(--qk-color-accent);
   }
 
   &__campaign-dot {
@@ -124,6 +140,7 @@
     }
     &__campaign-name,
     &__switch-copy,
+    &__tour-label,
     &__search-label,
     &__search kbd {
       display: none;

@@ -15,6 +15,7 @@ import { filter } from 'rxjs/operators';
 
 import { CampaignService } from '@guild/services/campaign.service';
 import { LanguageService } from '@guild/services/language.service';
+import { GuidedTourService } from '@guild/services/guidedTour.service';
 import { localizeText } from '@guild/models/language.model';
 
 interface NavigationCommand {
@@ -61,6 +62,7 @@ export class SiteCommandBarComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly campaigns = inject(CampaignService);
   private readonly language = inject(LanguageService);
+  private readonly guidedTour = inject(GuidedTourService);
   private readonly currentUrl = signal(this.router.url);
   private readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
 
@@ -68,6 +70,7 @@ export class SiteCommandBarComponent {
   readonly query = signal('');
   readonly isItalian = this.language.isItalian;
   readonly activeCampaignId = this.campaigns.activeCampaignId;
+  readonly tourStatus = this.guidedTour.status;
 
   readonly activeCampaignName = computed((): string | undefined => {
     const campaignId = this.activeCampaignId();
@@ -212,6 +215,10 @@ export class SiteCommandBarComponent {
   close(): void {
     this.isOpen.set(false);
     this.query.set('');
+  }
+
+  openTour(): void {
+    this.guidedTour.open();
   }
 
   updateQuery(event: Event): void {

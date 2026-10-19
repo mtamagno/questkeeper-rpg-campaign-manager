@@ -29,6 +29,7 @@ import { DiceLoaderComponent } from '@guild/components/dice-loader/dice-loader.c
 import { type CampaignManifestEntry } from '@guild/models/campaignConfig.model';
 import { resolveCampaignPalette, type CampaignPalette } from '@guild/models/campaignPalette.model';
 import { localizeText } from '@guild/models/language.model';
+import { GuidedTourService } from '@guild/services/guidedTour.service';
 
 /**
  * Root landing page that lists all available campaigns.
@@ -49,6 +50,7 @@ export class CampaignSelectorComponent {
   private readonly consentService = inject(SpoilerConsentService);
   private readonly audiencePreference = inject(AudiencePreferenceService);
   private readonly router = inject(Router);
+  private readonly guidedTour = inject(GuidedTourService);
 
   /** Public interactive destination used by the first-visit GM journey. */
   readonly managerDemoUrl = 'manager-demo/';
@@ -64,6 +66,7 @@ export class CampaignSelectorComponent {
 
   /** Locally remembered orientation path; never grants access or permissions. */
   readonly audience = this.audiencePreference.audience;
+  readonly tourStatus = this.guidedTour.status;
 
   readonly audienceLabel: Signal<string> = computed(() => {
     const selected = this.audience();
@@ -128,6 +131,11 @@ export class CampaignSelectorComponent {
   /** Makes the two first-visit paths visible again. */
   resetAudience(): void {
     this.audiencePreference.reset();
+  }
+
+  /** Opens a fresh or remembered walkthrough without changing campaign access. */
+  openTour(): void {
+    this.guidedTour.open();
   }
 
   /** Warning modal message based on current language and selected campaign. */

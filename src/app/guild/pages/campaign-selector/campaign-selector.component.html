@@ -113,6 +113,20 @@
               {{ lang() === 'it' ? 'Continua alle campagne' : 'Continue to campaigns' }}
             </a>
           }
+          <button
+            class="qk-button qk-button--secondary"
+            type="button"
+            data-tour-launch="first-visit"
+            (click)="openTour()"
+          >
+            @if (tourStatus() === 'paused') {
+              {{ lang() === 'it' ? 'Riprendi il tour' : 'Resume tour' }}
+            } @else if (tourStatus() === 'completed') {
+              {{ lang() === 'it' ? 'Rifai il tour' : 'Restart tour' }}
+            } @else {
+              {{ lang() === 'it' ? 'Tour di 2 minuti' : '2-minute tour' }}
+            }
+          </button>
           <button class="qk-button qk-button--ghost" type="button" (click)="resetAudience()">
             {{ lang() === 'it' ? 'Cambia percorso' : 'Change path' }}
           </button>

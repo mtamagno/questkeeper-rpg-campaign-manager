@@ -1,0 +1,65 @@
+@if (tour.isActive()) {
+  <aside
+    class="guided-tour"
+    role="region"
+    aria-live="polite"
+    aria-labelledby="guided-tour-title"
+    data-guided-tour="active"
+  >
+    <header class="guided-tour__header">
+      <div>
+        <span class="guided-tour__step">
+          {{ isItalian() ? 'Tappa' : 'Stop' }} {{ stepNumber() }} / {{ totalSteps }}
+        </span>
+        <span class="guided-tour__kicker">{{ copy().kicker }}</span>
+      </div>
+      <button
+        class="guided-tour__pause"
+        type="button"
+        (click)="tour.pause()"
+        [attr.aria-label]="
+          isItalian() ? 'Sospendi e continua più tardi' : 'Pause and continue later'
+        "
+      >
+        &times;
+      </button>
+    </header>
+
+    <div
+      class="guided-tour__progress"
+      role="progressbar"
+      [attr.aria-label]="isItalian() ? 'Progresso del tour' : 'Tour progress'"
+      [attr.aria-valuenow]="stepNumber()"
+      aria-valuemin="1"
+      [attr.aria-valuemax]="totalSteps"
+    >
+      <span [style.width.%]="progress()"></span>
+    </div>
+
+    <div class="guided-tour__body">
+      <h2 id="guided-tour-title">{{ copy().title }}</h2>
+      <p>{{ copy().description }}</p>
+      <small>{{ copy().hint }}</small>
+    </div>
+
+    <footer class="guided-tour__actions">
+      @if (tour.state().step > 0) {
+        <button class="qk-button qk-button--ghost" type="button" (click)="previous()">
+          {{ isItalian() ? 'Indietro' : 'Back' }}
+        </button>
+      }
+      <button
+        class="qk-button qk-button--primary guided-tour__primary"
+        type="button"
+        (click)="primaryAction()"
+      >
+        {{ primaryLabel() }}
+        <span aria-hidden="true">&rarr;</span>
+      </button>
+    </footer>
+
+    <button class="guided-tour__later" type="button" (click)="tour.pause()">
+      {{ isItalian() ? 'Continua più tardi' : 'Continue later' }}
+    </button>
+  </aside>
+}

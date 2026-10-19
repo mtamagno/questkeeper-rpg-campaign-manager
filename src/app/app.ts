@@ -17,6 +17,7 @@ import { filter } from 'rxjs/operators';
 
 import { SidebarComponent } from '@guild/components/sidebar/sidebar.component';
 import { SiteCommandBarComponent } from '@guild/components/site-command-bar/site-command-bar.component';
+import { GuidedTourComponent } from '@guild/components/guided-tour/guided-tour.component';
 import { SFX } from '@guild/constants/sfx.constant';
 import { AudioService } from '@guild/services/audio.service';
 import { CampaignService } from '@guild/services/campaign.service';
@@ -87,7 +88,7 @@ function extractFirstSegment(url: string): string {
  */
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, SidebarComponent, SiteCommandBarComponent],
+  imports: [RouterOutlet, SidebarComponent, SiteCommandBarComponent, GuidedTourComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

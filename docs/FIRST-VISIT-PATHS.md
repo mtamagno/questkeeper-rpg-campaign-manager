@@ -47,6 +47,6 @@ Run `npm run test:first-visit` to verify the two journey markers, bilingual copy
 local-only disclosure, reset, destinations and focus contract. The check is
 part of `npm run verify` in the public template.
 
-The next guided-tour task should read this preference only to choose its opening
-copy and suggested destination. It must not hide features or treat the value as
-identity or authorization.
+The [guided live-demo tour](GUIDED-DEMO-TOUR.md) reads this preference only to
+choose its opening and closing guidance. It does not hide features or treat the
+value as identity or authorization.
