@@ -35,6 +35,27 @@ Campaign themes may replace the `--campaign-*` accent variables. Shared
 components inherit those values through the semantic layer; status colors and
 readability rules stay stable.
 
+## Curated campaign palettes
+
+Campaign manifests may choose one of three stable presets with the `palette`
+field:
+
+| ID        | Character                              | Intended use                                     |
+| --------- | -------------------------------------- | ------------------------------------------------ |
+| `heroic`  | Midnight blue, parchment and warm gold | Classic high adventure; legacy campaign fallback |
+| `gothic`  | Charcoal, bone, burgundy and cool fog  | Horror, tragedy and oppressive settings          |
+| `neutral` | Slate, silver and restrained blue-grey | System pages or campaigns needing quiet framing  |
+
+Product pages without an active campaign use `neutral`. A campaign without a
+`palette` keeps the original `heroic` appearance, so existing archives do not
+need an immediate migration. Palette rules live in `src/styles/_palettes.scss`
+and are activated with `data-qk-palette`; components must not branch on a
+campaign ID to obtain ordinary colors.
+
+The Campaign Manager exposes these presets when creating or editing a
+campaign. Custom palette editing belongs to the later Theme Studio milestone;
+do not add undocumented one-off colors to campaign data.
+
 ## UI primitives
 
 ### Panels
@@ -99,7 +120,8 @@ page introductions consistent without forcing one heading level.
 2. Name the component for its function, not its current visual treatment.
 3. Use an existing semantic token or add one with a documented purpose.
 4. Test default, hover, focus, disabled, narrow and reduced-motion states.
-5. Verify both the public Lantern Road fixture and the production campaigns.
+5. Verify neutral product pages, the public Lantern Road fixture and both
+   production campaigns.
 6. Record any intentional product-specific difference in the sync ledger.
 
 The password dialog is the first production consumer of `qk-panel` and

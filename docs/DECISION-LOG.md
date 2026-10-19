@@ -379,6 +379,33 @@ are changed rather than through an unsafe bulk rewrite.
 **Revisit when:** Native applications require a generated cross-platform token
 artifact or browser support allows a safer typed custom-property contract.
 
+### QK-015 — Campaign identity uses three curated palette presets
+
+**Date:** 19 October 2026
+
+**Status:** Active
+
+**Decision:** QuestKeeper provides `heroic`, `gothic` and `neutral` campaign
+palettes. Campaign manifests choose a preset; product pages without an active
+campaign use `neutral`, while manifests without a choice fall back to
+`heroic` for backward compatibility.
+
+**Why:** A small set of tested visual identities gives campaigns atmosphere
+without reintroducing arbitrary component colors or making every Game Master
+responsible for contrast and interaction states.
+
+**Consequences:** Palette selection is available in Campaign Manager, shared
+components inherit it through semantic tokens, and campaign IDs do not define
+ordinary theme colors. Every preset must maintain WCAG AA contrast for body
+text and text on primary accents. Free-form palette editing remains reserved
+for the later Theme Studio with automatic contrast guidance.
+
+**Source:**
+[Curated campaign palettes](DESIGN-SYSTEM.md#curated-campaign-palettes)
+
+**Revisit when:** Theme Studio can validate custom choices as reliably as the
+curated presets or a light color scheme becomes a committed product outcome.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD

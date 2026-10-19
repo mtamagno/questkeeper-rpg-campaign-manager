@@ -253,11 +253,11 @@
     flex-direction: column;
     border-radius: $border-radius-lg;
     overflow: hidden;
-    background: $color-bg-surface;
+    background: var(--qk-color-surface);
     box-shadow: $shadow-md;
     text-decoration: none;
-    color: inherit;
-    border: 1px solid $color-border-subtle;
+    color: var(--qk-color-text);
+    border: 1px solid var(--qk-color-border-subtle);
     cursor: pointer;
     padding: 0;
     text-align: left;
@@ -266,22 +266,16 @@
     @include card-hover-lift($lift: 4px, $glow: $shadow-lg);
 
     &:hover {
-      border-color: $color-gold-dark;
+      border-color: var(--qk-color-accent-strong);
+      box-shadow: $shadow-lg, var(--qk-shadow-accent);
 
       .campaign-selector__card-image {
         transform: scale(1.035);
       }
 
       .campaign-selector__card-cta {
-        color: $color-gold-light;
+        color: var(--qk-color-accent-text);
       }
-    }
-
-    &--gothic:hover {
-      border-color: $color-gothic-burgundy-light;
-      box-shadow:
-        $shadow-lg,
-        0 0 28px rgba($color-gothic-burgundy, 0.22);
     }
   }
 
@@ -290,7 +284,8 @@
     aspect-ratio: 16 / 9;
     overflow: hidden;
     background:
-      linear-gradient(135deg, rgba($color-gold-dark, 0.12), transparent 55%), $color-bg-deep;
+      linear-gradient(135deg, var(--qk-color-accent-soft), transparent 55%),
+      var(--qk-color-canvas-deep);
   }
 
   &__arcana {
@@ -392,8 +387,13 @@
     overflow: hidden;
     background:
       linear-gradient(180deg, rgba($color-bg-void, 0.08), rgba($color-bg-void, 0.85)),
-      radial-gradient(circle at 50% 26%, rgba($color-gothic-burgundy-light, 0.28), transparent 28%),
-      linear-gradient(135deg, #24202b, $color-gothic-burgundy-dark 58%, #0d0c11);
+      radial-gradient(circle at 50% 26%, var(--qk-color-accent-soft), transparent 28%),
+      linear-gradient(
+        135deg,
+        var(--qk-color-surface-raised),
+        var(--qk-color-surface) 58%,
+        var(--qk-color-canvas)
+      );
 
     &::before {
       content: '';
@@ -415,9 +415,9 @@
     background: linear-gradient(
       90deg,
       transparent,
-      $color-gothic-fog,
+      var(--qk-color-accent-text),
       transparent 42%,
-      $color-gothic-fog,
+      var(--qk-color-accent-text),
       transparent
     );
     transform: skewX(-12deg);
@@ -435,7 +435,7 @@
     border: $border-width-thin solid rgba($color-parchment, 0.5);
     border-radius: 50%;
     text-shadow: 0 2px 12px rgba($color-bg-void, 0.9);
-    box-shadow: 0 0 32px rgba($color-gothic-burgundy-light, 0.18);
+    box-shadow: var(--qk-shadow-accent);
   }
 
   &__fallback-label {
@@ -475,13 +475,13 @@
   &__card-title {
     font-family: $font-family-heading;
     font-size: $font-size-xl;
-    color: $color-gold;
+    color: var(--qk-color-accent);
     margin: 0 0 $spacing-sm;
   }
 
   &__card-description {
     font-size: $font-size-base;
-    color: $color-text-secondary;
+    color: var(--qk-color-text-secondary);
     margin: 0 0 $spacing-lg;
     line-height: 1.5;
   }
@@ -493,8 +493,8 @@
     gap: $spacing-md;
     margin-top: auto;
     padding-top: $spacing-md;
-    border-top: $border-width-thin solid $color-border-subtle;
-    color: $color-text-primary;
+    border-top: $border-width-thin solid var(--qk-color-border-subtle);
+    color: var(--qk-color-text);
     font-family: $font-family-heading;
     font-size: $font-size-xs;
     font-weight: $font-weight-semibold;

@@ -23,6 +23,7 @@ import { LanguageToggleComponent } from '@guild/components/language-toggle/langu
 import { SfxHoverDirective } from '@guild/directives/sfxHover.directive';
 import { DiceLoaderComponent } from '@guild/components/dice-loader/dice-loader.component';
 import { type CampaignManifestEntry } from '@guild/models/campaignConfig.model';
+import { resolveCampaignPalette, type CampaignPalette } from '@guild/models/campaignPalette.model';
 import { localizeText } from '@guild/models/language.model';
 
 /**
@@ -82,6 +83,11 @@ export class CampaignSelectorComponent {
         (campaign) => campaign.status?.en.toLocaleLowerCase().includes('completed') === true,
       ).length,
   );
+
+  /** Resolves legacy manifests to the backward-compatible heroic palette. */
+  campaignPalette(campaign: CampaignManifestEntry): CampaignPalette {
+    return resolveCampaignPalette(campaign.palette);
+  }
 
   /** Warning modal message based on current language and selected campaign. */
   readonly warningMessage: Signal<string> = computed(() => {

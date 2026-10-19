@@ -422,6 +422,15 @@ function campaignForm(campaign) {
       field('name', 'Campaign name', '', { required: true }),
       field('description', 'Short description', '', { type: 'textarea' }),
       field('status', 'Status', 'In progress'),
+      field('palette', 'Campaign palette', 'heroic', {
+        type: 'select',
+        values: [
+          ['heroic', 'Heroic · gold and midnight'],
+          ['gothic', 'Gothic · burgundy and fog'],
+          ['neutral', 'Neutral · slate and silver'],
+        ],
+        hint: 'A curated readable theme. You can change it later.',
+      }),
       section('Your table'),
       field('dungeonMaster', 'Game Master', ''),
       field('partyName', 'Party name', ''),
@@ -449,6 +458,15 @@ function campaignForm(campaign) {
       type: 'textarea',
     }),
     ...localizedFields('status', 'Status', entry.status, languages),
+    field('palette', 'Campaign palette', entry.palette ?? 'heroic', {
+      type: 'select',
+      values: [
+        ['heroic', 'Heroic · gold and midnight'],
+        ['gothic', 'Gothic · burgundy and fog'],
+        ['neutral', 'Neutral · slate and silver'],
+      ],
+      hint: 'A curated readable theme. You can change it later.',
+    }),
     section('Your table'),
     field('dungeonMaster', 'Game Master', details.dungeonMaster ?? ''),
     field('partyName', 'Party name', details.partyName ?? ''),
@@ -776,6 +794,7 @@ async function saveCampaign(form) {
     id: form.get('id')?.toString() || state.selectedId,
     languages,
     defaultLanguage,
+    palette: form.get('palette')?.toString() || 'heroic',
     name: creating ? primary('name') : localizedFormValue(form, 'name', '', languages),
     description: creating
       ? primary('description')

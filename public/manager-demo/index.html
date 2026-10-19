@@ -434,6 +434,30 @@
         margin-top: 14px;
       }
 
+      .sandbox-preview {
+        --preview-canvas: #171722;
+        --preview-surface: #243249;
+        --preview-accent: #d5ad3d;
+        --preview-accent-soft: #f2d36d;
+        --preview-glow: rgba(213, 173, 61, 0.38);
+      }
+
+      .sandbox-preview[data-demo-palette='gothic'] {
+        --preview-canvas: #0d0b0e;
+        --preview-surface: #2c222c;
+        --preview-accent: #c06173;
+        --preview-accent-soft: #e7a0ad;
+        --preview-glow: rgba(192, 97, 115, 0.42);
+      }
+
+      .sandbox-preview[data-demo-palette='neutral'] {
+        --preview-canvas: #101318;
+        --preview-surface: #27313d;
+        --preview-accent: #8fa9bf;
+        --preview-accent-soft: #c6d9e7;
+        --preview-glow: rgba(143, 169, 191, 0.42);
+      }
+
       .preview-hero {
         position: relative;
         min-height: 210px;
@@ -441,12 +465,12 @@
         align-items: end;
         padding: 24px;
         overflow: hidden;
-        border: 1px solid rgba(213, 173, 61, 0.22);
+        border: 1px solid var(--preview-accent);
         border-radius: 12px;
         background:
           linear-gradient(0deg, rgba(8, 8, 15, 0.96), rgba(8, 8, 15, 0.12)),
-          radial-gradient(circle at 78% 25%, rgba(213, 173, 61, 0.38), transparent 8rem),
-          linear-gradient(135deg, #243249, #422e3f 55%, #171722);
+          radial-gradient(circle at 78% 25%, var(--preview-glow), transparent 8rem),
+          linear-gradient(135deg, var(--preview-surface), #422e3f 55%, var(--preview-canvas));
       }
 
       .preview-hero::after {
@@ -454,9 +478,9 @@
         position: absolute;
         top: 24px;
         right: 30px;
-        color: var(--gold-soft);
+        color: var(--preview-accent-soft);
         font-size: 4rem;
-        filter: drop-shadow(0 0 18px rgba(213, 173, 61, 0.6));
+        filter: drop-shadow(0 0 18px var(--preview-glow));
       }
 
       .preview-hero h3 {
@@ -841,6 +865,13 @@
                   <option>日本語</option>
                 </select></label
               >
+              <label class="demo-field wide"
+                >Campaign palette<select id="demo-palette">
+                  <option value="heroic">Heroic · gold and midnight</option>
+                  <option value="gothic">Gothic · burgundy and fog</option>
+                  <option value="neutral">Neutral · slate and silver</option>
+                </select></label
+              >
             </div>
             <hr class="form-divider" />
             <h3>Add an adventurer</h3>
@@ -880,7 +911,7 @@
             </p>
           </form>
 
-          <div class="sandbox-preview" aria-live="polite">
+          <div class="sandbox-preview" data-demo-palette="heroic" aria-live="polite">
             <div class="preview-hero">
               <div>
                 <span class="eyebrow" id="preview-language">English chronicle</span>
@@ -1067,6 +1098,7 @@
         gm: 'Mara',
         party: 'The Wayfarers',
         language: 'English',
+        palette: 'heroic',
         characters: [
           { name: 'Aria Vale', role: 'Wayfinder' },
           { name: 'Mira Thorn', role: 'Storm Courier' },
@@ -1087,6 +1119,8 @@
       const demoGm = document.querySelector('#demo-gm');
       const demoParty = document.querySelector('#demo-party');
       const demoLanguage = document.querySelector('#demo-language');
+      const demoPalette = document.querySelector('#demo-palette');
+      const sandboxPreview = document.querySelector('.sandbox-preview');
       const sandboxStatus = document.querySelector('#sandbox-status');
 
       function persistDemo(message = 'Draft saved locally in this browser.') {
@@ -1103,6 +1137,8 @@
         demoGm.value = demoState.gm;
         demoParty.value = demoState.party;
         demoLanguage.value = demoState.language;
+        demoPalette.value = demoState.palette;
+        sandboxPreview.dataset.demoPalette = demoState.palette;
         document.querySelector('#preview-name').textContent = demoState.name || 'Untitled campaign';
         document.querySelector('#preview-gm').textContent = demoState.gm || 'Unknown';
         document.querySelector('#preview-party').textContent = demoState.party || 'Unnamed party';
@@ -1133,6 +1169,7 @@
         [demoGm, 'gm'],
         [demoParty, 'party'],
         [demoLanguage, 'language'],
+        [demoPalette, 'palette'],
       ].forEach(([control, key]) =>
         control.addEventListener('input', () => {
           demoState[key] = control.value;

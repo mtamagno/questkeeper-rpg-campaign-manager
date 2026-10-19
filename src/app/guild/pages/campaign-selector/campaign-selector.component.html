@@ -80,6 +80,7 @@
         <button
           type="button"
           class="campaign-selector__card"
+          [attr.data-qk-palette]="campaignPalette(campaign)"
           [attr.aria-label]="
             (lang() === 'it' ? 'Entra nella campagna ' : 'Enter campaign ') + campaign.name[lang()]
           "

@@ -108,6 +108,9 @@ export class App implements OnInit {
   /** Active campaign ID, exposed to the template for campaign-aware theming. */
   readonly activeCampaignId = this.campaignService.activeCampaignId;
 
+  /** Semantic palette chosen by the campaign manifest. */
+  readonly activePalette = this.campaignService.activePalette;
+
   /** Current language, used by app-shell controls outside routed pages. */
   readonly isItalian = computed((): boolean => this.languageService.currentLanguage() === 'it');
 

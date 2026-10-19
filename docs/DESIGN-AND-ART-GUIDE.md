@@ -26,6 +26,8 @@ that every campaign still feels part of one product.
   `--qk-*` tokens, then shared UI primitives.
 - Runtime campaign identity changes semantic accent tokens; components must not
   need campaign-specific selectors to remain readable.
+- Choose the curated `heroic`, `gothic` or `neutral` preset in the manifest or
+  Campaign Manager. The palette frames UI; artwork still follows its event.
 - Gold is an accent, not body text or a universal outline.
 - Campaign colors may tint highlights and atmosphere, but not redefine status
   meaning or reduce readability.

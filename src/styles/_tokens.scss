@@ -10,14 +10,14 @@
   color-scheme: dark;
 
   // Surfaces and readable content
-  --qk-color-canvas: #{$color-bg-void};
-  --qk-color-canvas-deep: #{$color-bg-deep};
-  --qk-color-surface: #{$color-bg-surface};
-  --qk-color-surface-raised: #{$color-bg-elevated};
-  --qk-color-overlay: #{$color-bg-overlay};
-  --qk-color-text: #{$color-text-primary};
-  --qk-color-text-secondary: #{$color-text-secondary};
-  --qk-color-text-muted: #{$color-text-muted};
+  --qk-color-canvas: var(--campaign-canvas, #{$color-bg-void});
+  --qk-color-canvas-deep: var(--campaign-canvas-deep, #{$color-bg-deep});
+  --qk-color-surface: var(--campaign-surface, #{$color-bg-surface});
+  --qk-color-surface-raised: var(--campaign-surface-raised, #{$color-bg-elevated});
+  --qk-color-overlay: var(--campaign-overlay, #{$color-bg-overlay});
+  --qk-color-text: var(--campaign-text, #{$color-text-primary});
+  --qk-color-text-secondary: var(--campaign-text-secondary, #{$color-text-secondary});
+  --qk-color-text-muted: var(--campaign-text-muted, #{$color-text-muted});
   --qk-color-text-inverse: #{$color-text-inverse};
 
   // Campaign-aware accents. A future palette only needs to replace the
@@ -26,13 +26,13 @@
   --qk-color-accent-strong: var(--campaign-accent-strong, #{$color-gold-dark});
   --qk-color-accent-text: var(--campaign-accent-light, #{$color-gold-light});
   --qk-color-accent-soft: var(--campaign-glow, #{rgba($color-gold, 0.18)});
-  --qk-color-on-accent: #{$color-bg-void};
-  --qk-color-focus: var(--campaign-accent-light, #{$color-gold-light});
+  --qk-color-on-accent: var(--campaign-on-accent, #{$color-bg-void});
+  --qk-color-focus: var(--campaign-focus, var(--campaign-accent-light, #{$color-gold-light}));
 
   // Borders and states
-  --qk-color-border-subtle: #{$color-border-subtle};
-  --qk-color-border: #{$color-border-default};
-  --qk-color-border-strong: #{$color-border-strong};
+  --qk-color-border-subtle: var(--campaign-border-subtle, #{$color-border-subtle});
+  --qk-color-border: var(--campaign-border, #{$color-border-default});
+  --qk-color-border-strong: var(--campaign-border-strong, #{$color-border-strong});
   --qk-color-success: #{$color-success-light};
   --qk-color-warning: #{$color-warning-light};
   --qk-color-danger: #{$color-danger-light};

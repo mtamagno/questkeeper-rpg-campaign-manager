@@ -15,6 +15,7 @@
 
 // 3b. Runtime semantic tokens (palette-ready CSS custom properties)
 @use 'tokens';
+@use 'palettes';
 
 // 4. Reset (browser normalization)
 @use 'reset';

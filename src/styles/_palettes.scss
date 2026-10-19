@@ -1,0 +1,89 @@
+// ============================================
+// QuestKeeper campaign palettes
+// Curated presets set visual identity; semantic components remain unchanged.
+// ============================================
+
+[data-qk-palette='neutral'] {
+  color-scheme: dark;
+  --campaign-canvas: #101318;
+  --campaign-canvas-deep: #151a21;
+  --campaign-surface: #1d242d;
+  --campaign-surface-raised: #27313d;
+  --campaign-overlay: rgba(9, 12, 16, 0.88);
+  --campaign-text: #f0ede6;
+  --campaign-text-secondary: #c3c0b8;
+  --campaign-text-muted: #a6a39a;
+  --campaign-border-subtle: #35404c;
+  --campaign-border: #566474;
+  --campaign-border-strong: #78899a;
+  --campaign-accent: #8fa9bf;
+  --campaign-accent-strong: #607d94;
+  --campaign-accent-light: #c6d9e7;
+  --campaign-on-accent: #0c141b;
+  --campaign-focus: #d5e8f5;
+  --campaign-glow: rgba(143, 169, 191, 0.18);
+}
+
+[data-qk-palette='heroic'] {
+  color-scheme: dark;
+  --campaign-canvas: #0a0a0f;
+  --campaign-canvas-deep: #111118;
+  --campaign-surface: #222233;
+  --campaign-surface-raised: #2a2a3d;
+  --campaign-overlay: rgba(10, 10, 15, 0.88);
+  --campaign-text: #f0eadb;
+  --campaign-text-secondary: #c7bea8;
+  --campaign-text-muted: #aaa18d;
+  --campaign-border-subtle: #343449;
+  --campaign-border: #50506c;
+  --campaign-border-strong: #6e6e8b;
+  --campaign-accent: #d3b54a;
+  --campaign-accent-strong: #9b7b20;
+  --campaign-accent-light: #f4d96d;
+  --campaign-on-accent: #171306;
+  --campaign-focus: #ffe58a;
+  --campaign-glow: rgba(211, 181, 74, 0.2);
+}
+
+[data-qk-palette='gothic'] {
+  color-scheme: dark;
+  --campaign-canvas: #0d0b0e;
+  --campaign-canvas-deep: #151116;
+  --campaign-surface: #211a22;
+  --campaign-surface-raised: #2c222c;
+  --campaign-overlay: rgba(10, 7, 11, 0.9);
+  --campaign-text: #f0e7e1;
+  --campaign-text-secondary: #c8b9b3;
+  --campaign-text-muted: #aa9691;
+  --campaign-border-subtle: #3a2c38;
+  --campaign-border: #62434f;
+  --campaign-border-strong: #8d5a68;
+  --campaign-accent: #c06173;
+  --campaign-accent-strong: #7d2838;
+  --campaign-accent-light: #e7a0ad;
+  --campaign-on-accent: #19090d;
+  --campaign-focus: #f2bac4;
+  --campaign-glow: rgba(192, 97, 115, 0.22);
+}
+
+// Resolve the campaign tier into the shared semantic contract on the same
+// element. This keeps nested cards and future embedded previews self-contained.
+[data-qk-palette] {
+  --qk-color-canvas: var(--campaign-canvas);
+  --qk-color-canvas-deep: var(--campaign-canvas-deep);
+  --qk-color-surface: var(--campaign-surface);
+  --qk-color-surface-raised: var(--campaign-surface-raised);
+  --qk-color-overlay: var(--campaign-overlay);
+  --qk-color-text: var(--campaign-text);
+  --qk-color-text-secondary: var(--campaign-text-secondary);
+  --qk-color-text-muted: var(--campaign-text-muted);
+  --qk-color-border-subtle: var(--campaign-border-subtle);
+  --qk-color-border: var(--campaign-border);
+  --qk-color-border-strong: var(--campaign-border-strong);
+  --qk-color-accent: var(--campaign-accent);
+  --qk-color-accent-strong: var(--campaign-accent-strong);
+  --qk-color-accent-text: var(--campaign-accent-light);
+  --qk-color-accent-soft: var(--campaign-glow);
+  --qk-color-on-accent: var(--campaign-on-accent);
+  --qk-color-focus: var(--campaign-focus);
+}

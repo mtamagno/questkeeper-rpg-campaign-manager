@@ -27,22 +27,12 @@
 }
 
 .app-layout {
-  --campaign-accent: #{$color-gold};
-  --campaign-accent-strong: #{$color-gold-dark};
-  --campaign-accent-light: #{$color-gold-light};
-  --campaign-glow: rgba(201, 166, 52, 0.12);
-
   display: flex;
   min-height: 100vh;
   background:
-    radial-gradient(circle at 72% 0%, var(--campaign-glow), transparent 42%), $color-bg-base;
-
-  &--gothic {
-    --campaign-accent: #{$color-gothic-burgundy-light};
-    --campaign-accent-strong: #{$color-gothic-burgundy};
-    --campaign-accent-light: #d2a2aa;
-    --campaign-glow: rgba(125, 40, 56, 0.18);
-  }
+    radial-gradient(circle at 72% 0%, var(--qk-color-accent-soft), transparent 42%),
+    var(--qk-color-canvas);
+  color: var(--qk-color-text);
 
   // --- Hamburger toggle (mobile only) ---
   &__hamburger {
@@ -51,10 +41,10 @@
     top: $spacing-md;
     left: $spacing-md;
     z-index: $z-index-header;
-    background: $color-bg-elevated;
-    border: $border-width-thin solid $color-border-default;
+    background: var(--qk-color-surface-raised);
+    border: $border-width-thin solid var(--qk-color-border);
     border-radius: $border-radius-sm;
-    color: $color-gold-light;
+    color: var(--qk-color-accent-text);
     font-size: $font-size-xl;
     cursor: pointer;
     width: 44px;
@@ -66,14 +56,14 @@
     @include transition-colors;
 
     &:hover {
-      border-color: $color-gold-dark;
-      box-shadow: $shadow-glow-gold;
+      border-color: var(--qk-color-accent-strong);
+      box-shadow: var(--qk-shadow-accent);
     }
 
     &[aria-expanded='true'] {
-      color: $color-parchment-light;
-      border-color: var(--campaign-accent, #{$color-gold});
-      background: $color-bg-surface;
+      color: var(--qk-color-text);
+      border-color: var(--qk-color-accent);
+      background: var(--qk-color-surface);
     }
 
     @include respond-below(lg) {

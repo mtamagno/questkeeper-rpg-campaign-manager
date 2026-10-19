@@ -28,6 +28,12 @@
     Save: 'Salva',
     'No campaigns found.': 'Nessuna campagna trovata.',
     Campaign: 'Campagna',
+    'Campaign palette': 'Palette della campagna',
+    'Heroic · gold and midnight': 'Eroica · oro e blu notte',
+    'Gothic · burgundy and fog': 'Gotica · bordeaux e nebbia',
+    'Neutral · slate and silver': 'Neutrale · ardesia e argento',
+    'A curated readable theme. You can change it later.':
+      'Un tema curato e leggibile. Puoi cambiarlo in seguito.',
     'No JSON. No folders to copy.': 'Niente JSON. Nessuna cartella da copiare.',
     'Your next campaign starts here': 'La tua prossima campagna comincia qui',
     'Create a world, gather the party and chronicle each session through friendly forms. Campaign Companion prepares the files for you.':

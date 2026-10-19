@@ -18,15 +18,15 @@ never a reason to split broken work or bypass `npm run verify`.
 
 ## Week 1 — A compelling first experience
 
-| Day         | Commit 1                                                                               | Commit 2                                                                                   |
-| ----------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| 01 · 18 Oct | [x] [`docs: define the Game Night Edition product goals`](GAME-NIGHT-EDITION-GOALS.md) | [x] [`docs: publish player and GM acceptance journeys`](GAME-NIGHT-ACCEPTANCE-JOURNEYS.md) |
-| 02 · 19 Oct | [x] [`style: ship unified fantasy design tokens and components`](DESIGN-SYSTEM.md)     | [ ] `style: add heroic gothic and neutral campaign palettes`                               |
-| 03 · 20 Oct | [ ] `feat: add separate first-visit paths for players and GMs`                         | [ ] `feat: add a guided live-demo tour with remembered progress`                           |
-| 04 · 21 Oct | [ ] `feat: make the Companion installable as a PWA`                                    | [ ] `feat: cache recent characters and recaps for offline reading`                         |
-| 05 · 22 Oct | [ ] `feat: introduce global command palette navigation`                                | [ ] `feat: add recent pages favourites and continue-reading actions`                       |
-| 06 · 23 Oct | [ ] `a11y: complete keyboard focus and landmark overhaul`                              | [ ] `perf: enforce image font and initial-load budgets`                                    |
-| 07 · 24 Oct | [ ] `feat: publish a richer Lantern Road player journey`                               | [ ] `release: ship QuestKeeper 1.4 foundation release`                                     |
+| Day         | Commit 1                                                                               | Commit 2                                                                                                   |
+| ----------- | -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| 01 · 18 Oct | [x] [`docs: define the Game Night Edition product goals`](GAME-NIGHT-EDITION-GOALS.md) | [x] [`docs: publish player and GM acceptance journeys`](GAME-NIGHT-ACCEPTANCE-JOURNEYS.md)                 |
+| 02 · 19 Oct | [x] [`style: ship unified fantasy design tokens and components`](DESIGN-SYSTEM.md)     | [x] [`style: add heroic gothic and neutral campaign palettes`](DESIGN-SYSTEM.md#curated-campaign-palettes) |
+| 03 · 20 Oct | [ ] `feat: add separate first-visit paths for players and GMs`                         | [ ] `feat: add a guided live-demo tour with remembered progress`                                           |
+| 04 · 21 Oct | [ ] `feat: make the Companion installable as a PWA`                                    | [ ] `feat: cache recent characters and recaps for offline reading`                                         |
+| 05 · 22 Oct | [ ] `feat: introduce global command palette navigation`                                | [ ] `feat: add recent pages favourites and continue-reading actions`                                       |
+| 06 · 23 Oct | [ ] `a11y: complete keyboard focus and landmark overhaul`                              | [ ] `perf: enforce image font and initial-load budgets`                                                    |
+| 07 · 24 Oct | [ ] `feat: publish a richer Lantern Road player journey`                               | [ ] `release: ship QuestKeeper 1.4 foundation release`                                                     |
 
 ## Week 2 — Characters that grow with the story
 

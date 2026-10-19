@@ -19,6 +19,11 @@ import { filter } from 'rxjs';
 import { type ActivatedRouteSnapshot } from '@angular/router';
 
 import { type CampaignManifestEntry } from '@guild/models/campaignConfig.model';
+import {
+  PLATFORM_PALETTE,
+  resolveCampaignPalette,
+  type CampaignPalette,
+} from '@guild/models/campaignPalette.model';
 
 const CAMPAIGNS_MANIFEST_PATH = 'campaigns/campaigns.json';
 
@@ -64,6 +69,16 @@ export class CampaignService {
 
   /** Whether a campaign is currently active. */
   readonly hasCampaign: Signal<boolean> = computed(() => this._activeCampaignId() !== undefined);
+
+  /** Palette selected by the active campaign, or the neutral product palette. */
+  readonly activePalette: Signal<CampaignPalette> = computed(() => {
+    const id = this._activeCampaignId();
+    if (id === undefined) {
+      return PLATFORM_PALETTE;
+    }
+    const campaign = this._manifest().find((entry) => entry.id === id);
+    return resolveCampaignPalette(campaign?.palette);
+  });
 
   /** Base path for loading campaign data files (e.g., `campaigns/example-campaign/data`). */
   readonly dataBasePath: Signal<string | undefined> = computed(() => {

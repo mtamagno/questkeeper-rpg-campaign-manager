@@ -43,12 +43,27 @@ test('creates a complete campaign and reports its counts', async (t) => {
   const root = await fixture(t);
   const campaign = await createCampaign(root, campaignInput);
   assert.equal(campaign.manifestEntry.id, campaignInput.id);
+  assert.equal(campaign.manifestEntry.palette, 'heroic');
   assert.deepEqual((await getState(root)).campaigns[0].counts, {
     characters: 0,
     npcs: 0,
     sessions: 0,
     maps: 0,
   });
+});
+
+test('stores curated campaign palettes and rejects unknown themes', async (t) => {
+  const root = await fixture(t);
+  const campaign = await createCampaign(root, { ...campaignInput, palette: 'gothic' });
+  assert.equal(campaign.manifestEntry.palette, 'gothic');
+
+  const updated = await updateCampaign(root, campaignInput.id, { palette: 'neutral' });
+  assert.equal(updated.manifestEntry.palette, 'neutral');
+
+  await assert.rejects(
+    updateCampaign(root, campaignInput.id, { palette: 'neon' }),
+    /heroic, gothic or neutral/,
+  );
 });
 
 test('manages characters, sessions and maps without editing manifests', async (t) => {

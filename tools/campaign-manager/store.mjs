@@ -4,6 +4,7 @@ import { dirname, join, relative, resolve } from 'node:path';
 const ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const ENTITY_TYPES = new Set(['characters', 'npcs', 'sessions', 'maps']);
 const LANGUAGE_PATTERN = /^[a-z]{2,3}(?:-[A-Z]{2})?$/;
+const CAMPAIGN_PALETTES = new Set(['heroic', 'gothic', 'neutral']);
 
 function nowStamp() {
   return new Date().toISOString().replace(/[:.]/g, '-');
@@ -24,6 +25,14 @@ function normalizeLanguages(values) {
     throw new Error('Use language codes such as en, es, de or fr-CA.');
   }
   return languages;
+}
+
+function normalizeCampaignPalette(value, fallback = 'heroic') {
+  const palette = value ?? fallback;
+  if (!CAMPAIGN_PALETTES.has(palette)) {
+    throw new Error('Campaign palette must be heroic, gothic or neutral.');
+  }
+  return palette;
 }
 
 function assertInside(base, target) {
@@ -168,6 +177,7 @@ export async function createCampaign(projectRoot, input) {
     id,
     languages,
     defaultLanguage,
+    palette: normalizeCampaignPalette(input.palette),
     name: input.name,
     description: input.description ?? { [defaultLanguage]: '' },
     thumbnail: '',
@@ -216,6 +226,7 @@ export async function updateCampaign(projectRoot, campaignId, input) {
     ...current.manifestEntry,
     languages,
     defaultLanguage,
+    palette: normalizeCampaignPalette(input.palette ?? current.manifestEntry.palette),
     name: input.name ?? current.manifestEntry.name,
     description: input.description ?? current.manifestEntry.description,
     status: input.status ?? current.manifestEntry.status,

@@ -3,7 +3,7 @@
   {{ isItalian() ? 'Vai al contenuto principale' : 'Skip to main content' }}
 </a>
 
-<div class="app-layout">
+<div class="app-layout" [attr.data-qk-palette]="activePalette()">
   <!-- Mobile hamburger toggle -->
   <button
     class="app-layout__hamburger"

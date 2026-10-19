@@ -34,6 +34,11 @@ Forms manage names, biographies, public/private details, images, statistics,
 relationships and manifests. Uploaded PNG, JPEG and WebP files are copied into
 the correct campaign folder automatically.
 
+When creating or editing a campaign, choose **Heroic**, **Gothic** or
+**Neutral**. The preset updates the Companion's surfaces, accents and focus
+colors while preserving readable status colors. Existing campaigns without a
+selection keep the Heroic appearance, and the choice can be changed later.
+
 For faster character and NPC entry, choose an assisted import source:
 
 - up to four character-sheet photos or screenshots;

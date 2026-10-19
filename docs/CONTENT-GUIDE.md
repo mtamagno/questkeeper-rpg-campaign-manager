@@ -51,7 +51,16 @@ available translation into `en` while keeping the chosen default language.
 
 `campaigns.json` is the homepage index. Each item needs `id`, localized
 `name` and `description`, a `thumbnail` path from the site root and an
-optional localized `status`.
+optional localized `status`. Set `palette` to `heroic`, `gothic` or `neutral`;
+older entries without it safely retain the `heroic` appearance. The Campaign
+Manager presents the same three choices when a campaign is created or edited.
+
+```json
+{
+  "id": "your-campaign-id",
+  "palette": "heroic"
+}
+```
 
 The campaign folder name must exactly match its ID.
 
