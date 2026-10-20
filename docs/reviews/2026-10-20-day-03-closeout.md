@@ -43,5 +43,7 @@ page and command bar, pause/resume, role change and keyboard exit.
 ## Evidence
 
 The guided-tour contract guard now checks role-change reset, clean-visitor
-routing, a focusable guide and focus restoration. Full verification and browser
-review are recorded with the paired delivery commits.
+routing, a focusable guide and focus restoration. Full verification passed in
+both targets. No browser surface was available for a fresh visual pass; this
+refinement adds no CSS and keeps the previously reviewed desktop and 360 px
+layout. A live smoke check remains appropriate after deployment.
