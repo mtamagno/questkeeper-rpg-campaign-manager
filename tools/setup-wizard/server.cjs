@@ -271,16 +271,27 @@ function quoteShell(value) {
 
 function createWindowsShortcut(name, kind) {
   const command = selfLaunchArguments(kind);
-  const shortcut = path.join(os.homedir(), 'Desktop', `${name}.lnk`);
-  run('powershell.exe', [
-    '-NoProfile',
-    '-Command',
-    '$s=(New-Object -ComObject WScript.Shell).CreateShortcut($args[0]);$s.TargetPath=$args[1];$s.Arguments=$args[2];$s.WorkingDirectory=$args[3];$s.Save()',
-    shortcut,
-    command.target,
-    command.arguments,
-    root,
-  ]);
+  const desktop = process.env.QUESTKEEPER_DESKTOP || path.join(os.homedir(), 'Desktop');
+  const shortcut = path.join(desktop, `${name}.lnk`);
+  fs.mkdirSync(desktop, { recursive: true });
+  run(
+    'powershell.exe',
+    [
+      '-NoProfile',
+      '-Command',
+      '$s=(New-Object -ComObject WScript.Shell).CreateShortcut($env:QUESTKEEPER_SHORTCUT_PATH);$s.TargetPath=$env:QUESTKEEPER_SHORTCUT_TARGET;$s.Arguments=$env:QUESTKEEPER_SHORTCUT_ARGUMENTS;$s.WorkingDirectory=$env:QUESTKEEPER_SHORTCUT_WORKING_DIRECTORY;$s.Save()',
+    ],
+    {
+      env: {
+        ...process.env,
+        QUESTKEEPER_SHORTCUT_PATH: shortcut,
+        QUESTKEEPER_SHORTCUT_TARGET: command.target,
+        QUESTKEEPER_SHORTCUT_ARGUMENTS: command.arguments,
+        QUESTKEEPER_SHORTCUT_WORKING_DIRECTORY: root,
+      },
+    },
+  );
+  return shortcut;
 }
 
 function createLinuxShortcut(name, kind) {
@@ -426,6 +437,19 @@ async function route(request, response) {
 }
 
 async function main() {
+  if (args.has('--self-test-shortcuts')) {
+    if (process.platform !== 'win32') {
+      console.log(JSON.stringify({ ok: true, skipped: true, platform: process.platform }));
+      return;
+    }
+    const shortcuts = [
+      createShortcut('QuestKeeper Campaign Manager', 'manager'),
+      createShortcut('QuestKeeper Companion', 'companion'),
+    ];
+    const ok = shortcuts.every((shortcut) => fs.existsSync(shortcut));
+    console.log(JSON.stringify({ ok, shortcuts }));
+    process.exit(ok ? 0 : 1);
+  }
   if (args.has('--self-test')) {
     for (const name of Object.keys(contentTypes)) asset(name);
     const packageFile = path.join(root, 'package.json');

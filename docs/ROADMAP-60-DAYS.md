@@ -37,7 +37,9 @@ An explicit user-requested re-plan first added the Windows bootstrap and then
 expanded it into the [cross-platform graphical setup](INSTALLATION-GUIDE.md),
 bringing the 1.1 Lanternwake release forward from Day 07. The Day 04 PWA/offline
 scope and date remain unchanged; they are not included in the immutable 1.1.0
-tag.
+tag. The focused 1.1.1 Hearthkey patch followed on 20 Oct to make Windows
+shortcut creation safe for user names and installation paths containing spaces;
+it is corrective release work, not borrowed scope from a later roadmap day.
 
 | Day         | Commit 1                                                           | Commit 2                                                                |
 | ----------- | ------------------------------------------------------------------ | ----------------------------------------------------------------------- |

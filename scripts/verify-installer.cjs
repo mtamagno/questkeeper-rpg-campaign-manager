@@ -1,4 +1,5 @@
 const fs = require('node:fs');
+const os = require('node:os');
 const path = require('node:path');
 const { execFileSync } = require('node:child_process');
 
@@ -47,6 +48,12 @@ const checks = [
       wizard.includes('createMacShortcut'),
   ],
   [
+    'space-safe Windows shortcut values',
+    wizard.includes('QUESTKEEPER_SHORTCUT_PATH') &&
+      wizard.includes('QUESTKEEPER_SHORTCUT_WORKING_DIRECTORY') &&
+      !wizard.includes('CreateShortcut($args[0])'),
+  ],
+  [
     'Node.js SEA construction and smoke test',
     builder.includes('--experimental-sea-config') &&
       builder.includes('NODE_SEA_BLOB') &&
@@ -86,6 +93,36 @@ try {
 }
 
 if (process.platform === 'win32') {
+  const shortcutTestRoot = fs.mkdtempSync(
+    path.join(os.tmpdir(), 'QuestKeeper Shortcut Test With Spaces '),
+  );
+  const shortcutDesktop = path.join(shortcutTestRoot, 'Desktop Folder With Spaces');
+  try {
+    fs.mkdirSync(shortcutDesktop, { recursive: true });
+    const output = execFileSync(
+      process.execPath,
+      ['tools/setup-wizard/server.cjs', '--self-test-shortcuts'],
+      {
+        cwd: root,
+        encoding: 'utf8',
+        env: { ...process.env, QUESTKEEPER_DESKTOP: shortcutDesktop },
+      },
+    );
+    const result = JSON.parse(output);
+    if (!result.ok || result.shortcuts.length !== 2) {
+      failures.push('Windows shortcut integration test did not create both launchers.');
+    }
+    for (const shortcut of result.shortcuts) {
+      if (!fs.existsSync(shortcut)) {
+        failures.push(`Windows shortcut integration test did not create ${shortcut}.`);
+      }
+    }
+  } catch (error) {
+    failures.push(`Windows shortcut integration test failed: ${error.message}`);
+  } finally {
+    fs.rmSync(shortcutTestRoot, { recursive: true, force: true });
+  }
+
   try {
     execFileSync(
       'powershell.exe',
