@@ -6,10 +6,12 @@ folders or editing JSON manifests.
 
 ## Open it
 
-First install [Node.js 24](https://nodejs.org/). No global packages, database
-or online account are required.
+No global packages, database or online account are required. On Windows, the
+visual setup can download and verify Node.js 24 automatically.
 
-- Windows: double-click `setup.bat` in the project folder.
+- Windows: double-click `setup.bat`, review the graphical checklist and choose
+  **Prepare QuestKeeper**. Optional desktop shortcuts can reopen either the
+  Manager or player Companion later.
 - macOS: double-click `setup.command`. On first launch, Control-click the file,
   choose **Open**, then confirm. If needed, run `chmod +x setup.command` once.
 - Linux: run `chmod +x setup.sh && ./setup.sh`.
@@ -108,8 +110,11 @@ See the [deployment guide](../../docs/DEPLOYMENT.md) for the complete flow.
 
 - **The window closes immediately:** open PowerShell or Terminal in the project
   folder and run `npm run manage` to see the error message.
-- **`node` is not recognized:** install Node.js 24, then reopen the terminal or
-  restart Windows.
+- **`node` is not recognized on Windows:** reopen `setup.bat` and keep automatic
+  Node.js installation selected. The installer verifies the official checksum
+  before requesting administrator approval.
+- **A desktop shortcut stopped working:** move the QuestKeeper folder back or
+  rerun setup after moving it to recreate both links.
 - **The Companion does not open:** use **Prepare automatically** once, then
   start it again. Only one preview can use port 4200 at a time.
 - **A build reports invalid data:** open the affected entry in the manager or

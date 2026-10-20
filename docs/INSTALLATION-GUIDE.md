@@ -6,9 +6,9 @@
 
 <p align="center"><em>Lyra knows the shortest road from download to game night.</em></p>
 
-QuestKeeper runs on your computer and produces a static campaign website. You
-only need **Node.js 24** to begin; a database, cloud account and AI provider are
-not required.
+QuestKeeper runs on your computer and produces a static campaign website. A
+database, cloud account and AI provider are not required. On Windows, the
+graphical setup can install the supported **Node.js 24** release for you.
 
 > **Looking around first?** Open the
 > [live Companion](https://mtamagno.github.io/questkeeper-rpg-campaign-manager/)
@@ -29,24 +29,49 @@ git clone https://github.com/mtamagno/questkeeper-rpg-campaign-manager.git
 cd questkeeper-rpg-campaign-manager
 ```
 
-Install the current [Node.js 24 LTS release](https://nodejs.org/) if it is not
-already available.
+Keep the extracted QuestKeeper folder in the location where you want to use it.
+Desktop shortcuts point to that folder, so move it before running setup rather
+than afterward.
 
 ## 2. Start the guided setup
 
-| Platform     | What to open                          |
-| ------------ | ------------------------------------- |
-| Windows      | Double-click `setup.bat`              |
-| macOS        | Double-click `setup.command`          |
-| Linux        | Run `chmod +x setup.sh && ./setup.sh` |
-| Any platform | Run `npm run manage` in a terminal    |
+| Platform     | What to open                                         |
+| ------------ | ---------------------------------------------------- |
+| Windows      | Double-click `setup.bat` to open the graphical setup |
+| macOS        | Double-click `setup.command`                         |
+| Linux        | Run `chmod +x setup.sh && ./setup.sh`                |
+| Any platform | Run `npm run manage` in a terminal                   |
 
 On macOS, Control-click **setup.command**, choose **Open**, then confirm if
 Gatekeeper blocks the first launch.
 
-On its first run, setup installs the locked project dependencies, opens Campaign
-Manager and guides you through the first campaign. The Manager normally uses
-`http://127.0.0.1:4173`; keep its terminal window open while working.
+### Windows graphical setup
+
+The bilingual setup shows each optional action before it runs:
+
+- install Node.js 24 automatically when no supported version is available;
+- prepare the project's locked dependencies;
+- create separate **QuestKeeper Campaign Manager** and **QuestKeeper
+  Companion** desktop shortcuts;
+- open Campaign Manager when setup finishes.
+
+Node.js comes directly from `https://nodejs.org/dist/`. QuestKeeper reads the
+official release index, downloads the correct MSI for x64, x86 or ARM64, and
+compares it with the published SHA-256 checksum before Windows is allowed to
+install it. The Windows administrator prompt is still visible and must be
+approved by the person using the computer.
+
+Nothing is installed silently merely by opening `setup.bat`: the checklist and
+**Prepare QuestKeeper** button make the selected actions explicit. AI tools and
+models remain a separate, optional Manager decision.
+
+On its first successful run, setup opens Campaign Manager and guides you through
+the first campaign. The Manager normally uses `http://127.0.0.1:4173`; keep its
+terminal window open while working.
+
+> The graphical Windows bootstrap is available on the current development
+> branch and will be included in the next packaged release. The immutable
+> v1.0.0 archive still requires Node.js to be installed manually.
 
 ## 3. Choose only what you need
 
@@ -99,14 +124,17 @@ stored as ordinary files under `src/campaigns/`.
 
 ## Quick troubleshooting
 
-| Symptom                              | Try this                                                                                 |
-| ------------------------------------ | ---------------------------------------------------------------------------------------- |
-| The setup closes immediately         | Open a terminal in the folder and run `npm run manage` to see the message.               |
-| `node` is not recognized             | Install Node.js 24, close the terminal and reopen it.                                    |
-| Port 4173 is busy                    | QuestKeeper automatically tries ports through 4183; use the URL printed in the terminal. |
-| The Companion does not reflect edits | Run **Check and build site**, then refresh without cache.                                |
-| A local model is unavailable         | Start Ollama or ComfyUI, then use **Discover installed** in AI setup.                    |
-| Publishing fails                     | Run **Test connection** and confirm the remote folder and FTPS mode.                     |
+| Symptom                                 | Try this                                                                                 |
+| --------------------------------------- | ---------------------------------------------------------------------------------------- |
+| The setup closes immediately            | Open a terminal in the folder and run `npm run manage` to see the message.               |
+| Windows asks for administrator access   | Confirm only when the dialog identifies the official Node.js installer you requested.    |
+| Node installation fails                 | Reopen `setup.bat`; the verified download is temporary and setup can safely try again.   |
+| A desktop shortcut stops working        | Return the QuestKeeper folder to its original location or rerun setup to recreate links. |
+| `node` is not recognized on macOS/Linux | Install Node.js 24, close Terminal and reopen it.                                        |
+| Port 4173 is busy                       | QuestKeeper automatically tries ports through 4183; use the URL printed in the terminal. |
+| The Companion does not reflect edits    | Run **Check and build site**, then refresh without cache.                                |
+| A local model is unavailable            | Start Ollama or ComfyUI, then use **Discover installed** in AI setup.                    |
+| Publishing fails                        | Run **Test connection** and confirm the remote folder and FTPS mode.                     |
 
 Still stuck? Open a GitHub issue with your operating system, Node version and
 the error text—never include API keys or publishing passwords.

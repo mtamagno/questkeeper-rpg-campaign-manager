@@ -60,6 +60,9 @@ GitHub Actions repeats the quality gate, then publishes:
 
 Both archives contain one versioned top-level folder. They are built with
 `git archive`, so ignored local state and untracked files cannot enter a release.
+Windows archives also include the graphical bootstrap and the dedicated Manager
+and Companion launchers. Release verification checks that Node.js downloads are
+checksum-verified and that setup retains an explicit user choice.
 
 ## Recovery
 

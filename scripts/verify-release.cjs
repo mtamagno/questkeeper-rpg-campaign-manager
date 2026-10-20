@@ -7,7 +7,9 @@ const read = (relativePath) => fs.readFileSync(path.join(root, relativePath), 'u
 const packageJson = JSON.parse(read('package.json'));
 const packageLock = JSON.parse(read('package-lock.json'));
 const workflow = read('.github/workflows/release.yml');
-const setupFiles = ['setup.bat', 'setup.ps1', 'setup.sh'].map(read);
+const setupBatch = read('setup.bat');
+const setupPowerShell = read('setup.ps1');
+const setupShell = read('setup.sh');
 const releaseNotes = `docs/releases/v${packageJson.version}.md`;
 const releaseCodex = 'RELEASES.md';
 const releaseAssetDirectory = 'docs/images/releases';
@@ -66,8 +68,18 @@ for (const marker of ['npm run verify', 'git archive', 'sha256sum', 'gh release 
   if (!workflow.includes(marker)) failures.push(`Release workflow is missing: ${marker}.`);
 }
 
-if (setupFiles.some((source) => !source.includes('npm ci'))) {
-  failures.push('Every primary platform setup script must install locked dependencies.');
+if (!setupBatch.includes('setup.ps1') || !setupPowerShell.includes('npm.FullName ci')) {
+  failures.push('Windows setup must delegate to the GUI and install locked dependencies.');
+}
+
+if (!setupShell.includes('npm ci')) {
+  failures.push('Unix setup must install locked dependencies.');
+}
+
+for (const launcher of ['launch-manager.bat', 'launch-companion.bat']) {
+  if (!fs.existsSync(path.join(root, launcher))) {
+    failures.push(`Missing Windows desktop launcher: ${launcher}.`);
+  }
 }
 
 const trackedFiles = execFileSync('git', ['ls-files', '-z'], {
@@ -76,6 +88,12 @@ const trackedFiles = execFileSync('git', ['ls-files', '-z'], {
 })
   .split('\0')
   .filter(Boolean);
+
+for (const launcher of ['setup.bat', 'setup.ps1', 'launch-manager.bat', 'launch-companion.bat']) {
+  if (!trackedFiles.includes(launcher)) {
+    failures.push(`Windows setup entry is not part of the release archive: ${launcher}.`);
+  }
+}
 
 const forbiddenTrackedPatterns = [
   /(^|\/)node_modules\//,

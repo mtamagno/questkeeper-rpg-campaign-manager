@@ -33,6 +33,9 @@ never a reason to split broken work or bypass `npm run verify`.
 Day 03 closed with the
 [first-visit and guided-tour integration review](reviews/2026-10-20-day-03-closeout.md).
 It corrected the combined journey without pulling Day 04 PWA work forward.
+An explicit user-requested re-plan then added the
+[graphical Windows setup](INSTALLATION-GUIDE.md#windows-graphical-setup) as an
+out-of-band packaging improvement; the Day 04 scope and date remain unchanged.
 
 | Day         | Commit 1                                                           | Commit 2                                                                |
 | ----------- | ------------------------------------------------------------------ | ----------------------------------------------------------------------- |

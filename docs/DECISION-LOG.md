@@ -537,6 +537,32 @@ is spent strengthening today's outcome before tomorrow's scope is opened.
 **Revisit when:** A weekly review deliberately adopts a different cadence and
 updates both the 60-day plan and working agreement.
 
+### QK-021 — Windows setup begins with choices, not prerequisites
+
+**Date:** 20 October 2026
+
+**Status:** Active
+
+**Decision:** Windows users begin with a bilingual graphical bootstrap that
+works before Node.js exists. It can install the supported Node.js 24 release,
+prepare locked dependencies and create separate Manager and Companion desktop
+shortcuts. Every machine-changing option is visible before execution.
+
+**Why:** Asking a Game Master to interpret missing-runtime errors and terminal
+commands makes local ownership feel harder than a cloud account. The bootstrap
+can remove that friction without hiding trust decisions.
+
+**Consequences:** Node.js is downloaded only from `nodejs.org`, matched against
+the official SHA-256 manifest and installed only after the user starts the
+selected setup and accepts Windows elevation. AI models remain outside this
+bootstrap. macOS and Linux keep their existing launchers until equivalent
+native, verifiable flows are designed.
+
+**Source:** [Installation Guide](INSTALLATION-GUIDE.md#windows-graphical-setup)
+
+**Revisit when:** Signed native installers or bundled runtimes replace the
+source-folder distribution, or when macOS/Linux reach equivalent setup UX.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD
