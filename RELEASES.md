@@ -17,21 +17,21 @@ setting or visual identity from a commercial game.
 <table>
   <tr>
     <td width="38%" align="center" valign="middle">
-      <img src="docs/images/releases/v1.0.0-starquill-auri.webp" alt="Auri Starquill, a mothkin chronicle-keeper holding a luminous quill and campaign journal" width="330">
+      <img src="docs/images/releases/v1.1.0-lanternwake-fen.webp" alt="Fen Wickwhistle, a lantern-tailed pathfinder holding a three-point compass" width="330">
     </td>
     <td width="62%" valign="middle">
-      <p><strong>QuestKeeper 1.0.0 · Starquill</strong></p>
-      <h3>The First Chronicle</h3>
-      <p><strong>Auri Starquill</strong> · mothkin chronicle-keeper</p>
-      <blockquote>“A story becomes a legend when the whole party can find its way back.”</blockquote>
-      <p>Auri carries the first public chronicle: a self-hosted campaign home, a guided Manager and a portable archive that belongs to the party.</p>
-      <p><a href="docs/releases/v1.0.0.md"><strong>Read the release notes →</strong></a> · <a href="https://github.com/mtamagno/questkeeper-rpg-campaign-manager/releases/tag/v1.0.0"><strong>Download 1.0.0 →</strong></a></p>
+      <p><strong>QuestKeeper 1.1.0 · Lanternwake</strong></p>
+      <h3>The Welcoming Path</h3>
+      <p><strong>Fen Wickwhistle</strong> · lantern-tailed pathfinder</p>
+      <blockquote>“Three roads, one warm light. Your chronicle begins here.”</blockquote>
+      <p>Fen carries a verified setup across Windows, macOS and Linux: no terminal knowledge, no system-wide Node.js installation and no guesswork about the next step.</p>
+      <p><a href="docs/releases/v1.1.0.md"><strong>Read the release notes →</strong></a> · <a href="https://github.com/mtamagno/questkeeper-rpg-campaign-manager/releases/tag/v1.1.0"><strong>Download 1.1.0 →</strong></a></p>
     </td>
   </tr>
 </table>
 
-> Auri joined the living codex immediately after 1.0.0 was published. The
-> original tag and downloadable archives remain unchanged and immutable.
+> Auri Starquill still guards the immutable 1.0.0 First Chronicle. Every
+> published companion remains part of the living codex.
 
 ---
 
@@ -44,7 +44,7 @@ milestone; after publication, its identity is permanent.
 | Version   | Codename          | Chapter                 | Release companion                              | Promise                                                  | Status      |
 | --------- | ----------------- | ----------------------- | ---------------------------------------------- | -------------------------------------------------------- | ----------- |
 | **1.0.0** | **Starquill**     | The First Chronicle     | **Auri Starquill**, mothkin chronicler         | A campaign receives a beautiful, portable home.          | Released    |
-| **1.1.0** | **Lanternwake**   | The Welcoming Path      | **Fen Wickwhistle**, lantern-tailed pathfinder | Setup and first steps become easier to follow.           | Planned     |
+| **1.1.0** | **Lanternwake**   | The Welcoming Path      | **Fen Wickwhistle**, lantern-tailed pathfinder | Native guided setup reaches Windows, macOS and Linux.    | Released    |
 | **1.2.0** | **Echobloom**     | Stories With Roots      | **Morrow Bellroot**, memory gardener           | Characters grow beyond a static sheet.                   | Planned     |
 | **1.3.0** | **Moonmoot**      | Gather at the Table     | **Pip Hearthroll**, goblin table scout         | The party can prepare and catch up together.             | Planned     |
 | **1.4.0** | **Waywhisper**    | The Living Atlas        | **Orra Mosscompass**, centaur mapmaker         | People, places, clues and roads become connected.        | Planned     |

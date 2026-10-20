@@ -1,6 +1,6 @@
 {
   "name": "questkeeper-rpg-campaign-manager",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A self-hosted D&D and tabletop RPG companion for character sheets, session journals, party bonds, maps and campaign lore.",
   "scripts": {
     "ng": "ng",
@@ -16,6 +16,7 @@
     "test:guided-tour": "node scripts/verify-guided-tour.cjs",
     "test:installer": "node scripts/verify-installer.cjs",
     "test:release": "node scripts/verify-release.cjs",
+    "build:setup": "node scripts/build-setup-binary.cjs",
     "lint": "eslint .",
     "format": "prettier --write . --ignore-unknown",
     "format:check": "prettier --check . --ignore-unknown",
@@ -47,6 +48,7 @@
     "@eslint/js": "^10.0.1",
     "angular-eslint": "^21.4.0",
     "eslint": "^10.13.0",
+    "postject": "^1.0.0-alpha.6",
     "prettier": "^3.8.1",
     "sharp": "^0.35.5",
     "typescript": "~5.9.2",

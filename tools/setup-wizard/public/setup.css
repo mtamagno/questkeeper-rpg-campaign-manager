@@ -1,0 +1,262 @@
+:root {
+  color-scheme: dark;
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+  background: #0e1014;
+  color: #f1eadc;
+}
+
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 15% 5%, rgba(53, 112, 104, 0.24), transparent 34rem),
+    radial-gradient(circle at 90% 10%, rgba(210, 145, 47, 0.16), transparent 30rem), #0e1014;
+}
+button,
+input {
+  font: inherit;
+}
+.shell {
+  width: min(880px, calc(100% - 32px));
+  margin: 40px auto;
+}
+.hero {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 22px;
+  align-items: start;
+  padding: 28px 0 30px;
+  border-bottom: 1px solid #4e493e;
+}
+.sigil {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border: 1px solid #d59b45;
+  transform: rotate(45deg);
+  color: #f5c878;
+  font-family: Georgia, serif;
+  font-weight: 700;
+}
+.sigil::first-line {
+  transform: rotate(-45deg);
+}
+.eyebrow,
+.step {
+  margin: 0 0 5px;
+  color: #e3ad59;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+h1,
+h2 {
+  margin: 0;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+h1 {
+  font-size: clamp(2rem, 5vw, 3.3rem);
+  line-height: 1.02;
+}
+h2 {
+  font-size: 1.35rem;
+}
+.lede,
+.muted {
+  color: #bcb5a9;
+  line-height: 1.6;
+}
+.lede {
+  max-width: 650px;
+  margin: 12px 0 0;
+}
+.language {
+  color: #f1eadc;
+  border: 1px solid #655d50;
+  border-radius: 999px;
+  background: #17191f;
+  padding: 9px 14px;
+  cursor: pointer;
+}
+.status-card,
+.options,
+.trust {
+  margin-top: 22px;
+  border: 1px solid #464238;
+  background: rgba(25, 27, 32, 0.92);
+  border-radius: 14px;
+}
+.status-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 22px;
+}
+.status-card p {
+  margin-bottom: 0;
+}
+.badge {
+  border-radius: 999px;
+  background: #2a312f;
+  color: #9ee0c0;
+  padding: 7px 12px;
+  font-weight: 750;
+}
+.options {
+  padding: 22px;
+  display: grid;
+  gap: 10px;
+}
+.section-heading {
+  display: flex;
+  gap: 18px;
+  align-items: start;
+  margin-bottom: 6px;
+}
+.section-heading .muted {
+  margin: 5px 0 0;
+}
+.options label {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 13px 14px;
+  border-radius: 9px;
+  background: #111318;
+  cursor: pointer;
+}
+.options input {
+  width: 19px;
+  height: 19px;
+  accent-color: #ca9140;
+}
+.trust {
+  border-color: #655633;
+  background: rgba(70, 52, 25, 0.24);
+  padding: 17px 20px;
+}
+.trust strong {
+  color: #f4cb82;
+}
+.trust p {
+  margin: 5px 0 0;
+  color: #cbc2b3;
+  line-height: 1.55;
+}
+.progress-area {
+  margin-top: 24px;
+}
+.progress-track {
+  height: 7px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: #292b31;
+}
+#progress {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, #3e8e82, #e5ae54);
+  transition: width 0.35s ease;
+}
+#progress.running {
+  width: 70%;
+  animation: breathe 1.6s ease-in-out infinite alternate;
+}
+#progress.complete {
+  width: 100%;
+}
+#progress.failed {
+  width: 100%;
+  background: #bb5e56;
+}
+#progress-message {
+  font-weight: 750;
+}
+#log {
+  display: none;
+  max-height: 210px;
+  overflow: auto;
+  white-space: pre-wrap;
+  color: #bdb9c4;
+  background: #090a0d;
+  border: 1px solid #34343b;
+  border-radius: 9px;
+  padding: 14px;
+}
+#log:not(:empty) {
+  display: block;
+}
+footer {
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 0;
+}
+footer p {
+  margin: 0;
+  color: #9f9a90;
+  font-size: 0.9rem;
+}
+.primary {
+  border: 1px solid #f0c57e;
+  border-radius: 9px;
+  color: #15110b;
+  background: linear-gradient(180deg, #edbd70, #c88932);
+  padding: 13px 21px;
+  font-weight: 850;
+  cursor: pointer;
+  box-shadow: 0 10px 28px rgba(190, 126, 40, 0.2);
+}
+.primary:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+@keyframes breathe {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (max-width: 680px) {
+  .shell {
+    margin: 15px auto;
+  }
+  .hero {
+    grid-template-columns: auto 1fr;
+  }
+  .language {
+    grid-column: 2;
+    justify-self: start;
+  }
+  footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .primary {
+    width: 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

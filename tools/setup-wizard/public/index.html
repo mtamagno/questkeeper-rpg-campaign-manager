@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>QuestKeeper Setup</title>
+    <link rel="stylesheet" href="setup.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="hero">
+        <div class="sigil" aria-hidden="true">QK</div>
+        <div>
+          <p class="eyebrow" data-copy="eyebrow">The Welcoming Path</p>
+          <h1 data-copy="title">Prepare your campaign workshop</h1>
+          <p class="lede" data-copy="intro">
+            QuestKeeper prepares its private runtime, tools and launchers without asking you to use
+            a terminal.
+          </p>
+        </div>
+        <button id="language" class="language" type="button">Italiano</button>
+      </header>
+
+      <section class="status-card" aria-labelledby="status-title">
+        <div>
+          <p class="step">01</p>
+          <h2 id="status-title" data-copy="statusTitle">Your device</h2>
+          <p id="device-status" class="muted">Checking…</p>
+        </div>
+        <span id="status-badge" class="badge">…</span>
+      </section>
+
+      <section class="options" aria-labelledby="options-title">
+        <div class="section-heading">
+          <p class="step">02</p>
+          <div>
+            <h2 id="options-title" data-copy="optionsTitle">Choose what to prepare</h2>
+            <p class="muted" data-copy="optionsHint">You can run this setup again at any time.</p>
+          </div>
+        </div>
+        <label
+          ><input id="dependencies" type="checkbox" checked /><span data-copy="dependencies"
+            >Install the locked QuestKeeper tools</span
+          ></label
+        >
+        <label
+          ><input id="manager-shortcut" type="checkbox" checked /><span data-copy="managerShortcut"
+            >Create a Campaign Manager shortcut</span
+          ></label
+        >
+        <label
+          ><input id="companion-shortcut" type="checkbox" checked /><span
+            data-copy="companionShortcut"
+            >Create a player Companion shortcut</span
+          ></label
+        >
+        <label
+          ><input id="launch-manager" type="checkbox" checked /><span data-copy="launchManager"
+            >Open Campaign Manager when setup finishes</span
+          ></label
+        >
+      </section>
+
+      <aside class="trust">
+        <strong data-copy="trustTitle">A private, verified runtime</strong>
+        <p data-copy="trustBody">
+          Node.js 24 is downloaded only from nodejs.org, verified against its published SHA-256
+          checksum and kept inside this QuestKeeper folder. No administrator access is required.
+        </p>
+      </aside>
+
+      <section class="progress-area" aria-live="polite">
+        <div class="progress-track"><span id="progress"></span></div>
+        <p id="progress-message" data-copy="ready">Ready to begin.</p>
+        <pre id="log" tabindex="0"></pre>
+      </section>
+
+      <footer>
+        <p data-copy="footer">No AI model or remote provider is enabled by this setup.</p>
+        <button id="prepare" class="primary" type="button" data-copy="prepare">
+          Prepare QuestKeeper
+        </button>
+      </footer>
+    </main>
+    <script src="setup.js"></script>
+  </body>
+</html>

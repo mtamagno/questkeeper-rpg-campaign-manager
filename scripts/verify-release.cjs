@@ -8,7 +8,8 @@ const packageJson = JSON.parse(read('package.json'));
 const packageLock = JSON.parse(read('package-lock.json'));
 const workflow = read('.github/workflows/release.yml');
 const setupBatch = read('setup.bat');
-const setupPowerShell = read('setup.ps1');
+const setupWizard = read('tools/setup-wizard/server.cjs');
+const setupBuilder = read('scripts/build-setup-binary.cjs');
 const setupShell = read('setup.sh');
 const releaseNotes = `docs/releases/v${packageJson.version}.md`;
 const releaseCodex = 'RELEASES.md';
@@ -64,16 +65,30 @@ if (
   failures.push(`The Release Codex does not list v${packageJson.version}.`);
 }
 
-for (const marker of ['npm run verify', 'git archive', 'sha256sum', 'gh release create']) {
+for (const marker of [
+  'npm run verify',
+  'npm run build:setup',
+  'git archive',
+  'sha256sum',
+  'gh release create',
+  'actions/upload-artifact@v7',
+  'actions/download-artifact@v8',
+]) {
   if (!workflow.includes(marker)) failures.push(`Release workflow is missing: ${marker}.`);
 }
 
-if (!setupBatch.includes('setup.ps1') || !setupPowerShell.includes('npm.FullName ci')) {
-  failures.push('Windows setup must delegate to the GUI and install locked dependencies.');
+for (const target of ['windows-x64', 'linux-x64', 'macos-intel', 'macos-apple-silicon']) {
+  if (!workflow.includes(target))
+    failures.push(`Release workflow is missing native target: ${target}.`);
 }
 
-if (!setupShell.includes('npm ci')) {
-  failures.push('Unix setup must install locked dependencies.');
+if (
+  !setupBatch.includes('QuestKeeper-Setup.exe') ||
+  !setupShell.includes('questkeeper-setup') ||
+  !setupWizard.includes('SHASUMS256.txt') ||
+  !setupBuilder.includes('NODE_SEA_BLOB')
+) {
+  failures.push('Release entries must prefer the verified cross-platform SEA setup.');
 }
 
 for (const launcher of ['launch-manager.bat', 'launch-companion.bat']) {
@@ -89,7 +104,19 @@ const trackedFiles = execFileSync('git', ['ls-files', '-z'], {
   .split('\0')
   .filter(Boolean);
 
-for (const launcher of ['setup.bat', 'setup.ps1', 'launch-manager.bat', 'launch-companion.bat']) {
+for (const launcher of [
+  'setup.bat',
+  'setup.ps1',
+  'setup.command',
+  'setup.sh',
+  'launch-manager.bat',
+  'launch-companion.bat',
+  'tools/setup-wizard/server.cjs',
+  'tools/setup-wizard/public/index.html',
+  'tools/setup-wizard/public/setup.css',
+  'tools/setup-wizard/public/setup.js',
+  'scripts/build-setup-binary.cjs',
+]) {
   if (!trackedFiles.includes(launcher)) {
     failures.push(`Windows setup entry is not part of the release archive: ${launcher}.`);
   }
@@ -115,5 +142,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `Release contract verified for v${packageJson.version}: codename, companion, notes, archives, checksums, setup bootstrap and tracked-file privacy guard.`,
+  `Release contract verified for v${packageJson.version}: codename, companion, four native archives, checksums, standalone setup and tracked-file privacy guard.`,
 );

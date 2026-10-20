@@ -541,7 +541,7 @@ updates both the 60-day plan and working agreement.
 
 **Date:** 20 October 2026
 
-**Status:** Active
+**Status:** Superseded by QK-022
 
 **Decision:** Windows users begin with a bilingual graphical bootstrap that
 works before Node.js exists. It can install the supported Node.js 24 release,
@@ -558,10 +558,39 @@ selected setup and accepts Windows elevation. AI models remain outside this
 bootstrap. macOS and Linux keep their existing launchers until equivalent
 native, verifiable flows are designed.
 
-**Source:** [Installation Guide](INSTALLATION-GUIDE.md#windows-graphical-setup)
+**Source:** [Installation Guide](INSTALLATION-GUIDE.md)
 
-**Revisit when:** Signed native installers or bundled runtimes replace the
-source-folder distribution, or when macOS/Linux reach equivalent setup UX.
+**Revisit when:** See QK-022.
+
+### QK-022 — One verified setup path across desktop platforms
+
+**Date:** 20 October 2026
+
+**Status:** Active
+
+**Decision:** Stable releases contain standalone graphical setup builds for
+Windows x64, Linux x64, macOS Intel and macOS Apple Silicon. The same local,
+bilingual browser UI prepares a private Node.js 24 runtime, locked dependencies
+and optional Manager/Companion desktop launchers. Source scripts remain fallback
+developer entries rather than the recommended player path.
+
+**Why:** A Game Master should not have to install a programming runtime or learn
+terminal commands before seeing the Manager. An application-owned runtime also
+keeps version support consistent without making system-wide changes.
+
+**Consequences:** Platform binaries are built as Node.js Single Executable
+Applications on matching GitHub runners. Runtime archives come only from
+`nodejs.org` and must pass the published SHA-256 check. The local setup server
+binds to loopback and requires a random token. Unsigned first-release binaries
+must disclose SmartScreen/Gatekeeper warnings; signing and notarization are a
+future trust improvement. The explicit re-plan moves 1.1.0 forward but does not
+move Day 04 PWA/offline work.
+
+**Source:** [Installation Guide](INSTALLATION-GUIDE.md) and
+[QuestKeeper 1.1.0 release notes](releases/v1.1.0.md)
+
+**Revisit when:** Signing credentials are available, another desktop
+architecture has demonstrated demand, or Node SEA leaves active development.
 
 ### QK-XXX — Short decision title
 

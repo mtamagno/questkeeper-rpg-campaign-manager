@@ -26,16 +26,18 @@ never a reason to split broken work or bypass `npm run verify`.
 | 04 · 21 Oct | [ ] `feat: make the Companion installable as a PWA`                                    | [ ] `feat: cache recent characters and recaps for offline reading`                                         |
 | 05 · 22 Oct | [ ] `feat: introduce global command palette navigation`                                | [ ] `feat: add recent pages favourites and continue-reading actions`                                       |
 | 06 · 23 Oct | [ ] `a11y: complete keyboard focus and landmark overhaul`                              | [ ] `perf: enforce image font and initial-load budgets`                                                    |
-| 07 · 24 Oct | [ ] `feat: publish a richer Lantern Road player journey`                               | [ ] `release: ship QuestKeeper 1.1 foundation release`                                                     |
+| 07 · 24 Oct | [ ] `feat: publish a richer Lantern Road player journey`                               | [x] `release: ship QuestKeeper 1.1 Lanternwake` (moved to 20 Oct by explicit re-plan)                      |
 
 ## Week 2 — Characters that grow with the story
 
 Day 03 closed with the
 [first-visit and guided-tour integration review](reviews/2026-10-20-day-03-closeout.md).
 It corrected the combined journey without pulling Day 04 PWA work forward.
-An explicit user-requested re-plan then added the
-[graphical Windows setup](INSTALLATION-GUIDE.md#windows-graphical-setup) as an
-out-of-band packaging improvement; the Day 04 scope and date remain unchanged.
+An explicit user-requested re-plan first added the Windows bootstrap and then
+expanded it into the [cross-platform graphical setup](INSTALLATION-GUIDE.md),
+bringing the 1.1 Lanternwake release forward from Day 07. The Day 04 PWA/offline
+scope and date remain unchanged; they are not included in the immutable 1.1.0
+tag.
 
 | Day         | Commit 1                                                           | Commit 2                                                                |
 | ----------- | ------------------------------------------------------------------ | ----------------------------------------------------------------------- |

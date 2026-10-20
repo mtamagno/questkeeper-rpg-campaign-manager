@@ -48,21 +48,24 @@ Before creating a tag:
 8. create and push the annotated tag.
 
 ```bash
-git tag -a v1.0.0 -m "QuestKeeper 1.0.0"
-git push origin v1.0.0
+git tag -a v1.1.0 -m "QuestKeeper 1.1.0 · Lanternwake"
+git push origin v1.1.0
 ```
 
 GitHub Actions repeats the quality gate, then publishes:
 
-- `questkeeper-vX.Y.Z.zip` for Windows and general use;
-- `questkeeper-vX.Y.Z.tar.gz` for macOS and Linux;
+- `questkeeper-vX.Y.Z-windows-x64.zip` with `QuestKeeper-Setup.exe`;
+- `questkeeper-vX.Y.Z-macos-intel.tar.gz` with a setup app;
+- `questkeeper-vX.Y.Z-macos-apple-silicon.tar.gz` with a setup app;
+- `questkeeper-vX.Y.Z-linux-x64.tar.gz` with `questkeeper-setup`;
 - `SHA256SUMS.txt` for integrity verification.
 
-Both archives contain one versioned top-level folder. They are built with
-`git archive`, so ignored local state and untracked files cannot enter a release.
-Windows archives also include the graphical bootstrap and the dedicated Manager
-and Companion launchers. Release verification checks that Node.js downloads are
-checksum-verified and that setup retains an explicit user choice.
+Every archive contains one versioned top-level folder. Tracked source is staged
+with `git archive`, so ignored local state and untracked files cannot enter a
+release; each platform job then adds only its smoke-tested Node.js SEA bootstrap.
+Release verification checks that runtime downloads are checksum-verified, setup
+retains explicit user choices and all four native packages finish before the
+GitHub release is published.
 
 ## Recovery
 

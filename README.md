@@ -71,13 +71,14 @@ portable folder you control.
 
 ## Start in a few minutes
 
-1. Download the **[latest release](https://github.com/mtamagno/questkeeper-rpg-campaign-manager/releases/latest)** or the **[current source ZIP](https://github.com/mtamagno/questkeeper-rpg-campaign-manager/archive/refs/heads/main.zip)** and extract its folder. The graphical bootstrap is on `main` now and enters packaged downloads with the next release; the immutable v1.0.0 archive keeps its original manual Node.js step.
-2. On supported Windows packages, double-click `setup.bat`: the visual setup can install **Node.js 24**, prepare QuestKeeper and create desktop shortcuts for you.
-3. On macOS open `setup.command`; on Linux run `./setup.sh`. Then follow the guided Manager, preview your Companion and publish when ready.
+1. Download the **[latest release](https://github.com/mtamagno/questkeeper-rpg-campaign-manager/releases/latest)** for Windows, macOS Intel, macOS Apple Silicon or Linux, then extract its folder.
+2. Open `QuestKeeper-Setup.exe` on Windows, **QuestKeeper Setup.app** on macOS or `questkeeper-setup` on Linux.
+3. Choose the launchers you want, let the visual setup prepare QuestKeeper, then follow the guided Manager.
 
-The Windows installer downloads Node.js only from `nodejs.org`, verifies its
-official SHA-256 checksum and asks before changing the computer. It never
-downloads an AI model without a separate choice. See the
+The standalone setup needs no prior Node.js installation. It downloads a
+private Node.js 24 runtime only from `nodejs.org`, verifies its official SHA-256
+checksum and keeps it inside the QuestKeeper folder. It never downloads an AI
+model without a separate choice. See the
 **[Installation Guide](docs/INSTALLATION-GUIDE.md)** for the complete platform
 walkthrough and troubleshooting.
 
