@@ -59,6 +59,21 @@ if (!currentReleaseAssets.some((file) => currentReleaseNotes.includes(file))) {
 }
 
 if (
+  /\b(?:src|href)=["']\.\.?\//i.test(currentReleaseNotes) ||
+  /\]\(\.\.?\//.test(currentReleaseNotes)
+) {
+  failures.push(
+    'Release notes contain relative links that will break when rendered as a GitHub Release body.',
+  );
+}
+
+if (!currentReleaseNotes.includes(`/v${packageJson.version}/docs/images/releases/`)) {
+  failures.push(
+    `Release companion art must use an absolute URL pinned to v${packageJson.version}.`,
+  );
+}
+
+if (
   fs.existsSync(path.join(root, releaseCodex)) &&
   !read(releaseCodex).includes(`**${packageJson.version}**`)
 ) {

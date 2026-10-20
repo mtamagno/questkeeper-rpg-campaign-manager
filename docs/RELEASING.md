@@ -14,6 +14,9 @@ credentials, transcripts, generated model files or maintainer workspaces.
   companion, recorded in the [Release Codex](../RELEASES.md).
 - Companion art lives under `docs/images/releases/` and starts with the full
   version, for example `v1.0.0-starquill-auri.webp`.
+- Images and documentation links inside a release-notes file use absolute URLs
+  pinned to that release tag. GitHub Release pages do not resolve paths relative
+  to `docs/releases/` like repository Markdown does.
 - Compatible fixes increment the patch version, compatible features increment
   the minor version and breaking changes increment the major version.
 
