@@ -80,6 +80,11 @@ export class GuidedTourService {
     this.storedState.set({ ...INITIAL_STATE, status: 'active' });
   }
 
+  /** Clears progress when the visitor deliberately changes first-visit path. */
+  reset(): void {
+    this.storedState.set(INITIAL_STATE);
+  }
+
   /** Associates the tour with the campaign the visitor explicitly opened. */
   attachCampaign(campaignId: string): void {
     const current = this.state();

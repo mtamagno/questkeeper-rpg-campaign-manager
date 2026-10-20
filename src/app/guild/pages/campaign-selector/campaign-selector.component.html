@@ -19,7 +19,12 @@
     </div>
   </header>
 
-  <section class="campaign-selector__audience" aria-labelledby="first-visit-title">
+  <section
+    id="first-visit-paths"
+    class="campaign-selector__audience"
+    tabindex="-1"
+    aria-labelledby="first-visit-title"
+  >
     @if (audience() === null) {
       <div class="campaign-selector__audience-heading">
         <span class="campaign-selector__section-kicker">{{
@@ -75,7 +80,7 @@
             }}</span>
           </span>
           <span class="campaign-selector__path-cta">
-            {{ lang() === 'it' ? 'Apri la demo del Manager' : 'Open the Manager demo' }}
+            {{ lang() === 'it' ? 'Scegli il percorso GM' : 'Choose the GM path' }}
             <span aria-hidden="true">→</span>
           </span>
         </button>
@@ -117,6 +122,7 @@
             class="qk-button qk-button--secondary"
             type="button"
             data-tour-launch="first-visit"
+            data-tour-control
             (click)="openTour()"
           >
             @if (tourStatus() === 'paused') {

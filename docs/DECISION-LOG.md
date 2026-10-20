@@ -510,6 +510,33 @@ the tour.
 help at least four of five visitors explain and navigate the Companion within
 two minutes.
 
+### QK-020 — Close the day before moving the calendar
+
+**Date:** 20 October 2026
+
+**Status:** Active
+
+**Decision:** The two dated items in the 60-day plan define the scheduled scope
+for that day. A third work block is normally a closeout review that tests the
+combined journey, corrects gaps, connects durable decisions and updates future
+task assumptions. Work assigned to a later date moves forward only through an
+explicit re-plan recorded in the roadmap.
+
+**Why:** Fast implementation can make adjacent features look complete in
+isolation while leaving contradictory labels, stale state, missing focus or
+outdated documentation between them. Pulling later work forward hides those
+integration costs and makes the calendar unreliable.
+
+**Consequences:** Daily reviews use the reusable closeout template, may produce
+a focused refinement commit and must record downstream impact. Spare capacity
+is spent strengthening today's outcome before tomorrow's scope is opened.
+
+**Source:** [Daily closeout template](templates/DAILY-CLOSEOUT.md) and
+[Day 03 integration review](reviews/2026-10-20-day-03-closeout.md)
+
+**Revisit when:** A weekly review deliberately adopts a different cadence and
+updates both the 60-day plan and working agreement.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD

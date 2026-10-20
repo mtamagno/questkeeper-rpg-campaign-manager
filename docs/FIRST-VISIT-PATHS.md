@@ -30,6 +30,11 @@ visible **Change path** control. `first-visit-audience` is stored through the
 same local preference mechanism used elsewhere in the Companion. Only
 `player`, `gm` or `null` are accepted.
 
+Changing path also clears any remembered guided-tour stop. A clean visitor who
+uses the persistent Tour action is returned to these choices instead of being
+silently treated as a Player. The GM choice first confirms the path; the
+Manager demo remains the explicit next action in the resulting summary.
+
 Campaign spoiler consent, protected profiles and every other permission remain
 separate systems. Clearing browser storage also clears the orientation choice.
 
@@ -39,6 +44,7 @@ separate systems. Clearing browser storage also clears the orientation choice.
 - The choice is explained in text; icons are decorative.
 - Desktop presents two equal cards; narrow screens stack them in reading order.
 - The selected-state actions maintain the shared 44 px control target.
+- Tour entry and exit move focus to the relevant region or launcher.
 - Motion and contrast continue to follow the shared design-system preferences.
 
 ## Verification

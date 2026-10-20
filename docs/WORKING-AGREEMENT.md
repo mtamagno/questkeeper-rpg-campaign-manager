@@ -104,12 +104,21 @@ downstream adaptation and compatibility validation.
 ### During the week: deliver in small chapters
 
 - Aim for two useful, independently understandable commits per working day.
+- Treat the two dated roadmap items as that day's delivery boundary. Finishing
+  early does not automatically pull work from tomorrow or a later date.
+- Use any third work block for a same-day closeout: exercise the combined
+  journey, find omissions and regressions, reconcile tests and documentation,
+  and record how the day's work changes later tasks. Start a future-dated item
+  only after an explicit re-plan that updates the roadmap and states why.
 - Commit one concern at a time; do not split a single broken change merely to
   reach a number.
 - Keep the branch releasable. Run focused tests while working and
   `npm run verify` before a pull request or push to `main`.
 - Record discoveries that change scope in the weekly note.
 - Preview visual work at desktop and 360 px mobile widths before review.
+
+Use the reusable [daily closeout](templates/DAILY-CLOSEOUT.md) after the two
+scheduled tasks whenever more work is available that day.
 
 ### Friday or Sunday: review and re-plan
 

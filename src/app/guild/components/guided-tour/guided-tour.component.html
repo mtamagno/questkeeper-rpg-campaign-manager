@@ -1,6 +1,8 @@
 @if (tour.isActive()) {
   <aside
+    #tourPanel
     class="guided-tour"
+    tabindex="-1"
     role="region"
     aria-live="polite"
     aria-labelledby="guided-tour-title"
@@ -16,7 +18,7 @@
       <button
         class="guided-tour__pause"
         type="button"
-        (click)="tour.pause()"
+        (click)="pause()"
         [attr.aria-label]="
           isItalian() ? 'Sospendi e continua più tardi' : 'Pause and continue later'
         "
@@ -58,7 +60,7 @@
       </button>
     </footer>
 
-    <button class="guided-tour__later" type="button" (click)="tour.pause()">
+    <button class="guided-tour__later" type="button" (click)="pause()">
       {{ isItalian() ? 'Continua più tardi' : 'Continue later' }}
     </button>
   </aside>

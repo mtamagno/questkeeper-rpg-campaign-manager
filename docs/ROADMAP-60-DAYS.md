@@ -30,6 +30,10 @@ never a reason to split broken work or bypass `npm run verify`.
 
 ## Week 2 — Characters that grow with the story
 
+Day 03 closed with the
+[first-visit and guided-tour integration review](reviews/2026-10-20-day-03-closeout.md).
+It corrected the combined journey without pulling Day 04 PWA work forward.
+
 | Day         | Commit 1                                                           | Commit 2                                                                |
 | ----------- | ------------------------------------------------------------------ | ----------------------------------------------------------------------- |
 | 08 · 25 Oct | [ ] `feat: redesign profiles around identity bonds and memories`   | [ ] `feat: add quick facts signature items and favourite moments`       |
@@ -145,6 +149,13 @@ These run throughout the sixty days and do not replace the two daily commits:
 - Each commit must deliver a coherent capability, not a partial broken layer.
 - Tests and documentation travel with the feature whenever practical.
 - The second daily commit should usually deepen the first, not merely rename it.
+- The two dated commits are the day's scheduled scope. Do not borrow tomorrow's
+  work simply because today's work finished early.
+- A third task is normally a review/refinement pass across the day's combined
+  experience: find mistakes, close gaps, connect prior decisions and update
+  downstream tasks using the [daily closeout](templates/DAILY-CLOSEOUT.md).
+- Moving a future-dated task earlier requires an explicit re-plan and a visible
+  roadmap update; it is never an implicit use of spare capacity.
 - Build and focused tests run before every push.
 - The second push of the day is verified on GitHub Pages in Chrome and mobile view.
 - A working release candidate is tagged at the end of every week.

@@ -42,18 +42,23 @@ remembered stop instead of forcing a redirect.
 
 Malformed or obsolete state falls back to a clean idle tour. **Continue later**
 preserves the exact stop. Opening a completed tour starts a fresh walkthrough.
-No progress leaves the browser and it is not an identity, analytics signal or
-permission boundary.
+Choosing **Change path** clears tour progress as well as the previous role so a
+new Player/GM journey never resumes with stale context. No progress leaves the
+browser and it is not an identity, analytics signal or permission boundary.
 
 ## Entry points and accessibility
 
 - The selected first-visit path shows a prominent two-minute tour action.
-- The persistent command bar can start or resume the tour from any page.
+- Before a path is chosen, the persistent command bar returns the visitor to
+  the Player/GM choice instead of silently assuming a role.
+- Once a path exists, the command bar can start, resume, restart or refocus the
+  active tour from any page and exposes that state in its label.
 - The guide is a non-modal complementary region, so the underlying page remains
   readable and interactive.
 - Step changes are announced politely; progress has native progressbar
-  semantics; every action is keyboard accessible.
-- Escape pauses instead of discarding progress.
+  semantics; opening moves keyboard focus into the guide.
+- Escape or **Continue later** pauses instead of discarding progress and returns
+  focus to a tour launcher.
 - Mobile uses a compact bottom sheet and animation respects reduced-motion
   preferences.
 

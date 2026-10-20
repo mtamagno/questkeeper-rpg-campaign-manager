@@ -2,11 +2,13 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  type ElementRef,
   HostListener,
   computed,
   effect,
   inject,
   signal,
+  viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router } from '@angular/router';
@@ -43,6 +45,7 @@ export class GuidedTourComponent {
   private readonly campaigns = inject(CampaignService);
   private readonly audiencePreference = inject(AudiencePreferenceService);
   private readonly language = inject(LanguageService);
+  private readonly panel = viewChild<ElementRef<HTMLElement>>('tourPanel');
 
   readonly tour = inject(GuidedTourService);
   readonly currentUrl = signal(cleanUrl(this.router.url));
@@ -237,6 +240,12 @@ export class GuidedTourComponent {
         this.tour.attachCampaign(campaignId);
       }
     });
+
+    effect((): void => {
+      if (this.tour.isActive()) {
+        setTimeout((): void => this.panel()?.nativeElement.focus());
+      }
+    });
   }
 
   async primaryAction(): Promise<void> {
@@ -261,6 +270,7 @@ export class GuidedTourComponent {
     }
     if (step === this.totalSteps - 1) {
       this.tour.complete();
+      this.restoreLaunchFocus();
       return;
     }
     this.tour.advance();
@@ -276,10 +286,15 @@ export class GuidedTourComponent {
     await this.goTo(previousUrl);
   }
 
+  pause(): void {
+    this.tour.pause();
+    this.restoreLaunchFocus();
+  }
+
   @HostListener('document:keydown.escape')
   pauseOnEscape(): void {
     if (this.tour.isActive()) {
-      this.tour.pause();
+      this.pause();
     }
   }
 
@@ -292,6 +307,12 @@ export class GuidedTourComponent {
   private scrollToCampaigns(): void {
     setTimeout((): void => {
       document.querySelector('#campaigns')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+
+  private restoreLaunchFocus(): void {
+    setTimeout((): void => {
+      document.querySelector<HTMLElement>('[data-tour-control]')?.focus();
     });
   }
 }

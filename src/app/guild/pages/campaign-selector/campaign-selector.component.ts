@@ -131,6 +131,7 @@ export class CampaignSelectorComponent {
   /** Makes the two first-visit paths visible again. */
   resetAudience(): void {
     this.audiencePreference.reset();
+    this.guidedTour.reset();
   }
 
   /** Opens a fresh or remembered walkthrough without changing campaign access. */

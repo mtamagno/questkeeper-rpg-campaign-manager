@@ -14,6 +14,7 @@ import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { filter } from 'rxjs/operators';
 
 import { CampaignService } from '@guild/services/campaign.service';
+import { AudiencePreferenceService } from '@guild/services/audiencePreference.service';
 import { LanguageService } from '@guild/services/language.service';
 import { GuidedTourService } from '@guild/services/guidedTour.service';
 import { localizeText } from '@guild/models/language.model';
@@ -61,6 +62,7 @@ export class SiteCommandBarComponent {
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly campaigns = inject(CampaignService);
+  private readonly audiencePreference = inject(AudiencePreferenceService);
   private readonly language = inject(LanguageService);
   private readonly guidedTour = inject(GuidedTourService);
   private readonly currentUrl = signal(this.router.url);
@@ -71,6 +73,36 @@ export class SiteCommandBarComponent {
   readonly isItalian = this.language.isItalian;
   readonly activeCampaignId = this.campaigns.activeCampaignId;
   readonly tourStatus = this.guidedTour.status;
+
+  readonly tourActionLabel = computed((): string => {
+    const it = this.isItalian();
+    if (this.audiencePreference.audience() === null) {
+      return it ? 'Scegli un percorso per iniziare il tour' : 'Choose a path to begin the tour';
+    }
+    if (this.tourStatus() === 'active') {
+      return it ? 'Torna al tour in corso' : 'Return to active tour';
+    }
+    if (this.tourStatus() === 'paused') {
+      return it ? 'Riprendi il tour guidato' : 'Resume guided tour';
+    }
+    if (this.tourStatus() === 'completed') {
+      return it ? 'Ricomincia il tour guidato' : 'Restart guided tour';
+    }
+    return it ? 'Apri il tour guidato' : 'Open guided tour';
+  });
+
+  readonly tourButtonLabel = computed((): string => {
+    if (this.tourStatus() === 'active') {
+      return this.isItalian() ? 'Tour attivo' : 'Tour active';
+    }
+    if (this.tourStatus() === 'paused') {
+      return this.isItalian() ? 'Riprendi' : 'Resume';
+    }
+    if (this.tourStatus() === 'completed') {
+      return this.isItalian() ? 'Rifai tour' : 'Restart tour';
+    }
+    return 'Tour';
+  });
 
   readonly activeCampaignName = computed((): string | undefined => {
     const campaignId = this.activeCampaignId();
@@ -217,8 +249,25 @@ export class SiteCommandBarComponent {
     this.query.set('');
   }
 
-  openTour(): void {
+  async openTour(): Promise<void> {
+    if (this.guidedTour.isActive()) {
+      this.focusTour();
+      return;
+    }
+    if (this.audiencePreference.audience() === null) {
+      await this.router.navigateByUrl('/');
+      setTimeout((): void => {
+        const paths = document.querySelector<HTMLElement>('#first-visit-paths');
+        paths?.focus();
+        paths?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      return;
+    }
     this.guidedTour.open();
+  }
+
+  private focusTour(): void {
+    document.querySelector<HTMLElement>('[data-guided-tour]')?.focus();
   }
 
   updateQuery(event: Event): void {
