@@ -17,20 +17,20 @@ setting or visual identity from a commercial game.
 <table>
   <tr>
     <td width="38%" align="center" valign="middle">
-      <img src="docs/images/releases/v1.1.1-hearthkey-twick.png" alt="Twick Brasswhisker, a mousekin path-mender holding a glowing brass key" width="330">
+      <img src="docs/images/releases/v1.1.2-hearthrest-vesper.png" alt="Vesper Hushwing, an owlkin night steward closing an extinguished lantern" width="330">
     </td>
     <td width="62%" valign="middle">
-      <p><strong>QuestKeeper 1.1.1 · Hearthkey</strong></p>
-      <h3>The Reopened Door</h3>
-      <p><strong>Twick Brasswhisker</strong> · mousekin path-mender</p>
-      <blockquote>“No space in a name should bar a good road.”</blockquote>
-      <p>Twick repairs the Windows desktop path: Campaign Manager and Companion shortcuts are now created safely even when user names or installation folders contain spaces.</p>
-      <p><a href="docs/releases/v1.1.1.md"><strong>Read the release notes →</strong></a> · <a href="https://github.com/mtamagno/questkeeper-rpg-campaign-manager/releases/tag/v1.1.1"><strong>Download 1.1.1 →</strong></a></p>
+      <p><strong>QuestKeeper 1.1.2 · Hearthrest</strong></p>
+      <h3>The Quiet Farewell</h3>
+      <p><strong>Vesper Hushwing</strong> · owlkin night steward</p>
+      <blockquote>“Every good path deserves a proper ending.”</blockquote>
+      <p>Vesper gives setup a visible, bilingual final step: close its local service and terminate the installer process cleanly while launched QuestKeeper apps continue their work.</p>
+      <p><a href="docs/releases/v1.1.2.md"><strong>Read the release notes →</strong></a> · <a href="https://github.com/mtamagno/questkeeper-rpg-campaign-manager/releases/tag/v1.1.2"><strong>Download 1.1.2 →</strong></a></p>
     </td>
   </tr>
 </table>
 
-> Fen Wickwhistle still guards the immutable 1.1.0 Welcoming Path. Every
+> Twick Brasswhisker still guards the immutable 1.1.1 Reopened Door. Every
 > published companion remains part of the living codex.
 
 ---
@@ -46,6 +46,7 @@ milestone; after publication, its identity is permanent.
 | **1.0.0** | **Starquill**     | The First Chronicle     | **Auri Starquill**, mothkin chronicler         | A campaign receives a beautiful, portable home.          | Released    |
 | **1.1.0** | **Lanternwake**   | The Welcoming Path      | **Fen Wickwhistle**, lantern-tailed pathfinder | Native guided setup reaches Windows, macOS and Linux.    | Released    |
 | **1.1.1** | **Hearthkey**     | The Reopened Door       | **Twick Brasswhisker**, mousekin path-mender   | Windows shortcuts survive spaces in every local path.    | Released    |
+| **1.1.2** | **Hearthrest**    | The Quiet Farewell      | **Vesper Hushwing**, owlkin night steward      | Setup closes cleanly instead of leaving a local process. | Released    |
 | **1.2.0** | **Echobloom**     | Stories With Roots      | **Morrow Bellroot**, memory gardener           | Characters grow beyond a static sheet.                   | Planned     |
 | **1.3.0** | **Moonmoot**      | Gather at the Table     | **Pip Hearthroll**, goblin table scout         | The party can prepare and catch up together.             | Planned     |
 | **1.4.0** | **Waywhisper**    | The Living Atlas        | **Orra Mosscompass**, centaur mapmaker         | People, places, clues and roads become connected.        | Planned     |

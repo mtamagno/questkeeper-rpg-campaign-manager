@@ -64,6 +64,12 @@ Nothing is installed merely by opening the setup: the checklist and **Prepare
 QuestKeeper** button make the selected actions explicit. AI tools and models
 remain a separate, optional Manager decision.
 
+When setup is complete, choose **Close setup / Chiudi setup**. This stops the
+loopback setup service and terminates the setup executable; Campaign Manager or
+Companion instances you deliberately launched remain open. If the browser does
+not allow the setup to close its tab, the page confirms that the local process
+has ended and the tab can be closed manually.
+
 On its first successful run, setup opens Campaign Manager and guides you through
 the first campaign. The Manager normally uses `http://127.0.0.1:4173`; keep its
 terminal window open while working.
@@ -132,6 +138,7 @@ stored as ordinary files under `src/campaigns/`.
 | Windows or macOS blocks the first launch    | Verify the release checksum, then use the deliberate first-open flow described above.    |
 | Runtime preparation fails                   | Rerun setup; partial downloads are temporary and the official checksum is checked again. |
 | Setup 1.1.0 stops while creating a shortcut | Download 1.1.1 and rerun setup; the prepared runtime and dependencies remain usable.     |
+| The setup process remains open after setup  | In 1.1.2 or later, choose **Close setup** to terminate its local service and executable. |
 | A desktop shortcut stops working            | Return the QuestKeeper folder to its original location or rerun setup to recreate links. |
 | `node` is not recognized in a terminal      | This is expected: the release keeps its Node.js runtime private inside QuestKeeper.      |
 | Port 4173 is busy                           | QuestKeeper automatically tries ports through 4183; use the URL printed in the terminal. |

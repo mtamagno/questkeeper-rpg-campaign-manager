@@ -30,6 +30,15 @@ const checks = [
       interfaceHtml.includes('launch-manager'),
   ],
   [
+    'a bilingual setup shutdown control',
+    interfaceHtml.includes('close-setup') &&
+      interfaceScript.includes("closeSetup: 'Close setup'") &&
+      interfaceScript.includes("closeSetup: 'Chiudi setup'") &&
+      interfaceScript.includes("api('shutdown'") &&
+      wizard.includes("requestUrl.pathname === '/api/shutdown'") &&
+      wizard.includes('setupServer.close'),
+  ],
+  [
     'official Node.js 24 discovery and verification',
     wizard.includes('https://nodejs.org/dist/index.json') &&
       wizard.includes('SHASUMS256.txt') &&
@@ -92,6 +101,16 @@ try {
   failures.push(`Setup wizard source self-test failed: ${error.message}`);
 }
 
+try {
+  execFileSync(process.execPath, ['scripts/verify-setup-shutdown.cjs'], {
+    cwd: root,
+    encoding: 'utf8',
+    timeout: 10_000,
+  });
+} catch (error) {
+  failures.push(`Setup shutdown integration test failed: ${error.message}`);
+}
+
 if (process.platform === 'win32') {
   const shortcutTestRoot = fs.mkdtempSync(
     path.join(os.tmpdir(), 'QuestKeeper Shortcut Test With Spaces '),
@@ -144,5 +163,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  'Cross-platform installer verified: bilingual loopback UI, checksum-verified private Node.js 24 runtime, native SEA builds and desktop launchers.',
+  'Cross-platform installer verified: bilingual loopback UI, checksum-verified private Node.js 24 runtime, native SEA builds, desktop launchers and clean process shutdown.',
 );

@@ -17,6 +17,11 @@ const copy = {
     ready: 'Ready to begin.',
     footer: 'No AI model or remote provider is enabled by this setup.',
     prepare: 'Prepare QuestKeeper',
+    closeSetup: 'Close setup',
+    closing: 'Closing QuestKeeper Setup and its local service…',
+    closed: 'Setup is closed. You can close this tab; launched QuestKeeper apps keep running.',
+    closedBadge: 'Closed',
+    closeFailed: 'Setup could not close cleanly. Try the button again.',
     language: 'Italiano',
     runtimeReady: 'Node.js {version} and QuestKeeper are ready on {platform}.',
     runtimeMissing: 'QuestKeeper will prepare Node.js 24 for {platform}.',
@@ -44,6 +49,12 @@ const copy = {
     ready: 'Tutto pronto per iniziare.',
     footer: 'Questo setup non abilita modelli AI o provider remoti.',
     prepare: 'Prepara QuestKeeper',
+    closeSetup: 'Chiudi setup',
+    closing: 'Chiusura del setup QuestKeeper e del suo servizio locale…',
+    closed:
+      'Il setup è chiuso. Puoi chiudere questa scheda; le app QuestKeeper già avviate restano aperte.',
+    closedBadge: 'Chiuso',
+    closeFailed: 'Non è stato possibile chiudere correttamente il setup. Riprova.',
     language: 'English',
     runtimeReady: 'Node.js {version} e QuestKeeper sono pronti su {platform}.',
     runtimeMissing: 'QuestKeeper preparerà Node.js 24 per {platform}.',
@@ -94,6 +105,7 @@ function render(status) {
   const phase = status.state.phase;
   $('progress').className = phase;
   $('prepare').disabled = phase === 'running';
+  $('close-setup').disabled = phase === 'running';
   if (phase === 'running') $('progress-message').textContent = status.state.message;
   else if (phase === 'complete') $('progress-message').textContent = copy[language].complete;
   else if (phase === 'failed') $('progress-message').textContent = copy[language].failed;
@@ -137,6 +149,30 @@ $('prepare').addEventListener('click', async () => {
   } catch (error) {
     $('progress-message').textContent = error.message;
     $('prepare').disabled = false;
+  }
+});
+
+$('close-setup').addEventListener('click', async () => {
+  if (polling) {
+    clearInterval(polling);
+    polling = null;
+  }
+  $('close-setup').disabled = true;
+  $('prepare').disabled = true;
+  $('progress-message').textContent = copy[language].closing;
+  try {
+    await api('shutdown', { method: 'POST', body: '{}' });
+    document.querySelectorAll('input, button').forEach((element) => {
+      element.disabled = true;
+    });
+    $('status-badge').textContent = copy[language].closedBadge;
+    $('progress').className = 'complete';
+    $('progress-message').textContent = copy[language].closed;
+    window.setTimeout(() => window.close(), 100);
+  } catch {
+    $('close-setup').disabled = false;
+    $('prepare').disabled = false;
+    $('progress-message').textContent = copy[language].closeFailed;
   }
 });
 

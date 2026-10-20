@@ -84,6 +84,15 @@ try {
     stdio: 'inherit',
   });
   if (process.platform === 'win32') hideWindowsConsole(executablePath);
+  execFileSync(process.execPath, ['scripts/verify-setup-shutdown.cjs'], {
+    cwd: root,
+    env: {
+      ...process.env,
+      QUESTKEEPER_ROOT: root,
+      QUESTKEEPER_SETUP_EXECUTABLE: executablePath,
+    },
+    stdio: 'inherit',
+  });
   console.log(`QuestKeeper setup binary created at ${executablePath}`);
 } finally {
   fs.rmSync(workDirectory, { recursive: true, force: true });

@@ -17,6 +17,8 @@ const contentTypes = {
 };
 
 let sea;
+let setupServer;
+let shutdownScheduled = false;
 try {
   sea = require('node:sea');
 } catch {
@@ -400,6 +402,21 @@ function openBrowser(url) {
   else runDetached('xdg-open', [url]);
 }
 
+function scheduleShutdown() {
+  if (shutdownScheduled) return;
+  shutdownScheduled = true;
+  const forcedExit = setTimeout(() => process.exit(0), 1_500);
+  forcedExit.unref();
+  const gracefulExit = setTimeout(() => {
+    if (!setupServer) process.exit(0);
+    setupServer.close(() => {
+      clearTimeout(forcedExit);
+      process.exit(0);
+    });
+  }, 100);
+  gracefulExit.unref();
+}
+
 async function route(request, response) {
   const requestUrl = new URL(request.url, `http://${HOST}`);
   if (requestUrl.pathname.startsWith('/api/') && !authorised(requestUrl)) {
@@ -419,6 +436,14 @@ async function route(request, response) {
     const { kind } = await readJson(request);
     await launch(kind);
     return json(response, 200, { launched: kind });
+  }
+  if (request.method === 'POST' && requestUrl.pathname === '/api/shutdown') {
+    if (state.phase === 'running') {
+      return json(response, 409, { error: 'Wait for the current setup step to finish.' });
+    }
+    json(response, 200, { closing: true });
+    scheduleShutdown();
+    return;
   }
   const name = requestUrl.pathname === '/' ? 'index.html' : requestUrl.pathname.slice(1);
   if (request.method === 'GET' && Object.hasOwn(contentTypes, name)) {
@@ -474,11 +499,11 @@ async function main() {
   if (!fs.existsSync(path.join(root, 'package.json'))) {
     throw new Error('QuestKeeper-Setup must remain in the extracted QuestKeeper folder.');
   }
-  const server = http.createServer((request, response) => {
+  setupServer = http.createServer((request, response) => {
     route(request, response).catch((error) => json(response, 500, { error: error.message }));
   });
-  server.listen(PORT, HOST, () => {
-    const address = server.address();
+  setupServer.listen(PORT, HOST, () => {
+    const address = setupServer.address();
     const url = `http://${HOST}:${address.port}/?token=${TOKEN}`;
     console.log(`QuestKeeper Setup: ${url}`);
     openBrowser(url);

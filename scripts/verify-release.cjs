@@ -131,6 +131,7 @@ for (const launcher of [
   'tools/setup-wizard/public/setup.css',
   'tools/setup-wizard/public/setup.js',
   'scripts/build-setup-binary.cjs',
+  'scripts/verify-setup-shutdown.cjs',
 ]) {
   if (!trackedFiles.includes(launcher)) {
     failures.push(`Windows setup entry is not part of the release archive: ${launcher}.`);
