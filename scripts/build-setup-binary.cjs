@@ -83,7 +83,34 @@ try {
     env: { ...process.env, QUESTKEEPER_ROOT: root },
     stdio: 'inherit',
   });
+  if (process.platform === 'win32') {
+    const shortcutDesktop = path.join(workDirectory, 'Packaged Shortcut Test With Spaces');
+    fs.mkdirSync(shortcutDesktop, { recursive: true });
+    const shortcutResult = JSON.parse(
+      execFileSync(executablePath, ['--self-test-shortcuts'], {
+        cwd: root,
+        encoding: 'utf8',
+        env: { ...process.env, QUESTKEEPER_DESKTOP: shortcutDesktop },
+      }),
+    );
+    if (
+      !shortcutResult.ok ||
+      shortcutResult.launchers?.[0]?.arguments !== '--launch-manager' ||
+      shortcutResult.launchers?.[1]?.arguments !== '--launch-companion'
+    ) {
+      throw new Error('Packaged Windows shortcuts did not preserve distinct launch modes.');
+    }
+  }
   if (process.platform === 'win32') hideWindowsConsole(executablePath);
+  execFileSync(process.execPath, ['scripts/verify-companion-launch.cjs'], {
+    cwd: root,
+    env: {
+      ...process.env,
+      QUESTKEEPER_LAUNCH_EXECUTABLE: executablePath,
+    },
+    stdio: 'inherit',
+    timeout: 60_000,
+  });
   execFileSync(process.execPath, ['scripts/verify-setup-shutdown.cjs'], {
     cwd: root,
     env: {
