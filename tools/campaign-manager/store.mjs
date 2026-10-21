@@ -1,13 +1,35 @@
 import { mkdir, readFile, rename, stat, writeFile } from 'node:fs/promises';
 import { dirname, join, relative, resolve } from 'node:path';
 
+import {
+  assertCampaignEntityIds,
+  assertEntityIdAvailable,
+  ENTITY_TYPES,
+} from './entity-identity.mjs';
+
 const ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-const ENTITY_TYPES = new Set(['characters', 'npcs', 'sessions', 'maps']);
+const ENTITY_TYPE_SET = new Set(ENTITY_TYPES);
 const LANGUAGE_PATTERN = /^[a-z]{2,3}(?:-[A-Z]{2})?$/;
 const CAMPAIGN_PALETTES = new Set(['heroic', 'gothic', 'neutral']);
+const campaignWriteLocks = new Map();
 
 function nowStamp() {
   return new Date().toISOString().replace(/[:.]/g, '-');
+}
+
+async function withCampaignWrite(campaignId, work) {
+  const previous = campaignWriteLocks.get(campaignId) ?? Promise.resolve();
+  let release;
+  const current = new Promise((resolveLock) => (release = resolveLock));
+  const tail = previous.then(() => current);
+  campaignWriteLocks.set(campaignId, tail);
+  await previous;
+  try {
+    return await work();
+  } finally {
+    release();
+    if (campaignWriteLocks.get(campaignId) === tail) campaignWriteLocks.delete(campaignId);
+  }
 }
 
 export function validateId(value, label = 'ID') {
@@ -271,7 +293,7 @@ export async function deleteCampaign(projectRoot, campaignId, confirmation) {
 }
 
 function validateEntity(type, entity) {
-  if (!ENTITY_TYPES.has(type)) throw new Error('Unsupported entity type.');
+  if (!ENTITY_TYPE_SET.has(type)) throw new Error('Unsupported entity type.');
   validateId(entity?.id, 'Entity ID');
   const label = type === 'sessions' ? entity?.title : entity?.name;
   if (typeof label !== 'string' && typeof label !== 'object') {
@@ -283,47 +305,45 @@ function validateEntity(type, entity) {
 
 export async function saveEntity(projectRoot, campaignId, type, entity, previousId) {
   validateEntity(type, entity);
-  const base = dataRoot(projectRoot, campaignId);
-  await getCampaign(projectRoot, campaignId);
+  return withCampaignWrite(campaignId, async () => {
+    const base = dataRoot(projectRoot, campaignId);
+    const campaign = await getCampaign(projectRoot, campaignId);
+    assertEntityIdAvailable(campaign, type, entity.id, previousId);
 
-  if (type === 'maps') {
-    const path = join(base, 'maps.json');
-    const maps = await readJson(path, []);
-    const matchId = previousId ?? entity.id;
-    const existsAlready = maps.some((item) => item.id === matchId);
-    const next = existsAlready
-      ? maps.map((item) => (item.id === matchId ? entity : item))
-      : [...maps, entity];
-    await writeJson(path, next);
+    if (type === 'maps') {
+      const path = join(base, 'maps.json');
+      const maps = await readJson(path, []);
+      const matchId = previousId ?? entity.id;
+      const existsAlready = maps.some((item) => item.id === matchId);
+      const next = existsAlready
+        ? maps.map((item) => (item.id === matchId ? entity : item))
+        : [...maps, entity];
+      await writeJson(path, next);
+      return entity;
+    }
+
+    const folder = join(base, type);
+    const manifestPath = join(folder, 'manifest.json');
+    const manifest = await readJson(manifestPath, []);
+    const oldFile = previousId ? `${validateId(previousId)}.json` : undefined;
+    const fileName = `${entity.id}.json`;
+    if (oldFile && oldFile !== fileName) {
+      await moveToTrash(projectRoot, join(folder, oldFile), `${campaignId}-${type}-${previousId}`);
+    }
+    await writeJson(join(folder, fileName), entity);
+    const nextManifest = oldFile
+      ? manifest.includes(oldFile)
+        ? manifest.map((item) => (item === oldFile ? fileName : item))
+        : [...manifest, fileName]
+      : [...manifest, fileName];
+    await writeJson(manifestPath, [...new Set(nextManifest)]);
     return entity;
-  }
-
-  const folder = join(base, type);
-  const manifestPath = join(folder, 'manifest.json');
-  const manifest = await readJson(manifestPath, []);
-  const oldFile = previousId ? `${validateId(previousId)}.json` : undefined;
-  const fileName = `${entity.id}.json`;
-  if (!oldFile && manifest.includes(fileName))
-    throw new Error(`Entity "${entity.id}" already exists.`);
-  if (oldFile && oldFile !== fileName && manifest.includes(fileName)) {
-    throw new Error(`Entity "${entity.id}" already exists.`);
-  }
-  if (oldFile && oldFile !== fileName) {
-    await moveToTrash(projectRoot, join(folder, oldFile), `${campaignId}-${type}-${previousId}`);
-  }
-  await writeJson(join(folder, fileName), entity);
-  const nextManifest = oldFile
-    ? manifest.includes(oldFile)
-      ? manifest.map((item) => (item === oldFile ? fileName : item))
-      : [...manifest, fileName]
-    : [...manifest, fileName];
-  await writeJson(manifestPath, [...new Set(nextManifest)]);
-  return entity;
+  });
 }
 
 export async function deleteEntity(projectRoot, campaignId, type, entityId) {
   validateId(entityId, 'Entity ID');
-  if (!ENTITY_TYPES.has(type)) throw new Error('Unsupported entity type.');
+  if (!ENTITY_TYPE_SET.has(type)) throw new Error('Unsupported entity type.');
   const base = dataRoot(projectRoot, campaignId);
   if (type === 'maps') {
     const path = join(base, 'maps.json');
@@ -386,6 +406,12 @@ export async function importCampaign(projectRoot, bundle) {
   if (bundle?.format !== 'campaign-companion-bundle' || bundle?.version !== 1) {
     throw new Error('This is not a supported Campaign Companion bundle.');
   }
+  assertCampaignEntityIds({
+    characters: bundle.characters ?? [],
+    npcs: bundle.npcs ?? [],
+    sessions: bundle.sessions ?? [],
+    maps: bundle.maps ?? [],
+  });
   const id = validateId(bundle.manifestEntry?.id, 'Campaign ID');
   await createCampaign(projectRoot, {
     id,

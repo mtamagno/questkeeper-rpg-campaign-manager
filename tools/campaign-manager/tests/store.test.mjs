@@ -105,6 +105,45 @@ test('manages characters, sessions and maps without editing manifests', async (t
   assert.deepEqual(JSON.parse(trash), []);
 });
 
+test('enforces one campaign-wide ID namespace under concurrent saves', async (t) => {
+  const root = await fixture(t);
+  await createCampaign(root, campaignInput);
+  await saveEntity(root, campaignInput.id, 'characters', { id: 'test', name: 'First hero' });
+
+  await assert.rejects(
+    saveEntity(root, campaignInput.id, 'characters', { id: 'test', name: 'Second hero' }),
+    /already used by a player character/,
+  );
+  await assert.rejects(
+    saveEntity(root, campaignInput.id, 'npcs', { id: 'test', name: 'Test NPC' }),
+    /already used by a player character/,
+  );
+  await assert.rejects(
+    saveEntity(root, campaignInput.id, 'sessions', { id: 'test', title: 'Test session' }),
+    /already used by a player character/,
+  );
+  await assert.rejects(
+    saveEntity(root, campaignInput.id, 'maps', { id: 'test', name: 'Test map' }),
+    /already used by a player character/,
+  );
+
+  await saveEntity(
+    root,
+    campaignInput.id,
+    'characters',
+    { id: 'test', name: 'Edited hero' },
+    'test',
+  );
+  assert.equal((await getCampaign(root, campaignInput.id)).characters[0].name, 'Edited hero');
+
+  const results = await Promise.allSettled([
+    saveEntity(root, campaignInput.id, 'npcs', { id: 'simultaneous', name: 'NPC' }),
+    saveEntity(root, campaignInput.id, 'maps', { id: 'simultaneous', name: 'Map' }),
+  ]);
+  assert.equal(results.filter((result) => result.status === 'fulfilled').length, 1);
+  assert.equal(results.filter((result) => result.status === 'rejected').length, 1);
+});
+
 test('exports, imports and recoverably deletes a campaign', async (t) => {
   const source = await fixture(t);
   const target = await fixture(t);
@@ -117,6 +156,18 @@ test('exports, imports and recoverably deletes a campaign', async (t) => {
   await assert.rejects(deleteCampaign(target, campaignInput.id, 'sbagliato'));
   await deleteCampaign(target, campaignInput.id, campaignInput.id);
   assert.equal((await getState(target)).campaigns.length, 0);
+});
+
+test('rejects a colliding import before creating partial campaign files', async (t) => {
+  const source = await fixture(t);
+  const target = await fixture(t);
+  await createCampaign(source, campaignInput);
+  const bundle = await exportCampaign(source, campaignInput.id);
+  bundle.characters = [{ id: 'shared', name: 'Hero' }];
+  bundle.npcs = [{ id: 'shared', name: 'NPC' }];
+
+  await assert.rejects(importCampaign(target, bundle), /unique across characters, NPCs/);
+  assert.deepEqual((await getState(target)).campaigns, []);
 });
 
 test('supports arbitrary campaign languages and regional codes', async (t) => {
