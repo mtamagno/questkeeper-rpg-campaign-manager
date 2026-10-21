@@ -137,19 +137,20 @@ stored as ordinary files under `src/campaigns/`.
 
 ## Quick troubleshooting
 
-| Symptom                                     | Try this                                                                                 |
-| ------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| The setup does not open a browser           | Copy the local URL shown by the setup into a browser, or rerun the platform binary.      |
-| Windows or macOS blocks the first launch    | Verify the release checksum, then use the deliberate first-open flow described above.    |
-| Runtime preparation fails                   | Rerun setup; partial downloads are temporary and the official checksum is checked again. |
-| Setup 1.1.0 stops while creating a shortcut | Download 1.1.1 and rerun setup; the prepared runtime and dependencies remain usable.     |
-| The setup process remains open after setup  | In 1.1.2 or later, choose **Close setup** to terminate its local service and executable. |
-| A desktop shortcut stops working            | Return the QuestKeeper folder to its original location or rerun setup to recreate links. |
-| `node` is not recognized in a terminal      | This is expected: the release keeps its Node.js runtime private inside QuestKeeper.      |
-| Port 4173 is busy                           | QuestKeeper automatically tries ports through 4183; use the URL printed in the terminal. |
-| The Companion does not reflect edits        | Run **Check and build site**, then refresh without cache.                                |
-| A local model is unavailable                | Start Ollama or ComfyUI, then use **Discover installed** in AI setup.                    |
-| Publishing fails                            | Run **Test connection** and confirm the remote folder and FTPS mode.                     |
+| Symptom                                      | Try this                                                                                                                              |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| The setup does not open a browser            | Copy the local URL shown by the setup into a browser, or rerun the platform binary.                                                   |
+| Windows or macOS blocks the first launch     | Verify the release checksum, then use the deliberate first-open flow described above.                                                 |
+| Runtime preparation fails                    | Rerun setup; partial downloads are temporary and the official checksum is checked again.                                              |
+| Setup 1.1.0 stops while creating a shortcut  | Download 1.1.1 and rerun setup; the prepared runtime and dependencies remain usable.                                                  |
+| The setup process remains open after setup   | In 1.1.2 or later, choose **Close setup** to terminate its local service and executable.                                              |
+| A desktop shortcut stops working             | Return the QuestKeeper folder to its original location or rerun setup to recreate links.                                              |
+| Companion shortcut does not open the browser | Check `.questkeeper/logs/companion-launch.log`; the launcher records port conflicts, missing dependencies and startup failures there. |
+| `node` is not recognized in a terminal       | This is expected: the release keeps its Node.js runtime private inside QuestKeeper.                                                   |
+| Port 4173 is busy                            | QuestKeeper automatically tries ports through 4183; use the URL printed in the terminal.                                              |
+| The Companion does not reflect edits         | Run **Check and build site**, then refresh without cache.                                                                             |
+| A local model is unavailable                 | Start Ollama or ComfyUI, then use **Discover installed** in AI setup.                                                                 |
+| Publishing fails                             | Run **Test connection** and confirm the remote folder and FTPS mode.                                                                  |
 
 Still stuck? Open a GitHub issue with your operating system, Node version and
 the error text—never include API keys or publishing passwords.

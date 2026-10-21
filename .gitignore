@@ -78,6 +78,7 @@ __pycache__/
 !/scripts/verify-release.cjs
 !/scripts/verify-installer.cjs
 !/scripts/verify-setup-shutdown.cjs
+!/scripts/verify-companion-launch.cjs
 !/scripts/verify-pwa.cjs
 !/scripts/verify-offline-pack.cjs
 !/scripts/build-setup-binary.cjs

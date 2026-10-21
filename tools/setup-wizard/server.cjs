@@ -10,6 +10,7 @@ const PORT = Number.parseInt(process.env.QUESTKEEPER_SETUP_PORT || '0', 10);
 const TOKEN = crypto.randomBytes(24).toString('hex');
 const args = new Set(process.argv.slice(2));
 const runtimeHome = '.questkeeper/runtime';
+const companionPort = Number.parseInt(process.env.QUESTKEEPER_COMPANION_PORT || '4200', 10);
 const contentTypes = {
   'index.html': 'text/html; charset=utf-8',
   'setup.css': 'text/css; charset=utf-8',
@@ -65,6 +66,13 @@ function asset(name) {
 
 function portableNodePath() {
   return path.join(root, runtimeHome, process.platform === 'win32' ? 'node.exe' : 'bin/node');
+}
+
+function launcherNodePath() {
+  if (process.env.NODE_ENV === 'test' && process.env.QUESTKEEPER_TEST_NODE_PATH) {
+    return path.resolve(process.env.QUESTKEEPER_TEST_NODE_PATH);
+  }
+  return portableNodePath();
 }
 
 function runtimeStatus() {
@@ -247,13 +255,126 @@ function runDetached(command, commandArgs) {
   child.unref();
 }
 
+function launchStatePath(...parts) {
+  const stateRoot = process.env.QUESTKEEPER_LAUNCH_STATE_ROOT
+    ? path.resolve(process.env.QUESTKEEPER_LAUNCH_STATE_ROOT)
+    : path.join(root, '.questkeeper');
+  return path.join(stateRoot, ...parts);
+}
+
+function appendLaunchLog(message) {
+  const logPath = launchStatePath('logs', 'companion-launch.log');
+  fs.mkdirSync(path.dirname(logPath), { recursive: true });
+  fs.appendFileSync(logPath, `[${new Date().toISOString()}] ${message}\n`);
+  return logPath;
+}
+
+async function companionStatus(url) {
+  try {
+    const response = await fetch(url, { signal: AbortSignal.timeout(1_200) });
+    if (!response.ok) return { reachable: true, questKeeper: false };
+    const html = await response.text();
+    return {
+      reachable: true,
+      questKeeper:
+        html.includes('name="application-name" content="QuestKeeper"') ||
+        html.includes('<app-root'),
+    };
+  } catch {
+    return { reachable: false, questKeeper: false };
+  }
+}
+
+function stopDetachedProcess(pid) {
+  if (!pid) return;
+  if (process.platform === 'win32') {
+    spawnSync('taskkill.exe', ['/pid', String(pid), '/T', '/F'], { windowsHide: true });
+    return;
+  }
+  try {
+    process.kill(-pid, 'SIGTERM');
+  } catch {
+    try {
+      process.kill(pid, 'SIGTERM');
+    } catch {
+      // The failed process has already exited.
+    }
+  }
+}
+
+async function waitForCompanion(child, url) {
+  const deadline = Date.now() + 90_000;
+  while (Date.now() < deadline) {
+    const status = await companionStatus(url);
+    if (status.questKeeper) return;
+    if (status.reachable) throw new Error(`Port ${companionPort} is used by another application.`);
+    if (child.launchError) throw child.launchError;
+    if (child.exitCode !== null) {
+      throw new Error(`The Companion process exited with code ${child.exitCode}.`);
+    }
+    await new Promise((resolveWait) => setTimeout(resolveWait, 500));
+  }
+  throw new Error('The Companion did not become ready within 90 seconds.');
+}
+
+async function launchCompanion() {
+  const url = `http://${HOST}:${companionPort}`;
+  const existing = await companionStatus(url);
+  if (existing.questKeeper) {
+    appendLaunchLog(`Reused the running Companion at ${url}.`);
+    openBrowser(url);
+    return { reused: true, url };
+  }
+  if (existing.reachable) throw new Error(`Port ${companionPort} is used by another application.`);
+
+  const nodePath = launcherNodePath();
+  const angularCli = path.join(root, 'node_modules', '@angular', 'cli', 'bin', 'ng.js');
+  if (!fs.existsSync(nodePath)) throw new Error('Run setup before opening QuestKeeper.');
+  if (!fs.existsSync(angularCli)) throw new Error('QuestKeeper dependencies are not ready.');
+
+  const logPath = appendLaunchLog(`Starting the Companion at ${url}.`);
+  const logFile = fs.openSync(logPath, 'a');
+  const child = spawn(
+    nodePath,
+    [angularCli, 'serve', '--host', HOST, '--port', String(companionPort)],
+    {
+      cwd: root,
+      detached: true,
+      stdio: ['ignore', logFile, logFile],
+      windowsHide: true,
+      env: { ...process.env, BROWSER: 'none' },
+    },
+  );
+  child.once('error', (error) => (child.launchError = error));
+  const processFile = launchStatePath('run', 'companion.json');
+  fs.mkdirSync(path.dirname(processFile), { recursive: true });
+  fs.writeFileSync(
+    processFile,
+    JSON.stringify({ pid: child.pid, port: companionPort, startedAt: new Date().toISOString() }),
+  );
+  try {
+    await waitForCompanion(child, url);
+    appendLaunchLog(`Companion ready at ${url} (PID ${child.pid}).`);
+    child.unref();
+    openBrowser(url);
+    return { reused: false, url, pid: child.pid };
+  } catch (error) {
+    stopDetachedProcess(child.pid);
+    fs.rmSync(processFile, { force: true });
+    appendLaunchLog(`Companion launch failed: ${error.message}`);
+    throw new Error(`${error.message} Details: ${logPath}`);
+  } finally {
+    fs.closeSync(logFile);
+  }
+}
+
 async function launch(kind) {
-  const nodePath = portableNodePath();
-  if (!runtimeStatus().ready) throw new Error('Run setup before opening QuestKeeper.');
   if (kind === 'manager') {
+    const nodePath = launcherNodePath();
+    if (!fs.existsSync(nodePath)) throw new Error('Run setup before opening QuestKeeper.');
     runDetached(nodePath, [path.join(root, 'tools', 'campaign-manager', 'server.mjs'), '--open']);
   } else if (kind === 'companion') {
-    runDetached(nodePath, [npmCliPath(), 'run', 'start', '--', '--open']);
+    await launchCompanion();
   } else {
     throw new Error('Unknown launcher.');
   }
@@ -467,12 +588,13 @@ async function main() {
       console.log(JSON.stringify({ ok: true, skipped: true, platform: process.platform }));
       return;
     }
+    const launchers = [selfLaunchArguments('manager'), selfLaunchArguments('companion')];
     const shortcuts = [
       createShortcut('QuestKeeper Campaign Manager', 'manager'),
       createShortcut('QuestKeeper Companion', 'companion'),
     ];
     const ok = shortcuts.every((shortcut) => fs.existsSync(shortcut));
-    console.log(JSON.stringify({ ok, shortcuts }));
+    console.log(JSON.stringify({ ok, shortcuts, launchers }));
     process.exit(ok ? 0 : 1);
   }
   if (args.has('--self-test')) {
@@ -492,8 +614,11 @@ async function main() {
     try {
       await launch(args.has('--launch-manager') ? 'manager' : 'companion');
       return;
-    } catch {
-      // Missing setup falls through to the guided wizard.
+    } catch (error) {
+      state.phase = 'failed';
+      state.error = error.message;
+      log(`Launch stopped: ${error.message}`);
+      // A failed launcher falls through to the visible guided wizard.
     }
   }
   if (!fs.existsSync(path.join(root, 'package.json'))) {

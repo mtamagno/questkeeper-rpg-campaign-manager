@@ -111,6 +111,16 @@ try {
   failures.push(`Setup shutdown integration test failed: ${error.message}`);
 }
 
+try {
+  execFileSync(process.execPath, ['scripts/verify-companion-launch.cjs'], {
+    cwd: root,
+    encoding: 'utf8',
+    timeout: 60_000,
+  });
+} catch (error) {
+  failures.push(`Companion shortcut launch integration test failed: ${error.message}`);
+}
+
 if (process.platform === 'win32') {
   const shortcutTestRoot = fs.mkdtempSync(
     path.join(os.tmpdir(), 'QuestKeeper Shortcut Test With Spaces '),
@@ -130,6 +140,14 @@ if (process.platform === 'win32') {
     const result = JSON.parse(output);
     if (!result.ok || result.shortcuts.length !== 2) {
       failures.push('Windows shortcut integration test did not create both launchers.');
+    }
+    if (
+      result.launchers?.length !== 2 ||
+      !result.launchers[0].arguments.includes('--launch-manager') ||
+      !result.launchers[1].arguments.includes('--launch-companion') ||
+      result.launchers[0].arguments === result.launchers[1].arguments
+    ) {
+      failures.push('Windows shortcuts did not preserve distinct Manager and Companion modes.');
     }
     for (const shortcut of result.shortcuts) {
       if (!fs.existsSync(shortcut)) {
