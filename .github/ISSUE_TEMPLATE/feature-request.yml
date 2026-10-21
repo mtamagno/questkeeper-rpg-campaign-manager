@@ -1,0 +1,48 @@
+name: Feature request
+description: Propose a player, GM or maintainer outcome for QuestKeeper.
+title: '[Feature]: '
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        Describe the outcome before the implementation. See
+        docs/ISSUE-TRACKING.md for required release and dependency traceability.
+  - type: input
+    id: reported-version
+    attributes:
+      label: Reported in version
+      description: The QuestKeeper release that prompted this request.
+      placeholder: 1.1.2
+    validations:
+      required: true
+  - type: dropdown
+    id: audience
+    attributes:
+      label: Primary audience
+      options:
+        - Players
+        - Game Masters
+        - Both players and Game Masters
+        - Maintainers and contributors
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or opportunity
+      description: What is difficult today, and for whom?
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired outcome
+      description: Describe success without prescribing unnecessary implementation details.
+    validations:
+      required: true
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Constraints, privacy or licensing notes

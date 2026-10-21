@@ -1,0 +1,60 @@
+name: Bug report
+description: Report reproducible QuestKeeper behavior that is not working as expected.
+title: '[Bug]: '
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        Do not include API keys, passwords, private campaign notes, transcripts
+        or licensed rulebook text. See docs/ISSUE-TRACKING.md for the release
+        traceability rule.
+  - type: input
+    id: reported-version
+    attributes:
+      label: Reported in version
+      description: The installed or downloaded QuestKeeper release where you observed the problem.
+      placeholder: 1.1.2
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - Windows
+        - macOS
+        - Linux
+        - Published Companion / browser
+        - Other or unknown
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      description: Tell us the smallest sequence that demonstrates the problem.
+      placeholder: |-
+        1. Open…
+        2. Choose…
+        3. Observe…
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual result
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Safe supporting evidence
+      description: Sanitized logs, screenshots or environment details. Remove all secrets and private campaign content.

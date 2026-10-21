@@ -655,6 +655,35 @@ acceptance journey P-06.
 secure encrypted vault is designed, or native storage provides a clearer
 equivalent boundary.
 
+### QK-025 — Issues record observed and released versions separately
+
+**Date:** 21 October 2026
+
+**Status:** Active
+
+**Decision:** Every actionable issue records the released version in which the
+feedback was observed with both a body field and a `reported-in:x.y.z` label.
+The resolved version remains unset until a published artifact containing the
+change passes its required compatibility checks and a release smoke test. Only
+then is `resolved-in:x.y.z` applied and the issue closed.
+
+**Why:** A merged commit is not necessarily available to players, and “reported
+in” does not prove that a release introduced the behavior. Keeping observation,
+implementation and verified distribution separate makes regressions and
+release notes traceable without rewriting history.
+
+**Consequences:** Bug and feature templates request the observed version;
+parent/child dependencies remain linked when feedback needs several deliveries;
+and issue bodies must exclude secrets, private campaign material and protected
+rules text. Maintainers update the first containing version during the release
+workflow rather than guessing a future target during triage.
+
+**Source:** [Issue and release traceability](ISSUE-TRACKING.md)
+
+**Revisit when:** GitHub provides an equally explicit native field for both
+observed and first-released versions, or the project adopts a different public
+release tracker.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD

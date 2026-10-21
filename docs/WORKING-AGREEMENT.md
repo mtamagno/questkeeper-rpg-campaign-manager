@@ -90,6 +90,11 @@ downstream adaptation and compatibility validation.
 
 ## 3. Weekly operating rhythm
 
+Issue intake and release traceability follow
+[`ISSUE-TRACKING.md`](ISSUE-TRACKING.md). In particular, every actionable issue
+records the version where it was reported, while a resolved version is assigned
+only after the containing release artifact has been published and verified.
+
 ### Monday: choose the week's outcome
 
 1. Copy [`templates/WEEKLY-REVIEW.md`](templates/WEEKLY-REVIEW.md) into a new
