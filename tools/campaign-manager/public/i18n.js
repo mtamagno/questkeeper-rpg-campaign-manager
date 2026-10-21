@@ -18,6 +18,15 @@
     'Campaign manager': 'Gestore campagne',
     'Your adventure archive': 'Il tuo archivio di avventure',
     'Open Companion': 'Apri Companion',
+    Quit: 'Esci',
+    'Quit Campaign Manager? Active local jobs and previews started here will stop. Your published Companion remains online.':
+      'Chiudere il Gestore campagne? Le attività locali e le anteprime avviate qui verranno interrotte. Il Companion pubblicato resterà online.',
+    'Stopping local services…': 'Arresto dei servizi locali…',
+    'QuestKeeper is closed': 'QuestKeeper è chiuso',
+    'The Campaign Manager and the local services it started have stopped safely.':
+      'Il Gestore campagne e i servizi locali che aveva avviato sono stati arrestati in sicurezza.',
+    'You can close this browser tab. Your published Companion remains online.':
+      'Puoi chiudere questa scheda del browser. Il Companion pubblicato resta online.',
     Interface: 'Interfaccia',
     Italian: 'Italiano',
     Edit: 'Modifica',
@@ -373,6 +382,7 @@
       return language;
     },
     setLanguage,
+    translate: translateCore,
     translateTree,
   };
   schedule();

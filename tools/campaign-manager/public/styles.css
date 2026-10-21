@@ -308,6 +308,31 @@ body::before {
 .topbar > div {
   flex: 1;
 }
+.topbar > .topbar__actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 0.65rem;
+}
+.topbar__quit {
+  color: #ffc8c0;
+  border-color: rgba(255, 125, 108, 0.42);
+}
+.shutdown-screen {
+  width: min(680px, calc(100% - 2rem));
+  min-height: 100vh;
+  display: grid;
+  align-content: center;
+  gap: 0.8rem;
+  margin: 0 auto;
+  text-align: center;
+}
+.shutdown-screen__sigil {
+  color: var(--gold);
+  font-size: 3rem;
+}
+.shutdown-screen p {
+  color: var(--muted);
+}
 .eyebrow {
   display: block;
   color: var(--gold);
@@ -1219,8 +1244,11 @@ code {
     min-height: 84px;
     padding: 1rem;
   }
-  .topbar .primary-button {
+  .topbar__actions .primary-button {
     display: none;
+  }
+  .topbar > .topbar__actions {
+    flex: 0 0 auto;
   }
   .content {
     padding: 1rem;

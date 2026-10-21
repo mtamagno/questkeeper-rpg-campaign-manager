@@ -52,6 +52,8 @@ const MAX_BODY_BYTES = 12 * 1024 * 1024;
 const jobs = new Map();
 const children = new Set();
 const hardwarePromise = detectHardware();
+let activeServer;
+let shuttingDown = false;
 
 const TYPES = {
   '.css': 'text/css; charset=utf-8',
@@ -85,6 +87,13 @@ async function readBody(request) {
 
 function assertToken(request) {
   if (request.headers['x-manager-token'] !== TOKEN) throw new Error('Invalid manager token.');
+}
+
+function assertSameOrigin(request) {
+  const origin = request.headers.origin;
+  if (!origin) return;
+  const expected = `http://${request.headers.host}`;
+  if (origin !== expected) throw new Error('Cross-origin manager requests are not allowed.');
 }
 
 function jobSnapshot() {
@@ -469,6 +478,22 @@ async function routeApi(request, response, url) {
   if (request.method === 'POST') assertToken(request);
   if (request.method === 'PUT') assertToken(request);
   if (request.method === 'DELETE') assertToken(request);
+  if (['POST', 'PUT', 'DELETE'].includes(request.method)) assertSameOrigin(request);
+
+  if (request.method === 'POST' && url.pathname === '/api/shutdown') {
+    const body = await readBody(request);
+    if (body.confirmation !== 'quit') throw new Error('Confirm the local shutdown request.');
+    const runningJobs = [...jobs.values()]
+      .filter((job) => ['running', 'stopping'].includes(job.status))
+      .map((job) => job.kind);
+    response.once('finish', () => setImmediate(() => void shutdown()));
+    sendJson(response, 200, {
+      closing: true,
+      stoppedServices: runningJobs,
+      message: 'QuestKeeper is shutting down. You can close this browser tab.',
+    });
+    return;
+  }
 
   if (request.method === 'GET' && url.pathname === '/api/ai/setup') {
     const hardware = await hardwarePromise;
@@ -724,7 +749,10 @@ function openBrowser(url) {
   child.unref();
 }
 
-export function startServer({ port = 4173, open = false } = {}) {
+export function startServer({
+  port = Number.parseInt(process.env.QUESTKEEPER_MANAGER_PORT || '4173', 10),
+  open = false,
+} = {}) {
   const server = createServer(async (request, response) => {
     const url = new URL(request.url ?? '/', `http://${request.headers.host ?? '127.0.0.1'}`);
     try {
@@ -740,7 +768,10 @@ export function startServer({ port = 4173, open = false } = {}) {
     }
   });
   server.listen(port, '127.0.0.1', () => {
-    const url = `http://127.0.0.1:${port}`;
+    activeServer = server;
+    const address = server.address();
+    const actualPort = typeof address === 'object' && address ? address.port : port;
+    const url = `http://127.0.0.1:${actualPort}`;
     console.log(`Campaign Manager ready at ${url}`);
     console.log('Press Ctrl+C to stop it.');
     if (open) openBrowser(url);
@@ -759,13 +790,19 @@ export function startServer({ port = 4173, open = false } = {}) {
 const isMain = process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 if (isMain) startServer({ open: process.argv.includes('--open') });
 
-let shuttingDown = false;
 async function shutdown() {
   if (shuttingDown) return;
   shuttingDown = true;
   await Promise.all([...jobs.keys()].map((kind) => stopJob(kind)));
   for (const child of children) child.kill();
-  process.exit(0);
+  const forcedExit = setTimeout(() => process.exit(0), 1_500);
+  forcedExit.unref();
+  activeServer?.closeIdleConnections?.();
+  if (!activeServer) process.exit(0);
+  activeServer.close(() => {
+    clearTimeout(forcedExit);
+    process.exit(0);
+  });
 }
 process.on('SIGINT', () => void shutdown());
 process.on('SIGTERM', () => void shutdown());

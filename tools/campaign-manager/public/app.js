@@ -69,6 +69,27 @@ function toast(message, error = false) {
   setTimeout(() => element.remove(), 4200);
 }
 
+function translate(message) {
+  return window.managerI18n?.translate?.(message) ?? message;
+}
+
+async function quitManager() {
+  const confirmation = translate(
+    'Quit Campaign Manager? Active local jobs and previews started here will stop. Your published Companion remains online.',
+  );
+  if (!confirm(confirmation)) return;
+  const button = document.querySelector('#quit-manager');
+  button.disabled = true;
+  button.textContent = translate('Stopping local services…');
+  const result = await api('/api/shutdown', {
+    method: 'POST',
+    body: JSON.stringify({ confirmation: 'quit', scope: 'all' }),
+  });
+  document.body.innerHTML = `<main class="shutdown-screen" role="status" aria-live="polite"><div class="shutdown-screen__sigil" aria-hidden="true">✦</div><h1>QuestKeeper is closed</h1><p>The Campaign Manager and the local services it started have stopped safely.</p><p>You can close this browser tab. Your published Companion remains online.</p></main>`;
+  window.managerI18n?.translateTree?.();
+  document.title = result.message;
+}
+
 function setMenuOpen(open) {
   document.body.classList.toggle('menu-open', open);
   mobileMenu.setAttribute('aria-expanded', String(open));
@@ -1616,6 +1637,9 @@ document.querySelector('#open-companion').addEventListener('click', () => {
     window.open('http://127.0.0.1:4200', '_blank', 'noopener');
   else runProjectAction('preview').catch((error) => toast(error.message, true));
 });
+document
+  .querySelector('#quit-manager')
+  .addEventListener('click', () => quitManager().catch((error) => toast(error.message, true)));
 
 content.addEventListener('click', async (event) => {
   const aiAction = event.target.closest('[data-ai-action]');
