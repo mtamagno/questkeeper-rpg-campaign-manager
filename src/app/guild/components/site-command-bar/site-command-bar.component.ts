@@ -18,6 +18,7 @@ import { AudiencePreferenceService } from '@guild/services/audiencePreference.se
 import { LanguageService } from '@guild/services/language.service';
 import { GuidedTourService } from '@guild/services/guidedTour.service';
 import { localizeText } from '@guild/models/language.model';
+import { PwaInstallService } from '@guild/services/pwaInstall.service';
 
 interface NavigationCommand {
   readonly icon: string;
@@ -65,6 +66,7 @@ export class SiteCommandBarComponent {
   private readonly audiencePreference = inject(AudiencePreferenceService);
   private readonly language = inject(LanguageService);
   private readonly guidedTour = inject(GuidedTourService);
+  private readonly pwaInstall = inject(PwaInstallService);
   private readonly currentUrl = signal(this.router.url);
   private readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
 
@@ -73,6 +75,7 @@ export class SiteCommandBarComponent {
   readonly isItalian = this.language.isItalian;
   readonly activeCampaignId = this.campaigns.activeCampaignId;
   readonly tourStatus = this.guidedTour.status;
+  readonly canInstall = this.pwaInstall.canInstall;
 
   readonly tourActionLabel = computed((): string => {
     const it = this.isItalian();
@@ -264,6 +267,10 @@ export class SiteCommandBarComponent {
       return;
     }
     this.guidedTour.open();
+  }
+
+  async installCompanion(): Promise<void> {
+    await this.pwaInstall.install();
   }
 
   private focusTour(): void {

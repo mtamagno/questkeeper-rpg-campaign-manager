@@ -67,7 +67,15 @@ the archive all evening.
 
 The Companion is responsive and works in modern browsers. Portrait phones keep
 navigation and reading compact; wider screens give artwork, relationships and
-character sheets more room. Native Android and iOS editions are part of the
+character sheets more room.
+
+On a supported browser, use **Install** in the top command bar to give
+QuestKeeper its own launcher icon and standalone window. On iPhone and iPad,
+use **Share → Add to Home Screen** instead. The
+[PWA installation guide](PWA-INSTALLATION.md) explains the current offline
+boundary as well as both install paths.
+
+Native Android and iOS editions are part of the
 [public roadmap](../ROADMAP.md).
 
 ---

@@ -1,0 +1,21 @@
+{
+  "$schema": "./node_modules/@angular/service-worker/config/schema.json",
+  "index": "/index.html",
+  "assetGroups": [
+    {
+      "name": "questkeeper-shell",
+      "installMode": "prefetch",
+      "resources": {
+        "files": ["/favicon.svg", "/index.html", "/manifest.webmanifest", "/*.css", "/*.js"]
+      }
+    },
+    {
+      "name": "questkeeper-brand",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "resources": {
+        "files": ["/icons/**"]
+      }
+    }
+  ]
+}

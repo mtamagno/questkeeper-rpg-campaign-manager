@@ -67,6 +67,7 @@ portable folder you control.
 - Sheet-photo and shared Roll20 print-view imports that always produce editable drafts
 - Discord Session Scribe or ordinary handwritten notes—the archive accepts both
 - GitHub Pages publishing or direct FTPS from the Manager
+- An installable Companion with its own app icon and standalone window
 - Any campaign language, with an English/Italian Manager interface
 
 ## Start in a few minutes
@@ -110,6 +111,7 @@ points readers toward the right guide without turning this page into a manual.
 | ------------------------------------------------------ | ---------------------------------------------------- |
 | Install, update or troubleshoot QuestKeeper            | **[Installation Guide](docs/INSTALLATION-GUIDE.md)** |
 | Understand the player-facing campaign website          | **[Companion Guide](docs/COMPANION-GUIDE.md)**       |
+| Install the published Companion as a web app           | **[PWA Guide](docs/PWA-INSTALLATION.md)**            |
 | Create content, use optional AI, transcribe or publish | **[Manager Guide](docs/MANAGER-GUIDE.md)**           |
 | Edit campaign JSON directly                            | [Content Guide](docs/CONTENT-GUIDE.md)               |
 | See what comes next                                    | [Public Roadmap](ROADMAP.md)                         |

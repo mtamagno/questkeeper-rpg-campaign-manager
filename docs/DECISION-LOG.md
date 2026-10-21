@@ -592,6 +592,37 @@ move Day 04 PWA/offline work.
 **Revisit when:** Signing credentials are available, another desktop
 architecture has demonstrated demand, or Node SEA leaves active development.
 
+### QK-023 — Installation is progressive; offline availability is explicit
+
+**Date:** 21 October 2026
+
+**Status:** Active
+
+**Decision:** QuestKeeper ships one hosting-path-independent web app manifest,
+branded standard and maskable icons, and a production-only Angular service
+worker. Its bilingual in-app Install action appears only after the browser
+raises `beforeinstallprompt`; other browsers retain their native install or
+home-screen path. This first delivery caches only the application shell and
+brand assets, not campaign records.
+
+**Why:** An unavailable install button erodes trust, while silently caching an
+undefined subset of campaign content creates dangerous confidence before a
+game night. Relative manifest scope lets the same shared implementation work at
+the public root and production's `/DnD/` path.
+
+**Consequences:** Normal browser reading remains the fallback. Development
+builds do not register the service worker. The second Day 04 task must add a
+visible, testable preparation state for recent characters and recaps rather
+than broad background caching, and must not expose protected data that was
+never deliberately unlocked.
+
+**Source:** [PWA installation guide](PWA-INSTALLATION.md), GN-05 and acceptance
+journey P-06.
+
+**Revisit when:** Browser installation events change materially, native shells
+replace the web install path, or offline journey evidence requires a different
+scope.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD

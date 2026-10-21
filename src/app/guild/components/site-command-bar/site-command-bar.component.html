@@ -16,6 +16,21 @@
   </nav>
 
   <div class="command-bar__actions">
+    @if (canInstall()) {
+      <button
+        class="command-bar__install"
+        type="button"
+        (click)="installCompanion()"
+        [attr.aria-label]="
+          isItalian()
+            ? 'Installa QuestKeeper su questo dispositivo'
+            : 'Install QuestKeeper on this device'
+        "
+      >
+        <span aria-hidden="true">&#8681;</span>
+        <span class="command-bar__install-label">{{ isItalian() ? 'Installa' : 'Install' }}</span>
+      </button>
+    }
     <button
       class="command-bar__tour"
       type="button"

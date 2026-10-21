@@ -63,6 +63,7 @@
   }
 
   &__campaign-switch,
+  &__install,
   &__tour,
   &__search {
     display: inline-flex;
@@ -140,6 +141,7 @@
     }
     &__campaign-name,
     &__switch-copy,
+    &__install-label,
     &__tour-label,
     &__search-label,
     &__search kbd {

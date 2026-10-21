@@ -1,0 +1,39 @@
+{
+  "name": "QuestKeeper — RPG Campaign Companion",
+  "short_name": "QuestKeeper",
+  "description": "Character sheets, recaps, maps and party memories for your tabletop campaign.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0d0d14",
+  "theme_color": "#1b2538",
+  "categories": ["games", "entertainment", "utilities"],
+  "icons": [
+    {
+      "src": "icons/questkeeper-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/questkeeper-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/questkeeper-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/questkeeper-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
