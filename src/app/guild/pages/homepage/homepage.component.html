@@ -144,6 +144,15 @@
             lang() === 'it' ? 'Rientra nella storia in pochi minuti' : 'Catch up in a few minutes'
           }}</small>
         </a>
+        <a [routerLink]="['/', cId, 'offline']" appSfxHover>
+          <span aria-hidden="true">⇩</span>
+          <strong>{{ lang() === 'it' ? 'Kit offline' : 'Offline pack' }}</strong>
+          <small>{{
+            lang() === 'it'
+              ? 'Porta con te profili e recap recenti'
+              : 'Take public profiles and recent recaps with you'
+          }}</small>
+        </a>
         <a [routerLink]="['/', cId, 'party', 'relationships']" appSfxHover>
           <span aria-hidden="true">◇</span>
           <strong>{{ lang() === 'it' ? 'Legami del party' : 'Party bonds' }}</strong>

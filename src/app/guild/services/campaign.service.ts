@@ -26,10 +26,9 @@ import {
 } from '@guild/models/campaignPalette.model';
 
 const CAMPAIGNS_MANIFEST_PATH = 'campaigns/campaigns.json';
-const CAMPAIGN_MANIFEST_REQUEST_VERSION = Date.now().toString(36);
 
 function versionedCampaignManifestUrl(): string {
-  return `${CAMPAIGNS_MANIFEST_PATH}?v=${CAMPAIGN_MANIFEST_REQUEST_VERSION}`;
+  return CAMPAIGNS_MANIFEST_PATH;
 }
 
 /**

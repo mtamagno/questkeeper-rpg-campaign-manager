@@ -22,6 +22,13 @@ export const routes: Routes = [
           import('./guild/pages/homepage/homepage.component').then((m) => m.HomepageComponent),
       },
       {
+        path: 'offline',
+        loadComponent: () =>
+          import('./guild/pages/offline-pack/offline-pack.component').then(
+            (m) => m.OfflinePackComponent,
+          ),
+      },
+      {
         path: 'party',
         pathMatch: 'full',
         loadComponent: () =>

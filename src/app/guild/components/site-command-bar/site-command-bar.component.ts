@@ -35,6 +35,7 @@ interface BreadcrumbItem {
 
 const ROUTE_LABELS: Readonly<Record<string, { readonly it: string; readonly en: string }>> = {
   party: { it: 'Compagnia', en: 'Party' },
+  offline: { it: 'Offline', en: 'Offline' },
   relationships: { it: 'Relazioni', en: 'Relationships' },
   npcs: { it: 'PNG', en: 'NPCs' },
   campaign: { it: 'Campagna', en: 'Campaign' },
@@ -178,6 +179,13 @@ export class SiteCommandBarComponent {
         detail: it ? 'Eroi, profili e diari' : 'Heroes, profiles and journals',
         url: `${prefix}/party`,
         keywords: 'party compagnia characters personaggi heroes eroi',
+      },
+      {
+        icon: '\u21e9',
+        title: it ? 'Kit offline' : 'Offline pack',
+        detail: it ? 'Profili pubblici e recap recenti' : 'Public profiles and recent recaps',
+        url: `${prefix}/offline`,
+        keywords: 'offline download save pack kit recap profile profili salva',
       },
       {
         icon: '\u26af',

@@ -29,10 +29,10 @@ install prompt used by the in-app button.
   code while authors work.
 - Normal browser use remains available when installation is unsupported.
 
-Installing the shell does **not yet mean every campaign page is available
-offline**. Character and recap preparation is the next separately tested
-delivery; until that lands, reconnect before relying on campaign content at the
-table.
+Installation alone does **not mean every campaign page is available offline**.
+Before game night, open the campaign's **Offline pack**, choose the public
+profiles you need and prepare the latest recaps. The
+[offline game-night guide](OFFLINE-GAME-NIGHT.md) describes the exact boundary.
 
 Technical background: [MDN's installability guide](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/Making_PWAs_installable)
 and [Apple's web-app instructions](https://support.apple.com/guide/iphone/iphea86e5236/ios).
@@ -46,7 +46,7 @@ barra superiore e conferma la finestra del browser. Su iPhone o iPad usa
 **Condividi → Aggiungi alla schermata Home** e, quando disponibile, abilita
 **Apri come app web**.
 
-Il pulsante interno compare solo se il browser può davvero installare l'app. In
-questa prima fase viene installata l'app QuestKeeper, ma non viene ancora
-promessa la disponibilità offline di schede e recap: quella preparazione sarà
-aggiunta e verificata nel passo successivo.
+Il pulsante interno compare solo se il browser può davvero installare l'app.
+L'installazione non salva automaticamente tutta la campagna: prima della
+sessione apri **Kit offline**, scegli i profili pubblici e prepara i recap
+recenti.

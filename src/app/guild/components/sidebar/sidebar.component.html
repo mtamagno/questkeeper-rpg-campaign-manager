@@ -171,6 +171,15 @@
       <section class="sidebar__section">
         <h2 class="sidebar__section-title">📜 {{ isItalian() ? 'Campagna' : 'Campaign' }}</h2>
 
+        <a
+          class="sidebar__section-link"
+          [routerLink]="['/', cId, 'offline']"
+          routerLinkActive="sidebar__section-link--active"
+          (click)="close()"
+        >
+          ⇩ {{ isItalian() ? 'Kit offline' : 'Offline Pack' }}
+        </a>
+
         @if (hasSessions()) {
           <a
             class="sidebar__section-link"

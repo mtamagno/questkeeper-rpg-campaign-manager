@@ -623,6 +623,38 @@ journey P-06.
 replace the web install path, or offline journey evidence requires a different
 scope.
 
+### QK-024 — Offline readiness is a public-only, user-prepared snapshot
+
+**Date:** 21 October 2026
+
+**Status:** Active
+
+**Decision:** Each campaign offers a visible offline pack that the participant
+prepares and removes explicitly. It stores selected public character identity
+and profile fields plus at most the three newest concise recaps in versioned
+local browser storage. The service worker caches only the public campaign
+directory, campaign metadata and public artwork needed to reopen that pack;
+character and session source JSON remain outside its data cache.
+
+**Why:** Static character files also contain protected sheets and secrets.
+Caching them wholesale would violate the trust boundary even when the visible
+page was public. A small rendered snapshot is easier to explain, inspect,
+refresh and remove, and gives an honest answer to “what works at the table?”
+
+**Consequences:** The offline library shows preparation time and exact counts,
+works in every configured campaign language, and never claims an unprepared
+page is available. Preparing again replaces only that campaign's pack. Browser
+storage is a convenience copy rather than an archive. Future offline work must
+extend the sanitized snapshot schema or introduce an equally reviewable
+boundary; it may not broaden service-worker patterns to protected JSON.
+
+**Source:** [Offline game-night guide](OFFLINE-GAME-NIGHT.md), GN-05 and
+acceptance journey P-06.
+
+**Revisit when:** User testing shows that three recaps are insufficient, a
+secure encrypted vault is designed, or native storage provides a clearer
+equivalent boundary.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD

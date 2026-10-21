@@ -73,7 +73,10 @@ On a supported browser, use **Install** in the top command bar to give
 QuestKeeper its own launcher icon and standalone window. On iPhone and iPad,
 use **Share → Add to Home Screen** instead. The
 [PWA installation guide](PWA-INSTALLATION.md) explains the current offline
-boundary as well as both install paths.
+boundary as well as both install paths. Before travelling, use the campaign's
+**Offline pack** to choose public characters and save the three newest recaps;
+follow the [game-night checklist](OFFLINE-GAME-NIGHT.md) to verify the exact
+device-local copy.
 
 Native Android and iOS editions are part of the
 [public roadmap](../ROADMAP.md).

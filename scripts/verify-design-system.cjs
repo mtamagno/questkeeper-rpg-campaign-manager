@@ -9,6 +9,7 @@ const palettes = read('src/styles/_palettes.scss');
 const main = read('src/styles/main.scss');
 const appTemplate = read('src/app/app.html');
 const campaignService = read('src/app/guild/services/campaign.service.ts');
+const serviceWorkerConfig = JSON.parse(read('ngsw-config.json'));
 const passwordDialog = read(
   'src/app/guild/components/password-dialog/password-dialog.component.html',
 );
@@ -112,8 +113,15 @@ if (
   failures.push('The app shell is not wired to the manifest-driven palette contract.');
 }
 
-if (!campaignService.includes('?v=${CAMPAIGN_MANIFEST_REQUEST_VERSION}')) {
-  failures.push('The campaign manifest is not refreshed between application loads.');
+const campaignDirectoryGroup = serviceWorkerConfig.dataGroups?.find(
+  ({ name }) => name === 'campaign-directory',
+);
+if (
+  !campaignService.includes('return CAMPAIGNS_MANIFEST_PATH;') ||
+  campaignDirectoryGroup?.cacheConfig?.strategy !== 'freshness' ||
+  !campaignDirectoryGroup.urls?.includes('/campaigns/campaigns.json')
+) {
+  failures.push('The campaign manifest lacks the stable network-first offline contract.');
 }
 
 if (

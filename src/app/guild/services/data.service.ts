@@ -36,6 +36,9 @@ import { CampaignService } from '@guild/services/campaign.service';
 const DATA_REQUEST_VERSION = Date.now().toString(36);
 
 function versionedDataUrl(path: string): string {
+  if (path.endsWith('/campaign.json')) {
+    return path;
+  }
   return `${path}?v=${DATA_REQUEST_VERSION}`;
 }
 

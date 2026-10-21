@@ -17,5 +17,26 @@
         "files": ["/icons/**"]
       }
     }
+  ],
+  "dataGroups": [
+    {
+      "name": "campaign-directory",
+      "urls": ["/campaigns/campaigns.json", "/campaigns/*/data/campaign.json"],
+      "cacheConfig": {
+        "strategy": "freshness",
+        "maxSize": 32,
+        "maxAge": "7d",
+        "timeout": "3s"
+      }
+    },
+    {
+      "name": "campaign-public-media",
+      "urls": ["/campaigns/**/images/**"],
+      "cacheConfig": {
+        "strategy": "performance",
+        "maxSize": 80,
+        "maxAge": "30d"
+      }
+    }
   ]
 }

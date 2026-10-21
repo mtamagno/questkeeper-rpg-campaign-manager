@@ -42,14 +42,13 @@ async function main() {
 
   const workerConfig = readJson('ngsw-config.json');
   assert.equal(workerConfig.index, '/index.html');
-  assert.equal(
-    workerConfig.dataGroups,
-    undefined,
-    'Task one must not claim campaign content is available offline yet',
-  );
   const workerFiles = JSON.stringify(workerConfig.assetGroups);
   assert.ok(workerFiles.includes('manifest.webmanifest'));
-  assert.ok(!workerFiles.includes('/campaigns/'), 'Campaign caching belongs to task two');
+  const dataGroups = JSON.stringify(workerConfig.dataGroups);
+  assert.ok(dataGroups.includes('campaign-directory'));
+  assert.ok(dataGroups.includes('campaign-public-media'));
+  assert.ok(!dataGroups.includes('/characters/'), 'Protected character JSON must never be cached');
+  assert.ok(!dataGroups.includes('/sessions/'), 'Session JSON is stored only as a public snapshot');
 
   const index = read('src/index.html');
   assert.match(index, /rel="manifest" href="manifest\.webmanifest"/);
