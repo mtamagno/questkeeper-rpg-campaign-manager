@@ -34,6 +34,12 @@ src/campaigns/
 Use lowercase URL-safe IDs. Declare the campaign's language codes and default
 language in both `campaigns.json` and `data/campaign.json`:
 
+Character, NPC, session and map IDs share one namespace inside a campaign. An
+ID such as `test` may identify exactly one of those records, never one record
+per folder. This keeps mixed relationship graphs, links, imports, search and
+future campaign books unambiguous. Campaign IDs remain a separate top-level
+namespace. Existing IDs stay stable when a display name or translation changes.
+
 ```json
 {
   "languages": ["en", "es", "pt-BR"],
