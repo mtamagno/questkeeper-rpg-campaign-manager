@@ -28,6 +28,11 @@ to explore the workflow safely in a browser.
 Use the **Interface** selector to switch Manager instructions between English
 and Italian. Campaigns may use any configured language codes.
 
+When you finish, choose **Quit / Esci** in the header. The confirmation makes
+clear that local previews and background jobs started by this Manager will
+stop, while an already published Companion remains online. Wait for the
+safe-to-close screen before closing the browser tab.
+
 ## Campaigns, characters and NPCs
 
 Forms manage names, biographies, public/private details, images, statistics,

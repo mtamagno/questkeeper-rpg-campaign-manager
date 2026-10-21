@@ -74,6 +74,11 @@ On its first successful run, setup opens Campaign Manager and guides you through
 the first campaign. The Manager normally uses `http://127.0.0.1:4173`; keep its
 terminal window open while working.
 
+Use **Quit / Esci** in the Manager header when you finish. After confirmation,
+QuestKeeper stops the local Manager and every preview or background job started
+by it, then shows a safe-to-close page. The published Companion website is not
+affected.
+
 > The first native binaries are not commercially code-signed. Windows may show
 > SmartScreen and macOS may show Gatekeeper on the first launch. Confirm that
 > the archive came from the official GitHub release, compare its checksum and
