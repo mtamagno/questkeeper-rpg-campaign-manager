@@ -38,6 +38,28 @@ baseline of each repository and any known compatibility difference.
 | New user feedback          |        |        |           |
 | Privacy/content concerns   |        |        |           |
 
+## Dependency and runtime health
+
+Use official release/advisory sources and the repository lockfiles. Checking
+for an update is not permission to apply it: record the compatibility, security
+and release-artifact impact before opening or scheduling work.
+
+| Surface                             | Supported/installed | Latest checked | Security or deprecation signal | Update/defer decision and evidence |
+| ----------------------------------- | ------------------- | -------------- | ------------------------------ | ---------------------------------- |
+| Node.js supported line              |                     |                |                                |                                    |
+| Node.js current major/LTS landscape |                     |                |                                |                                    |
+| npm dependencies and lockfile       |                     |                |                                |                                    |
+| Session Scribe Python dependencies  |                     |                |                                |                                    |
+| GitHub Actions and release tooling  |                     |                |                                |                                    |
+
+- [ ] Ran the appropriate outdated/audit checks without mutating lockfiles.
+- [ ] Checked the official Node release schedule and newest release in the
+      supported line.
+- [ ] Opened focused issues for actionable upgrades, or recorded why each
+      material change is deferred.
+- [ ] Identified installer, CI, platform-binary and production-campaign checks
+      required by any proposed runtime change.
+
 ## Decisions made
 
 | Decision | Evidence | Consequence | Revisit when |
@@ -87,6 +109,9 @@ more important than filling the list.
 - [ ] Demonstrated the outcome as a new player and as a GM.
 - [ ] Ran `npm run verify` successfully.
 - [ ] Reviewed live deployment and primary demo links.
+- [ ] Completed the dependency and runtime health review above.
+- [ ] Completed the monthly AI ecosystem review when this is the first weekly
+      review of the month.
 - [ ] Updated completed items in `docs/ROADMAP-60-DAYS.md`.
 - [ ] Reviewed every affected future task against this week's evidence.
 - [ ] Updated `docs/DECISION-LOG.md` for durable cross-task decisions.

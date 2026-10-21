@@ -684,6 +684,40 @@ workflow rather than guessing a future target during triage.
 observed and first-released versions, or the project adopts a different public
 release tracker.
 
+### QK-026 — Ecosystem freshness is reviewed on a fixed evidence cadence
+
+**Date:** 21 October 2026
+
+**Status:** Active
+
+**Decision:** Every weekly closeout records dependency, security, build-tool and
+Node runtime health. The first weekly review of each month also compares the AI
+provider/model landscape using official evidence and updates the provider
+research matrix. Findings receive an explicit adopt, experiment, watch,
+deprecate or no-action decision; nothing is upgraded or added merely because it
+is newer.
+
+**Why:** QuestKeeper packages a private runtime, local authoring services and
+optional fast-changing AI integrations. Ad-hoc checks can miss security or
+deprecation deadlines, while automatic novelty-driven updates can break
+downloadable builds, change costs or weaken the user's privacy expectations.
+
+**Consequences:** Weekly notes contain a repeatable runtime/dependency table and
+the monthly review records capabilities, privacy, price shape, regional and
+hardware constraints, licenses and deprecations. Material findings become
+focused issues. Runtime changes are verified in downloadable artifacts; shared
+provider work follows the dual-repository contract and never silently changes a
+configured model or sends campaign data remotely.
+
+**Source:** [Working Agreement](WORKING-AGREEMENT.md),
+[weekly review template](templates/WEEKLY-REVIEW.md),
+[monthly ecosystem review](templates/MONTHLY-ECOSYSTEM-REVIEW.md) and public
+issue #15.
+
+**Revisit when:** Dependency and provider monitoring is automated with equally
+clear human decisions, the release cadence changes, or a supported runtime
+enters end-of-life before the next scheduled review.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD

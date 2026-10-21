@@ -130,14 +130,36 @@ scheduled tasks whenever more work is available that day.
 1. Walk through the week's outcome as a new player and as a GM.
 2. Compare planned versus shipped outcomes, not raw commit count.
 3. Check CI, accessibility, mobile layout, demo paths and known regressions.
-4. Capture user feedback, decisions, metrics and unfinished work.
-5. Audit how shipped work changes the assumptions, dependencies and acceptance
+4. Complete the dependency and runtime health section in the weekly review:
+   inspect npm and Python package drift, security/deprecation notices, pinned
+   build actions, the newest release in the supported Node line and the current
+   Node major/LTS landscape. Record an update or defer decision with evidence;
+   never upgrade only because a larger version number exists.
+5. Capture user feedback, decisions, metrics and unfinished work.
+6. Audit how shipped work changes the assumptions, dependencies and acceptance
    criteria of every affected future task.
-6. Update the decision log and link each durable choice to its source.
-7. Update the 60-day plan checkboxes and only change the annual roadmap when a
+7. Update the decision log and link each durable choice to its source.
+8. Update the 60-day plan checkboxes and only change the annual roadmap when a
    user-visible checkpoint has materially changed.
-8. Carry work forward deliberately, reduce it, or remove it; never let it
+9. Carry work forward deliberately, reduce it, or remove it; never let it
    remain ambiguous.
+
+### First weekly review of each month: inspect the AI ecosystem
+
+1. Copy
+   [`templates/MONTHLY-ECOSYSTEM-REVIEW.md`](templates/MONTHLY-ECOSYSTEM-REVIEW.md)
+   into a dated issue or project note.
+2. Check official provider and model sources for useful new local or remote
+   options, capability changes, deprecations and replacement deadlines.
+3. Compare text, vision, image, structured-output and tool/browser capabilities
+   alongside privacy, regional availability, pricing shape, hardware needs,
+   licensing and redistribution constraints.
+4. Update the provider research matrix. Open a focused issue only when a
+   candidate gives players or GMs a meaningful outcome and fits QuestKeeper's
+   consent-first, capability-based provider contract.
+5. Record `adopt`, `experiment`, `watch`, `deprecate` or `no action` with dated
+   official evidence. A new announcement never triggers an automatic provider
+   addition or changes a user's configured model.
 
 ## 4. Definition of Ready
 
