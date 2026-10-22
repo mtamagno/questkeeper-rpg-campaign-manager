@@ -14,6 +14,7 @@ const state = {
   projectMode: false,
   scribeMode: false,
   aiMode: false,
+  advancedMode: localStorage.getItem('questkeeper-manager-advanced') === 'true',
   project: {
     dependenciesReady: false,
     companion: { action: 'prepare', label: 'Start Companion', status: 'Preparation required' },
@@ -686,12 +687,11 @@ function campaignContainsLocalizedContent(value, language, visited = new Set()) 
 
 function entityForm(type, item = {}) {
   const languages = campaignLanguages();
-  const common = [
-    field('id', 'Entry ID', item.id ?? '', {
-      required: true,
-      hint: 'Suggested automatically from the name.',
-    }),
-  ];
+  const common = state.advancedMode
+    ? [
+        `<details class="field field--wide advanced-identity" open><summary>Advanced identity</summary>${field('id', 'Entry ID', item.id ?? '', { hint: item.id ? 'Stable after creation. Renaming this entry will not change it.' : 'Optional. Leave blank to generate a unique stable ID automatically.' })}</details>`,
+      ]
+    : [];
   if (type === 'characters') {
     return [
       ...common,
@@ -928,7 +928,7 @@ function openEntityEditor(type, item) {
     });
     idInput.addEventListener('input', () => (idInput.dataset.touched = 'true'));
   }
-  if (item) idInput.readOnly = true;
+  if (item && idInput) idInput.readOnly = true;
 }
 
 function localizedFormValue(form, prefix, fallback = '', languages = campaignLanguages()) {
@@ -1095,7 +1095,7 @@ function baseCharacter(original = {}) {
 }
 
 async function buildEntity(type, form, original = {}) {
-  const id = form.get('id').toString();
+  const id = form.get('id')?.toString() || original.id || '';
   const languages = campaignLanguages();
   if (type === 'characters') {
     const item = baseCharacter(original);
@@ -1698,6 +1698,7 @@ function renderProject() {
       <section class="project-panel"><span class="eyebrow">2 · Preview</span><h2>Open your Companion</h2><p>Launch the local site with the campaign data you just entered.</p><div class="action-row">${companion.action === 'open' ? `<a class="primary-button" href="${escapeHtml(companion.url)}" target="_blank" rel="noreferrer">Open now</a>` : `<button class="primary-button" data-project-action="preview" ${['prepare', 'wait'].includes(companion.action) ? 'disabled' : ''}>${escapeHtml(companion.label)}</button>`}<span class="job-status ${escapeHtml(companion.action)}">${escapeHtml(companion.status)}</span></div></section>
       <section class="project-panel"><span class="eyebrow">3 · Validation</span><h2>Check before publishing</h2><p>The production build catches invalid data or components before you push to GitHub.</p><div class="action-row"><button class="secondary-button" data-project-action="build" ${!state.project.dependenciesReady || build?.status === 'running' ? 'disabled' : ''}>Check and build site</button><span class="job-status ${build?.status || ''}">${build ? escapeHtml(build.status) : 'Not run'}</span></div></section>
       <section class="project-panel"><span class="eyebrow">4 · Publishing</span><h2>Choose how the archive reaches the realm</h2><p>GitHub Pages remains available through the included workflow. If your hosting provides FTP, configure it once and publish directly from this computer without GitHub Actions.</p><a class="secondary-button" href="https://github.com/mtamagno/questkeeper-rpg-campaign-manager#publish" target="_blank" rel="noreferrer">Open the publishing guide</a></section>
+      <section class="project-panel"><span class="eyebrow">Authoring preferences</span><h2>Advanced controls</h2><p>Keep technical identifiers hidden during normal authoring, or reveal them when you need to integrate or troubleshoot campaign data.</p><label class="consent-check"><input type="checkbox" data-advanced-mode ${state.advancedMode ? 'checked' : ''} /> Show advanced identity controls in entity forms</label></section>
       <form id="publishing-form" class="project-panel publishing-panel"><span class="eyebrow">Direct hosting · FTP / FTPS</span><h2>Publish from Campaign Manager</h2><div class="publishing-grid"><label class="field"><span>Protocol</span><select name="protocol"><option value="ftps" ${publishing.protocol !== 'ftp' ? 'selected' : ''}>FTPS · encrypted (recommended)</option><option value="ftp" ${publishing.protocol === 'ftp' ? 'selected' : ''}>FTP · unencrypted</option></select></label><label class="field"><span>Host</span><input name="host" value="${escapeHtml(publishing.host)}" placeholder="ftp.example.com" /></label><label class="field"><span>Port</span><input name="port" type="number" min="1" value="${publishing.port || 21}" /></label><label class="field"><span>Remote folder</span><input name="remotePath" value="${escapeHtml(publishing.remotePath || '/')}" placeholder="/public_html/questkeeper" /></label><label class="field"><span>Username</span><input name="username" autocomplete="username" value="${escapeHtml(publishing.username)}" /></label><label class="field"><span>Password</span><input name="password" type="password" autocomplete="new-password" placeholder="${publishing.passwordConfigured ? 'Saved locally · leave blank to keep it' : 'Hosting password'}" /></label></div><label class="consent-check"><input name="insecureConsent" type="checkbox" /> I understand that plain FTP sends credentials and files without encryption. This is required only when FTP is selected instead of FTPS.</label><div class="action-row"><button class="secondary-button" type="button" data-publish-action="save">Save destination</button><button class="secondary-button" type="button" data-publish-action="test">Test connection</button><button class="primary-button" type="button" data-publish-action="publish" ${!state.project.dependenciesReady || ftpJob?.status === 'running' ? 'disabled' : ''}>Build & publish now</button><span class="job-status ${ftpJob?.status || ''}">${ftpJob ? escapeHtml(ftpJob.status) : publishing.host ? 'Configured' : 'Not configured'}</span></div><small>Credentials stay in the Git-ignored <code>.campaign-manager/</code> folder and are never returned to the browser.</small></form>
       ${activeLog ? `<pre class="job-log">${escapeHtml(activeLog.logs)}</pre>` : ''}
     </div>`;
@@ -1964,6 +1965,13 @@ content.addEventListener('click', async (event) => {
     const kind = scribeAction.dataset.scribeAction === 'stop' ? 'transcriber-stop' : 'transcriber';
     runProjectAction(kind, 'scribe').catch((error) => toast(error.message, true));
   }
+});
+
+content.addEventListener('change', (event) => {
+  if (!event.target.matches('[data-advanced-mode]')) return;
+  state.advancedMode = event.target.checked;
+  localStorage.setItem('questkeeper-manager-advanced', String(state.advancedMode));
+  toast(state.advancedMode ? 'Advanced controls enabled.' : 'Advanced controls hidden.');
 });
 
 content.addEventListener('submit', (event) => {

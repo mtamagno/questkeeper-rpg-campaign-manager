@@ -25,3 +25,11 @@ test('campaign language picker exposes searchable, custom and accessible control
   assert.match(styles, /@media \(max-width: 620px\)[\s\S]+\.language-picker__add/);
   assert.match(styles, /\.language-picker__selected/);
 });
+
+test('entity IDs stay optional unless advanced authoring is enabled', async () => {
+  const app = await readFile(join(root, 'public', 'app.js'), 'utf8');
+  assert.match(app, /questkeeper-manager-advanced/);
+  assert.match(app, /Show advanced identity controls in entity forms/);
+  assert.match(app, /Optional\. Leave blank to generate a unique stable ID automatically\./);
+  assert.match(app, /original\.id \|\| ''/);
+});

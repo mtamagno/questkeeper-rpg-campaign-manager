@@ -1312,6 +1312,19 @@ code {
   display: contents;
 }
 
+.advanced-identity {
+  order: 999;
+  padding: 0.8rem;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-md);
+}
+
+.advanced-identity summary {
+  cursor: pointer;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
 .toast-region {
   position: fixed;
   z-index: 30;

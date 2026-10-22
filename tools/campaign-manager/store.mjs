@@ -5,6 +5,7 @@ import {
   assertCampaignEntityIds,
   assertEntityIdAvailable,
   ENTITY_TYPES,
+  generateEntityId,
 } from './entity-identity.mjs';
 import { normalizeCampaignLanguages, normalizeLanguageTag } from './language-catalog.mjs';
 
@@ -301,7 +302,7 @@ export async function deleteCampaign(projectRoot, campaignId, confirmation) {
 
 function validateEntity(type, entity) {
   if (!ENTITY_TYPE_SET.has(type)) throw new Error('Unsupported entity type.');
-  validateId(entity?.id, 'Entity ID');
+  if (entity?.id) validateId(entity.id, 'Entity ID');
   const label = type === 'sessions' ? entity?.title : entity?.name;
   if (typeof label !== 'string' && typeof label !== 'object') {
     throw new Error(
@@ -315,37 +316,48 @@ export async function saveEntity(projectRoot, campaignId, type, entity, previous
   return withCampaignWrite(campaignId, async () => {
     const base = dataRoot(projectRoot, campaignId);
     const campaign = await getCampaign(projectRoot, campaignId);
-    assertEntityIdAvailable(campaign, type, entity.id, previousId);
+    const label = type === 'sessions' ? entity.title : entity.name;
+    const prepared = {
+      ...entity,
+      id: entity.id || generateEntityId(campaign, type, localizedIdentityLabel(label)),
+    };
+    validateId(prepared.id, 'Entity ID');
+    assertEntityIdAvailable(campaign, type, prepared.id, previousId);
 
     if (type === 'maps') {
       const path = join(base, 'maps.json');
       const maps = await readJson(path, []);
-      const matchId = previousId ?? entity.id;
+      const matchId = previousId ?? prepared.id;
       const existsAlready = maps.some((item) => item.id === matchId);
       const next = existsAlready
-        ? maps.map((item) => (item.id === matchId ? entity : item))
-        : [...maps, entity];
+        ? maps.map((item) => (item.id === matchId ? prepared : item))
+        : [...maps, prepared];
       await writeJson(path, next);
-      return entity;
+      return prepared;
     }
 
     const folder = join(base, type);
     const manifestPath = join(folder, 'manifest.json');
     const manifest = await readJson(manifestPath, []);
     const oldFile = previousId ? `${validateId(previousId)}.json` : undefined;
-    const fileName = `${entity.id}.json`;
+    const fileName = `${prepared.id}.json`;
     if (oldFile && oldFile !== fileName) {
       await moveToTrash(projectRoot, join(folder, oldFile), `${campaignId}-${type}-${previousId}`);
     }
-    await writeJson(join(folder, fileName), entity);
+    await writeJson(join(folder, fileName), prepared);
     const nextManifest = oldFile
       ? manifest.includes(oldFile)
         ? manifest.map((item) => (item === oldFile ? fileName : item))
         : [...manifest, fileName]
       : [...manifest, fileName];
     await writeJson(manifestPath, [...new Set(nextManifest)]);
-    return entity;
+    return prepared;
   });
+}
+
+function localizedIdentityLabel(value) {
+  if (typeof value === 'string') return value;
+  return Object.values(value ?? {}).find((entry) => String(entry || '').trim()) ?? '';
 }
 
 export async function deleteEntity(projectRoot, campaignId, type, entityId) {

@@ -146,6 +146,30 @@ test('enforces one campaign-wide ID namespace under concurrent saves', async (t)
   assert.equal(results.filter((result) => result.status === 'rejected').length, 1);
 });
 
+test('generates stable campaign-wide IDs when authors leave identity automatic', async (t) => {
+  const root = await fixture(t);
+  await createCampaign(root, campaignInput);
+  const first = await saveEntity(root, campaignInput.id, 'characters', {
+    name: 'Éowyn, Figlia di Éomund!',
+  });
+  const second = await saveEntity(root, campaignInput.id, 'npcs', {
+    name: 'Éowyn, Figlia di Éomund!',
+  });
+  const unnamed = await saveEntity(root, campaignInput.id, 'maps', { name: { en: '' } });
+  assert.equal(first.id, 'eowyn-figlia-di-eomund');
+  assert.equal(second.id, 'eowyn-figlia-di-eomund-2');
+  assert.equal(unnamed.id, 'map');
+
+  const renamed = await saveEntity(
+    root,
+    campaignInput.id,
+    'characters',
+    { ...first, name: 'The White Lady' },
+    first.id,
+  );
+  assert.equal(renamed.id, first.id);
+});
+
 test('exports, imports and recoverably deletes a campaign', async (t) => {
   const source = await fixture(t);
   const target = await fixture(t);

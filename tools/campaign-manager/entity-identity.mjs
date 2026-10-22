@@ -9,6 +9,30 @@ const ENTITY_LABELS = Object.freeze({
   maps: 'map',
 });
 
+function slugifyIdentity(value) {
+  return String(value ?? '')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 52);
+}
+
+export function generateEntityId(campaign, type, label) {
+  if (!ENTITY_TYPES.includes(type)) throw new Error('Unsupported entity type.');
+  const fallback =
+    type === 'characters' ? 'character' : type === 'npcs' ? 'npc' : type.slice(0, -1);
+  const base = slugifyIdentity(label) || fallback;
+  const used = new Set(entityIdentityRows(campaign).map((row) => row.id));
+  if (!used.has(base)) return base;
+  for (let suffix = 2; suffix < 10_000; suffix += 1) {
+    const candidate = `${base}-${suffix}`;
+    if (!used.has(candidate)) return candidate;
+  }
+  throw new Error(`Could not generate a unique ID for this ${ENTITY_LABELS[type]}.`);
+}
+
 export function entityIdentityRows(campaign) {
   return ENTITY_TYPES.flatMap((type) =>
     (campaign?.[type] ?? []).map((entity) => ({
