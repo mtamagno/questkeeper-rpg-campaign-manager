@@ -3,11 +3,18 @@ import test from 'node:test';
 
 import { normalizeAiConfig, publicAiConfig, recommendModels } from '../ai-config.mjs';
 import {
+  assertEngineCapability,
+  modelSupportsRole,
+  normalizeProviderModels,
+} from '../ai-providers.mjs';
+import {
   buildImagePromptPlan,
   buildNotesPrompt,
   ENTITY_IMPORT_SCHEMA,
+  generateDraftImages,
   normalizeImagePlacements,
   SESSION_DRAFT_SCHEMA,
+  processNotesWithText,
 } from '../ai-service.mjs';
 
 test('recommends a text model conservatively from RAM and CPU', () => {
@@ -39,6 +46,39 @@ test('keeps an existing secret when settings are saved with a blank key', () => 
   assert.equal(next.text.openaiApiKey, 'secret');
   assert.equal(publicAiConfig(next).text.openaiApiKey, undefined);
   assert.equal(publicAiConfig(next).text.openaiKeyConfigured, true);
+  assert.equal(publicAiConfig(next).providers.openai.apiKey, undefined);
+  assert.equal(publicAiConfig(next).providers.openai.keyConfigured, true);
+});
+
+test('supports adding, changing and explicitly removing each remote provider secret', () => {
+  const initial = normalizeAiConfig({ providers: { xai: { apiKey: 'xai-secret' } } });
+  const kept = normalizeAiConfig({ providers: { xai: { apiKey: '' } } }, initial);
+  const changed = normalizeAiConfig({ providers: { xai: { apiKey: 'replacement' } } }, kept);
+  const removed = normalizeAiConfig(
+    { providers: { xai: { apiKey: '', removeApiKey: true } } },
+    changed,
+  );
+  assert.equal(kept.providers.xai.apiKey, 'xai-secret');
+  assert.equal(changed.providers.xai.apiKey, 'replacement');
+  assert.equal(removed.providers.xai.apiKey, '');
+  assert.doesNotMatch(JSON.stringify(publicAiConfig(changed)), /replacement/);
+});
+
+test('filters configured models by explicit task capabilities', () => {
+  const models = normalizeProviderModels([
+    { id: 'writer', capabilities: ['text', 'structured-output', 'image-prompt'] },
+    { id: 'painter', capabilities: ['image-generation'] },
+  ]);
+  assert.equal(modelSupportsRole(models[0], 'prose'), true);
+  assert.equal(modelSupportsRole(models[0], 'image'), false);
+  assert.equal(modelSupportsRole(models[1], 'image'), true);
+  const config = normalizeAiConfig({
+    providers: { xai: { apiKey: 'secret', models } },
+  });
+  assert.throws(
+    () => assertEngineCapability(config, { provider: 'xai', model: 'writer' }, 'image'),
+    /does not support/,
+  );
 });
 
 test('keeps custom model catalogs and removes duplicate names', () => {
@@ -132,4 +172,95 @@ test('character imports require reviewable identity, rules and source-warning fi
     assert.ok(ENTITY_IMPORT_SCHEMA.required.includes(field), `${field} must be reviewed`);
   }
   assert.deepEqual(ENTITY_IMPORT_SCHEMA.properties.allegiance.enum, ['ally', 'neutral', 'enemy']);
+});
+
+const minimalCampaign = {
+  campaign: { name: { en: 'Test' } },
+  characters: [],
+  npcs: [],
+  maps: [],
+  sessions: [],
+};
+
+const validDraft = {
+  title: 'A careful test',
+  location: 'The table',
+  summary: 'Nothing was invented.',
+  prose: 'A reviewed draft.',
+  storySoFar: 'The test began.',
+  keyEvents: [],
+  imagePrompts: [],
+  suggestions: [],
+};
+
+test('xAI-compatible and native Gemini adapters produce reviewable drafts without fallback', async (t) => {
+  const originalFetch = globalThis.fetch;
+  t.after(() => {
+    globalThis.fetch = originalFetch;
+  });
+  const calls = [];
+  globalThis.fetch = async (url, options) => {
+    calls.push({ url: String(url), body: JSON.parse(options.body) });
+    if (String(url).includes('generativelanguage')) {
+      return new Response(
+        JSON.stringify({
+          candidates: [{ content: { parts: [{ text: JSON.stringify(validDraft) }] } }],
+        }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } },
+      );
+    }
+    return new Response(JSON.stringify({ output_text: JSON.stringify(validDraft) }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  };
+  const config = normalizeAiConfig({
+    providers: {
+      xai: { apiKey: 'xai-secret' },
+      gemini: { apiKey: 'gemini-secret' },
+    },
+  });
+  const xai = await processNotesWithText({
+    config,
+    campaign: minimalCampaign,
+    notes: 'The party tested the compatible provider carefully.',
+    language: 'English',
+    selection: { provider: 'xai', model: 'grok-4-1-fast' },
+  });
+  const gemini = await processNotesWithText({
+    config,
+    campaign: minimalCampaign,
+    notes: 'The party tested the native provider carefully.',
+    language: 'English',
+    selection: { provider: 'gemini', model: 'gemini-2.5-flash' },
+  });
+  assert.equal(xai.draft.title, validDraft.title);
+  assert.equal(gemini.draft.title, validDraft.title);
+  assert.match(calls[0].url, /api\.x\.ai\/v1\/responses/);
+  assert.match(calls[1].url, /generativelanguage.*generateContent/);
+  assert.equal(calls.length, 2, 'each task uses exactly the selected provider');
+});
+
+test('Gemini image output is accepted only through an image-capable model', async (t) => {
+  const originalFetch = globalThis.fetch;
+  t.after(() => {
+    globalThis.fetch = originalFetch;
+  });
+  globalThis.fetch = async () =>
+    new Response(
+      JSON.stringify({
+        candidates: [
+          { content: { parts: [{ inlineData: { mimeType: 'image/png', data: 'aGVsbG8=' } }] } },
+        ],
+      }),
+      { status: 200, headers: { 'Content-Type': 'application/json' } },
+    );
+  const config = normalizeAiConfig({ providers: { gemini: { apiKey: 'gemini-secret' } } });
+  const result = await generateDraftImages({
+    config,
+    prompts: [{ caption: 'Test', alt: 'Test', prompt: 'A calm test', afterSection: 0 }],
+    selection: { provider: 'gemini', model: 'gemini-2.5-flash-image' },
+    limit: 1,
+  });
+  assert.equal(result.images[0].dataUrl, 'data:image/png;base64,aGVsbG8=');
 });

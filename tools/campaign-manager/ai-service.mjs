@@ -1,5 +1,12 @@
 import { randomUUID } from 'node:crypto';
 
+import {
+  assertEngineCapability,
+  isRemoteProvider,
+  providerModel,
+  REMOTE_PROVIDER_REGISTRY,
+} from './ai-providers.mjs';
+
 export const SESSION_DRAFT_SCHEMA = Object.freeze({
   type: 'object',
   additionalProperties: false,
@@ -256,20 +263,118 @@ async function jsonRequest(url, options, label) {
   const result = await response.json().catch(() => ({}));
   if (!response.ok) {
     const message = result.error?.message || result.error || result.message || response.statusText;
-    throw new Error(`${label} error: ${message}`);
+    const retryAfter = response.headers.get('retry-after');
+    const requestId =
+      response.headers.get('x-request-id') || response.headers.get('request-id') || '';
+    const details = [
+      `${label} request failed (${response.status})`,
+      String(message || '').trim(),
+      retryAfter ? `retry after ${retryAfter}` : '',
+      requestId ? `request ${requestId}` : '',
+    ].filter(Boolean);
+    throw new Error(details.join(' · '));
   }
   return result;
 }
 
-function selectedTextEngine(config, selection) {
-  const provider = selection?.provider || config.text.provider;
-  if (!['ollama', 'openai'].includes(provider))
-    throw new Error('Choose a prose or prompt model for this task.');
-  const model = String(
-    selection?.model || (provider === 'ollama' ? config.text.ollamaModel : config.text.openaiModel),
-  ).trim();
+function selectedEngine(config, selection, role) {
+  const fallback = config.roles?.[role] ?? {};
+  const provider = String(selection?.provider || fallback.provider || '').trim();
+  const model = String(selection?.model || fallback.model || '').trim();
   if (!model) throw new Error('Choose a model for this task.');
-  return { provider, model };
+  return assertEngineCapability(config, { provider, model }, role);
+}
+
+function dataUrlPart(image) {
+  const match = String(image || '').match(/^data:([^;]+);base64,(.+)$/s);
+  if (!match) throw new Error('A source image is not a valid base64 data URL.');
+  return { mimeType: match[1], data: match[2] };
+}
+
+function remoteProviderConfig(config, providerId) {
+  const metadata = REMOTE_PROVIDER_REGISTRY[providerId];
+  const provider = config.providers?.[providerId];
+  if (!metadata || !provider) throw new Error('The selected remote provider is unavailable.');
+  if (!provider.apiKey) throw new Error(`Add the ${metadata.label} API key in AI setup first.`);
+  return { metadata, provider };
+}
+
+function extractGeminiText(response) {
+  return (response.candidates ?? [])
+    .flatMap((candidate) => candidate.content?.parts ?? [])
+    .map((part) => part.text || '')
+    .join('');
+}
+
+async function openAiCompatibleStructured({
+  config,
+  engine,
+  prompt,
+  schema,
+  schemaName,
+  role,
+  images,
+  webSearch,
+}) {
+  const { metadata, provider } = remoteProviderConfig(config, engine.provider);
+  const result = await jsonRequest(
+    `${provider.baseUrl}/responses`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${provider.apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: engine.model,
+        store: false,
+        instructions: role,
+        input: images.length
+          ? [
+              {
+                role: 'user',
+                content: [
+                  { type: 'input_text', text: prompt },
+                  ...images.map((image) => ({ type: 'input_image', image_url: image })),
+                ],
+              },
+            ]
+          : prompt,
+        ...(webSearch ? { tools: [{ type: 'web_search' }] } : {}),
+        text: { format: { type: 'json_schema', name: schemaName, strict: true, schema } },
+      }),
+    },
+    metadata.label,
+  );
+  return extractOpenAiText(result);
+}
+
+async function geminiStructured({ config, engine, prompt, schema, role, images, webSearch }) {
+  const { metadata, provider } = remoteProviderConfig(config, engine.provider);
+  const url = new URL(
+    `${provider.baseUrl}/models/${encodeURIComponent(engine.model)}:generateContent`,
+  );
+  url.searchParams.set('key', provider.apiKey);
+  const parts = [{ text: `${role}\n\n${prompt}` }];
+  for (const image of images) parts.push({ inlineData: dataUrlPart(image) });
+  const result = await jsonRequest(
+    url,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ role: 'user', parts }],
+        ...(webSearch ? { tools: [{ googleSearch: {} }] } : {}),
+        generationConfig: {
+          temperature: 0.2,
+          responseMimeType: 'application/json',
+          responseJsonSchema: schema,
+        },
+      }),
+    },
+    metadata.label,
+  );
+  return extractGeminiText(result);
 }
 
 async function structuredTextRequest({
@@ -279,10 +384,11 @@ async function structuredTextRequest({
   schema,
   schemaName,
   role,
+  taskRole,
   images = [],
   webSearch = false,
 }) {
-  const engine = selectedTextEngine(config, selection);
+  const engine = selectedEngine(config, selection, taskRole);
   if (engine.provider === 'ollama') {
     if (webSearch) throw new Error('Roll20 URL import requires a browser-capable remote model.');
     const result = await jsonRequest(
@@ -311,37 +417,28 @@ async function structuredTextRequest({
     );
     return { value: result.message?.content, engine };
   }
-  if (!config.text.openaiApiKey) throw new Error('Add an OpenAI API key in AI setup first.');
-  const result = await jsonRequest(
-    'https://api.openai.com/v1/responses',
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${config.text.openaiApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: engine.model,
-        store: false,
-        instructions: role,
-        input: images.length
-          ? [
-              {
-                role: 'user',
-                content: [
-                  { type: 'input_text', text: prompt },
-                  ...images.map((image) => ({ type: 'input_image', image_url: image })),
-                ],
-              },
-            ]
-          : prompt,
-        ...(webSearch ? { tools: [{ type: 'web_search' }] } : {}),
-        text: { format: { type: 'json_schema', name: schemaName, strict: true, schema } },
-      }),
-    },
-    'OpenAI',
-  );
-  return { value: extractOpenAiText(result), engine };
+  if (
+    webSearch &&
+    !providerModel(config, engine.provider, engine.model)?.capabilities.includes('web')
+  ) {
+    throw new Error('The selected model does not support public web-source access.');
+  }
+  if (!isRemoteProvider(engine.provider)) throw new Error('Unsupported text provider.');
+  const transport = REMOTE_PROVIDER_REGISTRY[engine.provider].transport;
+  const value =
+    transport === 'gemini'
+      ? await geminiStructured({ config, engine, prompt, schema, role, images, webSearch })
+      : await openAiCompatibleStructured({
+          config,
+          engine,
+          prompt,
+          schema,
+          schemaName,
+          role,
+          images,
+          webSearch,
+        });
+  return { value, engine };
 }
 
 export async function importEntityWithAi({
@@ -377,6 +474,7 @@ export async function importEntityWithAi({
     schema: ENTITY_IMPORT_SCHEMA,
     schemaName: 'campaign_entity_import',
     role: 'You are a meticulous tabletop character-sheet archivist.',
+    taskRole: 'extraction',
     images: cleanImages,
     webSearch: Boolean(cleanUrl),
   });
@@ -394,6 +492,7 @@ export async function processNotesWithText({ config, campaign, notes, language, 
     schema: SESSION_DRAFT_SCHEMA,
     schemaName: 'campaign_session_draft',
     role: 'You are a careful tabletop campaign chronicler.',
+    taskRole: 'prose',
   });
   return { draft: parseDraft(result.value), engine: result.engine };
 }
@@ -413,6 +512,7 @@ export async function generateImagePromptsWithText({
     schema: IMAGE_PROMPT_SCHEMA,
     schemaName: 'campaign_image_prompt_plan',
     role: 'You are a precise tabletop art director. Plan images; do not rewrite the chronicle.',
+    taskRole: 'imagePrompt',
   });
   const parsed = typeof result.value === 'string' ? JSON.parse(result.value) : result.value;
   return {
@@ -489,14 +589,14 @@ async function comfyImage(config, prompt, checkpoint) {
   throw new Error('ComfyUI image generation timed out.');
 }
 
-async function openAiImage(config, prompt, model) {
-  if (!config.text.openaiApiKey) throw new Error('Add an OpenAI API key in AI setup first.');
+async function compatibleRemoteImage(config, providerId, prompt, model) {
+  const { metadata, provider } = remoteProviderConfig(config, providerId);
   const result = await jsonRequest(
-    'https://api.openai.com/v1/images/generations',
+    `${provider.baseUrl}/images/generations`,
     {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${config.text.openaiApiKey}`,
+        Authorization: `Bearer ${provider.apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -507,29 +607,54 @@ async function openAiImage(config, prompt, model) {
         output_format: 'webp',
       }),
     },
-    'OpenAI Images',
+    `${metadata.label} Images`,
   );
   const base64 = result.data?.[0]?.b64_json;
-  if (!base64) throw new Error('OpenAI did not return image data.');
-  return `data:image/webp;base64,${base64}`;
+  if (base64) return `data:image/webp;base64,${base64}`;
+  const remoteUrl = result.data?.[0]?.url;
+  if (remoteUrl) {
+    const response = await fetch(remoteUrl, { signal: AbortSignal.timeout(60_000) });
+    if (!response.ok) throw new Error(`${metadata.label} image download failed.`);
+    const mime = response.headers.get('content-type') || 'image/webp';
+    return `data:${mime};base64,${Buffer.from(await response.arrayBuffer()).toString('base64')}`;
+  }
+  throw new Error(`${metadata.label} did not return image data.`);
+}
+
+async function geminiImage(config, providerId, prompt, model) {
+  const { metadata, provider } = remoteProviderConfig(config, providerId);
+  const url = new URL(`${provider.baseUrl}/models/${encodeURIComponent(model)}:generateContent`);
+  url.searchParams.set('key', provider.apiKey);
+  const result = await jsonRequest(
+    url,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: { responseModalities: ['TEXT', 'IMAGE'] },
+      }),
+    },
+    `${metadata.label} Images`,
+  );
+  const image = (result.candidates ?? [])
+    .flatMap((candidate) => candidate.content?.parts ?? [])
+    .map((part) => part.inlineData ?? part.inline_data)
+    .find((part) => part?.data);
+  if (!image) throw new Error(`${metadata.label} did not return image data.`);
+  return `data:${image.mimeType || image.mime_type || 'image/png'};base64,${image.data}`;
 }
 
 export async function generateDraftImages({ config, prompts, selection, limit = 2 }) {
-  const provider = selection?.provider || config.image.provider;
-  if (!['comfyui', 'openai'].includes(provider))
-    throw new Error('Choose an image renderer for this task.');
-  const model = String(
-    selection?.model ||
-      (provider === 'comfyui' ? config.image.comfyCheckpoint : config.image.openaiModel),
-  ).trim();
-  if (!model) throw new Error('Choose an image-rendering model for this task.');
+  const { provider, model } = selectedEngine(config, selection, 'image');
   const selected = prompts.slice(0, limit);
   const images = [];
   for (const item of selected) {
-    const dataUrl =
-      provider === 'comfyui'
-        ? await comfyImage(config, item.prompt, model)
-        : await openAiImage(config, item.prompt, model);
+    let dataUrl;
+    if (provider === 'comfyui') dataUrl = await comfyImage(config, item.prompt, model);
+    else if (REMOTE_PROVIDER_REGISTRY[provider]?.transport === 'gemini') {
+      dataUrl = await geminiImage(config, provider, item.prompt, model);
+    } else dataUrl = await compatibleRemoteImage(config, provider, item.prompt, model);
     images.push({ ...item, dataUrl });
   }
   return { images, engine: { provider, model } };
@@ -555,27 +680,41 @@ export async function discoverLocalModels(config, kind) {
   throw new Error('Unknown model discovery kind.');
 }
 
-export async function testAiProvider(config, kind) {
-  if (kind === 'text' && config.text.provider === 'ollama') {
+export async function discoverRemoteModels(config, providerId) {
+  const { metadata, provider } = remoteProviderConfig(config, providerId);
+  const url = new URL(`${provider.baseUrl}/models`);
+  if (metadata.transport === 'gemini') url.searchParams.set('key', provider.apiKey);
+  const result = await jsonRequest(
+    url,
+    metadata.transport === 'gemini'
+      ? { headers: { Accept: 'application/json' } }
+      : { headers: { Authorization: `Bearer ${provider.apiKey}` } },
+    metadata.label,
+  );
+  const models = result.data ?? result.models ?? [];
+  return models
+    .map((model) => String(model.id || model.name || '').replace(/^models\//, ''))
+    .filter(Boolean);
+}
+
+export async function testAiProvider(config, selection) {
+  const kind = typeof selection === 'string' ? selection : selection?.kind;
+  const providerId = typeof selection === 'object' ? selection.provider : null;
+  if (kind === 'text' && (providerId || config.text.provider) === 'ollama') {
     await jsonRequest(`${config.text.ollamaUrl}/api/tags`, {}, 'Ollama');
     return 'Ollama is reachable.';
   }
-  if (kind === 'image' && config.image.provider === 'comfyui') {
+  if (kind === 'image' && (providerId || config.image.provider) === 'comfyui') {
     await jsonRequest(`${config.image.comfyUrl}/system_stats`, {}, 'ComfyUI');
     return 'ComfyUI is reachable.';
   }
-  if (kind === 'text' && config.text.provider === 'openai') {
-    if (!config.text.openaiApiKey) throw new Error('Add an OpenAI API key first.');
-    await jsonRequest(
-      'https://api.openai.com/v1/models',
-      { headers: { Authorization: `Bearer ${config.text.openaiApiKey}` } },
-      'OpenAI',
-    );
-    return 'OpenAI is reachable and the API key was accepted.';
-  }
-  if (kind === 'image' && config.image.provider === 'openai') {
-    if (!config.text.openaiApiKey) throw new Error('Add an OpenAI API key first.');
-    return 'OpenAI Images will use the configured API key.';
+  const remoteId =
+    providerId ||
+    (kind === 'image' ? config.roles?.image?.provider : config.roles?.prose?.provider);
+  if (isRemoteProvider(remoteId)) {
+    const { metadata } = remoteProviderConfig(config, remoteId);
+    await discoverRemoteModels(config, remoteId);
+    return `${metadata.label} is reachable and the API key was accepted.`;
   }
   throw new Error(`Choose a ${kind} provider first.`);
 }

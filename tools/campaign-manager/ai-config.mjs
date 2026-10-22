@@ -4,6 +4,8 @@ import { mkdir, readFile, stat, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { promisify } from 'node:util';
 
+import { normalizeProviderModels, REMOTE_PROVIDER_REGISTRY } from './ai-providers.mjs';
+
 const execFileAsync = promisify(execFile);
 
 export const TEXT_MODELS = Object.freeze([
@@ -59,6 +61,22 @@ export const IMAGE_MODELS = Object.freeze([
 
 const DEFAULT_CONFIG = Object.freeze({
   setupComplete: false,
+  roles: {
+    prose: { provider: 'off', model: '' },
+    extraction: { provider: 'off', model: '' },
+    imagePrompt: { provider: 'off', model: '' },
+    image: { provider: 'off', model: '' },
+  },
+  providers: Object.fromEntries(
+    Object.values(REMOTE_PROVIDER_REGISTRY).map((provider) => [
+      provider.id,
+      {
+        apiKey: '',
+        baseUrl: provider.defaultBaseUrl,
+        models: provider.defaultModels,
+      },
+    ]),
+  ),
   text: {
     provider: 'off',
     ollamaUrl: 'http://127.0.0.1:11434',
@@ -110,6 +128,26 @@ function modelCatalog(value, defaults, selected) {
     .slice(0, 50);
 }
 
+function remoteBaseUrl(value, fallback) {
+  try {
+    const url = new URL(String(value || fallback));
+    const local = ['127.0.0.1', 'localhost', '[::1]'].includes(url.hostname);
+    if (url.protocol !== 'https:' && !(local && url.protocol === 'http:')) throw new Error();
+    return url.href.replace(/\/$/, '');
+  } catch {
+    throw new Error('Remote provider URLs must use HTTPS (or localhost for development).');
+  }
+}
+
+function roleSelection(value, fallback) {
+  return {
+    provider: String(value?.provider || fallback?.provider || 'off').slice(0, 40),
+    model: String(value?.model || fallback?.model || '')
+      .trim()
+      .slice(0, 180),
+  };
+}
+
 export function normalizeAiConfig(input = {}, previous = cloneDefaults()) {
   const textProvider = ['off', 'ollama', 'openai'].includes(input.text?.provider)
     ? input.text.provider
@@ -133,8 +171,73 @@ export function normalizeAiConfig(input = {}, previous = cloneDefaults()) {
   const openaiImageModel = String(
     input.image?.openaiModel || DEFAULT_CONFIG.image.openaiModel,
   ).slice(0, 100);
+  const providers = {};
+  for (const provider of Object.values(REMOTE_PROVIDER_REGISTRY)) {
+    const requested = input.providers?.[provider.id] ?? {};
+    const current = previous.providers?.[provider.id] ?? DEFAULT_CONFIG.providers[provider.id];
+    const legacyOpenAi = provider.id === 'openai';
+    const requestedKey = String(
+      requested.apiKey ?? (legacyOpenAi ? input.text?.openaiApiKey : '') ?? '',
+    ).trim();
+    const currentKey = String(
+      current.apiKey ?? (legacyOpenAi ? previous.text?.openaiApiKey : '') ?? '',
+    ).trim();
+    const legacyModels = legacyOpenAi
+      ? [
+          ...(input.text?.openaiModels ?? previous.text?.openaiModels ?? []),
+          ...(input.image?.openaiModels ?? previous.image?.openaiModels ?? []),
+        ].map((id) => ({
+          id,
+          capabilities: String(id).includes('image')
+            ? ['image-generation']
+            : ['text', 'structured-output', 'vision', 'image-prompt', 'web'],
+        }))
+      : [];
+    providers[provider.id] = {
+      apiKey: requested.removeApiKey === true ? '' : requestedKey || currentKey,
+      baseUrl: remoteBaseUrl(requested.baseUrl, current.baseUrl || provider.defaultBaseUrl),
+      models: normalizeProviderModels(requested.models, [
+        ...provider.defaultModels,
+        ...(current.models ?? []),
+        ...legacyModels,
+      ]),
+    };
+  }
+  const legacyText =
+    textProvider === 'off'
+      ? { provider: 'off', model: '' }
+      : {
+          provider: textProvider,
+          model: textProvider === 'ollama' ? ollamaModel : openaiTextModel,
+        };
+  const legacyImage =
+    imageProvider === 'off'
+      ? { provider: 'off', model: '' }
+      : {
+          provider: imageProvider,
+          model: imageProvider === 'comfyui' ? comfyCheckpoint : openaiImageModel,
+        };
+  const textRoleFallback = input.text?.provider
+    ? legacyText
+    : (previous.roles?.prose ?? legacyText);
+  const extractionRoleFallback = input.text?.provider
+    ? legacyText
+    : (previous.roles?.extraction ?? legacyText);
+  const promptRoleFallback = input.text?.provider
+    ? legacyText
+    : (previous.roles?.imagePrompt ?? legacyText);
+  const imageRoleFallback = input.image?.provider
+    ? legacyImage
+    : (previous.roles?.image ?? legacyImage);
   return {
     setupComplete: Boolean(input.setupComplete),
+    roles: {
+      prose: roleSelection(input.roles?.prose, textRoleFallback),
+      extraction: roleSelection(input.roles?.extraction, extractionRoleFallback),
+      imagePrompt: roleSelection(input.roles?.imagePrompt, promptRoleFallback),
+      image: roleSelection(input.roles?.image, imageRoleFallback),
+    },
+    providers,
     text: {
       provider: textProvider,
       ollamaUrl: httpLocalhost(input.text?.ollamaUrl, DEFAULT_CONFIG.text.ollamaUrl),
@@ -194,6 +297,16 @@ export async function writeAiConfig(projectRoot, input) {
 export function publicAiConfig(config) {
   return {
     ...config,
+    providers: Object.fromEntries(
+      Object.entries(config.providers ?? {}).map(([id, provider]) => [
+        id,
+        {
+          ...provider,
+          apiKey: undefined,
+          keyConfigured: Boolean(provider.apiKey),
+        },
+      ]),
+    ),
     text: {
       ...config.text,
       openaiApiKey: undefined,

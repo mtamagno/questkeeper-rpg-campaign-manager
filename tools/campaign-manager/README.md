@@ -63,9 +63,11 @@ then enter the summary and key events in the **Sessions** tab. Both workflows
 produce the same campaign archive. In either case, the session editor can turn
 reviewed notes into a fully editable draft with **Process notes**, or add
 illustrations with **Process notes with images**. Local Ollama and ComfyUI
-providers and an opt-in OpenAI API provider share the same guided setup.
-Every processing run exposes separate choices for the prose writer, the text
-model that plans visual prompts and the model that renders the images. Before
+providers share the same guided setup with opt-in OpenAI, xAI/Grok and Gemini
+accounts. Explicit capability tags prevent a text-only model from being
+offered as an image renderer. Every processing run exposes separate choices
+for the prose writer, sheet extractor, text model that plans visual prompts
+and model that renders the images. Before
 saving, the Game Master chooses the precise chronicle scene where each image
 appears and can edit its caption and accessibility text.
 

@@ -79,15 +79,17 @@ Open **AI setup** from the sidebar at any time—not only during installation.
 The hardware scan recommends practical choices based on CPU, RAM and detected
 graphics memory.
 
-| Need                            | Local option         | Remote option        |
-| ------------------------------- | -------------------- | -------------------- |
-| Prose and structured extraction | Ollama               | OpenAI API           |
-| Image generation                | ComfyUI              | OpenAI API           |
-| Manual work                     | No provider required | No provider required |
+| Need                            | Local option         | Remote option                         |
+| ------------------------------- | -------------------- | ------------------------------------- |
+| Prose and structured extraction | Ollama               | OpenAI, xAI/Grok or Gemini            |
+| Image-prompt planning           | Ollama               | Any configured capable text model     |
+| Image generation                | ComfyUI              | Any configured image-capable provider |
+| Manual work                     | No provider required | No provider required                  |
 
 You can discover installed models, add custom model IDs, change defaults and
-test providers. API keys stay in an ignored local configuration file and are
-never returned to the browser after saving. Remote tasks require explicit
+test providers. Prose, sheet extraction, prompt planning and rendering can use
+different engines. API keys stay in an ignored local configuration file and
+are never returned to the browser after saving. Remote tasks require explicit
 consent and may incur provider charges.
 
 See [AI Setup](AI-SETUP.md) for model roles, downloads, licenses and privacy.

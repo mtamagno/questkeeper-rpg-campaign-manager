@@ -29,12 +29,18 @@ import {
 } from './ai-config.mjs';
 import {
   discoverLocalModels,
+  discoverRemoteModels,
   generateDraftImages,
   generateImagePromptsWithText,
   importEntityWithAi,
   processNotesWithText,
   testAiProvider,
 } from './ai-service.mjs';
+import {
+  assertEngineCapability,
+  isRemoteProvider,
+  publicProviderRegistry,
+} from './ai-providers.mjs';
 import {
   publicPublishingConfig,
   readPublishingConfig,
@@ -188,31 +194,20 @@ async function pullOllamaModel(modelId) {
   });
 }
 
-function taskEngine(input, config, kind) {
-  const isText = kind !== 'image';
-  const fallbackProvider = isText ? config.text.provider : config.image.provider;
-  const provider = String(input?.provider || fallbackProvider);
-  const allowedProviders = isText ? ['ollama', 'openai'] : ['comfyui', 'openai'];
-  if (!allowedProviders.includes(provider))
-    throw new Error(`Choose a ${kind} model for this task.`);
-  const fallbackModel = isText
-    ? provider === 'ollama'
-      ? config.text.ollamaModel
-      : config.text.openaiModel
-    : provider === 'comfyui'
-      ? config.image.comfyCheckpoint
-      : config.image.openaiModel;
-  const model = String(input?.model || fallbackModel).trim();
-  const catalog = isText
-    ? provider === 'ollama'
-      ? config.text.ollamaModels
-      : config.text.openaiModels
-    : provider === 'comfyui'
-      ? config.image.comfyCheckpoints
-      : config.image.openaiModels;
-  if (!model || !catalog.includes(model))
-    throw new Error(`The selected ${kind} model is not in the saved AI model catalog.`);
-  return { provider, model };
+function taskEngine(input, config, role) {
+  const fallback = config.roles?.[role] ?? {};
+  const provider = String(input?.provider || fallback.provider || '').trim();
+  const model = String(input?.model || fallback.model || '').trim();
+  if (!provider || provider === 'off' || !model)
+    throw new Error(`Choose a compatible ${role} model for this task.`);
+  if (provider === 'ollama') {
+    if (role === 'image' || !config.text.ollamaModels.includes(model))
+      throw new Error(`The selected ${role} model is not in the saved AI model catalog.`);
+  } else if (provider === 'comfyui') {
+    if (role !== 'image' || !config.image.comfyCheckpoints.includes(model))
+      throw new Error(`The selected ${role} model is not in the saved AI model catalog.`);
+  }
+  return assertEngineCapability(config, { provider, model }, role);
 }
 
 async function downloadImageModel(input) {
@@ -429,6 +424,7 @@ async function projectStatus() {
     companion,
     ai: {
       config: publicAiConfig(aiConfig),
+      registry: publicProviderRegistry(),
       hardware,
       recommendations: recommendModels(hardware),
       models: { text: TEXT_MODELS, image: IMAGE_MODELS },
@@ -534,7 +530,7 @@ async function routeApi(request, response, url) {
   if (request.method === 'POST' && url.pathname === '/api/ai/test') {
     const body = await readBody(request);
     const config = await readAiConfig(PROJECT_ROOT);
-    sendJson(response, 200, { message: await testAiProvider(config, body.kind) });
+    sendJson(response, 200, { message: await testAiProvider(config, body) });
     return;
   }
   if (request.method === 'POST' && url.pathname === '/api/ai/models/text') {
@@ -550,9 +546,17 @@ async function routeApi(request, response, url) {
   if (request.method === 'POST' && url.pathname === '/api/ai/models/discover') {
     const input = await readBody(request);
     const config = await readAiConfig(PROJECT_ROOT);
-    const discovered = await discoverLocalModels(config, input.kind);
+    const discovered = input.provider
+      ? await discoverRemoteModels(config, input.provider)
+      : await discoverLocalModels(config, input.kind);
     const next = structuredClone(config);
-    if (input.kind === 'text') next.text.ollamaModels = [...next.text.ollamaModels, ...discovered];
+    if (input.provider) {
+      next.providers[input.provider].models = [
+        ...next.providers[input.provider].models,
+        ...discovered.map((id) => ({ id, capabilities: [] })),
+      ];
+    } else if (input.kind === 'text')
+      next.text.ollamaModels = [...next.text.ollamaModels, ...discovered];
     else if (input.kind === 'image')
       next.image.comfyCheckpoints = [...next.image.comfyCheckpoints, ...discovered];
     else throw new Error('Unknown model discovery kind.');
@@ -618,8 +622,8 @@ async function routeApi(request, response, url) {
   ) {
     const input = await readBody(request);
     const config = await readAiConfig(PROJECT_ROOT);
-    const engine = taskEngine(input.engine, config, 'entity');
-    if (engine.provider === 'openai' && input.remoteConsent !== true)
+    const engine = taskEngine(input.engine, config, 'extraction');
+    if (isRemoteProvider(engine.provider) && input.remoteConsent !== true)
       throw new Error('Confirm that these sheet sources may be sent to the remote provider.');
     const campaign = await getCampaign(PROJECT_ROOT, campaignId);
     const result = await importEntityWithAi({
@@ -647,13 +651,13 @@ async function routeApi(request, response, url) {
     const config = await readAiConfig(PROJECT_ROOT);
     const proseEngine = taskEngine(input.engines?.prose, config, 'prose');
     const promptEngine = input.includeImages
-      ? taskEngine(input.engines?.imagePrompt, config, 'image prompt')
+      ? taskEngine(input.engines?.imagePrompt, config, 'imagePrompt')
       : null;
     const imageEngine = input.includeImages
       ? taskEngine(input.engines?.image, config, 'image')
       : null;
-    const usesRemote = [proseEngine, promptEngine, imageEngine].some(
-      (engine) => engine?.provider === 'openai',
+    const usesRemote = [proseEngine, promptEngine, imageEngine].some((engine) =>
+      isRemoteProvider(engine?.provider),
     );
     if (usesRemote && input.remoteConsent !== true) {
       throw new Error('Confirm that these notes may be sent to the configured remote provider.');

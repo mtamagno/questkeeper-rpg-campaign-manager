@@ -58,7 +58,7 @@ async function api(path, options = {}) {
     },
   });
   const result = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(result.error || `Error ${response.status}`);
+  if (!response.ok) throw new Error(translate(result.error || `Error ${response.status}`));
   return result;
 }
 
@@ -393,62 +393,59 @@ function parseEngineValue(value) {
   return { provider: value.slice(0, separator), model: value.slice(separator + 2) };
 }
 
-function engineChoices(kind) {
+const AI_ROLE_CAPABILITIES = {
+  prose: ['text', 'structured-output'],
+  extraction: ['text', 'structured-output', 'vision'],
+  imagePrompt: ['text', 'structured-output', 'image-prompt'],
+  image: ['image-generation'],
+};
+
+function engineChoices(role) {
   const config = state.project.ai?.config;
   if (!config) return [];
-  if (kind === 'text') {
-    return [
-      ...(config.text.ollamaModels ?? []).map((model) => ({
-        value: engineValue('ollama', model),
-        label: `Local · Ollama · ${model}`,
-      })),
-      ...(config.text.openaiKeyConfigured ? config.text.openaiModels : []).map((model) => ({
-        value: engineValue('openai', model),
-        label: `Remote · OpenAI · ${model}`,
-      })),
-    ];
-  }
-  return [
-    ...(config.image.comfyCheckpoints ?? []).map((model) => ({
-      value: engineValue('comfyui', model),
-      label: `Local · ComfyUI · ${model}`,
-    })),
-    ...(config.text.openaiKeyConfigured ? config.image.openaiModels : []).map((model) => ({
-      value: engineValue('openai', model),
-      label: `Remote · OpenAI · ${model}`,
-    })),
-  ];
+  const local =
+    role === 'image'
+      ? (config.image.comfyCheckpoints ?? []).map((model) => ({
+          value: engineValue('comfyui', model),
+          label: `Local · ComfyUI · ${model}`,
+        }))
+      : (config.text.ollamaModels ?? []).map((model) => ({
+          value: engineValue('ollama', model),
+          label: `Local · Ollama · ${model}`,
+        }));
+  const required = AI_ROLE_CAPABILITIES[role] ?? [];
+  const remote = (state.project.ai.registry ?? []).flatMap((provider) => {
+    const saved = config.providers?.[provider.id];
+    if (!saved?.keyConfigured) return [];
+    return (saved.models ?? [])
+      .filter((model) => required.every((capability) => model.capabilities?.includes(capability)))
+      .map((model) => ({
+        value: engineValue(provider.id, model.id),
+        label: `Remote · ${provider.label} · ${model.id}`,
+      }));
+  });
+  return [...local, ...remote];
 }
 
-function defaultEngineValue(kind) {
+function defaultEngineValue(role) {
   const config = state.project.ai?.config;
   if (!config) return '';
-  const provider = kind === 'text' ? config.text.provider : config.image.provider;
-  if (provider === 'off') {
-    return kind === 'text'
-      ? engineValue('ollama', config.text.ollamaModel)
-      : engineValue('comfyui', config.image.comfyCheckpoint);
+  const configured = config.roles?.[role];
+  if (configured?.provider && configured.provider !== 'off' && configured.model) {
+    return engineValue(configured.provider, configured.model);
   }
-  const model =
-    kind === 'text'
-      ? provider === 'ollama'
-        ? config.text.ollamaModel
-        : config.text.openaiModel
-      : provider === 'comfyui'
-        ? config.image.comfyCheckpoint
-        : config.image.openaiModel;
-  return engineValue(provider, model);
+  return engineChoices(role)[0]?.value ?? '';
 }
 
-function engineSelect(name, label, kind, hint) {
-  const choices = engineChoices(kind);
-  const selected = defaultEngineValue(kind);
+function engineSelect(name, label, role, hint) {
+  const choices = engineChoices(role);
+  const selected = defaultEngineValue(role);
   return `<label class="field"><span>${escapeHtml(label)}</span><select name="${name}">${choices.length ? choices.map((item) => `<option value="${escapeHtml(item.value)}" ${item.value === selected ? 'selected' : ''}>${escapeHtml(item.label)}</option>`).join('') : '<option value="">Configure a model first</option>'}</select><small>${escapeHtml(hint)}</small></label>`;
 }
 
 function entityAiImportPanel(type, languages) {
   const label = type === 'characters' ? 'player character' : 'NPC';
-  return `<div class="ai-compose entity-ai-import field--wide"><div><strong>Import this ${label} with AI</strong><small>Use photos or screenshots of a sheet, or a public/shared Roll20 print-view URL. Every extracted field stays editable.</small></div><div class="ai-source-grid">${engineSelect('entityEngine', 'Extraction model', 'text', 'Vision support is required for sheet images. Browser-capable remote models can inspect public URLs.')}<label class="field"><span>Draft language</span><select name="entityLanguage">${languages.map((language) => `<option value="${escapeHtml(language)}">${escapeHtml(languageName(language))} (${escapeHtml(language)})</option>`).join('')}</select></label><label class="field field--wide"><span>Sheet photos or screenshots</span><input name="aiSourceImages" type="file" accept="image/png,image/jpeg,image/webp" multiple /><small>Up to four images. Private/authenticated Roll20 sheets should be imported this way.</small></label><label class="field field--wide"><span>Public Roll20 print view or source URL</span><input name="aiSourceUrl" type="url" placeholder="https://app.roll20.net/…" /><small>Optional. Signed-in pages cannot be read remotely; use screenshots instead.</small></label></div><label class="consent-check"><input name="entityRemoteConsent" type="checkbox" /> I consent to sending these sources to the selected engine when it is labelled <strong>Remote</strong>.</label><div class="action-row"><button class="primary-button" type="button" data-ai-entity="${type}">Extract editable draft</button></div><div class="ai-review" data-ai-entity-review hidden></div></div>`;
+  return `<div class="ai-compose entity-ai-import field--wide"><div><strong>Import this ${label} with AI</strong><small>Use photos or screenshots of a sheet, or a public/shared Roll20 print-view URL. Every extracted field stays editable.</small></div><div class="ai-source-grid">${engineSelect('entityEngine', 'Extraction model', 'extraction', 'Only configured models with structured output and vision appear here. Public URL access also requires web capability.')}<label class="field"><span>Draft language</span><select name="entityLanguage">${languages.map((language) => `<option value="${escapeHtml(language)}">${escapeHtml(languageName(language))} (${escapeHtml(language)})</option>`).join('')}</select></label><label class="field field--wide"><span>Sheet photos or screenshots</span><input name="aiSourceImages" type="file" accept="image/png,image/jpeg,image/webp" multiple /><small>Up to four images. Private/authenticated Roll20 sheets should be imported this way.</small></label><label class="field field--wide"><span>Public Roll20 print view or source URL</span><input name="aiSourceUrl" type="url" placeholder="https://app.roll20.net/…" /><small>Optional. Signed-in pages cannot be read remotely; use screenshots instead.</small></label></div><label class="consent-check"><input name="entityRemoteConsent" type="checkbox" /> I consent to sending these sources to the selected engine when it is labelled <strong>Remote</strong>.</label><div class="action-row"><button class="primary-button" type="button" data-ai-entity="${type}">Extract editable draft</button></div><div class="ai-review" data-ai-entity-review hidden></div></div>`;
 }
 
 function openDialog({ title, eyebrow, html, editor }) {
@@ -724,7 +721,7 @@ function entityForm(type, item = {}) {
           hint: 'The chosen translation is populated; the others remain available for review or later translation.',
         },
       ),
-      `<div class="ai-compose field--wide"><div><strong>Turn notes into a reviewable draft</strong><small>Choose the engine for each job. Nothing is saved until you review and choose Save.</small></div><div class="ai-engine-grid">${engineSelect('proseEngine', 'Prose writer', 'text', 'Turns raw notes into the editable chronicle.')}${engineSelect('imagePromptEngine', 'Visual prompt writer', 'text', 'Plans what to illustrate and where it belongs.')}${engineSelect('imageEngine', 'Image renderer', 'image', 'Renders the approved visual prompts.')}</div><div class="action-row"><button class="secondary-button" type="button" data-ai-notes="text">Process notes</button><button class="primary-button" type="button" data-ai-notes="images">Process notes with images</button></div><label class="consent-check"><input name="remoteConsent" type="checkbox" /> I consent to sending these notes to any selected engine labelled <strong>Remote</strong>. Local-only tasks do not require this.</label><div class="ai-review" data-ai-review hidden></div></div>`,
+      `<div class="ai-compose field--wide"><div><strong>Turn notes into a reviewable draft</strong><small>Choose the engine for each job. Nothing is saved until you review and choose Save.</small></div><div class="ai-engine-grid">${engineSelect('proseEngine', 'Prose writer', 'prose', 'Turns raw notes into the editable chronicle.')}${engineSelect('imagePromptEngine', 'Visual prompt writer', 'imagePrompt', 'Plans what to illustrate and where it belongs.')}${engineSelect('imageEngine', 'Image renderer', 'image', 'Renders the approved visual prompts.')}</div><div class="action-row"><button class="secondary-button" type="button" data-ai-notes="text">Process notes</button><button class="primary-button" type="button" data-ai-notes="images">Process notes with images</button></div><label class="consent-check"><input name="remoteConsent" type="checkbox" /> I consent to sending these notes to any selected engine labelled <strong>Remote</strong>. Local-only tasks do not require this.</label><div class="ai-review" data-ai-review hidden></div></div>`,
       section('Review and edit the draft'),
       ...localizedFields('title', 'Title', item.title, languages, { required: true }),
       ...localizedFields('location', 'Location', item.location, languages),
@@ -1163,6 +1160,17 @@ function modelNameOptions(items, selected) {
     .join('');
 }
 
+function providerModelLines(models) {
+  return (models ?? [])
+    .map((model) => `${model.id} | ${(model.capabilities ?? []).join(',')}`)
+    .join('\n');
+}
+
+function remoteProviderCard(provider, saved) {
+  const prefix = `provider__${provider.id}__`;
+  return `<section class="project-panel ai-provider-card"><span class="eyebrow">Remote provider · ${escapeHtml(provider.transport)}</span><h3>${escapeHtml(provider.label)}</h3><p>Register only models and capabilities verified for your account. Unknown capabilities remain unavailable to task selectors.</p><label class="field"><span>API base URL</span><input name="${prefix}baseUrl" type="url" value="${escapeHtml(saved.baseUrl)}" /></label><label class="field"><span>API key</span><input name="${prefix}apiKey" type="password" autocomplete="off" placeholder="${saved.keyConfigured ? 'Saved locally · leave blank to keep it' : 'Paste a provider key'}" /></label><label class="consent-check"><input name="${prefix}removeApiKey" type="checkbox" /> Remove the saved key</label><label class="field"><span>Model catalog and capabilities</span><textarea name="${prefix}models">${escapeHtml(providerModelLines(saved.models))}</textarea><small>One per line: <code>model-id | text,structured-output,vision,image-prompt,image-generation,web</code>.</small></label><div class="provider-help"><a href="${escapeHtml(provider.docsUrl)}" target="_blank" rel="noreferrer">API docs ↗</a><a href="${escapeHtml(provider.privacyUrl)}" target="_blank" rel="noreferrer">Privacy ↗</a><a href="${escapeHtml(provider.pricingUrl)}" target="_blank" rel="noreferrer">Pricing ↗</a></div><div class="action-row"><button class="secondary-button" type="button" data-ai-action="discover-provider" data-provider="${escapeHtml(provider.id)}">Discover models</button><button class="secondary-button" type="button" data-ai-action="test-provider" data-provider="${escapeHtml(provider.id)}">Test provider</button></div></section>`;
+}
+
 function renderAiSetup() {
   document.querySelector('#page-title').textContent = 'AI setup';
   const ai = state.project.ai;
@@ -1185,10 +1193,12 @@ function renderAiSetup() {
       <section class="project-panel guided-setup"><span class="eyebrow">Guided setup · about five minutes</span><h2>Three choices, always editable</h2><ol><li>Choose manual, local or remote creation.</li><li>Register or discover the models available to each provider.</li><li>Save the defaults; every session can still choose different models.</li></ol><small>Nothing is downloaded, uploaded or billed until you explicitly start that action.</small></section>
       <section class="ai-hero"><div class="ai-hero__sigil" aria-hidden="true">✧</div><div><span class="eyebrow">${config.setupComplete ? 'Permanent provider & model library' : 'Interactive first-run guide'}</span><h2>Your table, your choice of intelligence</h2><p>Keep everything local, connect a remote API, or leave AI off. Return here whenever you want to add a key, discover a newly installed model or change the defaults.</p></div></section>
       <section class="hardware-strip"><div><span>Processor</span><strong>${escapeHtml(hardware.cpu)}</strong><small>${hardware.logicalCores} logical cores</small></div><div><span>Memory</span><strong>${hardware.ramGb} GB RAM</strong><small>${hardware.freeRamGb} GB currently free</small></div><div><span>Graphics</span><strong>${escapeHtml(gpuText)}</strong><small>${escapeHtml(recommendations.imageReason)}</small></div></section>
+      <section class="project-panel"><span class="eyebrow">Independent task roles</span><h3>Choose the right engine for each job</h3><p>Only models whose saved capabilities match a role are offered. QuestKeeper never changes provider silently.</p><div class="ai-engine-grid">${engineSelect('roleProse', 'Prose & structured drafts', 'prose', 'Session prose and structured campaign drafts.')}${engineSelect('roleExtraction', 'Sheet extraction & vision', 'extraction', 'Character and NPC sheet images.')}${engineSelect('roleImagePrompt', 'Image-prompt planning', 'imagePrompt', 'Plans illustrations without rendering them.')}${engineSelect('roleImage', 'Image generation', 'image', 'Renders approved prompts.')}</div></section>
       <div class="choice-grid ai-provider-grid">
-        <section class="project-panel"><span class="eyebrow">The chronicler · prose & prompts</span><h3>Manage text engines</h3><label class="field"><span>Default provider</span><select name="textProvider"><option value="off" ${config.text.provider === 'off' ? 'selected' : ''}>Off · write manually</option><option value="ollama" ${config.text.provider === 'ollama' ? 'selected' : ''}>Local · Ollama</option><option value="openai" ${config.text.provider === 'openai' ? 'selected' : ''}>Remote · OpenAI API</option></select></label><label class="field"><span>Default Ollama model</span><select name="ollamaModel">${modelNameOptions(config.text.ollamaModels, config.setupComplete ? config.text.ollamaModel : recommendations.textModelId)}</select><small>Suggested for this machine: ${escapeHtml(recommendations.textModelId)}.</small></label><label class="field"><span>Ollama model catalog</span><textarea name="ollamaModels">${escapeHtml(config.text.ollamaModels.join('\n'))}</textarea><small>One model per line. You can add any model supported by your Ollama installation.</small></label><label class="field"><span>Ollama address</span><input name="ollamaUrl" value="${escapeHtml(config.text.ollamaUrl)}" /></label><div class="provider-help"><a href="https://ollama.com/download" target="_blank" rel="noreferrer">Install Ollama first ↗</a><span>Discover installed models or download the selected default.</span></div><div class="action-row"><button class="secondary-button" type="button" data-ai-action="discover-text">Discover installed</button><button class="secondary-button" type="button" data-ai-action="download-text">Download default</button><button class="secondary-button" type="button" data-ai-action="test-text">Test provider</button></div><hr /><label class="field"><span>Default OpenAI text model</span><select name="openaiTextModel">${modelNameOptions(config.text.openaiModels, config.text.openaiModel)}</select></label><label class="field"><span>OpenAI text-model catalog</span><textarea name="openaiTextModels">${escapeHtml(config.text.openaiModels.join('\n'))}</textarea><small>One model ID per line. These models become selectable per session.</small></label><label class="field"><span>OpenAI API key</span><input name="openaiApiKey" type="password" autocomplete="off" placeholder="${config.text.openaiKeyConfigured ? 'Saved locally · leave blank to keep it' : 'sk-…'}" /></label></section>
-        <section class="project-panel"><span class="eyebrow">The illustrator · images</span><h3>Manage image engines</h3><label class="field"><span>Default provider</span><select name="imageProvider"><option value="off" ${config.image.provider === 'off' ? 'selected' : ''}>Off · add images manually</option><option value="comfyui" ${config.image.provider === 'comfyui' ? 'selected' : ''}>Local · ComfyUI</option><option value="openai" ${config.image.provider === 'openai' ? 'selected' : ''}>Remote · OpenAI Images</option></select></label><div class="recommendation ${recommendations.localImageRecommended ? 'is-good' : 'is-caution'}"><strong>${recommendations.localImageRecommended ? 'Local generation looks viable' : 'Remote or manual art recommended'}</strong><span>${escapeHtml(recommendations.imageReason)}</span></div><label class="field"><span>ComfyUI address</span><input name="comfyUrl" value="${escapeHtml(config.image.comfyUrl)}" /></label><label class="field"><span>ComfyUI installation folder</span><input name="comfyRoot" value="${escapeHtml(config.image.comfyRoot)}" placeholder="C:\\ComfyUI" /><small>The folder must contain models/checkpoints.</small></label><label class="field"><span>Default ComfyUI checkpoint</span><select name="comfyCheckpoint">${modelNameOptions(config.image.comfyCheckpoints, config.image.comfyCheckpoint)}</select></label><label class="field"><span>ComfyUI checkpoint catalog</span><textarea name="comfyCheckpoints">${escapeHtml(config.image.comfyCheckpoints.join('\n'))}</textarea><small>Discover from a running ComfyUI instance or add a filename manually.</small></label><div class="provider-help"><a href="https://docs.comfy.org/installation/desktop" target="_blank" rel="noreferrer">Install ComfyUI first ↗</a><span>Keep it running while QuestKeeper illustrates a session.</span></div><div class="action-row"><button class="secondary-button" type="button" data-ai-action="discover-image">Discover installed</button><button class="secondary-button" type="button" data-ai-action="test-image">Test provider</button></div><hr /><label class="field"><span>Recommended checkpoint download</span><select name="imageModel">${optionList(models.image, recommendations.imageModelId)}</select></label><label class="consent-check"><input name="licenseAccepted" type="checkbox" /> I reviewed and accept the <a href="${escapeHtml(selectedImageModel.licenseUrl)}" target="_blank" rel="noreferrer">${escapeHtml(selectedImageModel.license)}</a>.</label><button class="secondary-button" type="button" data-ai-action="download-image">Download recommended checkpoint</button><hr /><label class="field"><span>Default OpenAI image model</span><select name="openaiImageModel">${modelNameOptions(config.image.openaiModels, config.image.openaiModel)}</select></label><label class="field"><span>OpenAI image-model catalog</span><textarea name="openaiImageModels">${escapeHtml(config.image.openaiModels.join('\n'))}</textarea><small>One model ID per line. The selected ID is sent on each image request.</small></label></section>
+        <section class="project-panel"><span class="eyebrow">Local chronicler</span><h3>Ollama</h3><label class="field"><span>Default Ollama model</span><select name="ollamaModel">${modelNameOptions(config.text.ollamaModels, config.setupComplete ? config.text.ollamaModel : recommendations.textModelId)}</select><small>Suggested for this machine: ${escapeHtml(recommendations.textModelId)}.</small></label><label class="field"><span>Ollama model catalog</span><textarea name="ollamaModels">${escapeHtml(config.text.ollamaModels.join('\n'))}</textarea></label><label class="field"><span>Ollama address</span><input name="ollamaUrl" value="${escapeHtml(config.text.ollamaUrl)}" /></label><div class="provider-help"><a href="https://ollama.com/download" target="_blank" rel="noreferrer">Install Ollama first ↗</a></div><div class="action-row"><button class="secondary-button" type="button" data-ai-action="discover-text">Discover installed</button><button class="secondary-button" type="button" data-ai-action="download-text">Download default</button><button class="secondary-button" type="button" data-ai-action="test-text">Test provider</button></div></section>
+        <section class="project-panel"><span class="eyebrow">Local illustrator</span><h3>ComfyUI</h3><div class="recommendation ${recommendations.localImageRecommended ? 'is-good' : 'is-caution'}"><strong>${recommendations.localImageRecommended ? 'Local generation looks viable' : 'Remote or manual art recommended'}</strong><span>${escapeHtml(recommendations.imageReason)}</span></div><label class="field"><span>ComfyUI address</span><input name="comfyUrl" value="${escapeHtml(config.image.comfyUrl)}" /></label><label class="field"><span>ComfyUI installation folder</span><input name="comfyRoot" value="${escapeHtml(config.image.comfyRoot)}" placeholder="C:\\ComfyUI" /></label><label class="field"><span>Default ComfyUI checkpoint</span><select name="comfyCheckpoint">${modelNameOptions(config.image.comfyCheckpoints, config.image.comfyCheckpoint)}</select></label><label class="field"><span>ComfyUI checkpoint catalog</span><textarea name="comfyCheckpoints">${escapeHtml(config.image.comfyCheckpoints.join('\n'))}</textarea></label><div class="action-row"><button class="secondary-button" type="button" data-ai-action="discover-image">Discover installed</button><button class="secondary-button" type="button" data-ai-action="test-image">Test provider</button></div><hr /><label class="field"><span>Recommended checkpoint download</span><select name="imageModel">${optionList(models.image, recommendations.imageModelId)}</select></label><label class="consent-check"><input name="licenseAccepted" type="checkbox" /> I reviewed and accept the <a href="${escapeHtml(selectedImageModel.licenseUrl)}" target="_blank" rel="noreferrer">${escapeHtml(selectedImageModel.license)}</a>.</label><button class="secondary-button" type="button" data-ai-action="download-image">Download recommended checkpoint</button></section>
       </div>
+      <section><span class="eyebrow">Remote provider library</span><h2>Bring the accounts you already use</h2><p>Keys stay in the ignored local configuration and are never returned to this page. Capability tags determine which task selectors can offer each model.</p><div class="choice-grid ai-provider-grid">${(ai.registry ?? []).map((provider) => remoteProviderCard(provider, config.providers[provider.id])).join('')}</div></section>
       <section class="privacy-panel"><strong>No silent cloud fallback.</strong><p>Local endpoints are restricted to this computer. API keys stay in the ignored <code>.campaign-manager/</code> folder and are never returned to the browser. Before a remote task, the Manager asks for consent again.</p></section>
       <div class="setup-footer"><button class="primary-button" type="submit">${config.setupComplete ? 'Save provider & model library' : 'Save choices and continue'}</button><span>All generated content opens as an editable draft.</span></div>
       ${activeLog ? `<pre class="job-log">${escapeHtml(activeLog.logs)}</pre>` : ''}
@@ -1201,25 +1211,56 @@ function aiSetupPayload(form, complete = true) {
       .split(/[\n,]/)
       .map((item) => item.trim())
       .filter(Boolean);
+  const providerModels = (name) =>
+    String(form.get(name) || '')
+      .split(/\r?\n/)
+      .map((line) => {
+        const [id, capabilities = ''] = line.split('|', 2);
+        return {
+          id: id.trim(),
+          capabilities: capabilities
+            .split(',')
+            .map((item) => item.trim())
+            .filter(Boolean),
+        };
+      })
+      .filter((model) => model.id);
+  const roles = {
+    prose: parseEngineValue(form.get('roleProse')) ?? { provider: 'off', model: '' },
+    extraction: parseEngineValue(form.get('roleExtraction')) ?? { provider: 'off', model: '' },
+    imagePrompt: parseEngineValue(form.get('roleImagePrompt')) ?? { provider: 'off', model: '' },
+    image: parseEngineValue(form.get('roleImage')) ?? { provider: 'off', model: '' },
+  };
+  const providers = Object.fromEntries(
+    (state.project.ai.registry ?? []).map((provider) => {
+      const prefix = `provider__${provider.id}__`;
+      return [
+        provider.id,
+        {
+          baseUrl: form.get(`${prefix}baseUrl`),
+          apiKey: form.get(`${prefix}apiKey`),
+          removeApiKey: form.get(`${prefix}removeApiKey`) === 'on',
+          models: providerModels(`${prefix}models`),
+        },
+      ];
+    }),
+  );
   return {
     setupComplete: complete,
+    roles,
+    providers,
     text: {
-      provider: form.get('textProvider'),
+      provider: roles.prose.provider === 'ollama' ? 'ollama' : 'off',
       ollamaUrl: form.get('ollamaUrl'),
       ollamaModel: form.get('ollamaModel'),
       ollamaModels: lines('ollamaModels'),
-      openaiModel: form.get('openaiTextModel'),
-      openaiModels: lines('openaiTextModels'),
-      openaiApiKey: form.get('openaiApiKey'),
     },
     image: {
-      provider: form.get('imageProvider'),
+      provider: roles.image.provider === 'comfyui' ? 'comfyui' : 'off',
       comfyUrl: form.get('comfyUrl'),
       comfyRoot: form.get('comfyRoot'),
       comfyCheckpoint: form.get('comfyCheckpoint'),
       comfyCheckpoints: lines('comfyCheckpoints'),
-      openaiModel: form.get('openaiImageModel'),
-      openaiModels: lines('openaiImageModels'),
     },
   };
 }
@@ -1237,12 +1278,27 @@ async function saveAiSetup(complete = true) {
   toast('AI choices saved locally.');
 }
 
-async function runAiSetupAction(action) {
+async function runAiSetupAction(action, providerId = '') {
   const form = new FormData(document.querySelector('#ai-setup-form'));
   await api('/api/ai/setup', {
     method: 'PUT',
     body: JSON.stringify(aiSetupPayload(form, state.project.ai.config.setupComplete)),
   });
+  if (action === 'discover-provider') {
+    const result = await api('/api/ai/models/discover', {
+      method: 'POST',
+      body: JSON.stringify({ provider: providerId }),
+    });
+    await loadState();
+    state.aiMode = true;
+    renderAiSetup();
+    toast(
+      result.discovered.length
+        ? `Discovered ${result.discovered.length} remote model${result.discovered.length === 1 ? '' : 's'}. Assign capabilities before using new IDs.`
+        : 'No additional remote models found.',
+    );
+    return;
+  }
   if (action === 'discover-text' || action === 'discover-image') {
     const kind = action === 'discover-text' ? 'text' : 'image';
     const result = await api('/api/ai/models/discover', {
@@ -1282,7 +1338,10 @@ async function runAiSetupAction(action) {
     return;
   }
   const kind = action === 'test-image' ? 'image' : 'text';
-  const result = await api('/api/ai/test', { method: 'POST', body: JSON.stringify({ kind }) });
+  const result = await api('/api/ai/test', {
+    method: 'POST',
+    body: JSON.stringify({ kind, provider: action === 'test-provider' ? providerId : undefined }),
+  });
   toast(result.message);
   await loadState();
 }
@@ -1694,7 +1753,9 @@ document
 content.addEventListener('click', async (event) => {
   const aiAction = event.target.closest('[data-ai-action]');
   if (aiAction) {
-    runAiSetupAction(aiAction.dataset.aiAction).catch((error) => toast(error.message, true));
+    runAiSetupAction(aiAction.dataset.aiAction, aiAction.dataset.provider).catch((error) =>
+      toast(error.message, true),
+    );
     return;
   }
   const tab = event.target.closest('[data-tab]');

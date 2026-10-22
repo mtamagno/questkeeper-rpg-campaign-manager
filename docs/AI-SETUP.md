@@ -6,8 +6,9 @@
 > and is revalidated during the monthly ecosystem review.
 
 QuestKeeper can remain completely manual, use models on the same computer, or
-connect to an explicitly chosen remote OpenAI API account. AI is optional in
-every campaign and generated material is never published automatically.
+connect to explicitly chosen OpenAI, xAI/Grok and Google Gemini API accounts.
+AI is optional in every campaign and generated material is never published
+automatically.
 
 ## Open the interactive installer
 
@@ -29,11 +30,12 @@ recommendation is not an automatic installation: the Game Master chooses the
 provider and model, accepts any applicable model license and starts each
 download.
 
-Each provider has an editable model catalog. Enter additional model IDs one
-per line, or choose **Discover installed** while Ollama or ComfyUI is running.
-Discovered models are added to the local catalog and become available in every
-session editor. The defaults selected here are conveniences, not locked
-choices.
+Each provider has an editable model catalog. Remote entries use
+`model-id | capability,capability`; this keeps unsupported models out of the
+wrong task. Choose **Discover installed** for Ollama or ComfyUI, or **Discover
+models** for a configured remote account. Newly discovered remote IDs have no
+assumed capabilities until the GM reviews them. The defaults selected here are
+conveniences, not locked choices.
 
 ## Prose choices
 
@@ -56,11 +58,14 @@ The default local URL is `http://127.0.0.1:11434`. QuestKeeper uses Ollama's
 so a recap arrives as predictable session fields instead of an unstructured
 block of text.
 
-### Remote with OpenAI
+### Remote with OpenAI, xAI/Grok or Gemini
 
-Choose **Remote · OpenAI API**, enter an API key and select the desired text
-model. The key is written only to `.campaign-manager/ai-config.json`, which is
-ignored by Git, and is never returned to the browser after saving.
+Add a provider key, review its API/privacy/pricing links and test the account.
+OpenAI and xAI use the compatible adapter documented by each provider; Gemini
+uses its native API. Keys are written only to
+`.campaign-manager/ai-config.json`, which is ignored by Git, and are never
+returned to the browser after saving. Leave the key field blank to retain it,
+or tick **Remove the saved key** to delete it explicitly.
 
 Remote processing has two consent gates: choosing the provider during setup
 and confirming each processing task in the session editor. QuestKeeper does
@@ -89,11 +94,24 @@ checkpoint is large and local image generation depends heavily on GPU memory;
 the installer therefore recommends remote or manual images on unsuitable
 hardware instead of pretending CPU and RAM are the only constraints.
 
-### Remote with OpenAI Images
+### Remote images
 
-Choose **Remote · OpenAI Images**. It shares the locally stored OpenAI API key
-with the prose provider, while retaining a separate image-model choice. Each
-session task still requires explicit remote consent.
+Models tagged with `image-generation` can be selected from OpenAI, xAI/Grok or
+Gemini. Text-only models never appear as renderers. The image provider can
+differ from the prose, extraction and prompt-planning providers, and each task
+still requires explicit remote consent.
+
+## Independent model roles
+
+AI setup stores four independent defaults:
+
+1. prose and structured session drafts;
+2. character/NPC extraction with vision;
+3. image-prompt planning;
+4. image rendering.
+
+The Manager filters each selector using explicit model capabilities. A failed
+request never falls back to another model, provider or privacy destination.
 
 ## Turn notes into a chapter
 

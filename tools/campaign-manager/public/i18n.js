@@ -176,6 +176,39 @@
     'Your table, your choice of intelligence': 'Il tuo tavolo, la tua scelta di intelligenza',
     'Keep everything local, connect a remote API, or leave AI off. Return here whenever you want to add a key, discover a newly installed model or change the defaults.':
       'Mantieni tutto in locale, collega un’API remota oppure lascia l’AI disattivata. Torna qui quando vuoi aggiungere una chiave, rilevare un nuovo modello o cambiare i predefiniti.',
+    'Independent task roles': 'Ruoli AI indipendenti',
+    'Choose the right engine for each job': 'Scegli il motore giusto per ogni attività',
+    'Only models whose saved capabilities match a role are offered. QuestKeeper never changes provider silently.':
+      'Sono proposti solo i modelli le cui capacità salvate corrispondono al ruolo. QuestKeeper non cambia mai provider di nascosto.',
+    'Prose & structured drafts': 'Prosa e bozze strutturate',
+    'Session prose and structured campaign drafts.':
+      'Prosa delle sessioni e bozze strutturate della campagna.',
+    'Sheet extraction & vision': 'Estrazione schede e visione',
+    'Character and NPC sheet images.': 'Immagini delle schede di personaggi e PNG.',
+    'Image-prompt planning': 'Pianificazione dei prompt immagine',
+    'Plans illustrations without rendering them.': 'Pianifica le illustrazioni senza generarle.',
+    'Image generation': 'Generazione immagini',
+    'Renders approved prompts.': 'Genera i prompt approvati.',
+    'Local chronicler': 'Cronista locale',
+    'Local illustrator': 'Illustratore locale',
+    'Remote provider library': 'Libreria di provider remoti',
+    'Bring the accounts you already use': 'Collega gli account che usi già',
+    'Keys stay in the ignored local configuration and are never returned to this page. Capability tags determine which task selectors can offer each model.':
+      'Le chiavi restano nella configurazione locale ignorata da Git e non vengono mai restituite a questa pagina. Le capacità determinano per quali attività può essere proposto ciascun modello.',
+    'Register only models and capabilities verified for your account. Unknown capabilities remain unavailable to task selectors.':
+      'Registra solo modelli e capacità verificati per il tuo account. Le capacità sconosciute restano escluse dalle attività.',
+    'API base URL': 'URL base API',
+    'API key': 'Chiave API',
+    'Paste a provider key': 'Incolla una chiave del provider',
+    'Remove the saved key': 'Rimuovi la chiave salvata',
+    'Model catalog and capabilities': 'Catalogo modelli e capacità',
+    'One per line:': 'Uno per riga:',
+    'API docs ↗': 'Documentazione API ↗',
+    'Privacy ↗': 'Privacy ↗',
+    'Pricing ↗': 'Prezzi ↗',
+    'Discover models': 'Rileva modelli',
+    'Only configured models with structured output and vision appear here. Public URL access also requires web capability.':
+      'Qui compaiono solo modelli configurati con output strutturato e visione. Gli URL pubblici richiedono anche la capacità web.',
     Processor: 'Processore',
     Memory: 'Memoria',
     Graphics: 'Grafica',
@@ -328,6 +361,14 @@
     if (match) return `${match[1]} GB attualmente liberi`;
     match = source.match(/^(Local|Remote) · (.+)$/);
     if (match) return `${match[1] === 'Local' ? 'Locale' : 'Remoto'} · ${match[2]}`;
+    match = source.match(/^Add the (.+) API key in AI setup first\.$/);
+    if (match) return `Aggiungi prima la chiave API ${match[1]} nella configurazione AI.`;
+    match = source.match(/^The selected model does not support the (.+) role\.$/);
+    if (match) return `Il modello selezionato non supporta il ruolo ${match[1]}.`;
+    match = source.match(/^Choose a compatible (.+) model for this task\.$/);
+    if (match) return `Scegli un modello ${match[1]} compatibile per questa attività.`;
+    match = source.match(/^(.+) request failed \((\d+)\)(.*)$/);
+    if (match) return `Richiesta ${match[1]} non riuscita (${match[2]})${match[3]}`;
     match = source.match(/^Level (\d+)$/);
     if (match) return `Livello ${match[1]}`;
     match = source.match(
