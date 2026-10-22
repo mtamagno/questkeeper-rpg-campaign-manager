@@ -35,9 +35,45 @@
         <span id="status-badge" class="badge">…</span>
       </section>
 
+      <fieldset class="runtime-options" aria-labelledby="runtime-title">
+        <legend>
+          <span class="step">02</span>
+          <span id="runtime-title" data-copy="runtimeTitle">Choose the Node.js runtime</span>
+        </legend>
+        <p class="muted runtime-hint" data-copy="runtimeHint">
+          Keep QuestKeeper isolated, or reuse a compatible Node.js 24 already on this device.
+        </p>
+        <label class="runtime-choice">
+          <input id="runtime-private" name="runtime" type="radio" value="private" checked />
+          <span>
+            <strong data-copy="privateRuntime">Private QuestKeeper runtime</strong>
+            <small data-copy="privateRuntimeHint"
+              >Recommended. Verified and isolated inside this folder.</small
+            >
+          </span>
+        </label>
+        <label class="runtime-choice" id="system-runtime-choice">
+          <input id="runtime-system" name="runtime" type="radio" value="system" />
+          <span>
+            <strong data-copy="systemRuntime">Reuse an existing Node.js 24</strong>
+            <small data-copy="systemRuntimeHint"
+              >Faster and smaller. QuestKeeper validates version, architecture and npm first.</small
+            >
+          </span>
+        </label>
+        <label class="runtime-picker" for="system-runtime">
+          <span data-copy="detectedRuntime">Detected compatible runtime</span>
+          <select id="system-runtime" disabled></select>
+        </label>
+        <p id="runtime-fallback" class="runtime-fallback" data-copy="runtimeFallback">
+          If the selected runtime changes or disappears, setup safely falls back to the private
+          runtime.
+        </p>
+      </fieldset>
+
       <section class="options" aria-labelledby="options-title">
         <div class="section-heading">
-          <p class="step">02</p>
+          <p class="step">03</p>
           <div>
             <h2 id="options-title" data-copy="optionsTitle">Choose what to prepare</h2>
             <p class="muted" data-copy="optionsHint">You can run this setup again at any time.</p>

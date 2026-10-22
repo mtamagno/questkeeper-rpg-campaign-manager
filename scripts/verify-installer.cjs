@@ -27,7 +27,10 @@ const checks = [
     'visible setup choices',
     interfaceHtml.includes('manager-shortcut') &&
       interfaceHtml.includes('companion-shortcut') &&
-      interfaceHtml.includes('launch-manager'),
+      interfaceHtml.includes('launch-manager') &&
+      interfaceHtml.includes('runtime-private') &&
+      interfaceHtml.includes('runtime-system') &&
+      interfaceHtml.includes('system-runtime'),
   ],
   [
     'a bilingual setup shutdown control',
@@ -49,7 +52,14 @@ const checks = [
     wizard.includes("const runtimeHome = '.questkeeper/runtime'") &&
       !wizard.includes('msiexec.exe'),
   ],
-  ['locked dependency installation', wizard.includes("[npmCliPath(), 'ci']")],
+  [
+    'validated selectable runtime persistence and fallback',
+    wizard.includes("runtimePreference === 'system'") &&
+      wizard.includes('runtime-selection.json') &&
+      wizard.includes('validateCandidate(selection.nodePath)') &&
+      wizard.includes('Falling back to a private verified runtime'),
+  ],
+  ['locked dependency installation', wizard.includes("[runtime.npmCliPath, 'ci']")],
   [
     'desktop launchers on every platform',
     wizard.includes('createWindowsShortcut') &&
@@ -90,6 +100,15 @@ const checks = [
 ];
 
 const failures = checks.filter(([, passed]) => !passed).map(([label]) => `Missing ${label}.`);
+
+try {
+  execFileSync(process.execPath, ['--test', 'tools/setup-wizard/runtime-selection.test.cjs'], {
+    cwd: root,
+    encoding: 'utf8',
+  });
+} catch (error) {
+  failures.push(`Runtime selection unit tests failed: ${error.message}`);
+}
 
 try {
   const output = execFileSync(process.execPath, ['tools/setup-wizard/server.cjs', '--self-test'], {
@@ -181,5 +200,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  'Cross-platform installer verified: bilingual loopback UI, checksum-verified private Node.js 24 runtime, native SEA builds, desktop launchers and clean process shutdown.',
+  'Cross-platform installer verified: bilingual loopback UI, validated system/private Node.js 24 selection, native SEA builds, desktop launchers and clean process shutdown.',
 );

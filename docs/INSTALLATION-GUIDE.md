@@ -8,8 +8,8 @@
 
 QuestKeeper runs on your computer and produces a static campaign website. A
 database, cloud account, AI provider and preinstalled Node.js are not required.
-The graphical setup prepares a private **Node.js 24** runtime on Windows, macOS
-and Linux.
+On Windows, macOS and Linux, the graphical setup can either prepare a private
+**Node.js 24** runtime or reuse a compatible installation already on the device.
 
 > **Looking around first?** Open the
 > [live Companion](https://mtamagno.github.io/questkeeper-rpg-campaign-manager/)
@@ -48,17 +48,26 @@ The setup opens a bilingual English/Italian page in the default browser. It is
 served only on `127.0.0.1` and protected by a random session token. The page
 shows each optional action before it runs:
 
-- download a private Node.js 24 runtime into `.questkeeper/runtime`;
+- choose the recommended private Node.js 24 runtime or a compatible detected
+  system runtime;
 - prepare the project's locked dependencies;
 - create separate **QuestKeeper Campaign Manager** and **QuestKeeper
   Companion** desktop launchers;
 - open Campaign Manager when setup finishes.
 
-Node.js comes directly from `https://nodejs.org/dist/`. QuestKeeper reads the
-official release index, downloads the archive matching the operating system and
-processor, and compares it with the published SHA-256 checksum before
-extraction. It does not make a system-wide installation and does not need
-administrator privileges.
+For an existing runtime, QuestKeeper resolves the exact executable and checks
+Node.js major version 24, processor architecture and a working npm before it is
+offered. The chosen path is recorded in `.questkeeper/runtime-selection.json`
+and reused by setup and both launchers. If that executable later disappears or
+becomes incompatible, setup explains the fallback and prepares the private
+runtime instead.
+
+For the recommended private option, Node.js comes directly from
+`https://nodejs.org/dist/`. QuestKeeper reads the official release index,
+downloads the archive matching the operating system and processor, and compares
+it with the published SHA-256 checksum before extraction into
+`.questkeeper/runtime`. It does not make a system-wide installation and does
+not need administrator privileges.
 
 Nothing is installed merely by opening the setup: the checklist and **Prepare
 QuestKeeper** button make the selected actions explicit. AI tools and models
@@ -141,12 +150,13 @@ stored as ordinary files under `src/campaigns/`.
 | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
 | The setup does not open a browser            | Copy the local URL shown by the setup into a browser, or rerun the platform binary.                                                   |
 | Windows or macOS blocks the first launch     | Verify the release checksum, then use the deliberate first-open flow described above.                                                 |
-| Runtime preparation fails                    | Rerun setup; partial downloads are temporary and the official checksum is checked again.                                              |
+| Runtime preparation fails                    | Select the private runtime and rerun setup; partial downloads are temporary and the official checksum is checked again.               |
 | Setup 1.1.0 stops while creating a shortcut  | Download 1.1.1 and rerun setup; the prepared runtime and dependencies remain usable.                                                  |
 | The setup process remains open after setup   | In 1.1.2 or later, choose **Close setup** to terminate its local service and executable.                                              |
 | A desktop shortcut stops working             | Return the QuestKeeper folder to its original location or rerun setup to recreate links.                                              |
 | Companion shortcut does not open the browser | Check `.questkeeper/logs/companion-launch.log`; the launcher records port conflicts, missing dependencies and startup failures there. |
-| `node` is not recognized in a terminal       | This is expected: the release keeps its Node.js runtime private inside QuestKeeper.                                                   |
+| An installed Node.js is not offered          | Only working Node.js 24 installations matching the app architecture and containing npm are listed. The private option remains safe.   |
+| `node` is not recognized in a terminal       | This is expected when using the private option: its runtime is available to QuestKeeper without changing the system PATH.             |
 | Port 4173 is busy                            | QuestKeeper automatically tries ports through 4183; use the URL printed in the terminal.                                              |
 | The Companion does not reflect edits         | Run **Check and build site**, then refresh without cache.                                                                             |
 | A local model is unavailable                 | Start Ollama or ComfyUI, then use **Discover installed** in AI setup.                                                                 |

@@ -4,6 +4,11 @@ const http = require('node:http');
 const os = require('node:os');
 const path = require('node:path');
 const { spawn, spawnSync } = require('node:child_process');
+const {
+  discoverNodePaths,
+  npmCliCandidates,
+  validateRuntimeCandidate,
+} = require('./runtime-selection.cjs');
 
 const HOST = '127.0.0.1';
 const PORT = Number.parseInt(process.env.QUESTKEEPER_SETUP_PORT || '0', 10);
@@ -68,19 +73,66 @@ function portableNodePath() {
   return path.join(root, runtimeHome, process.platform === 'win32' ? 'node.exe' : 'bin/node');
 }
 
+function runtimeSelectionPath() {
+  return path.join(root, '.questkeeper', 'runtime-selection.json');
+}
+
+function readRuntimeSelection() {
+  try {
+    return JSON.parse(fs.readFileSync(runtimeSelectionPath(), 'utf8'));
+  } catch {
+    return { preference: 'private' };
+  }
+}
+
+function writeRuntimeSelection(runtime) {
+  const destination = runtimeSelectionPath();
+  assertInside(root, destination);
+  fs.mkdirSync(path.dirname(destination), { recursive: true });
+  fs.writeFileSync(
+    destination,
+    `${JSON.stringify({ preference: runtime.source, nodePath: runtime.nodePath }, null, 2)}\n`,
+  );
+}
+
+function validateCandidate(nodePath) {
+  return validateRuntimeCandidate(nodePath, {
+    npmCandidates:
+      nodePath === portableNodePath() ? npmCliCandidates(nodePath, process.platform) : undefined,
+  });
+}
+
+function systemRuntimeCandidates() {
+  return discoverNodePaths({ portablePath: portableNodePath(), sea: isSea() })
+    .map((nodePath) => validateCandidate(nodePath))
+    .filter((runtime) => runtime.ready)
+    .map((runtime) => ({ ...runtime, source: 'system' }));
+}
+
 function launcherNodePath() {
   if (process.env.NODE_ENV === 'test' && process.env.QUESTKEEPER_TEST_NODE_PATH) {
     return path.resolve(process.env.QUESTKEEPER_TEST_NODE_PATH);
   }
-  return portableNodePath();
+  const runtime = activeRuntimeStatus();
+  return runtime.ready ? runtime.nodePath : portableNodePath();
 }
 
-function runtimeStatus() {
+function portableRuntimeStatus() {
   const nodePath = portableNodePath();
-  if (!fs.existsSync(nodePath)) return { ready: false, version: null };
-  const result = spawnSync(nodePath, ['--version'], { encoding: 'utf8', windowsHide: true });
-  const version = result.status === 0 ? result.stdout.trim() : null;
-  return { ready: Boolean(version?.startsWith('v24.')), version };
+  return { ...validateCandidate(nodePath), source: 'private' };
+}
+
+function activeRuntimeStatus() {
+  const selection = readRuntimeSelection();
+  if (selection.preference === 'system' && selection.nodePath) {
+    const selected = validateCandidate(selection.nodePath);
+    if (selected.ready) return { ...selected, source: 'system' };
+    const fallback = portableRuntimeStatus();
+    return fallback.ready
+      ? { ...fallback, fallbackReason: selected.reason }
+      : { ...selected, source: 'system', fallbackAvailable: false };
+  }
+  return portableRuntimeStatus();
 }
 
 function setupStatus() {
@@ -88,7 +140,8 @@ function setupStatus() {
     platform: process.platform,
     architecture: process.arch,
     root,
-    runtime: runtimeStatus(),
+    runtime: activeRuntimeStatus(),
+    systemRuntimes: systemRuntimeCandidates(),
     dependenciesReady: fs.existsSync(path.join(root, 'node_modules', '.package-lock.json')),
     state,
   };
@@ -171,10 +224,10 @@ function runAsync(command, commandArgs, options = {}) {
 }
 
 async function installPortableNode() {
-  const existing = runtimeStatus();
+  const existing = portableRuntimeStatus();
   if (existing.ready) {
     log(`Portable Node.js ${existing.version} is already ready.`);
-    return portableNodePath();
+    return existing;
   }
 
   log('Finding the latest supported Node.js 24 release…');
@@ -232,16 +285,30 @@ async function installPortableNode() {
     fs.rmSync(work, { recursive: true, force: true });
   }
 
-  const ready = runtimeStatus();
+  const ready = portableRuntimeStatus();
   if (!ready.ready) throw new Error('The portable Node.js 24 runtime could not be prepared.');
   log(`Portable Node.js ${ready.version} is ready.`);
-  return portableNodePath();
+  return ready;
 }
 
-function npmCliPath() {
-  return process.platform === 'win32'
-    ? path.join(root, runtimeHome, 'node_modules', 'npm', 'bin', 'npm-cli.js')
-    : path.join(root, runtimeHome, 'lib', 'node_modules', 'npm', 'bin', 'npm-cli.js');
+async function prepareRuntime(options) {
+  if (options.runtimePreference === 'system') {
+    const discovered = systemRuntimeCandidates();
+    const requestedPath = options.systemNodePath || discovered[0]?.nodePath;
+    const selected = requestedPath ? validateCandidate(requestedPath) : null;
+    if (selected?.ready) {
+      const runtime = { ...selected, source: 'system' };
+      writeRuntimeSelection(runtime);
+      log(`Using system Node.js ${runtime.version} at ${runtime.nodePath}.`);
+      return runtime;
+    }
+    log(
+      `The selected system runtime is unavailable or incompatible (${selected?.reason || 'not found'}). Falling back to a private verified runtime.`,
+    );
+  }
+  const runtime = await installPortableNode();
+  writeRuntimeSelection(runtime);
+  return runtime;
 }
 
 function runDetached(command, commandArgs) {
@@ -461,13 +528,13 @@ async function install(options) {
   state.finishedAt = null;
   state.logs = [];
   try {
-    const nodePath = await installPortableNode();
+    const runtime = await prepareRuntime(options);
     if (options.dependencies !== false) {
       log('Installing QuestKeeper locked dependencies…');
-      await runAsync(nodePath, [npmCliPath(), 'ci'], {
+      await runAsync(runtime.nodePath, [runtime.npmCliPath, 'ci'], {
         env: {
           ...process.env,
-          PATH: `${path.dirname(nodePath)}${path.delimiter}${process.env.PATH || ''}`,
+          PATH: `${path.dirname(runtime.nodePath)}${path.delimiter}${process.env.PATH || ''}`,
         },
       });
       log('Locked dependencies are ready.');

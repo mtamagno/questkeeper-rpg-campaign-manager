@@ -23,7 +23,8 @@ body {
     radial-gradient(circle at 90% 10%, rgba(210, 145, 47, 0.16), transparent 30rem), #0e1014;
 }
 button,
-input {
+input,
+select {
   font: inherit;
 }
 .shell {
@@ -105,12 +106,88 @@ h2 {
   cursor: wait;
 }
 .status-card,
+.runtime-options,
 .options,
 .trust {
   margin-top: 22px;
   border: 1px solid #464238;
   background: rgba(25, 27, 32, 0.92);
   border-radius: 14px;
+}
+.runtime-options {
+  padding: 22px;
+}
+.runtime-options legend {
+  padding: 0 8px;
+  color: #f1eadc;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+.runtime-options legend .step {
+  display: inline-block;
+  margin-right: 10px;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+}
+.runtime-hint {
+  margin: 0 0 12px;
+}
+.runtime-choice {
+  display: flex;
+  gap: 12px;
+  align-items: start;
+  margin-top: 10px;
+  padding: 14px;
+  border: 1px solid #3b3933;
+  border-radius: 9px;
+  background: #111318;
+  cursor: pointer;
+}
+.runtime-choice:has(input:checked) {
+  border-color: #d59b45;
+  background: rgba(96, 68, 31, 0.28);
+}
+.runtime-choice:has(input:disabled) {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.runtime-choice input {
+  width: 19px;
+  height: 19px;
+  margin-top: 2px;
+  accent-color: #ca9140;
+}
+.runtime-choice span {
+  display: grid;
+  gap: 4px;
+}
+.runtime-choice small,
+.runtime-fallback {
+  color: #bcb5a9;
+  line-height: 1.45;
+}
+.runtime-picker {
+  display: grid;
+  gap: 7px;
+  margin: 14px 0 0 45px;
+  color: #d9d2c6;
+  font-size: 0.9rem;
+}
+.runtime-picker select {
+  min-width: 0;
+  width: 100%;
+  border: 1px solid #655d50;
+  border-radius: 8px;
+  background: #0b0d11;
+  color: #f1eadc;
+  padding: 10px 12px;
+}
+.runtime-picker select:disabled {
+  color: #837d72;
+}
+.runtime-fallback {
+  margin: 10px 0 0 45px;
+  font-size: 0.82rem;
 }
 .status-card {
   display: flex;
@@ -262,6 +339,10 @@ footer p {
   footer {
     align-items: stretch;
     flex-direction: column;
+  }
+  .runtime-picker,
+  .runtime-fallback {
+    margin-left: 0;
   }
   .primary {
     width: 100%;
