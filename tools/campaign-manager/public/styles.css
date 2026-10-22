@@ -1325,6 +1325,11 @@ code {
   font-weight: 700;
 }
 
+.ruleset-combobox__state.is-custom {
+  color: var(--accent-strong);
+  font-weight: 700;
+}
+
 .toast-region {
   position: fixed;
   z-index: 30;

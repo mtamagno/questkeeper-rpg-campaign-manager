@@ -429,6 +429,19 @@ function activeIdentityFields() {
     .filter((definition) => definition.label);
 }
 
+function rulesetIdentityField(definition, sheet = {}) {
+  const value = sheet?.[definition.storageKey] ?? '';
+  const options = definition.options ?? [];
+  const known = options.find((option) => option.value === value);
+  const listId = `ruleset-${definition.key}-options`;
+  const stateLabel = known
+    ? `${known.provenance?.source || 'Profile catalog'} · ${known.provenance?.license || 'licensed'}`
+    : value
+      ? 'Custom or imported value · preserved exactly'
+      : 'Choose a suggestion or type a custom value';
+  return `<label class="field ruleset-combobox"><span>${escapeHtml(definition.label)}</span><input name="${escapeHtml(definition.storageKey)}" value="${escapeHtml(value)}" list="${listId}" autocomplete="off" aria-describedby="${listId}-hint" /><datalist id="${listId}">${options.map((option) => `<option value="${escapeHtml(option.value)}"></option>`).join('')}</datalist><small id="${listId}-hint" class="ruleset-combobox__state ${value && !known ? 'is-custom' : ''}">${escapeHtml(stateLabel)}</small></label>`;
+}
+
 function localizedFields(prefix, label, value, languages, options = {}) {
   const requiredLanguage = options.requiredLanguage ?? campaignLanguages()[0];
   return languages.map((language) => {
@@ -748,9 +761,7 @@ function entityForm(type, item = {}) {
         hint: 'Optional. Used on the profile and as an artwork proportion reference.',
       }),
       field('level', 'Level', item.sheet?.level ?? 1, { type: 'number', min: 1 }),
-      ...identityFields.map((definition) =>
-        field(definition.storageKey, definition.label, item.sheet?.[definition.storageKey]),
-      ),
+      ...identityFields.map((definition) => rulesetIdentityField(definition, item.sheet)),
       field('alignment', 'Alignment / outlook', item.sheet?.alignment),
       field('hitPoints', 'Current hit points', item.sheet?.hitPoints ?? 10, {
         type: 'number',

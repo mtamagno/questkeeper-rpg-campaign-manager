@@ -1,11 +1,16 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+import { dirname, join } from 'node:path';
 import test from 'node:test';
+import { fileURLToPath } from 'node:url';
 
 import {
   inferRulesetId,
   normalizeGameSystem,
   resolveRulesetProfile,
 } from '../ruleset-profiles.mjs';
+
+const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
 test('ruleset profiles expose materially different terminology', () => {
   assert.equal(resolveRulesetProfile('dnd-2014').fields[0].labels.en, 'Race');
@@ -35,4 +40,16 @@ test('only redistributable suggestions carry explicit provenance', () => {
     assert.match(entry.provenance.url, /^https:\/\//);
   }
   assert.equal(resolveRulesetProfile('coc7e').fields[0].options.length, 0);
+});
+
+test('ruleset identity controls preserve known, custom and imported values', async () => {
+  const [app, styles] = await Promise.all([
+    readFile(join(root, 'public', 'app.js'), 'utf8'),
+    readFile(join(root, 'public', 'styles.css'), 'utf8'),
+  ]);
+  assert.match(app, /rulesetIdentityField/);
+  assert.match(app, /list="\$\{listId\}"/);
+  assert.match(app, /Custom or imported value · preserved exactly/);
+  assert.match(app, /definition\.storageKey/);
+  assert.match(styles, /\.ruleset-combobox__state\.is-custom/);
 });
