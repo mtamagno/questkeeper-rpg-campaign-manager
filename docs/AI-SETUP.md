@@ -1,5 +1,10 @@
 # AI setup and session-draft workflow
 
+> Looking for remote provider support? Read the maintained
+> [AI provider capability, privacy and adapter matrix](AI-PROVIDER-MATRIX.md).
+> It records which roles are supported, model-dependent or deliberately hidden
+> and is revalidated during the monthly ecosystem review.
+
 QuestKeeper can remain completely manual, use models on the same computer, or
 connect to an explicitly chosen remote OpenAI API account. AI is optional in
 every campaign and generated material is never published automatically.
