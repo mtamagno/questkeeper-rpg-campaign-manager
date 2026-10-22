@@ -332,14 +332,20 @@ function languageName(code) {
 }
 
 function localizedFields(prefix, label, value, languages, options = {}) {
-  return languages.map((language) =>
-    field(
+  const requiredLanguage = options.requiredLanguage ?? campaignLanguages()[0];
+  return languages.map((language) => {
+    const fieldOptions = {
+      ...options,
+      required: Boolean(options.required && language === requiredLanguage),
+    };
+    delete fieldOptions.requiredLanguage;
+    return field(
       `loc__${prefix}__${language}`,
       `${label} · ${languageName(language)} (${language})`,
       value?.[language] ?? '',
-      options,
-    ),
-  );
+      fieldOptions,
+    );
+  });
 }
 
 function engineValue(provider, model) {
@@ -474,7 +480,11 @@ function campaignForm(campaign) {
     }),
     field('defaultLanguage', 'Default language', entry.defaultLanguage ?? languages[0]),
     section('Name and introduction'),
-    ...localizedFields('name', 'Campaign name', entry.name, languages, { required: true }),
+    ...localizedFields('name', 'Campaign name', entry.name, languages, {
+      required: true,
+      requiredLanguage: entry.defaultLanguage ?? languages[0],
+      hint: 'Required only in the default language; other translations may remain drafts.',
+    }),
     ...localizedFields('description', 'Description', entry.description, languages, {
       type: 'textarea',
     }),
@@ -758,15 +768,12 @@ function openEntityEditor(type, item) {
 }
 
 function localizedFormValue(form, prefix, fallback = '', languages = campaignLanguages()) {
-  const value = Object.fromEntries(
+  return Object.fromEntries(
     languages.map((language) => [
       language,
       form.get(`loc__${prefix}__${language}`)?.toString().trim() || fallback,
     ]),
   );
-  const first = Object.values(value).find(Boolean) || fallback;
-  if (!value.en) value.en = first;
-  return value;
 }
 
 async function uploadSelectedImage(inputName, category) {
@@ -805,10 +812,7 @@ async function saveCampaign(form) {
   const primary = (fieldName, fallback = '') => {
     const text = form.get(fieldName)?.toString().trim() || fallback;
     return Object.fromEntries(
-      [...new Set([...languages, 'en'])].map((language) => [
-        language,
-        language === defaultLanguage || language === 'en' ? text : '',
-      ]),
+      languages.map((language) => [language, language === defaultLanguage ? text : '']),
     );
   };
   const data = {

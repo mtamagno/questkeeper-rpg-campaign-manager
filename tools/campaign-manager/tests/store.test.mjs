@@ -187,6 +187,7 @@ test('supports arbitrary campaign languages and regional codes', async (t) => {
   const updated = await updateCampaign(root, campaign.manifestEntry.id, {
     languages: ['de', 'fr-CA'],
     defaultLanguage: 'fr-CA',
+    name: { de: '', 'fr-CA': 'Chroniques de la mer' },
   });
   assert.deepEqual(updated.campaign.languages, ['de', 'fr-CA']);
   assert.equal(updated.campaign.defaultLanguage, 'fr-CA');
@@ -194,5 +195,26 @@ test('supports arbitrary campaign languages and regional codes', async (t) => {
   await assert.rejects(
     updateCampaign(root, campaign.manifestEntry.id, { languages: ['not a language'] }),
     /language codes/,
+  );
+});
+
+test('allows partial secondary-language drafts but requires the default campaign name', async (t) => {
+  const root = await fixture(t);
+  const campaign = await createCampaign(root, {
+    id: 'partial-translations',
+    languages: ['it', 'en', 'fr'],
+    defaultLanguage: 'it',
+    name: { it: 'Cronache', en: '', fr: '' },
+    description: { it: 'Testo completo', en: '', fr: '' },
+  });
+
+  assert.deepEqual(campaign.manifestEntry.name, { it: 'Cronache', en: '', fr: '' });
+  const updated = await updateCampaign(root, 'partial-translations', { palette: 'gothic' });
+  assert.equal(updated.manifestEntry.palette, 'gothic');
+  assert.equal(updated.manifestEntry.name.en, '');
+
+  await assert.rejects(
+    updateCampaign(root, 'partial-translations', { defaultLanguage: 'fr' }),
+    /Campaign name is required in the default language \(fr\)/,
   );
 });

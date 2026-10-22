@@ -57,6 +57,12 @@ function normalizeCampaignPalette(value, fallback = 'heroic') {
   return palette;
 }
 
+function assertDefaultLocalizedValue(value, defaultLanguage, label) {
+  if (!String(value?.[defaultLanguage] ?? '').trim()) {
+    throw new Error(`${label} is required in the default language (${defaultLanguage}).`);
+  }
+}
+
 function assertInside(base, target) {
   const rel = relative(resolve(base), resolve(target));
   if (rel.startsWith('..') || rel === '..') throw new Error('Unsafe path rejected.');
@@ -175,8 +181,7 @@ export async function createCampaign(projectRoot, input) {
   const defaultLanguage = languages.includes(input.defaultLanguage)
     ? input.defaultLanguage
     : languages[0];
-  if (!Object.values(input.name ?? {}).some((value) => String(value).trim()))
-    throw new Error('A campaign name is required.');
+  assertDefaultLocalizedValue(input.name, defaultLanguage, 'Campaign name');
 
   const manifestPath = join(campaignsRoot(projectRoot), 'campaigns.json');
   const manifest = await readJson(manifestPath, []);
@@ -244,12 +249,14 @@ export async function updateCampaign(projectRoot, campaignId, input) {
     current.campaign.defaultLanguage ??
     languages[0];
   const defaultLanguage = languages.includes(requestedDefault) ? requestedDefault : languages[0];
+  const nextName = input.name ?? current.manifestEntry.name;
+  assertDefaultLocalizedValue(nextName, defaultLanguage, 'Campaign name');
   const nextEntry = {
     ...current.manifestEntry,
     languages,
     defaultLanguage,
     palette: normalizeCampaignPalette(input.palette ?? current.manifestEntry.palette),
-    name: input.name ?? current.manifestEntry.name,
+    name: nextName,
     description: input.description ?? current.manifestEntry.description,
     status: input.status ?? current.manifestEntry.status,
     thumbnail: input.thumbnail ?? current.manifestEntry.thumbnail,
