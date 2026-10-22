@@ -749,6 +749,38 @@ and acceptance journey P-04.
 insufficient, or user testing shows that keyboard and touch discovery need
 different entry points.
 
+### QK-028 — Operational state comes from one verified readiness model
+
+**Date:** 22 October 2026
+
+**Status:** Active
+
+**Decision:** Setup, launchers and Manager controls must describe the same
+observed operational state: configured, detected, starting, ready, conflicting,
+failed or safely falling back. A process spawn, saved preference or existing
+file is not by itself proof that a capability is ready.
+
+**Why:** Field feedback exposed the same failure family in several forms: an
+installed Node.js runtime was ignored, Companion controls disagreed about
+whether the site could open, palette selection appeared inert until a reload,
+and valid partial translations were treated as invalid finished translations.
+Each bug came from presenting an inferred state instead of the user-relevant
+state and transition.
+
+**Consequences:** Runtime selection validates the exact executable, version,
+architecture and npm; local services use active readiness probes and actionable
+port-conflict states; visual settings pair preview with an explicit application
+boundary; translation health distinguishes missing required source content from
+an intentionally unfinished secondary-language draft. Future health dashboards
+reuse these contracts instead of implementing new boolean checks.
+
+**Source:** Public issues #4, #5, #6 and #10; the 22 October field-feedback
+constraints in the [60-day plan](ROADMAP-60-DAYS.md).
+
+**Revisit when:** A persistent background service can provide a typed health
+protocol shared across setup, Manager, Companion and Session Scribe, or user
+testing shows that the state vocabulary is still ambiguous.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD

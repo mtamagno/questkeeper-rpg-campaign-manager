@@ -28,6 +28,31 @@ never a reason to split broken work or bypass `npm run verify`.
 | 06 · 23 Oct | [ ] `a11y: complete keyboard focus and landmark overhaul`                              | [ ] `perf: enforce image font and initial-load budgets`                                                    |
 | 07 · 24 Oct | [ ] `feat: publish a richer Lantern Road player journey`                               | [x] `release: ship QuestKeeper 1.1 Lanternwake` (moved to 20 Oct by explicit re-plan)                      |
 
+### Field-feedback constraints carried forward · 22 October
+
+The 1.1.2 correction batch did more than close isolated defects. Its findings
+now constrain later work without pulling those future tasks into Day 05:
+
+- Day 37's campaign health dashboard must distinguish required default-language
+  content from valid partial secondary-language drafts, and link directly to
+  the later translation completeness workflow on Day 51.
+- Day 41's Theme Studio must show the selected palette on real representative
+  surfaces, explain when a published Companion refreshes, and run contrast
+  checks before a custom theme can be approved.
+- Day 43's diagnostics must reuse one readiness model for Manager, Companion,
+  Session Scribe, ports and launchers rather than inferring health from a
+  button click or process start.
+- Runtime diagnostics must show the exact active Node executable, version,
+  architecture and npm state, allow a later safe switch between compatible
+  system and private runtimes, and preserve the verified fallback path.
+- Ruleset-aware terminology work must carry explicit ruleset provenance and
+  review state so a label such as “2024” cannot silently describe legacy or
+  unaudited content.
+
+These are acceptance constraints for the listed tasks, not extra calendar
+commits. Weekly review may split a constraint into a focused issue when its
+parent task reaches Definition of Ready.
+
 ## Week 2 — Characters that grow with the story
 
 Day 03 closed with the
