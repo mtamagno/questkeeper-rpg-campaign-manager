@@ -60,7 +60,10 @@ assert.ok(!dataGroups.includes('/sessions/'), 'Recaps must use sanitized snapsho
 
 const campaignService = read('src/app/guild/services/campaign.service.ts');
 const dataService = read('src/app/guild/services/data.service.ts');
-assert.match(campaignService, /return CAMPAIGNS_MANIFEST_PATH/);
+assert.match(campaignService, /const CAMPAIGNS_MANIFEST_PATH = 'campaigns\/campaigns\.json'/);
+assert.match(campaignService, /versionedCampaignManifestUrl\(forceNetwork\)/);
+assert.match(campaignService, /manager-refresh/);
+assert.match(campaignService, /: CAMPAIGNS_MANIFEST_PATH;/);
 assert.match(dataService, /path\.endsWith\('\/campaign\.json'\)/);
 
 console.log(
