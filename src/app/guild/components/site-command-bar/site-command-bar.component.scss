@@ -9,6 +9,10 @@
   margin-bottom: $spacing-lg;
 }
 
+:host.command-palette-open {
+  z-index: $z-index-modal;
+}
+
 .command-bar {
   display: flex;
   align-items: center;
@@ -295,10 +299,12 @@ kbd {
     cursor: pointer;
 
     &:hover,
-    &:focus-visible {
+    &:focus-visible,
+    &--active {
       outline: 0;
       border-color: $color-border-default;
-      background: $color-bg-surface;
+      background:
+        linear-gradient(90deg, rgba($color-gold, 0.08), transparent 62%), $color-bg-surface;
       .command-palette__result-arrow {
         opacity: 1;
         transform: translateX(0);
@@ -337,6 +343,25 @@ kbd {
     }
   }
 
+  &__result-meta {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    margin-bottom: 2px;
+    color: var(--campaign-accent-light, #{$color-gold-light});
+    font-family: $font-family-heading;
+    font-size: 0.62rem;
+    letter-spacing: $letter-spacing-wide;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  &__current {
+    padding-left: $spacing-xs;
+    border-left: $border-width-thin solid $color-border-default;
+    color: $color-text-muted;
+  }
+
   &__result-arrow {
     opacity: 0;
     color: $color-gold-light;
@@ -363,6 +388,7 @@ kbd {
   &__footer {
     display: flex;
     justify-content: flex-end;
+    flex-wrap: wrap;
     gap: $spacing-md;
     padding: $spacing-sm $spacing-md;
     border-top: $border-width-thin solid $color-border-subtle;
@@ -390,6 +416,18 @@ kbd {
       display: none;
     }
   }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 @keyframes palette-backdrop-in {

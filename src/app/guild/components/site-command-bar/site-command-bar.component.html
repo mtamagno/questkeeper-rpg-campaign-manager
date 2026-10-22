@@ -55,6 +55,9 @@
       class="command-bar__search"
       type="button"
       (click)="open()"
+      aria-haspopup="dialog"
+      aria-keyshortcuts="Control+K Meta+K"
+      [attr.aria-expanded]="isOpen()"
       [attr.aria-label]="isItalian() ? 'Apri la navigazione rapida' : 'Open quick navigation'"
     >
       <span aria-hidden="true">&#9906;</span>
@@ -72,10 +75,13 @@
     (keydown.escape)="close()"
   >
     <section
+      #paletteDialog
       class="command-palette__dialog"
       role="dialog"
       aria-modal="true"
       aria-labelledby="command-palette-title"
+      aria-describedby="command-palette-description"
+      (keydown)="onDialogKeydown($event)"
     >
       <header class="command-palette__header">
         <span class="command-palette__mark" aria-hidden="true">&#10022;</span>
@@ -83,11 +89,11 @@
           <h2 id="command-palette-title" class="command-palette__title">
             {{ isItalian() ? 'Dove vuoi andare?' : 'Where would you like to go?' }}
           </h2>
-          <p class="command-palette__subtitle">
+          <p id="command-palette-description" class="command-palette__subtitle">
             {{
               isItalian()
-                ? 'Cerca una sezione, una campagna o uno strumento'
-                : 'Find a section, campaign or tool'
+                ? 'Cerca in questa campagna e in tutto QuestKeeper'
+                : 'Search this campaign and all of QuestKeeper'
             }}
           </p>
         </div>
@@ -106,12 +112,16 @@
         <input
           #searchInput
           type="text"
-          role="searchbox"
+          role="combobox"
+          aria-autocomplete="list"
+          aria-controls="command-palette-results"
+          [attr.aria-activedescendant]="activeCommandId()"
+          [attr.aria-expanded]="true"
           inputmode="search"
           autocomplete="off"
           [value]="query()"
           (input)="updateQuery($event)"
-          (keydown.escape)="close()"
+          (keydown)="onSearchKeydown($event)"
           [placeholder]="
             activeCampaignId()
               ? isItalian()
@@ -125,11 +135,31 @@
         <kbd>Esc</kbd>
       </label>
 
-      <div class="command-palette__results">
-        @for (command of filteredCommands(); track command.url) {
-          <button class="command-palette__result" type="button" (click)="navigate(command.url)">
+      <p class="sr-only" aria-live="polite">{{ resultSummary() }}</p>
+
+      <div id="command-palette-results" class="command-palette__results" role="listbox">
+        @for (command of filteredCommands(); track command.id; let index = $index) {
+          <button
+            class="command-palette__result"
+            type="button"
+            role="option"
+            [id]="commandOptionId(index)"
+            [class.command-palette__result--active]="activeIndex() === index"
+            [attr.aria-selected]="activeIndex() === index"
+            (mouseenter)="setActiveIndex(index)"
+            (focus)="setActiveIndex(index)"
+            (click)="navigate(command.url)"
+          >
             <span class="command-palette__result-icon" aria-hidden="true">{{ command.icon }}</span>
             <span class="command-palette__result-copy">
+              <span class="command-palette__result-meta">
+                <span>{{ commandScopeLabel(command) }}</span>
+                @if (isCurrent(command)) {
+                  <span class="command-palette__current">
+                    {{ isItalian() ? 'Pagina attuale' : 'Current page' }}
+                  </span>
+                }
+              </span>
               <strong>{{ command.title }}</strong>
               <small>{{ command.detail }}</small>
             </span>
@@ -147,7 +177,9 @@
       </div>
 
       <footer class="command-palette__footer">
-        <span><kbd>Tab</kbd> {{ isItalian() ? 'naviga' : 'navigate' }}</span>
+        <span>{{ resultSummary() }}</span>
+        <span><kbd>&uarr;</kbd><kbd>&darr;</kbd> {{ isItalian() ? 'seleziona' : 'select' }}</span>
+        <span><kbd>&crarr;</kbd> {{ isItalian() ? 'apri' : 'open' }}</span>
         <span><kbd>Esc</kbd> {{ isItalian() ? 'chiudi' : 'close' }}</span>
       </footer>
     </section>

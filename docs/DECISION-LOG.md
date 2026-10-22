@@ -718,6 +718,37 @@ issue #15.
 clear human decisions, the release cadence changes, or a supported runtime
 enters end-of-life before the next scheduled review.
 
+### QK-027 — The command palette indexes routes, not private content
+
+**Date:** 22 October 2026
+
+**Status:** Active
+
+**Decision:** The persistent **Go to… / Vai a…** control is QuestKeeper's global
+keyboard-first navigation palette. It exposes current-campaign destinations,
+campaign switching and global product areas; supports `Ctrl/Command+K`, arrow,
+boundary, Enter, Escape and trapped-Tab navigation; restores focus on close;
+and sends focus to the main landmark after navigation. It indexes stable routes
+and bilingual navigation keywords only.
+
+**Why:** A route palette shortens in-play retrieval without pretending to be
+full-text search or reading protected campaign records. A single predictable
+interaction also scales better than adding more permanent controls to the
+responsive command bar.
+
+**Consequences:** Route guards and spoiler consent remain authoritative. The
+palette may label the current route and production-only destinations, but it
+must not expose protected sheets, GM notes or campaign canon in the public
+template. Day 05's recent/favourite work extends the palette as explicit local
+actions; later content search requires a separate visibility-aware index.
+
+**Source:** [Global command palette](GLOBAL-COMMAND-PALETTE.md), GN-03, GN-05
+and acceptance journey P-04.
+
+**Revisit when:** Full-text search ships, route volume makes grouping
+insufficient, or user testing shows that keyboard and touch discovery need
+different entry points.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD
