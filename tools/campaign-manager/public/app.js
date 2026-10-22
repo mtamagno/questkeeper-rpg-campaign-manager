@@ -393,6 +393,46 @@ function campaignLocalizedBlock(values, languages, defaultLanguage, includeStory
   return `<div class="campaign-localized-fields field--wide" data-campaign-localized-fields>${section('Name and introduction')}${localizedFields('name', 'Campaign name', values.name, languages, { required: true, requiredLanguage: defaultLanguage, hint: 'Required only in the default language; other translations may remain drafts.' }).join('')}${localizedFields('description', 'Description', values.description, languages, { type: 'textarea' }).join('')}${localizedFields('status', 'Status', values.status, languages).join('')}${includeStory ? `${section('Running recap')}${localizedFields('story', 'Story so far', values.story, languages, { type: 'textarea' }).join('')}` : ''}</div>`;
 }
 
+function translationWorkspace(languages) {
+  if (languages.length < 2) return '';
+  const source = state.campaign?.manifestEntry?.defaultLanguage ?? languages[0];
+  const target = languages.find((language) => language !== source) ?? languages[1];
+  const translationState = state.campaign?.campaign?.translationState ?? {};
+  const badges = languages
+    .filter((language) => language !== source)
+    .map((language) => {
+      const values = storedCampaignValuesForLanguage(language);
+      const record = translationState[language];
+      const status = Object.values(values).some((value) => String(value || '').trim())
+        ? record?.sourceSnapshot &&
+          record.sourceSnapshot !== JSON.stringify(storedCampaignValuesForLanguage(source))
+          ? 'stale'
+          : record?.status || 'manual'
+        : 'missing';
+      return `<span class="translation-status translation-status--${status}">${escapeHtml(languageName(language))}: ${escapeHtml(status)}</span>`;
+    })
+    .join('');
+  return `<section class="translation-workspace field--wide"><div><strong>Translation workspace</strong><p>Write manually in the fields above, or create an editable AI draft. Existing text is never overwritten without confirmation.</p><div class="translation-statuses">${badges}</div></div><div class="ai-engine-grid"><label class="field"><span>Source language</span><select name="translationSource">${languages.map((language) => `<option value="${escapeHtml(language)}" ${language === source ? 'selected' : ''}>${escapeHtml(languageName(language))}</option>`).join('')}</select></label><label class="field"><span>Target language</span><select name="translationTarget">${languages.map((language) => `<option value="${escapeHtml(language)}" ${language === target ? 'selected' : ''}>${escapeHtml(languageName(language))}</option>`).join('')}</select></label>${engineSelect('translationEngine', 'Translation model', 'prose', 'Choose a configured local or remote structured-text model.')}</div><label class="consent-check"><input name="translationRemoteConsent" type="checkbox" /> I consent to sending only the four visible campaign fields to the selected engine when it is Remote.</label><div class="action-row"><button type="button" class="primary-button" data-translate-campaign>Create translation draft</button></div><div class="ai-review" data-translation-review hidden></div></section>`;
+}
+
+function storedCampaignValuesForLanguage(language) {
+  const entry = state.campaign?.manifestEntry ?? {};
+  const campaign = state.campaign?.campaign ?? {};
+  return {
+    name: entry.name?.[language] ?? '',
+    description: entry.description?.[language] ?? '',
+    status: entry.status?.[language] ?? '',
+    story: campaign.storySoFar?.[language] ?? '',
+  };
+}
+
+function currentCampaignValuesForLanguage(language) {
+  const values = currentCampaignLocalizedValues();
+  return Object.fromEntries(
+    ['name', 'description', 'status', 'story'].map((key) => [key, values[key]?.[language] ?? '']),
+  );
+}
+
 function rulesetProfile(id) {
   const profiles = state.project.rulesetProfiles ?? [];
   return profiles.find((profile) => profile.id === id) ?? profiles.at(-1) ?? { fields: [] };
@@ -583,6 +623,7 @@ function campaignForm(campaign) {
       languages,
       entry.defaultLanguage ?? languages[0],
     ),
+    translationWorkspace(languages),
     section('Game system'),
     rulesetPicker(campaignRuleset(campaign)),
     palettePicker(entry.palette ?? 'heroic'),
@@ -1078,6 +1119,17 @@ async function saveCampaign(form) {
       languages,
       defaultLanguage,
       storySoFar: localizedValues.story,
+      translationState: state.editor.translationApplied
+        ? {
+            ...(state.campaign.campaign.translationState ?? {}),
+            [state.editor.translationApplied.language]: {
+              status: 'reviewed',
+              sourceLanguage: state.editor.translationApplied.sourceLanguage,
+              sourceSnapshot: state.editor.translationApplied.sourceSnapshot,
+              reviewedAt: new Date().toISOString(),
+            },
+          }
+        : state.campaign.campaign.translationState,
       heroImages: image
         ? [
             image.path,
@@ -1717,6 +1769,72 @@ async function processSessionNotes(includeImages) {
   }
 }
 
+async function processCampaignTranslation() {
+  if (state.editor?.kind !== 'campaign' || !state.editor.editing) return;
+  const form = new FormData(editorForm);
+  const sourceLanguage = form.get('translationSource')?.toString();
+  const targetLanguage = form.get('translationTarget')?.toString();
+  if (sourceLanguage === targetLanguage) {
+    languagePickerMessage('Choose two different campaign languages for translation.', true);
+    return;
+  }
+  const button = fields.querySelector('[data-translate-campaign]');
+  button.disabled = true;
+  button.textContent = 'Translating…';
+  try {
+    const result = await api(
+      `/api/campaigns/${encodeURIComponent(state.selectedId)}/ai/translate`,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          sourceLanguage,
+          targetLanguage,
+          content: currentCampaignValuesForLanguage(sourceLanguage),
+          engine: parseEngineValue(form.get('translationEngine')),
+          remoteConsent: form.get('translationRemoteConsent') === 'on',
+        }),
+      },
+    );
+    state.editor.translationDraft = {
+      ...result.draft,
+      sourceLanguage,
+      targetLanguage,
+      sourceSnapshot: JSON.stringify(currentCampaignValuesForLanguage(sourceLanguage)),
+    };
+    const review = fields.querySelector('[data-translation-review]');
+    review.hidden = false;
+    review.innerHTML = `<strong>Editable translation draft</strong><p>Review every field. Applying fills the form; nothing is written until you press Save.</p>${['name', 'description', 'status', 'story'].map((key) => `<label class="field"><span>${escapeHtml(key)}</span><textarea data-translation-draft-field="${key}">${escapeHtml(result.draft[key])}</textarea></label>`).join('')}<button type="button" class="secondary-button" data-apply-translation>Apply reviewed draft</button>`;
+  } finally {
+    button.disabled = false;
+    button.textContent = 'Create translation draft';
+  }
+}
+
+function applyCampaignTranslation() {
+  const draft = state.editor?.translationDraft;
+  if (!draft) return;
+  const existing = currentCampaignValuesForLanguage(draft.targetLanguage);
+  if (
+    Object.values(existing).some((value) => String(value || '').trim()) &&
+    !confirm(
+      'The target language already contains text. Replace those four fields with this draft?',
+    )
+  ) {
+    return;
+  }
+  for (const key of ['name', 'description', 'status', 'story']) {
+    const reviewed = fields.querySelector(`[data-translation-draft-field="${key}"]`)?.value ?? '';
+    const input = fields.querySelector(`[name="loc__${key}__${draft.targetLanguage}"]`);
+    if (input) input.value = reviewed;
+  }
+  state.editor.translationApplied = {
+    language: draft.targetLanguage,
+    sourceLanguage: draft.sourceLanguage,
+    sourceSnapshot: draft.sourceSnapshot,
+  };
+  toast('Translation applied to the editable form. Press Save when ready.');
+}
+
 async function saveEditor() {
   const form = new FormData(editorForm);
   let message = 'Saved. Your Companion is up to date.';
@@ -2048,6 +2166,16 @@ content.addEventListener('submit', (event) => {
 });
 
 fields.addEventListener('click', (event) => {
+  const translateCampaign = event.target.closest('[data-translate-campaign]');
+  if (translateCampaign) {
+    processCampaignTranslation().catch((error) => toast(error.message, true));
+    return;
+  }
+  const applyTranslation = event.target.closest('[data-apply-translation]');
+  if (applyTranslation) {
+    applyCampaignTranslation();
+    return;
+  }
   const addLanguage = event.target.closest('[data-language-add]');
   if (addLanguage) {
     addCampaignLanguage(false);

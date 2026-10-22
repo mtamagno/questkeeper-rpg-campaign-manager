@@ -1330,6 +1330,38 @@ code {
   font-weight: 700;
 }
 
+.translation-workspace {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface-raised) 92%, transparent);
+}
+
+.translation-statuses {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.translation-status {
+  padding: 0.25rem 0.55rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.translation-status--reviewed {
+  color: var(--success);
+}
+
+.translation-status--stale,
+.translation-status--missing {
+  color: var(--warning);
+}
+
 .toast-region {
   position: fixed;
   z-index: 30;

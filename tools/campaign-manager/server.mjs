@@ -32,6 +32,7 @@ import {
   discoverRemoteModels,
   generateDraftImages,
   generateImagePromptsWithText,
+  translateCampaignDraft,
   importEntityWithAi,
   processNotesWithText,
   testAiProvider,
@@ -642,6 +643,31 @@ async function routeApi(request, response, url) {
     sendJson(response, 200, {
       ...result,
       notice: 'Draft only. Review every imported field before saving.',
+    });
+    return;
+  }
+  if (
+    request.method === 'POST' &&
+    parts[3] === 'ai' &&
+    parts[4] === 'translate' &&
+    parts.length === 5
+  ) {
+    const input = await readBody(request);
+    const config = await readAiConfig(PROJECT_ROOT);
+    const engine = taskEngine(input.engine, config, 'prose');
+    if (isRemoteProvider(engine.provider) && input.remoteConsent !== true) {
+      throw new Error('Confirm that this translation scope may be sent to the remote provider.');
+    }
+    const result = await translateCampaignDraft({
+      config,
+      content: input.content,
+      sourceLanguage: input.sourceLanguage,
+      targetLanguage: input.targetLanguage,
+      selection: engine,
+    });
+    sendJson(response, 200, {
+      ...result,
+      notice: 'Draft only. Review and explicitly apply each translation before saving.',
     });
     return;
   }

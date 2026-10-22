@@ -15,6 +15,7 @@ import {
   normalizeImagePlacements,
   SESSION_DRAFT_SCHEMA,
   processNotesWithText,
+  translateCampaignDraft,
 } from '../ai-service.mjs';
 
 test('recommends a text model conservatively from RAM and CPU', () => {
@@ -263,4 +264,52 @@ test('Gemini image output is accepted only through an image-capable model', asyn
     limit: 1,
   });
   assert.equal(result.images[0].dataUrl, 'data:image/png;base64,aGVsbG8=');
+});
+
+test('translation drafts preserve scope and use exactly the selected engine', async (t) => {
+  const originalFetch = globalThis.fetch;
+  t.after(() => {
+    globalThis.fetch = originalFetch;
+  });
+  let request;
+  globalThis.fetch = async (url, options) => {
+    request = { url: String(url), body: JSON.parse(options.body) };
+    return new Response(
+      JSON.stringify({
+        output_text: JSON.stringify({
+          name: 'La Via',
+          description: 'Descrizione {{hero}} images/map.webp',
+          status: 'In corso',
+          story: 'Prima scena<hr>Seconda scena',
+        }),
+      }),
+      { status: 200, headers: { 'Content-Type': 'application/json' } },
+    );
+  };
+  const config = normalizeAiConfig({ providers: { xai: { apiKey: 'xai-secret' } } });
+  const result = await translateCampaignDraft({
+    config,
+    content: {
+      name: 'The Road',
+      description: 'Description {{hero}} images/map.webp',
+      status: 'Running',
+      story: 'First scene<hr>Second scene',
+    },
+    sourceLanguage: 'en',
+    targetLanguage: 'it',
+    selection: { provider: 'xai', model: 'grok-4-1-fast' },
+  });
+  assert.equal(result.draft.name, 'La Via');
+  assert.match(request.url, /api\.x\.ai/);
+  assert.match(JSON.stringify(request.body), /Preserve Markdown/);
+  await assert.rejects(
+    translateCampaignDraft({
+      config,
+      content: {},
+      sourceLanguage: 'en',
+      targetLanguage: 'en',
+      selection: { provider: 'xai', model: 'grok-4-1-fast' },
+    }),
+    /two different campaign languages/,
+  );
 });

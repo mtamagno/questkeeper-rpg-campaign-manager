@@ -33,3 +33,17 @@ test('entity IDs stay optional unless advanced authoring is enabled', async () =
   assert.match(app, /Optional\. Leave blank to generate a unique stable ID automatically\./);
   assert.match(app, /original\.id \|\| ''/);
 });
+
+test('translation workspace requires review, consent and overwrite confirmation', async () => {
+  const app = await readFile(join(root, 'public', 'app.js'), 'utf8');
+  for (const contract of [
+    'Translation workspace',
+    'translationRemoteConsent',
+    'data-translation-review',
+    'data-apply-translation',
+    'The target language already contains text',
+    'sourceSnapshot',
+  ]) {
+    assert.match(app, new RegExp(contract));
+  }
+});
