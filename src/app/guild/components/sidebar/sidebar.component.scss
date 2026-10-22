@@ -321,3 +321,44 @@
     }
   }
 }
+
+// The navigation is a primary campaign surface and must follow the active
+// semantic palette instead of retaining the historical gold theme.
+.sidebar {
+  border-right-color: var(--qk-color-border-subtle);
+  background-color: var(--qk-color-canvas-deep);
+  background-image: linear-gradient(180deg, var(--qk-color-accent-soft), transparent 30%);
+  color: var(--qk-color-text);
+}
+.sidebar__header,
+.sidebar__footer,
+.sidebar__home-link,
+.sidebar__section:not(:last-child) {
+  border-color: var(--qk-color-border-subtle);
+}
+.sidebar__title-link,
+.sidebar__home-link--active,
+.sidebar__link--active .sidebar__name,
+.sidebar__section-link--active {
+  color: var(--qk-color-accent-text);
+}
+.sidebar__home-link,
+.sidebar__section-link,
+.sidebar__category-title,
+.sidebar__close {
+  color: var(--qk-color-text-secondary);
+}
+.sidebar__section-title,
+.sidebar__detail,
+.sidebar__loading {
+  color: var(--qk-color-text-muted);
+}
+.sidebar__link,
+.sidebar__section-link {
+  &:hover,
+  &--active {
+    border-left-color: var(--qk-color-accent);
+    background: var(--qk-color-surface);
+    color: var(--qk-color-text);
+  }
+}

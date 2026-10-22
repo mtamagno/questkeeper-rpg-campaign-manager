@@ -6,6 +6,7 @@
  */
 
 import {
+  DestroyRef,
   Injectable,
   inject,
   signal,
@@ -13,6 +14,7 @@ import {
   type Signal,
   type WritableSignal,
 } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { filter } from 'rxjs';
@@ -27,8 +29,10 @@ import {
 
 const CAMPAIGNS_MANIFEST_PATH = 'campaigns/campaigns.json';
 
-function versionedCampaignManifestUrl(): string {
-  return CAMPAIGNS_MANIFEST_PATH;
+function versionedCampaignManifestUrl(forceNetwork = false): string {
+  return forceNetwork
+    ? `${CAMPAIGNS_MANIFEST_PATH}?manager-refresh=${Date.now().toString(36)}`
+    : CAMPAIGNS_MANIFEST_PATH;
 }
 
 /**
@@ -63,6 +67,8 @@ function extractCampaignId(route: ActivatedRouteSnapshot): string | undefined {
 export class CampaignService {
   private readonly router = inject(Router);
   private readonly http = inject(HttpClient);
+  private readonly document = inject(DOCUMENT);
+  private readonly destroyRef = inject(DestroyRef);
 
   private readonly _activeCampaignId: WritableSignal<string | undefined> = signal(undefined);
   private readonly _manifest: WritableSignal<ReadonlyArray<CampaignManifestEntry>> = signal([]);
@@ -105,6 +111,12 @@ export class CampaignService {
   constructor() {
     this.listenToRouteChanges();
     this.loadManifest();
+    const browserWindow = this.document.defaultView;
+    const refreshAfterAuthoring = (): void => this.loadManifest(true);
+    browserWindow?.addEventListener('focus', refreshAfterAuthoring);
+    this.destroyRef.onDestroy(() =>
+      browserWindow?.removeEventListener('focus', refreshAfterAuthoring),
+    );
   }
 
   /**
@@ -130,16 +142,20 @@ export class CampaignService {
   }
 
   /** Loads the global campaigns manifest from the assets. */
-  private loadManifest(): void {
-    this.http.get<ReadonlyArray<CampaignManifestEntry>>(versionedCampaignManifestUrl()).subscribe({
-      next: (entries) => {
-        this._manifest.set(entries);
-        this._manifestLoaded.set(true);
-      },
-      error: () => {
-        this._manifest.set([]);
-        this._manifestLoaded.set(true);
-      },
-    });
+  private loadManifest(forceNetwork = false): void {
+    this.http
+      .get<ReadonlyArray<CampaignManifestEntry>>(versionedCampaignManifestUrl(forceNetwork))
+      .subscribe({
+        next: (entries) => {
+          this._manifest.set(entries);
+          this._manifestLoaded.set(true);
+        },
+        error: () => {
+          if (!this._manifestLoaded()) {
+            this._manifest.set([]);
+            this._manifestLoaded.set(true);
+          }
+        },
+      });
   }
 }

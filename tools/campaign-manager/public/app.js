@@ -325,6 +325,22 @@ function section(label) {
   return `<div class="form-section">${escapeHtml(label)}</div>`;
 }
 
+function palettePicker(value = 'heroic') {
+  const choices = [
+    ['heroic', 'Heroic', 'Gold and midnight'],
+    ['gothic', 'Gothic', 'Burgundy and fog'],
+    ['neutral', 'Neutral', 'Slate and silver'],
+  ];
+  return `<fieldset class="field field--wide palette-picker"><legend>Campaign palette</legend><div class="palette-picker__grid">${choices
+    .map(
+      ([id, name, description]) =>
+        `<label class="palette-choice palette-choice--${id}"><input type="radio" name="palette" value="${id}" ${id === value ? 'checked' : ''} /><span class="palette-choice__swatch" aria-hidden="true"><i></i><i></i><i></i></span><span><strong>${name}</strong><small>${description}</small></span></label>`,
+    )
+    .join(
+      '',
+    )}</div><small>Previewed here and applied when the Companion tab reloads or regains focus.</small></fieldset>`;
+}
+
 function normalizeLanguageCodes(value) {
   return [
     ...new Set(
@@ -468,15 +484,7 @@ function campaignForm(campaign) {
       field('name', 'Campaign name', '', { required: true }),
       field('description', 'Short description', '', { type: 'textarea' }),
       field('status', 'Status', 'In progress'),
-      field('palette', 'Campaign palette', 'heroic', {
-        type: 'select',
-        values: [
-          ['heroic', 'Heroic · gold and midnight'],
-          ['gothic', 'Gothic · burgundy and fog'],
-          ['neutral', 'Neutral · slate and silver'],
-        ],
-        hint: 'A curated readable theme. You can change it later.',
-      }),
+      palettePicker('heroic'),
       section('Your table'),
       field('dungeonMaster', 'Game Master', ''),
       field('partyName', 'Party name', ''),
@@ -508,15 +516,7 @@ function campaignForm(campaign) {
       type: 'textarea',
     }),
     ...localizedFields('status', 'Status', entry.status, languages),
-    field('palette', 'Campaign palette', entry.palette ?? 'heroic', {
-      type: 'select',
-      values: [
-        ['heroic', 'Heroic · gold and midnight'],
-        ['gothic', 'Gothic · burgundy and fog'],
-        ['neutral', 'Neutral · slate and silver'],
-      ],
-      hint: 'A curated readable theme. You can change it later.',
-    }),
+    palettePicker(entry.palette ?? 'heroic'),
     section('Your table'),
     field('dungeonMaster', 'Game Master', details.dungeonMaster ?? ''),
     field('partyName', 'Party name', details.partyName ?? ''),
@@ -895,6 +895,7 @@ async function saveCampaign(form) {
       body: JSON.stringify(data),
     });
   }
+  return data.palette;
 }
 
 function baseCharacter(original = {}) {
@@ -1458,8 +1459,11 @@ async function processSessionNotes(includeImages) {
 
 async function saveEditor() {
   const form = new FormData(editorForm);
-  if (state.editor.kind === 'campaign') await saveCampaign(form);
-  else {
+  let message = 'Saved. Your Companion is up to date.';
+  if (state.editor.kind === 'campaign') {
+    const palette = await saveCampaign(form);
+    message = `Saved. The ${palette} palette will appear when the Companion reloads or regains focus.`;
+  } else {
     const entity = await buildEntity(state.editor.type, form, state.editor.original);
     const base = `/api/campaigns/${encodeURIComponent(state.selectedId)}/${state.editor.type}`;
     const path = state.editor.previousId
@@ -1473,7 +1477,7 @@ async function saveEditor() {
   }
   await loadState();
   dialog.close();
-  toast('Saved. Your Companion is up to date.');
+  toast(message);
 }
 
 function renderProject() {

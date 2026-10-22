@@ -1157,6 +1157,89 @@ code {
 .field small {
   color: var(--dim);
 }
+.palette-picker {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.palette-picker legend {
+  margin-bottom: 0.45rem;
+  color: var(--muted);
+}
+.palette-picker__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+.palette-choice {
+  display: grid;
+  grid-template-columns: auto 48px minmax(0, 1fr);
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+  padding: 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.025);
+  cursor: pointer;
+}
+.palette-choice:has(input:checked),
+.palette-choice:focus-within {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(214, 182, 111, 0.12);
+}
+.palette-choice input {
+  margin: 0;
+  accent-color: var(--gold);
+}
+.palette-choice > span:last-child {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+}
+.palette-choice strong {
+  color: var(--text);
+  font-size: 0.82rem;
+}
+.palette-choice__swatch {
+  display: flex;
+  width: 48px;
+  height: 32px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 7px;
+}
+.palette-choice__swatch i {
+  flex: 1;
+}
+.palette-choice--heroic .palette-choice__swatch i:nth-child(1) {
+  background: #111118;
+}
+.palette-choice--heroic .palette-choice__swatch i:nth-child(2) {
+  background: #222233;
+}
+.palette-choice--heroic .palette-choice__swatch i:nth-child(3) {
+  background: #d3b54a;
+}
+.palette-choice--gothic .palette-choice__swatch i:nth-child(1) {
+  background: #151116;
+}
+.palette-choice--gothic .palette-choice__swatch i:nth-child(2) {
+  background: #2c222c;
+}
+.palette-choice--gothic .palette-choice__swatch i:nth-child(3) {
+  background: #c06173;
+}
+.palette-choice--neutral .palette-choice__swatch i:nth-child(1) {
+  background: #151a21;
+}
+.palette-choice--neutral .palette-choice__swatch i:nth-child(2) {
+  background: #27313d;
+}
+.palette-choice--neutral .palette-choice__swatch i:nth-child(3) {
+  background: #8fa9bf;
+}
 .form-section {
   grid-column: 1 / -1;
   margin-top: 0.5rem;
@@ -1278,6 +1361,9 @@ code {
     grid-template-columns: 1fr 1fr;
   }
   .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .palette-picker__grid {
     grid-template-columns: 1fr;
   }
   .field--wide,

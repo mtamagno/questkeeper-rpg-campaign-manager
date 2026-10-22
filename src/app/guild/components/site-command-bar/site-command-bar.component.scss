@@ -455,3 +455,30 @@ kbd {
     animation: none;
   }
 }
+
+// Keep the persistent command surface visibly in step with the campaign.
+.command-bar {
+  border-color: var(--qk-color-border);
+  background: color-mix(in srgb, var(--qk-color-canvas-deep) 88%, transparent);
+  color: var(--qk-color-text);
+}
+.command-bar__crumb {
+  color: var(--qk-color-text-muted);
+}
+.command-bar__crumb--current {
+  color: var(--qk-color-text);
+}
+.command-bar__campaign-switch,
+.command-bar__install,
+.command-bar__tour,
+.command-bar__search {
+  border-color: var(--qk-color-border);
+  background: var(--qk-color-surface);
+  color: var(--qk-color-text-secondary);
+
+  &:hover {
+    border-color: var(--qk-color-accent);
+    background: var(--qk-color-surface-raised);
+    color: var(--qk-color-text);
+  }
+}

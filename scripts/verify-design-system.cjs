@@ -13,6 +13,15 @@ const serviceWorkerConfig = JSON.parse(read('ngsw-config.json'));
 const passwordDialog = read(
   'src/app/guild/components/password-dialog/password-dialog.component.html',
 );
+const passwordDialogStyles = read(
+  'src/app/guild/components/password-dialog/password-dialog.component.scss',
+);
+const sidebarStyles = read('src/app/guild/components/sidebar/sidebar.component.scss');
+const commandBarStyles = read(
+  'src/app/guild/components/site-command-bar/site-command-bar.component.scss',
+);
+const managerApp = read('tools/campaign-manager/public/app.js');
+const managerStyles = read('tools/campaign-manager/public/styles.css');
 
 const requiredTokens = [
   '--qk-color-canvas',
@@ -117,11 +126,34 @@ const campaignDirectoryGroup = serviceWorkerConfig.dataGroups?.find(
   ({ name }) => name === 'campaign-directory',
 );
 if (
-  !campaignService.includes('return CAMPAIGNS_MANIFEST_PATH;') ||
+  !campaignService.includes(': CAMPAIGNS_MANIFEST_PATH;') ||
+  !campaignService.includes("addEventListener('focus', refreshAfterAuthoring)") ||
+  !campaignService.includes('?manager-refresh=') ||
   campaignDirectoryGroup?.cacheConfig?.strategy !== 'freshness' ||
   !campaignDirectoryGroup.urls?.includes('/campaigns/campaigns.json')
 ) {
   failures.push('The campaign manifest lacks the stable network-first offline contract.');
+}
+
+for (const [surface, source] of [
+  ['sidebar', sidebarStyles],
+  ['command bar', commandBarStyles],
+  ['password dialog', passwordDialogStyles],
+]) {
+  if (
+    (!source.includes('var(--qk-color-surface') && !source.includes('var(--qk-color-canvas')) ||
+    !source.includes('var(--qk-color-accent')
+  ) {
+    failures.push(`The ${surface} does not visibly consume the active campaign palette.`);
+  }
+}
+
+if (
+  !managerApp.includes('function palettePicker') ||
+  !managerStyles.includes('.palette-choice--gothic') ||
+  !managerStyles.includes('.palette-choice--neutral')
+) {
+  failures.push('Campaign Manager lacks accessible, visibly distinct palette previews.');
 }
 
 if (

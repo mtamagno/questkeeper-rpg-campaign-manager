@@ -48,6 +48,14 @@
     'No campaigns found.': 'Nessuna campagna trovata.',
     Campaign: 'Campagna',
     'Campaign palette': 'Palette della campagna',
+    Heroic: 'Eroica',
+    Gothic: 'Gotica',
+    Neutral: 'Neutrale',
+    'Gold and midnight': 'Oro e blu notte',
+    'Burgundy and fog': 'Bordeaux e nebbia',
+    'Slate and silver': 'Ardesia e argento',
+    'Previewed here and applied when the Companion tab reloads or regains focus.':
+      'Mostrata qui e applicata quando la scheda del Companion si ricarica o torna in primo piano.',
     'Heroic · gold and midnight': 'Eroica · oro e blu notte',
     'Gothic · burgundy and fog': 'Gotica · bordeaux e nebbia',
     'Neutral · slate and silver': 'Neutrale · ardesia e argento',
@@ -322,6 +330,13 @@
     if (match) return `${match[1] === 'Local' ? 'Locale' : 'Remoto'} · ${match[2]}`;
     match = source.match(/^Level (\d+)$/);
     if (match) return `Livello ${match[1]}`;
+    match = source.match(
+      /^Saved\. The (heroic|gothic|neutral) palette will appear when the Companion reloads or regains focus\.$/,
+    );
+    if (match) {
+      const names = { heroic: 'eroica', gothic: 'gotica', neutral: 'neutrale' };
+      return `Salvato. La palette ${names[match[1]]} apparirà quando il Companion si ricarica o torna in primo piano.`;
+    }
     match = source.match(/^(.+) · (English|Italian) \(([^)]+)\)$/);
     if (match)
       return `${it[match[1]] || match[1]} · ${match[2] === 'Italian' ? 'Italiano' : 'English'} (${match[3]})`;
