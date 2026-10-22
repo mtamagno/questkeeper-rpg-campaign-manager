@@ -311,7 +311,21 @@ body::before {
 .topbar > .topbar__actions {
   display: flex;
   flex: 0 0 auto;
+  align-items: center;
   gap: 0.65rem;
+}
+.companion-state {
+  max-width: 15rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1.25;
+  text-align: right;
+}
+.companion-state--open {
+  color: #86d89f;
+}
+.companion-state--retry {
+  color: var(--danger);
 }
 .topbar__quit {
   color: #ffc8c0;

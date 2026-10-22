@@ -16,6 +16,7 @@ const state = {
   aiMode: false,
   project: {
     dependenciesReady: false,
+    companion: { action: 'prepare', label: 'Start Companion', status: 'Preparation required' },
     transcriber: { configured: false, environmentReady: false },
     jobs: {},
     ai: null,
@@ -100,6 +101,7 @@ async function loadState({ selectFirst = false } = {}) {
   state.campaigns = result.campaigns;
   state.project = {
     dependenciesReady: result.dependenciesReady,
+    companion: result.companion,
     transcriber: result.transcriber,
     jobs: result.jobs,
     ai: result.ai,
@@ -145,7 +147,24 @@ function renderSidebar() {
     : '<div class="empty">No campaigns found.</div>';
 }
 
+function renderCompanionAction() {
+  const control = state.project.companion ?? {
+    action: 'prepare',
+    label: 'Start Companion',
+    status: 'Preparation required',
+  };
+  const button = document.querySelector('#open-companion');
+  const status = document.querySelector('#companion-state');
+  button.textContent = control.label;
+  button.dataset.companionAction = control.action;
+  button.disabled = control.action === 'wait';
+  button.title = control.status;
+  status.textContent = control.status;
+  status.className = `companion-state companion-state--${control.action}`;
+}
+
 function render() {
+  renderCompanionAction();
   if (state.aiMode) {
     renderAiSetup();
     return;
@@ -1462,6 +1481,12 @@ function renderProject() {
   const install = state.project.jobs.install;
   const build = state.project.jobs.build;
   const preview = state.project.jobs.preview;
+  const companion = state.project.companion ?? {
+    action: 'prepare',
+    label: 'Start Companion',
+    status: 'Preparation required',
+    url: 'http://127.0.0.1:4200',
+  };
   const ftpJob = state.project.jobs['ftp-publish'];
   const publishing = state.project.publishing ?? {};
   const activeLog =
@@ -1473,7 +1498,7 @@ function renderProject() {
   content.innerHTML = `
     <div class="project-stack">
       <section class="project-panel"><span class="eyebrow">1 · Preparation</span><h2>Prepare the project</h2><p>${state.project.dependenciesReady ? 'Dependencies are installed. You can preview or validate your Companion.' : 'On first use, install everything the project needs. An internet connection is required.'}</p><div class="action-row"><button class="primary-button" data-project-action="install" ${install?.status === 'running' ? 'disabled' : ''}>${state.project.dependenciesReady ? 'Reinstall dependencies' : 'Prepare automatically'}</button><span class="job-status ${install?.status || ''}">${install ? escapeHtml(install.status) : state.project.dependenciesReady ? 'Ready' : 'Not prepared'}</span></div></section>
-      <section class="project-panel"><span class="eyebrow">2 · Preview</span><h2>Open your Companion</h2><p>Launch the local site with the campaign data you just entered.</p><div class="action-row"><button class="primary-button" data-project-action="preview" ${!state.project.dependenciesReady || preview?.status === 'running' ? 'disabled' : ''}>Launch site</button>${preview?.status === 'running' ? '<a class="secondary-button" href="http://127.0.0.1:4200" target="_blank" rel="noreferrer">Open now</a>' : ''}<span class="job-status ${preview?.status || ''}">${preview ? escapeHtml(preview.status) : 'Not started'}</span></div></section>
+      <section class="project-panel"><span class="eyebrow">2 · Preview</span><h2>Open your Companion</h2><p>Launch the local site with the campaign data you just entered.</p><div class="action-row">${companion.action === 'open' ? `<a class="primary-button" href="${escapeHtml(companion.url)}" target="_blank" rel="noreferrer">Open now</a>` : `<button class="primary-button" data-project-action="preview" ${['prepare', 'wait'].includes(companion.action) ? 'disabled' : ''}>${escapeHtml(companion.label)}</button>`}<span class="job-status ${escapeHtml(companion.action)}">${escapeHtml(companion.status)}</span></div></section>
       <section class="project-panel"><span class="eyebrow">3 · Validation</span><h2>Check before publishing</h2><p>The production build catches invalid data or components before you push to GitHub.</p><div class="action-row"><button class="secondary-button" data-project-action="build" ${!state.project.dependenciesReady || build?.status === 'running' ? 'disabled' : ''}>Check and build site</button><span class="job-status ${build?.status || ''}">${build ? escapeHtml(build.status) : 'Not run'}</span></div></section>
       <section class="project-panel"><span class="eyebrow">4 · Publishing</span><h2>Choose how the archive reaches the realm</h2><p>GitHub Pages remains available through the included workflow. If your hosting provides FTP, configure it once and publish directly from this computer without GitHub Actions.</p><a class="secondary-button" href="https://github.com/mtamagno/questkeeper-rpg-campaign-manager#publish" target="_blank" rel="noreferrer">Open the publishing guide</a></section>
       <form id="publishing-form" class="project-panel publishing-panel"><span class="eyebrow">Direct hosting · FTP / FTPS</span><h2>Publish from Campaign Manager</h2><div class="publishing-grid"><label class="field"><span>Protocol</span><select name="protocol"><option value="ftps" ${publishing.protocol !== 'ftp' ? 'selected' : ''}>FTPS · encrypted (recommended)</option><option value="ftp" ${publishing.protocol === 'ftp' ? 'selected' : ''}>FTP · unencrypted</option></select></label><label class="field"><span>Host</span><input name="host" value="${escapeHtml(publishing.host)}" placeholder="ftp.example.com" /></label><label class="field"><span>Port</span><input name="port" type="number" min="1" value="${publishing.port || 21}" /></label><label class="field"><span>Remote folder</span><input name="remotePath" value="${escapeHtml(publishing.remotePath || '/')}" placeholder="/public_html/questkeeper" /></label><label class="field"><span>Username</span><input name="username" autocomplete="username" value="${escapeHtml(publishing.username)}" /></label><label class="field"><span>Password</span><input name="password" type="password" autocomplete="new-password" placeholder="${publishing.passwordConfigured ? 'Saved locally · leave blank to keep it' : 'Hosting password'}" /></label></div><label class="consent-check"><input name="insecureConsent" type="checkbox" /> I understand that plain FTP sends credentials and files without encryption. This is required only when FTP is selected instead of FTPS.</label><div class="action-row"><button class="secondary-button" type="button" data-publish-action="save">Save destination</button><button class="secondary-button" type="button" data-publish-action="test">Test connection</button><button class="primary-button" type="button" data-publish-action="publish" ${!state.project.dependenciesReady || ftpJob?.status === 'running' ? 'disabled' : ''}>Build & publish now</button><span class="job-status ${ftpJob?.status || ''}">${ftpJob ? escapeHtml(ftpJob.status) : publishing.host ? 'Configured' : 'Not configured'}</span></div><small>Credentials stay in the Git-ignored <code>.campaign-manager/</code> folder and are never returned to the browser.</small></form>
@@ -1549,6 +1574,7 @@ function renderScribe() {
 async function refreshJobs() {
   const result = await api('/api/jobs');
   state.project = result;
+  renderCompanionAction();
   if (state.projectMode) renderProject();
   if (state.scribeMode) renderScribe();
   if (state.aiMode) renderAiSetup();
@@ -1559,6 +1585,14 @@ async function refreshJobs() {
 
 async function runProjectAction(kind, view = 'project') {
   await api(`/api/actions/${kind}`, { method: 'POST', body: '{}' });
+  if (kind === 'preview') {
+    state.project.companion = {
+      action: 'wait',
+      label: 'Starting…',
+      status: 'Waiting for the Companion to become ready…',
+      url: 'http://127.0.0.1:4200',
+    };
+  }
   state.projectMode = view === 'project';
   state.scribeMode = view === 'scribe';
   state.aiMode = false;
@@ -1630,16 +1664,24 @@ document.querySelector('#import-file').addEventListener('change', (event) => {
   if (file) importFile(file).catch((error) => toast(error.message, true));
   event.target.value = '';
 });
-document.querySelector('#open-companion').addEventListener('click', () => {
-  if (!state.project.dependenciesReady) {
+document.querySelector('#open-companion').addEventListener('click', (event) => {
+  const action = event.currentTarget.dataset.companionAction;
+  if (action === 'prepare') {
     state.projectMode = true;
     render();
     toast('Prepare the project first.');
     return;
   }
-  if (state.project.jobs.preview?.status === 'running')
-    window.open('http://127.0.0.1:4200', '_blank', 'noopener');
-  else runProjectAction('preview').catch((error) => toast(error.message, true));
+  if (action === 'open') {
+    window.open(state.project.companion.url, '_blank', 'noopener');
+    return;
+  }
+  if (action === 'wait') {
+    state.projectMode = true;
+    render();
+    return;
+  }
+  runProjectAction('preview').catch((error) => toast(error.message, true));
 });
 document
   .querySelector('#quit-manager')

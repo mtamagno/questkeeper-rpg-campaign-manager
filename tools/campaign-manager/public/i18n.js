@@ -18,6 +18,16 @@
     'Campaign manager': 'Gestore campagne',
     'Your adventure archive': 'Il tuo archivio di avventure',
     'Open Companion': 'Apri Companion',
+    'Start Companion': 'Avvia Companion',
+    'Starting…': 'Avvio…',
+    Retry: 'Riprova',
+    Ready: 'Pronto',
+    'Preparation required': 'Preparazione necessaria',
+    'Prepare the project first.': 'Prepara prima il progetto.',
+    'Waiting for the Companion to become ready…': 'Attendo che il Companion sia pronto…',
+    'Port 4200 is used by another application.': 'La porta 4200 è usata da un’altra applicazione.',
+    'Startup failed. Review the preview log and try again.':
+      'Avvio non riuscito. Controlla il registro dell’anteprima e riprova.',
     Quit: 'Esci',
     'Quit Campaign Manager? Active local jobs and previews started here will stop. Your published Companion remains online.':
       'Chiudere il Gestore campagne? Le attività locali e le anteprime avviate qui verranno interrotte. Il Companion pubblicato resterà online.',
@@ -236,6 +246,7 @@
     'Launch the local site with the campaign data you just entered.':
       'Avvia il sito locale con i dati della campagna appena inseriti.',
     'Launch site': 'Avvia sito',
+    'Open now': 'Apri ora',
     'Not started': 'Non avviato',
     '3 · Validation': '3 · Convalida',
     'Check before publishing': 'Controlla prima di pubblicare',

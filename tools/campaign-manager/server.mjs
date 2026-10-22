@@ -42,6 +42,7 @@ import {
   uploadBuild,
   writePublishingConfig,
 } from './publishing.mjs';
+import { probeCompanion, resolveCompanionControl } from './companion-status.mjs';
 
 const MANAGER_ROOT = dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = resolve(MANAGER_ROOT, '..', '..');
@@ -328,6 +329,18 @@ async function transcriberStatus() {
 async function startJob(kind) {
   const current = jobs.get(kind);
   if (current && ['running', 'stopping'].includes(current.status)) return current;
+  if (kind === 'preview') {
+    const probe = await probeCompanion();
+    if (probe.questKeeper) {
+      return {
+        kind,
+        status: 'success',
+        logs: 'Reused the Companion already running on port 4200.\n',
+        updatedAt: new Date().toISOString(),
+      };
+    }
+    if (probe.reachable) throw new Error('Port 4200 is used by another application.');
+  }
   if (kind === 'transcriber' && !(await transcriberStatus()).configured) {
     throw new Error('Configure discord-transcriber/.env before starting Discord Scribe.');
   }
@@ -403,10 +416,17 @@ async function projectStatus() {
   const hardware = await hardwarePromise;
   const aiConfig = await readAiConfig(PROJECT_ROOT);
   const publishingConfig = await readPublishingConfig(PROJECT_ROOT);
+  const jobState = jobSnapshot();
+  const companion = resolveCompanionControl({
+    dependenciesReady,
+    job: jobState.preview,
+    probe: await probeCompanion(),
+  });
   return {
     dependenciesReady,
     transcriber: await transcriberStatus(),
-    jobs: jobSnapshot(),
+    jobs: jobState,
+    companion,
     ai: {
       config: publicAiConfig(aiConfig),
       hardware,
