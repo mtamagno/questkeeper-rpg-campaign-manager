@@ -114,6 +114,32 @@
     'Saving throw proficiencies': 'Competenze nei tiri salvezza',
     'Skill proficiencies': 'Competenze nelle abilità',
     Languages: 'Linguaggi',
+    'Campaign content languages': 'Lingue dei contenuti della campagna',
+    'Search common languages by name or code. Regional variants remain separate.':
+      'Cerca le lingue comuni per nome o codice. Le varianti regionali restano distinte.',
+    'Find a language': 'Trova una lingua',
+    'Add language': 'Aggiungi lingua',
+    'Default language': 'Lingua predefinita',
+    'Add a custom BCP-47 tag': 'Aggiungi un tag BCP-47 personalizzato',
+    'Custom language tag': 'Tag lingua personalizzato',
+    'Add custom language': 'Aggiungi lingua personalizzata',
+    'Use this for a valid language or regional variant not listed above.':
+      'Usalo per una lingua valida o una variante regionale non presente nell’elenco.',
+    'Choose a language from the list, or use the custom language path.':
+      'Scegli una lingua dall’elenco oppure usa il percorso per una lingua personalizzata.',
+    'Enter a valid BCP-47 language tag, such as sr-Latn or en-GB.':
+      'Inserisci un tag lingua BCP-47 valido, come sr-Latn o en-GB.',
+    'That language is already selected.': 'Questa lingua è già selezionata.',
+    'Language added. Its translation fields are ready below.':
+      'Lingua aggiunta. I campi di traduzione sono già disponibili qui sotto.',
+    'A campaign needs at least one language.': 'Una campagna richiede almeno una lingua.',
+    'This language already contains campaign text. It will be hidden from the campaign but preserved in the data. Continue?':
+      'Questa lingua contiene già testi della campagna. Verrà nascosta dalla campagna ma conservata nei dati. Continuare?',
+    'Language removed from the campaign list; its existing text is preserved.':
+      'Lingua rimossa dall’elenco della campagna; i testi esistenti sono stati conservati.',
+    'Language removed.': 'Lingua rimossa.',
+    'Default language updated. Required fields changed below.':
+      'Lingua predefinita aggiornata. I campi obbligatori qui sotto sono cambiati.',
     Equipment: 'Equipaggiamento',
     'Features and traits': 'Privilegi e tratti',
     'One per line.': 'Uno per riga.',

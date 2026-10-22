@@ -20,6 +20,7 @@ const state = {
     transcriber: { configured: false, environmentReady: false },
     jobs: {},
     ai: null,
+    languageCatalog: [],
   },
   editor: null,
 };
@@ -105,6 +106,7 @@ async function loadState({ selectFirst = false } = {}) {
     transcriber: result.transcriber,
     jobs: result.jobs,
     ai: result.ai,
+    languageCatalog: result.languageCatalog ?? [],
     publishing: result.publishing,
   };
   if (selectFirst && !state.selectedId && result.campaigns.length) {
@@ -342,14 +344,18 @@ function palettePicker(value = 'heroic') {
 }
 
 function normalizeLanguageCodes(value) {
-  return [
-    ...new Set(
-      String(value ?? '')
-        .split(/[\s,]+/)
-        .map((code) => code.trim())
-        .filter(Boolean),
-    ),
-  ];
+  const normalized = String(value ?? '')
+    .split(/[\s,]+/)
+    .map((code) => code.trim())
+    .filter(Boolean)
+    .map((code) => {
+      try {
+        return Intl.getCanonicalLocales(code)[0];
+      } catch {
+        return code;
+      }
+    });
+  return [...new Set(normalized)];
 }
 
 function campaignLanguages() {
@@ -360,10 +366,28 @@ function campaignLanguages() {
 
 function languageName(code) {
   try {
-    return new Intl.DisplayNames(['en'], { type: 'language' }).of(code) ?? code.toUpperCase();
+    const locale = window.managerI18n?.language === 'it' ? 'it' : 'en';
+    return new Intl.DisplayNames([locale], { type: 'language' }).of(code) ?? code.toUpperCase();
   } catch {
     return code.toUpperCase();
   }
+}
+
+function campaignLanguagePicker(languages, defaultLanguage) {
+  const catalog = state.project.languageCatalog ?? [];
+  const locale = window.managerI18n?.language === 'it' ? 'it' : 'en';
+  const datalistId = `campaign-language-catalog-${state.editor?.editing ? 'edit' : 'create'}`;
+  const selected = languages
+    .map(
+      (code) =>
+        `<li><span><strong>${escapeHtml(languageName(code))}</strong><small>${escapeHtml(code)}</small></span><button type="button" class="icon-button" data-language-remove="${escapeHtml(code)}" aria-label="Remove ${escapeHtml(languageName(code))}">×</button></li>`,
+    )
+    .join('');
+  return `<fieldset class="field field--wide language-picker" data-language-picker><legend>Campaign content languages</legend><p>Search common languages by name or code. Regional variants remain separate.</p><div class="language-picker__add"><label class="field"><span>Find a language</span><input data-language-search list="${datalistId}" autocomplete="off" placeholder="English, Italiano, pt-BR…" /></label><button type="button" class="secondary-button" data-language-add>Add language</button></div><datalist id="${datalistId}">${catalog.map((item) => `<option value="${escapeHtml(item.code)}">${escapeHtml(item.names?.[locale] || item.names?.en || item.code)}</option>`).join('')}</datalist><ul class="language-picker__selected" data-language-selected>${selected}</ul><input type="hidden" name="languages" value="${escapeHtml(languages.join(','))}" /><label class="field"><span>Default language</span><select name="defaultLanguage">${languages.map((code) => `<option value="${escapeHtml(code)}" ${code === defaultLanguage ? 'selected' : ''}>${escapeHtml(languageName(code))} (${escapeHtml(code)})</option>`).join('')}</select></label><details><summary>Add a custom BCP-47 tag</summary><div class="language-picker__add"><label class="field"><span>Custom language tag</span><input data-language-custom autocomplete="off" placeholder="sr-Latn or en-GB" /></label><button type="button" class="secondary-button" data-language-add-custom>Add custom language</button></div><small>Use this for a valid language or regional variant not listed above.</small></details><p class="language-picker__message" data-language-message role="status" aria-live="polite"></p></fieldset>`;
+}
+
+function campaignLocalizedBlock(values, languages, defaultLanguage, includeStory = true) {
+  return `<div class="campaign-localized-fields field--wide" data-campaign-localized-fields>${section('Name and introduction')}${localizedFields('name', 'Campaign name', values.name, languages, { required: true, requiredLanguage: defaultLanguage, hint: 'Required only in the default language; other translations may remain drafts.' }).join('')}${localizedFields('description', 'Description', values.description, languages, { type: 'textarea' }).join('')}${localizedFields('status', 'Status', values.status, languages).join('')}${includeStory ? `${section('Running recap')}${localizedFields('story', 'Story so far', values.story, languages, { type: 'textarea' }).join('')}` : ''}</div>`;
 }
 
 function localizedFields(prefix, label, value, languages, options = {}) {
@@ -470,17 +494,13 @@ function campaignForm(campaign) {
       }),
       field('startDate', 'Start date', new Date().toISOString().slice(0, 10), { type: 'date' }),
       section('Languages'),
-      field('primaryLanguage', 'Primary language code', 'en', {
-        required: true,
-        hint: 'Any language code, such as en, es, de, pt-BR or fr-CA.',
-      }),
-      field('additionalLanguages', 'Additional language codes', '', {
-        hint: 'Optional · comma-separated. You can add translations after creation.',
-      }),
-      section('Campaign introduction'),
-      field('name', 'Campaign name', '', { required: true }),
-      field('description', 'Short description', '', { type: 'textarea' }),
-      field('status', 'Status', 'In progress'),
+      campaignLanguagePicker(languages, 'en'),
+      campaignLocalizedBlock(
+        { name: {}, description: {}, status: { en: 'In progress' }, story: {} },
+        languages,
+        'en',
+        false,
+      ),
       palettePicker('heroic'),
       section('Your table'),
       field('dungeonMaster', 'Game Master', ''),
@@ -498,31 +518,23 @@ function campaignForm(campaign) {
       type: 'date',
     }),
     section('Languages'),
-    field('languages', 'Language codes', languages.join(', '), {
-      required: true,
-      hint: 'Add any BCP-47 language code. Save and reopen to reveal new translation fields.',
-    }),
-    field('defaultLanguage', 'Default language', entry.defaultLanguage ?? languages[0]),
-    section('Name and introduction'),
-    ...localizedFields('name', 'Campaign name', entry.name, languages, {
-      required: true,
-      requiredLanguage: entry.defaultLanguage ?? languages[0],
-      hint: 'Required only in the default language; other translations may remain drafts.',
-    }),
-    ...localizedFields('description', 'Description', entry.description, languages, {
-      type: 'textarea',
-    }),
-    ...localizedFields('status', 'Status', entry.status, languages),
+    campaignLanguagePicker(languages, entry.defaultLanguage ?? languages[0]),
+    campaignLocalizedBlock(
+      {
+        name: entry.name,
+        description: entry.description,
+        status: entry.status,
+        story: details.storySoFar,
+      },
+      languages,
+      entry.defaultLanguage ?? languages[0],
+    ),
     palettePicker(entry.palette ?? 'heroic'),
     section('Your table'),
     field('dungeonMaster', 'Game Master', details.dungeonMaster ?? ''),
     field('partyName', 'Party name', details.partyName ?? ''),
     field('edition', 'System / edition', details.edition ?? ''),
     field('cover', 'Cover image', '', { type: 'file', hint: 'PNG, JPEG or WebP · up to 8 MB' }),
-    section('Running recap'),
-    ...localizedFields('story', 'Story so far', details.storySoFar, languages, {
-      type: 'textarea',
-    }),
   ].join('');
 }
 
@@ -534,6 +546,142 @@ function openCampaignEditor(editing = false) {
     editor: { kind: 'campaign', editing },
   });
   if (editing) fields.querySelector('[name="id"]').disabled = true;
+}
+
+function currentCampaignLocalizedValues() {
+  const original = state.editor?.editing
+    ? {
+        name: state.campaign?.manifestEntry?.name ?? {},
+        description: state.campaign?.manifestEntry?.description ?? {},
+        status: state.campaign?.manifestEntry?.status ?? {},
+        story: state.campaign?.campaign?.storySoFar ?? {},
+      }
+    : { name: {}, description: {}, status: {}, story: {} };
+  const values = structuredClone(state.editor?.campaignDraftValues ?? original);
+  for (const input of fields.querySelectorAll('[name^="loc__"]')) {
+    const [, prefix, language] = input.name.split('__');
+    values[prefix] ??= {};
+    values[prefix][language] = input.value;
+  }
+  return values;
+}
+
+function canonicalLanguage(value) {
+  try {
+    return Intl.getCanonicalLocales(String(value || '').trim())[0] || '';
+  } catch {
+    return '';
+  }
+}
+
+function languagePickerMessage(message, error = false) {
+  const element = fields.querySelector('[data-language-message]');
+  if (!element) return;
+  element.textContent = translate(message);
+  element.classList.toggle('is-error', error);
+}
+
+function refreshCampaignLanguages(languages, defaultLanguage) {
+  const values = currentCampaignLocalizedValues();
+  state.editor.campaignDraftValues = values;
+  const picker = fields.querySelector('[data-language-picker]');
+  const localizedBlock = fields.querySelector('[data-campaign-localized-fields]');
+  picker.outerHTML = campaignLanguagePicker(languages, defaultLanguage);
+  localizedBlock.outerHTML = campaignLocalizedBlock(
+    values,
+    languages,
+    defaultLanguage,
+    Boolean(state.editor?.editing),
+  );
+  window.managerI18n?.translateTree?.(fields);
+}
+
+function resolveCatalogLanguage(value) {
+  const requested = String(value || '')
+    .trim()
+    .toLocaleLowerCase();
+  const locale = window.managerI18n?.language === 'it' ? 'it' : 'en';
+  const match = (state.project.languageCatalog ?? []).find(
+    (item) =>
+      item.code.toLocaleLowerCase() === requested ||
+      item.names?.[locale]?.toLocaleLowerCase() === requested ||
+      item.names?.en?.toLocaleLowerCase() === requested,
+  );
+  return match?.code ?? '';
+}
+
+function addCampaignLanguage(custom = false) {
+  const picker = fields.querySelector('[data-language-picker]');
+  const input = picker?.querySelector(custom ? '[data-language-custom]' : '[data-language-search]');
+  const code = canonicalLanguage(custom ? input?.value : resolveCatalogLanguage(input?.value));
+  if (!code) {
+    languagePickerMessage(
+      custom
+        ? 'Enter a valid BCP-47 language tag, such as sr-Latn or en-GB.'
+        : 'Choose a language from the list, or use the custom language path.',
+      true,
+    );
+    input?.focus();
+    return;
+  }
+  const languages = normalizeLanguageCodes(picker.querySelector('[name="languages"]').value);
+  if (languages.includes(code)) {
+    languagePickerMessage('That language is already selected.', true);
+    input?.focus();
+    return;
+  }
+  refreshCampaignLanguages(
+    [...languages, code],
+    picker.querySelector('[name="defaultLanguage"]').value,
+  );
+  languagePickerMessage('Language added. Its translation fields are ready below.');
+}
+
+function removeCampaignLanguage(code) {
+  const picker = fields.querySelector('[data-language-picker]');
+  const languages = normalizeLanguageCodes(picker.querySelector('[name="languages"]').value);
+  if (languages.length === 1) {
+    languagePickerMessage('A campaign needs at least one language.', true);
+    return;
+  }
+  const values = currentCampaignLocalizedValues();
+  const hasContent =
+    Object.values(values).some((localized) => String(localized?.[code] || '').trim()) ||
+    campaignContainsLocalizedContent(state.campaign, code);
+  if (
+    hasContent &&
+    !confirm(
+      translate(
+        'This language already contains campaign text. It will be hidden from the campaign but preserved in the data. Continue?',
+      ),
+    )
+  ) {
+    return;
+  }
+  const next = languages.filter((language) => language !== code);
+  const currentDefault = picker.querySelector('[name="defaultLanguage"]').value;
+  refreshCampaignLanguages(next, currentDefault === code ? next[0] : currentDefault);
+  languagePickerMessage(
+    hasContent
+      ? 'Language removed from the campaign list; its existing text is preserved.'
+      : 'Language removed.',
+  );
+}
+
+function campaignContainsLocalizedContent(value, language, visited = new Set()) {
+  if (!value || typeof value !== 'object' || visited.has(value)) return false;
+  visited.add(value);
+  if (Object.prototype.hasOwnProperty.call(value, language)) {
+    const localized = value[language];
+    if (typeof localized === 'string' && localized.trim()) return true;
+    if (Array.isArray(localized) && localized.length > 0) return true;
+    if (localized && typeof localized === 'object' && Object.keys(localized).length > 0) {
+      return true;
+    }
+  }
+  return Object.values(value).some((entry) =>
+    campaignContainsLocalizedContent(entry, language, visited),
+  );
 }
 
 function entityForm(type, item = {}) {
@@ -818,31 +966,17 @@ function fileDataUrl(file) {
 
 async function saveCampaign(form) {
   const creating = !state.editor.editing;
-  const primaryLanguage = form.get('primaryLanguage')?.toString().trim() || 'en';
-  const languages = creating
-    ? normalizeLanguageCodes(`${primaryLanguage},${form.get('additionalLanguages') ?? ''}`)
-    : normalizeLanguageCodes(form.get('languages'));
-  const defaultLanguage = creating
-    ? primaryLanguage
-    : form.get('defaultLanguage')?.toString().trim() || languages[0];
-  const primary = (fieldName, fallback = '') => {
-    const text = form.get(fieldName)?.toString().trim() || fallback;
-    return Object.fromEntries(
-      languages.map((language) => [language, language === defaultLanguage ? text : '']),
-    );
-  };
+  const languages = normalizeLanguageCodes(form.get('languages'));
+  const defaultLanguage = form.get('defaultLanguage')?.toString().trim() || languages[0];
+  const localizedValues = currentCampaignLocalizedValues();
   const data = {
     id: form.get('id')?.toString() || state.selectedId,
     languages,
     defaultLanguage,
     palette: form.get('palette')?.toString() || 'heroic',
-    name: creating ? primary('name') : localizedFormValue(form, 'name', '', languages),
-    description: creating
-      ? primary('description')
-      : localizedFormValue(form, 'description', '', languages),
-    status: creating
-      ? primary('status', 'In progress')
-      : localizedFormValue(form, 'status', '', languages),
+    name: localizedValues.name,
+    description: localizedValues.description,
+    status: localizedValues.status,
     edition: form.get('edition')?.toString(),
     startDate: form.get('startDate')?.toString(),
     dungeonMaster: form.get('dungeonMaster')?.toString(),
@@ -879,7 +1013,7 @@ async function saveCampaign(form) {
       partyName: data.partyName,
       languages,
       defaultLanguage,
-      storySoFar: localizedFormValue(form, 'story', '', languages),
+      storySoFar: localizedValues.story,
       heroImages: image
         ? [
             image.path,
@@ -1839,6 +1973,21 @@ content.addEventListener('submit', (event) => {
 });
 
 fields.addEventListener('click', (event) => {
+  const addLanguage = event.target.closest('[data-language-add]');
+  if (addLanguage) {
+    addCampaignLanguage(false);
+    return;
+  }
+  const addCustomLanguage = event.target.closest('[data-language-add-custom]');
+  if (addCustomLanguage) {
+    addCampaignLanguage(true);
+    return;
+  }
+  const removeLanguage = event.target.closest('[data-language-remove]');
+  if (removeLanguage) {
+    removeCampaignLanguage(removeLanguage.dataset.languageRemove);
+    return;
+  }
   const entityButton = event.target.closest('[data-ai-entity]');
   if (entityButton) {
     processEntityImport(entityButton.dataset.aiEntity).catch((error) => toast(error.message, true));
@@ -1852,6 +2001,14 @@ fields.addEventListener('click', (event) => {
 });
 
 fields.addEventListener('change', (event) => {
+  if (event.target.name === 'defaultLanguage' && event.target.closest('[data-language-picker]')) {
+    const languages = normalizeLanguageCodes(
+      fields.querySelector('[data-language-picker] [name="languages"]').value,
+    );
+    refreshCampaignLanguages(languages, event.target.value);
+    languagePickerMessage('Default language updated. Required fields changed below.');
+    return;
+  }
   const imageField = event.target.closest('[data-ai-image-field]');
   if (imageField && state.editor?.aiImages) {
     const image = state.editor.aiImages[Number(imageField.dataset.aiImageIndex)];
@@ -1868,6 +2025,17 @@ fields.addEventListener('change', (event) => {
     state.editor.aiLanguage
   ) {
     renderAiReview(state.editor.aiDraft, state.editor.aiLanguage);
+  }
+});
+
+fields.addEventListener('keydown', (event) => {
+  if (event.key !== 'Enter') return;
+  if (event.target.matches('[data-language-search]')) {
+    event.preventDefault();
+    addCampaignLanguage(false);
+  } else if (event.target.matches('[data-language-custom]')) {
+    event.preventDefault();
+    addCampaignLanguage(true);
   }
 });
 

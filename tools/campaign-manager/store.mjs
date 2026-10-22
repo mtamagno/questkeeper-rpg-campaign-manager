@@ -6,10 +6,10 @@ import {
   assertEntityIdAvailable,
   ENTITY_TYPES,
 } from './entity-identity.mjs';
+import { normalizeCampaignLanguages, normalizeLanguageTag } from './language-catalog.mjs';
 
 const ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const ENTITY_TYPE_SET = new Set(ENTITY_TYPES);
-const LANGUAGE_PATTERN = /^[a-z]{2,3}(?:-[A-Z]{2})?$/;
 const CAMPAIGN_PALETTES = new Set(['heroic', 'gothic', 'neutral']);
 const campaignWriteLocks = new Map();
 
@@ -40,13 +40,15 @@ export function validateId(value, label = 'ID') {
 }
 
 function normalizeLanguages(values) {
-  const languages = [
-    ...new Set((values ?? ['en']).map((value) => String(value).trim()).filter(Boolean)),
-  ];
-  if (languages.length === 0 || languages.some((code) => !LANGUAGE_PATTERN.test(code))) {
-    throw new Error('Use language codes such as en, es, de or fr-CA.');
+  return normalizeCampaignLanguages(values);
+}
+
+function defaultCampaignLanguage(value, languages) {
+  const requested = value ? normalizeLanguageTag(value) : languages[0];
+  if (!languages.includes(requested)) {
+    throw new Error('The default language must be one of the selected campaign languages.');
   }
-  return languages;
+  return requested;
 }
 
 function normalizeCampaignPalette(value, fallback = 'heroic') {
@@ -178,9 +180,7 @@ export async function createCampaign(projectRoot, input) {
   const root = campaignRoot(projectRoot, id);
   if (await exists(root)) throw new Error(`Campaign "${id}" already exists.`);
   const languages = normalizeLanguages(input.languages);
-  const defaultLanguage = languages.includes(input.defaultLanguage)
-    ? input.defaultLanguage
-    : languages[0];
+  const defaultLanguage = defaultCampaignLanguage(input.defaultLanguage, languages);
   assertDefaultLocalizedValue(input.name, defaultLanguage, 'Campaign name');
 
   const manifestPath = join(campaignsRoot(projectRoot), 'campaigns.json');
@@ -248,7 +248,7 @@ export async function updateCampaign(projectRoot, campaignId, input) {
     current.manifestEntry.defaultLanguage ??
     current.campaign.defaultLanguage ??
     languages[0];
-  const defaultLanguage = languages.includes(requestedDefault) ? requestedDefault : languages[0];
+  const defaultLanguage = defaultCampaignLanguage(requestedDefault, languages);
   const nextName = input.name ?? current.manifestEntry.name;
   assertDefaultLocalizedValue(nextName, defaultLanguage, 'Campaign name');
   const nextEntry = {

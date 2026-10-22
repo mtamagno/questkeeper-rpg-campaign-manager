@@ -4,6 +4,8 @@ import { tmpdir } from 'node:os';
 import { join, relative } from 'node:path';
 import test from 'node:test';
 
+import { normalizeCampaignLanguages, normalizeLanguageTag } from '../language-catalog.mjs';
+
 import {
   createCampaign,
   deleteCampaign,
@@ -170,7 +172,7 @@ test('rejects a colliding import before creating partial campaign files', async 
   assert.deepEqual((await getState(target)).campaigns, []);
 });
 
-test('supports arbitrary campaign languages and regional codes', async (t) => {
+test('supports arbitrary BCP-47 campaign languages and regional codes', async (t) => {
   const root = await fixture(t);
   const campaign = await createCampaign(root, {
     ...campaignInput,
@@ -194,8 +196,22 @@ test('supports arbitrary campaign languages and regional codes', async (t) => {
 
   await assert.rejects(
     updateCampaign(root, campaign.manifestEntry.id, { languages: ['not a language'] }),
-    /language codes/,
+    /valid BCP-47/,
   );
+  await assert.rejects(
+    updateCampaign(root, campaign.manifestEntry.id, {
+      languages: ['de', 'fr-CA'],
+      defaultLanguage: 'it',
+    }),
+    /default language must be one of the selected/,
+  );
+});
+
+test('canonicalizes valid custom language tags and removes duplicates', () => {
+  assert.equal(normalizeLanguageTag('EN-us'), 'en-US');
+  assert.equal(normalizeLanguageTag('sr-latn'), 'sr-Latn');
+  assert.deepEqual(normalizeCampaignLanguages(['pt-br', 'pt-BR', 'zh-hant']), ['pt-BR', 'zh-Hant']);
+  assert.throws(() => normalizeLanguageTag('not a language'), /valid BCP-47/);
 });
 
 test('allows partial secondary-language drafts but requires the default campaign name', async (t) => {
