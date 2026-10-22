@@ -21,6 +21,7 @@ import { filter } from 'rxjs';
 import { type ActivatedRouteSnapshot } from '@angular/router';
 
 import { type CampaignManifestEntry } from '@guild/models/campaignConfig.model';
+import { resolveRulesetProfile, type RulesetProfile } from '@guild/models/rulesetProfile.model';
 import {
   PLATFORM_PALETTE,
   resolveCampaignPalette,
@@ -88,6 +89,13 @@ export class CampaignService {
     }
     const campaign = this._manifest().find((entry) => entry.id === id);
     return resolveCampaignPalette(campaign?.palette);
+  });
+
+  /** Terminology and identity-field contract selected by the active campaign. */
+  readonly activeRuleset: Signal<RulesetProfile> = computed(() => {
+    const id = this._activeCampaignId();
+    const campaign = this._manifest().find((entry) => entry.id === id);
+    return resolveRulesetProfile(campaign?.gameSystem);
   });
 
   /** Base path for loading campaign data files (e.g., `campaigns/example-campaign/data`). */

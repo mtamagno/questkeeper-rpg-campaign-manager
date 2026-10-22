@@ -7,6 +7,11 @@
     "it": "Un gruppo di viandanti segue una catena di luci morenti attraverso una valle che ha dimenticato l'alba."
   },
   "edition": "Your ruleset",
+  "gameSystem": {
+    "id": "generic",
+    "edition": "Your ruleset",
+    "customLabels": {}
+  },
   "startDate": "2026-01-01",
   "dungeonMaster": "Game Master",
   "partyName": "The Wayfarers",

@@ -8,6 +8,7 @@ import {
   generateEntityId,
 } from './entity-identity.mjs';
 import { normalizeCampaignLanguages, normalizeLanguageTag } from './language-catalog.mjs';
+import { normalizeGameSystem } from './ruleset-profiles.mjs';
 
 const ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const ENTITY_TYPE_SET = new Set(ENTITY_TYPES);
@@ -164,9 +165,13 @@ export async function getCampaign(projectRoot, campaignId) {
       readJson(join(root, 'npc-relationships.json'), []),
     ]);
 
+  const gameSystem = normalizeGameSystem(
+    campaign.gameSystem ?? manifestEntry.gameSystem,
+    campaign.edition,
+  );
   return {
-    manifestEntry,
-    campaign,
+    manifestEntry: { ...manifestEntry, gameSystem },
+    campaign: { ...campaign, gameSystem },
     characters,
     npcs,
     sessions,
@@ -210,6 +215,7 @@ export async function createCampaign(projectRoot, input) {
     description: input.description ?? { [defaultLanguage]: '' },
     thumbnail: '',
     status: input.status ?? { [defaultLanguage]: 'In progress' },
+    gameSystem: normalizeGameSystem(input.gameSystem, input.edition),
   };
   const campaign = {
     name: input.name,
@@ -217,6 +223,7 @@ export async function createCampaign(projectRoot, input) {
     languages,
     defaultLanguage,
     edition: input.edition?.trim() || 'Your ruleset',
+    gameSystem: entry.gameSystem,
     startDate: input.startDate || new Date().toISOString().slice(0, 10),
     dungeonMaster: input.dungeonMaster?.trim() || 'Game Master',
     partyName: input.partyName?.trim() || 'The Party',
@@ -261,6 +268,10 @@ export async function updateCampaign(projectRoot, campaignId, input) {
     description: input.description ?? current.manifestEntry.description,
     status: input.status ?? current.manifestEntry.status,
     thumbnail: input.thumbnail ?? current.manifestEntry.thumbnail,
+    gameSystem: normalizeGameSystem(
+      input.gameSystem ?? current.manifestEntry.gameSystem,
+      input.edition ?? input.campaign?.edition ?? current.campaign.edition,
+    ),
   };
   const nextCampaign = {
     ...current.campaign,
@@ -269,6 +280,7 @@ export async function updateCampaign(projectRoot, campaignId, input) {
     defaultLanguage,
     name: nextEntry.name,
     description: nextEntry.description,
+    gameSystem: nextEntry.gameSystem,
   };
   await Promise.all([
     writeJson(

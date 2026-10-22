@@ -50,6 +50,7 @@ import {
 } from './publishing.mjs';
 import { probeCompanion, resolveCompanionControl } from './companion-status.mjs';
 import { publicLanguageCatalog } from './language-catalog.mjs';
+import { publicRulesetProfiles } from './ruleset-profiles.mjs';
 
 const MANAGER_ROOT = dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = resolve(MANAGER_ROOT, '..', '..');
@@ -421,6 +422,7 @@ async function projectStatus() {
   return {
     dependenciesReady,
     languageCatalog: publicLanguageCatalog(),
+    rulesetProfiles: publicRulesetProfiles(),
     transcriber: await transcriberStatus(),
     jobs: jobState,
     companion,

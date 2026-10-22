@@ -22,6 +22,7 @@ const state = {
     jobs: {},
     ai: null,
     languageCatalog: [],
+    rulesetProfiles: [],
   },
   editor: null,
 };
@@ -108,6 +109,7 @@ async function loadState({ selectFirst = false } = {}) {
     jobs: result.jobs,
     ai: result.ai,
     languageCatalog: result.languageCatalog ?? [],
+    rulesetProfiles: result.rulesetProfiles ?? [],
     publishing: result.publishing,
   };
   if (selectFirst && !state.selectedId && result.campaigns.length) {
@@ -391,6 +393,42 @@ function campaignLocalizedBlock(values, languages, defaultLanguage, includeStory
   return `<div class="campaign-localized-fields field--wide" data-campaign-localized-fields>${section('Name and introduction')}${localizedFields('name', 'Campaign name', values.name, languages, { required: true, requiredLanguage: defaultLanguage, hint: 'Required only in the default language; other translations may remain drafts.' }).join('')}${localizedFields('description', 'Description', values.description, languages, { type: 'textarea' }).join('')}${localizedFields('status', 'Status', values.status, languages).join('')}${includeStory ? `${section('Running recap')}${localizedFields('story', 'Story so far', values.story, languages, { type: 'textarea' }).join('')}` : ''}</div>`;
 }
 
+function rulesetProfile(id) {
+  const profiles = state.project.rulesetProfiles ?? [];
+  return profiles.find((profile) => profile.id === id) ?? profiles.at(-1) ?? { fields: [] };
+}
+
+function campaignRuleset(campaign = state.campaign) {
+  return campaign?.campaign?.gameSystem ?? campaign?.manifestEntry?.gameSystem ?? { id: 'generic' };
+}
+
+function rulesetPicker(value = { id: 'generic', customLabels: {} }) {
+  const profiles = state.project.rulesetProfiles ?? [];
+  const labels = value.customLabels ?? {};
+  return `${field('gameSystemId', 'Game system', value.id || 'generic', { type: 'select', values: profiles.map((profile) => [profile.id, profile.names?.en || profile.id]), hint: 'Controls terminology and authoring fields without changing stored character values.' })}<details class="field field--wide"><summary>Custom terminology</summary><p>Used by the Generic / custom profile. Leave a label blank to hide that identity field.</p><div class="form-grid">${[
+    ['ancestry', 'Origin / ancestry'],
+    ['class', 'Role / archetype'],
+    ['specialization', 'Specialization'],
+    ['background', 'Background'],
+  ]
+    .map(([key, fallback]) => field(`rulesetLabel__${key}`, fallback, labels[key] ?? fallback))
+    .join('')}</div></details>`;
+}
+
+function activeIdentityFields() {
+  const system = campaignRuleset();
+  const profile = rulesetProfile(system.id);
+  return (profile.fields ?? [])
+    .map((definition) => ({
+      ...definition,
+      label:
+        profile.id === 'generic' && system.customLabels?.[definition.key] !== undefined
+          ? system.customLabels[definition.key]
+          : definition.labels?.en || definition.key,
+    }))
+    .filter((definition) => definition.label);
+}
+
 function localizedFields(prefix, label, value, languages, options = {}) {
   const requiredLanguage = options.requiredLanguage ?? campaignLanguages()[0];
   return languages.map((language) => {
@@ -502,6 +540,8 @@ function campaignForm(campaign) {
         'en',
         false,
       ),
+      section('Game system'),
+      rulesetPicker({ id: 'generic', customLabels: {} }),
       palettePicker('heroic'),
       section('Your table'),
       field('dungeonMaster', 'Game Master', ''),
@@ -530,6 +570,8 @@ function campaignForm(campaign) {
       languages,
       entry.defaultLanguage ?? languages[0],
     ),
+    section('Game system'),
+    rulesetPicker(campaignRuleset(campaign)),
     palettePicker(entry.palette ?? 'heroic'),
     section('Your table'),
     field('dungeonMaster', 'Game Master', details.dungeonMaster ?? ''),
@@ -693,6 +735,7 @@ function entityForm(type, item = {}) {
       ]
     : [];
   if (type === 'characters') {
+    const identityFields = activeIdentityFields();
     return [
       ...common,
       entityAiImportPanel(type, languages),
@@ -705,9 +748,9 @@ function entityForm(type, item = {}) {
         hint: 'Optional. Used on the profile and as an artwork proportion reference.',
       }),
       field('level', 'Level', item.sheet?.level ?? 1, { type: 'number', min: 1 }),
-      field('classType', 'Class / archetype', item.sheet?.classType),
-      field('race', 'Species / ancestry', item.sheet?.race),
-      field('background', 'Background', item.sheet?.background),
+      ...identityFields.map((definition) =>
+        field(definition.storageKey, definition.label, item.sheet?.[definition.storageKey]),
+      ),
       field('alignment', 'Alignment / outlook', item.sheet?.alignment),
       field('hitPoints', 'Current hit points', item.sheet?.hitPoints ?? 10, {
         type: 'number',
@@ -981,6 +1024,16 @@ async function saveCampaign(form) {
     startDate: form.get('startDate')?.toString(),
     dungeonMaster: form.get('dungeonMaster')?.toString(),
     partyName: form.get('partyName')?.toString(),
+    gameSystem: {
+      id: form.get('gameSystemId')?.toString() || 'generic',
+      edition: form.get('edition')?.toString() || '',
+      customLabels: Object.fromEntries(
+        ['ancestry', 'class', 'specialization', 'background'].map((key) => [
+          key,
+          form.get(`rulesetLabel__${key}`)?.toString().trim() ?? '',
+        ]),
+      ),
+    },
   };
   if (creating) {
     const created = await api('/api/campaigns', { method: 'POST', body: JSON.stringify(data) });
@@ -1140,9 +1193,12 @@ async function buildEntity(type, form, original = {}) {
     item.sheet = {
       ...item.sheet,
       level: Number(form.get('level')) || 1,
-      classType: form.get('classType').toString(),
-      race: form.get('race').toString(),
-      background: form.get('background').toString(),
+      ...Object.fromEntries(
+        activeIdentityFields().map((definition) => [
+          definition.storageKey,
+          form.get(definition.storageKey)?.toString() ?? item.sheet[definition.storageKey] ?? '',
+        ]),
+      ),
       alignment: form.get('alignment').toString(),
       hitPoints: Number(form.get('hitPoints')) || 0,
       maxHitPoints: Number(form.get('maxHitPoints')) || 1,

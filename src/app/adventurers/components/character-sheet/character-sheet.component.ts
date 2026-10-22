@@ -23,6 +23,7 @@ import {
   type CharacterSheetSnapshot,
 } from '@guild/models/character.model';
 import { LanguageService } from '@guild/services/language.service';
+import { CampaignService } from '@guild/services/campaign.service';
 import { PasswordDialogComponent } from '@guild/components/password-dialog/password-dialog.component';
 import { SPELL_CATEGORIES } from '@arcana/constants/spells.constants';
 import { SPELL_SCHOOLS, isSpellEntry, type SpellEntry } from '@arcana/models/compendium.model';
@@ -89,6 +90,10 @@ interface SpellcastingSummary {
 export class CharacterSheetComponent {
   private readonly passwordService = inject(PasswordService);
   private readonly languageService = inject(LanguageService);
+  private readonly campaignService = inject(CampaignService);
+
+  /** Shared terminology profile used by the Companion and PDF export. */
+  readonly rulesetProfile = this.campaignService.activeRuleset;
 
   /** Whether the current interface language is Italian. */
   readonly isItalian = computed(() => this.languageService.currentLanguage() === 'it');
@@ -329,6 +334,9 @@ export class CharacterSheetComponent {
           portraitImageUrl: this.portraitImageUrl(),
           chapterTitle: this.activeSnapshot()?.title,
           recordedAt: this.activeSnapshot()?.recordedAt,
+          identityLabels: Object.fromEntries(
+            this.rulesetProfile().fields.map((field) => [field.storageKey, field.labels[language]]),
+          ),
         },
       );
       const objectUrl = URL.createObjectURL(blob);

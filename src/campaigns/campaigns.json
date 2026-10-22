@@ -4,6 +4,7 @@
     "languages": ["en", "it"],
     "defaultLanguage": "en",
     "palette": "heroic",
+    "gameSystem": { "id": "generic", "edition": "Your ruleset", "customLabels": {} },
     "name": { "en": "The Lantern Road", "it": "La Via delle Lanterne" },
     "description": {
       "en": "An original sample campaign ready to replace with your own world.",

@@ -3,6 +3,7 @@
  */
 
 import { type BilingualText } from '@guild/models/language.model';
+import { type CampaignGameSystem } from '@guild/models/rulesetProfile.model';
 
 /** Top-level campaign information. */
 export interface Campaign {
@@ -13,6 +14,7 @@ export interface Campaign {
   readonly name: BilingualText;
   readonly description: BilingualText;
   readonly edition: string;
+  readonly gameSystem?: CampaignGameSystem;
   readonly startDate: string;
   readonly dungeonMaster: string;
   readonly partyName: string;

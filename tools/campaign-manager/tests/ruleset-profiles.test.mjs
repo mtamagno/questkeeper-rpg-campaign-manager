@@ -1,0 +1,38 @@
+import assert from 'node:assert/strict';
+import test from 'node:test';
+
+import {
+  inferRulesetId,
+  normalizeGameSystem,
+  resolveRulesetProfile,
+} from '../ruleset-profiles.mjs';
+
+test('ruleset profiles expose materially different terminology', () => {
+  assert.equal(resolveRulesetProfile('dnd-2014').fields[0].labels.en, 'Race');
+  assert.equal(resolveRulesetProfile('dnd-2024').fields[0].labels.en, 'Species');
+  assert.equal(resolveRulesetProfile('pf2e-remaster').fields[0].labels.en, 'Ancestry');
+  assert.equal(resolveRulesetProfile('coc7e').fields[0].labels.en, 'Occupation');
+  assert.equal(resolveRulesetProfile('generic').fields[1].labels.en, 'Role / archetype');
+});
+
+test('legacy editions infer a profile without destructive migration', () => {
+  assert.equal(inferRulesetId('D&D 5e (2024)'), 'dnd-2024');
+  assert.equal(inferRulesetId('Call of Cthulhu 7e'), 'coc7e');
+  assert.deepEqual(normalizeGameSystem(undefined, 'Unknown homebrew'), {
+    id: 'generic',
+    edition: 'Unknown homebrew',
+    customLabels: {},
+  });
+});
+
+test('only redistributable suggestions carry explicit provenance', () => {
+  const catalog = resolveRulesetProfile('dnd-2024').fields.flatMap(
+    (definition) => definition.options,
+  );
+  assert.ok(catalog.length > 0);
+  for (const entry of catalog) {
+    assert.equal(entry.provenance.license, 'CC-BY-4.0');
+    assert.match(entry.provenance.url, /^https:\/\//);
+  }
+  assert.equal(resolveRulesetProfile('coc7e').fields[0].options.length, 0);
+});

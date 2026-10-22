@@ -39,6 +39,9 @@ export interface CampaignCharacterPdfOptions {
   readonly portraitImageUrl?: string;
   readonly chapterTitle?: BilingualText;
   readonly recordedAt?: string;
+  readonly identityLabels?: Partial<
+    Record<'classType' | 'background' | 'race' | 'subclass', string>
+  >;
 }
 
 interface PdfArtwork {
@@ -142,7 +145,7 @@ export async function generateCampaignCharacterSheetPdf(
 
   drawProfilePage(doc, characterName, sheet, language, options, artwork);
   doc.addPage();
-  drawPageOne(doc, characterName, sheet, language);
+  drawPageOne(doc, characterName, sheet, language, options);
   doc.addPage();
   drawPageTwo(doc, characterName, sheet, language);
   drawPageNumbers(doc, language);
@@ -358,6 +361,7 @@ function drawPageOne(
   characterName: string,
   sheet: CharacterSheet,
   language: CampaignPdfLanguage,
+  options: CampaignCharacterPdfOptions,
 ): void {
   drawHeader(
     doc,
@@ -368,7 +372,7 @@ function drawPageOne(
   );
 
   let y = 35;
-  y = drawIdentity(doc, sheet, language, y);
+  y = drawIdentity(doc, sheet, language, y, options.identityLabels);
   y = drawCombatSummary(doc, sheet, language, y + 5);
   y = drawAbilityScores(doc, sheet, language, y + 6);
   drawProficiencyColumns(doc, sheet, language, y + 7);
@@ -432,11 +436,15 @@ function drawIdentity(
   sheet: CharacterSheet,
   language: CampaignPdfLanguage,
   y: number,
+  identityLabels: CampaignCharacterPdfOptions['identityLabels'],
 ): number {
-  const labels =
-    language === 'it'
-      ? ['Classe e livello', 'Background', 'Razza', 'Allineamento', 'Punti esperienza']
-      : ['Class & level', 'Background', 'Race', 'Alignment', 'Experience points'];
+  const labels = [
+    `${identityLabels?.classType ?? (language === 'it' ? 'Classe' : 'Class')} ${language === 'it' ? 'e livello' : '& level'}`,
+    identityLabels?.background ?? 'Background',
+    identityLabels?.race ?? (language === 'it' ? 'Razza' : 'Race'),
+    language === 'it' ? 'Allineamento' : 'Alignment',
+    language === 'it' ? 'Punti esperienza' : 'Experience points',
+  ];
   const values = [
     `${sheet.classType}${sheet.subclass ? ` - ${sheet.subclass}` : ''} ${sheet.level}`,
     sheet.background,

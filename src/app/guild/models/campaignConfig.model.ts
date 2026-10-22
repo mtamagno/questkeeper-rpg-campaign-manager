@@ -5,6 +5,7 @@
 
 import { type BilingualText } from '@guild/models/language.model';
 import { type CampaignPalette } from '@guild/models/campaignPalette.model';
+import { type CampaignGameSystem } from '@guild/models/rulesetProfile.model';
 
 /** A single campaign listed in the global campaigns manifest. */
 export interface CampaignManifestEntry {
@@ -15,6 +16,7 @@ export interface CampaignManifestEntry {
   readonly defaultLanguage?: string;
   /** Curated visual identity. Missing values retain the legacy heroic theme. */
   readonly palette?: CampaignPalette;
+  readonly gameSystem?: CampaignGameSystem;
   readonly name: BilingualText;
   readonly description: BilingualText;
   readonly thumbnail: string;
