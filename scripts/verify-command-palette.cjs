@@ -26,10 +26,9 @@ for (const phrase of [
   "event.key === 'ArrowDown'",
   "event.key === 'Home'",
   "event.key === 'Enter'",
-  "event.key !== 'Tab'",
   "event.key === 'Escape'",
   'event.ctrlKey || event.metaKey',
-  "document.querySelector<HTMLElement>('#main-content')?.focus()",
+  'trapTabKey(dialog, event)',
   'this.previouslyFocused',
 ]) {
   assert.ok(component.includes(phrase), `Keyboard or focus contract is missing: ${phrase}`);

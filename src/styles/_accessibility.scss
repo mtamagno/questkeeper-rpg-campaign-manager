@@ -5,8 +5,33 @@
 @use 'variables' as *;
 
 :where(a, button, input, select, textarea, [role='button'], [tabindex]):focus-visible {
-  outline: $border-width-default solid $color-gold-light;
+  outline: max(#{$border-width-default}, 2px) solid var(--qk-color-focus, #{$color-gold-light});
   outline-offset: $spacing-2xs;
+}
+
+:where(h1, main)[tabindex='-1']:focus:not(:focus-visible) {
+  outline: 0;
+}
+
+:where(h1, h2, h3, [id]) {
+  scroll-margin-block-start: 6rem;
+}
+
+@media (prefers-contrast: more) {
+  :where(a, button, input, select, textarea, [role='button'], [tabindex]):focus-visible {
+    outline-width: 3px;
+    outline-offset: 3px;
+  }
+}
+
+@media (forced-colors: active) {
+  :where(a, button, input, select, textarea, [role='button'], [tabindex]):focus-visible {
+    outline-color: Highlight;
+  }
+
+  :where(button, a, input, select, textarea) {
+    forced-color-adjust: auto;
+  }
 }
 
 ::selection {

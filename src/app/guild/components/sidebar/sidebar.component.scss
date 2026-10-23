@@ -171,6 +171,9 @@
 
   // --- NPC category toggle ---
   &__category-title {
+    width: 100%;
+    border: 0;
+    background: transparent;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -182,6 +185,7 @@
     letter-spacing: $letter-spacing-wide;
     padding: $spacing-xs $spacing-md $spacing-xs $spacing-lg;
     margin: 0;
+    text-align: left;
     @include transition-colors($transition-fast);
 
     &:hover {

@@ -6,11 +6,16 @@
 import {
   Component,
   ChangeDetectionStrategy,
+  type AfterViewInit,
+  type ElementRef,
+  type OnDestroy,
   input,
   output,
   signal,
   type WritableSignal,
+  viewChild,
 } from '@angular/core';
+import { activeElement, restoreFocus, trapTabKey } from '@guild/utils/focusTrap';
 
 /**
  * Reusable password dialog with fantasy styling.
@@ -32,7 +37,11 @@ import {
   styleUrl: './password-dialog.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PasswordDialogComponent {
+export class PasswordDialogComponent implements AfterViewInit, OnDestroy {
+  private readonly dialogPanel = viewChild.required<ElementRef<HTMLElement>>('dialogPanel');
+  private readonly passwordInput =
+    viewChild.required<ElementRef<HTMLInputElement>>('passwordInput');
+  private readonly previouslyFocused = activeElement();
   /** Name of the character being unlocked — shown in the dialog header. */
   readonly characterName = input.required<string>();
 
@@ -50,6 +59,14 @@ export class PasswordDialogComponent {
 
   /** Whether the password text is visible (toggle). */
   readonly isPasswordVisible: WritableSignal<boolean> = signal(false);
+
+  ngAfterViewInit(): void {
+    setTimeout((): void => this.passwordInput().nativeElement.focus());
+  }
+
+  ngOnDestroy(): void {
+    restoreFocus(this.previouslyFocused);
+  }
 
   /**
    * Handles form submission.
@@ -97,6 +114,8 @@ export class PasswordDialogComponent {
   onKeydown(event: KeyboardEvent): void {
     if (event.key === 'Escape') {
       this.dialogClose.emit();
+      return;
     }
+    trapTabKey(this.dialogPanel().nativeElement, event);
   }
 }

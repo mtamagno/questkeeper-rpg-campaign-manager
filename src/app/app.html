@@ -6,6 +6,7 @@
 <div class="app-layout" [attr.data-qk-palette]="activePalette()">
   <!-- Mobile hamburger toggle -->
   <button
+    #menuToggle
     class="app-layout__hamburger"
     type="button"
     (click)="toggleSidebar()"
@@ -21,16 +22,25 @@
 
   <!-- Mobile backdrop overlay -->
   @if (isSidebarOpen()) {
-    <div class="app-layout__backdrop" (click)="closeSidebar()" role="presentation"></div>
+    <div class="app-layout__backdrop" (click)="closeSidebar(true)" aria-hidden="true"></div>
   }
 
   <!-- Main content area -->
-  <main id="main-content" class="app-layout__content" tabindex="-1">
+  <main
+    id="main-content"
+    class="app-layout__content"
+    tabindex="-1"
+    [attr.aria-label]="isItalian() ? 'Contenuto della campagna' : 'Campaign content'"
+  >
     <app-site-command-bar />
     <div class="app-layout__route-wrapper">
       <router-outlet />
     </div>
   </main>
 </div>
+
+<p class="route-announcer" aria-live="polite" aria-atomic="true">
+  {{ routeAnnouncement() }}
+</p>
 
 <app-guided-tour />

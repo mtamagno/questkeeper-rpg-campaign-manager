@@ -4,11 +4,13 @@ import {
   computed,
   DestroyRef,
   effect,
+  ElementRef,
   HostListener,
   inject,
   signal,
   type OnInit,
   type WritableSignal,
+  viewChild,
 } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -102,6 +104,8 @@ export class App implements OnInit {
   private readonly languageService = inject(LanguageService);
   private readonly documentTitle = inject(Title);
   private readonly journeyMemory = inject(JourneyMemoryService);
+  private readonly menuToggle = viewChild<ElementRef<HTMLButtonElement>>('menuToggle');
+  private completedInitialNavigation = false;
 
   protected readonly title = 'QuestKeeper';
 
@@ -116,16 +120,21 @@ export class App implements OnInit {
 
   /** Current language, used by app-shell controls outside routed pages. */
   readonly isItalian = computed((): boolean => this.languageService.currentLanguage() === 'it');
+  readonly routeAnnouncement = signal('');
 
   /** Tracks the previous first-segment to detect major route changes. */
   private previousFirstSegment: string | undefined = undefined;
 
   ngOnInit(): void {
     this.subscribeToMajorRouteChanges();
+    this.subscribeToAccessibleRouteChanges();
   }
 
   constructor() {
     this.journeyMemory.initialize();
+    effect((): void => {
+      document.documentElement.lang = this.languageService.currentLanguage();
+    });
     effect((): void => {
       const campaignId = this.activeCampaignId();
       const language = this.languageService.currentLanguage();
@@ -141,18 +150,26 @@ export class App implements OnInit {
 
   /** Toggles the mobile sidebar. */
   toggleSidebar(): void {
-    this.isSidebarOpen.update((v) => !v);
+    const willOpen = !this.isSidebarOpen();
+    this.isSidebarOpen.set(willOpen);
+    if (willOpen) {
+      setTimeout((): void => document.querySelector<HTMLElement>('.sidebar__close')?.focus());
+    } else {
+      this.restoreMenuFocus();
+    }
   }
 
   /** Closes the mobile sidebar. */
-  closeSidebar(): void {
+  closeSidebar(restoreFocus = false): void {
+    const wasOpen = this.isSidebarOpen();
     this.isSidebarOpen.set(false);
+    if (wasOpen && restoreFocus) this.restoreMenuFocus();
   }
 
   /** Lets keyboard users dismiss the mobile navigation consistently. */
   @HostListener('document:keydown.escape')
   closeSidebarOnEscape(): void {
-    this.closeSidebar();
+    this.closeSidebar(true);
   }
 
   /**
@@ -191,5 +208,35 @@ export class App implements OnInit {
         }
         this.previousFirstSegment = nextSegment;
       });
+  }
+
+  private subscribeToAccessibleRouteChanges(): void {
+    this.router.events
+      .pipe(
+        filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((): void => {
+        const shouldMoveFocus = this.completedInitialNavigation;
+        this.completedInitialNavigation = true;
+        setTimeout((): void => {
+          const main = document.querySelector<HTMLElement>('#main-content');
+          const heading = main?.querySelector<HTMLElement>('h1');
+          const label =
+            heading?.textContent?.replace(/\s+/g, ' ').trim() || this.documentTitle.getTitle();
+          this.routeAnnouncement.set(
+            this.isItalian() ? `Pagina caricata: ${label}` : `Page loaded: ${label}`,
+          );
+          if (!shouldMoveFocus) return;
+          const target = heading ?? main;
+          target?.setAttribute('tabindex', '-1');
+          target?.focus({ preventScroll: true });
+          target?.scrollIntoView({ block: 'start' });
+        });
+      });
+  }
+
+  private restoreMenuFocus(): void {
+    setTimeout((): void => this.menuToggle()?.nativeElement.focus());
   }
 }

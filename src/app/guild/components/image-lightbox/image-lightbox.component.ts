@@ -11,9 +11,16 @@ import {
   computed,
   type Signal,
   HostListener,
+  type AfterViewInit,
+  type ElementRef,
+  inject,
+  type OnDestroy,
+  viewChild,
 } from '@angular/core';
 
 import { type ImageRef } from '@guild/models/character.model';
+import { LanguageService } from '@guild/services/language.service';
+import { activeElement, restoreFocus, trapTabKey } from '@guild/utils/focusTrap';
 
 /**
  * Fullscreen overlay lightbox for viewing images at full resolution.
@@ -36,7 +43,12 @@ import { type ImageRef } from '@guild/models/character.model';
   styleUrl: './image-lightbox.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ImageLightboxComponent {
+export class ImageLightboxComponent implements AfterViewInit, OnDestroy {
+  private readonly language = inject(LanguageService);
+  private readonly dialog = viewChild.required<ElementRef<HTMLElement>>('lightboxDialog');
+  private readonly closeButton = viewChild.required<ElementRef<HTMLButtonElement>>('closeButton');
+  private readonly previouslyFocused = activeElement();
+  readonly isItalian = this.language.isItalian;
   /** All images in the gallery. */
   readonly images = input.required<ReadonlyArray<ImageRef>>();
 
@@ -69,6 +81,14 @@ export class ImageLightboxComponent {
     () => `${this.currentIndex() + 1} / ${this.images().length}`,
   );
 
+  ngAfterViewInit(): void {
+    setTimeout((): void => this.closeButton().nativeElement.focus());
+  }
+
+  ngOnDestroy(): void {
+    restoreFocus(this.previouslyFocused);
+  }
+
   /** Navigates to the previous image. */
   goToPrevious(): void {
     if (this.hasPrevious()) {
@@ -99,6 +119,10 @@ export class ImageLightboxComponent {
    */
   @HostListener('document:keydown', ['$event'])
   onKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Tab') {
+      trapTabKey(this.dialog().nativeElement, event);
+      return;
+    }
     switch (event.key) {
       case 'Escape':
         this.lightboxClose.emit();

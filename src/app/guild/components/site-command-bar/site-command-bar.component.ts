@@ -20,6 +20,7 @@ import { GuidedTourService } from '@guild/services/guidedTour.service';
 import { localizeText } from '@guild/models/language.model';
 import { PwaInstallService } from '@guild/services/pwaInstall.service';
 import { JourneyMemoryService, type JourneyPage } from '@guild/services/journeyMemory.service';
+import { activeElement, restoreFocus, trapTabKey } from '@guild/utils/focusTrap';
 
 interface NavigationCommand {
   readonly id: string;
@@ -345,21 +346,20 @@ export class SiteCommandBarComponent {
   }
 
   open(): void {
-    this.previouslyFocused =
-      document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    this.previouslyFocused = activeElement();
     this.query.set('');
     this.activeIndex.set(0);
     this.isOpen.set(true);
     setTimeout((): void => this.searchInput()?.nativeElement.focus());
   }
 
-  close(restoreFocus = true): void {
+  close(shouldRestoreFocus = true): void {
     this.isOpen.set(false);
     this.query.set('');
     this.activeIndex.set(0);
-    if (restoreFocus) {
+    if (shouldRestoreFocus) {
       const focusTarget = this.previouslyFocused;
-      setTimeout((): void => focusTarget?.focus());
+      restoreFocus(focusTarget);
     }
     this.previouslyFocused = null;
   }
@@ -405,7 +405,6 @@ export class SiteCommandBarComponent {
     }
     this.close(false);
     await this.router.navigateByUrl(url);
-    setTimeout((): void => document.querySelector<HTMLElement>('#main-content')?.focus());
   }
 
   navigateActive(): void {
@@ -450,30 +449,8 @@ export class SiteCommandBarComponent {
   }
 
   onDialogKeydown(event: KeyboardEvent): void {
-    if (event.key !== 'Tab') {
-      return;
-    }
     const dialog = this.paletteDialog()?.nativeElement;
-    if (dialog === undefined) {
-      return;
-    }
-    const focusable = Array.from(
-      dialog.querySelectorAll<HTMLElement>(
-        'button:not([disabled]), input:not([disabled]), a[href]',
-      ),
-    ).filter((element): boolean => element.offsetParent !== null);
-    const first = focusable[0];
-    const last = focusable[focusable.length - 1];
-    if (first === undefined || last === undefined) {
-      return;
-    }
-    if (event.shiftKey && document.activeElement === first) {
-      event.preventDefault();
-      last.focus();
-    } else if (!event.shiftKey && document.activeElement === last) {
-      event.preventDefault();
-      first.focus();
-    }
+    if (dialog !== undefined) trapTabKey(dialog, event);
   }
 
   commandOptionId(index: number): string {

@@ -808,6 +808,32 @@ and acceptance journeys P-04/P-06.
 **Revisit when:** Cross-device profiles ship, route identities change during a
 schema migration, or user testing requires an explicit history-disable option.
 
+### QK-030 — Route focus and modal focus belong to the shared shell
+
+**Date:** 23 October 2026
+
+**Status:** Active
+
+**Decision:** Every in-app navigation announces its destination and moves focus
+to the new routed heading after the initial load. Every modal contains Tab focus,
+supports Escape and restores its launcher. These behaviors use shared shell and
+focus utilities rather than per-page workarounds.
+
+**Why:** A visually successful route change can leave keyboard and screen-reader
+users operating controls from the previous page. Independently implemented
+overlays also drift in Escape, Tab and restoration behavior.
+
+**Consequences:** Routed pages keep one meaningful `h1`; persistent navigation
+must not introduce another. New dialogs use the shared focus helper. Visual
+focus must survive campaign palettes, increased contrast and forced colours.
+
+**Source:** [Accessibility contract](ACCESSIBILITY.md), roadmap Day 06 and all
+published player/GM acceptance journeys.
+
+**Revisit when:** Native mobile shells define an equivalent navigation-focus
+API or automated browser accessibility checks can replace part of the static
+guard without reducing coverage.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD

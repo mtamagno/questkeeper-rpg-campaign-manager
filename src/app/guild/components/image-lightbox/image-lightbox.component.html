@@ -1,19 +1,21 @@
 <!-- Image Lightbox — Fullscreen overlay with navigation -->
 <div
+  #lightboxDialog
   class="lightbox"
   tabindex="-1"
   (click)="onBackdropClick($event)"
   (keydown.escape)="lightboxClose.emit()"
   role="dialog"
   aria-modal="true"
-  aria-label="Image viewer"
+  [attr.aria-label]="isItalian() ? 'Visualizzatore immagini' : 'Image viewer'"
 >
   <!-- Close button -->
   <button
+    #closeButton
     class="lightbox__close"
     type="button"
     (click)="lightboxClose.emit()"
-    aria-label="Close lightbox"
+    [attr.aria-label]="isItalian() ? 'Chiudi immagine' : 'Close lightbox'"
   >
     ✕
   </button>
@@ -41,7 +43,7 @@
       type="button"
       [disabled]="!hasPrevious()"
       (click)="goToPrevious(); $event.stopPropagation()"
-      aria-label="Previous image"
+      [attr.aria-label]="isItalian() ? 'Immagine precedente' : 'Previous image'"
     >
       ‹
     </button>
@@ -51,7 +53,7 @@
       type="button"
       [disabled]="!hasNext()"
       (click)="goToNext(); $event.stopPropagation()"
-      aria-label="Next image"
+      [attr.aria-label]="isItalian() ? 'Immagine successiva' : 'Next image'"
     >
       ›
     </button>

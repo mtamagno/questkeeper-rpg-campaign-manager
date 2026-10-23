@@ -2,7 +2,7 @@
 <aside class="sidebar" [class.sidebar--open]="isOpen()">
   <!-- Header -->
   <div class="sidebar__header">
-    <h1 class="sidebar__title">
+    <div class="sidebar__title">
       @if (activeCampaignId(); as cId) {
         <a [routerLink]="['/', cId]" class="sidebar__title-link" (click)="close()">{{
           campaignTitle()
@@ -10,7 +10,7 @@
       } @else {
         <a routerLink="/" class="sidebar__title-link" (click)="close()">QuestKeeper</a>
       }
-    </h1>
+    </div>
     <button
       class="sidebar__close"
       type="button"
@@ -102,21 +102,20 @@
           />
         } @else {
           @for (group of npcGroups(); track group.category) {
-            <h3
-              class="sidebar__category-title"
-              (click)="toggleNpcCategory(group.category)"
-              (keydown.enter)="toggleNpcCategory(group.category)"
-              (keydown.space)="toggleNpcCategory(group.category)"
-              role="button"
-              [attr.tabindex]="0"
-              [attr.aria-expanded]="isNpcCategoryOpen(group.category)"
-            >
-              {{ group.category }}
-              <span
-                class="sidebar__toggle-icon"
-                [class.sidebar__toggle-icon--open]="isNpcCategoryOpen(group.category)"
-                >▸</span
+            <h3>
+              <button
+                class="sidebar__category-title"
+                type="button"
+                (click)="toggleNpcCategory(group.category)"
+                [attr.aria-expanded]="isNpcCategoryOpen(group.category)"
               >
+                {{ group.category }}
+                <span
+                  class="sidebar__toggle-icon"
+                  [class.sidebar__toggle-icon--open]="isNpcCategoryOpen(group.category)"
+                  >▸</span
+                >
+              </button>
             </h3>
 
             @if (isNpcCategoryOpen(group.category)) {
