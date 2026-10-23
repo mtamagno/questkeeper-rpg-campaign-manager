@@ -36,6 +36,8 @@
                 class="session-summary__event-image"
                 [src]="event.image.url"
                 [alt]="event.image.alt"
+                loading="lazy"
+                decoding="async"
               />
             }
           </li>

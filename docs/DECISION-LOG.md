@@ -834,6 +834,32 @@ published player/GM acceptance journeys.
 API or automated browser accessibility checks can replace part of the static
 guard without reducing coverage.
 
+### QK-031 — Performance limits are executable product contracts
+
+**Date:** 23 October 2026
+
+**Status:** Active
+
+**Decision:** Initial HTML, JavaScript and CSS, request count, deferred chunks,
+optimized images and font loading each have repository-specific ceilings that
+are measured after a production build.
+
+**Why:** A feature can appear correct while quietly making every session slower,
+especially on game-night Wi-Fi and mobile devices. Review-only guidance cannot
+prevent gradual regressions.
+
+**Consequences:** Every image declares loading and decoding intent, only the hero
+receives high fetch priority, and fonts cannot block first text. Budget increases
+require measured evidence and a recorded decision; the public and production
+ceilings may differ while their policy and verifier remain equivalent.
+
+**Source:** [Performance budgets](PERFORMANCE-BUDGETS.md), roadmap Day 06 and the
+mobile/offline acceptance journeys.
+
+**Revisit when:** Real-user measurements justify a tighter ceiling, a self-hosted
+font package replaces the current provider, or native shells need separate
+budgets.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD

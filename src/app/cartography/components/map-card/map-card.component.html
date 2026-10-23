@@ -3,7 +3,13 @@
   <!-- Preview image -->
   @if (previewUrl()) {
     <div class="map-card__image-wrapper">
-      <img class="map-card__image" [src]="previewUrl()" [alt]="(map().name | bilingual) + ' map'" />
+      <img
+        class="map-card__image"
+        [src]="previewUrl()"
+        [alt]="(map().name | bilingual) + ' map'"
+        loading="lazy"
+        decoding="async"
+      />
     </div>
   }
 

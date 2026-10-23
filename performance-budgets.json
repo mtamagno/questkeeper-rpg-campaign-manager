@@ -1,0 +1,9 @@
+{
+  "distDirectory": "dist/campaign-companion/browser",
+  "initialBytes": 430000,
+  "initialRequests": 12,
+  "largestInitialAssetBytes": 300000,
+  "largestDeferredScriptBytes": 500000,
+  "generatedImageBytes": 400000,
+  "imagePathMarkers": ["manager-demo/images/"]
+}

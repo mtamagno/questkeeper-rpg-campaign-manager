@@ -28,6 +28,8 @@
         [src]="image.url"
         [alt]="image.alt"
         (load)="$event.target.classList.add('is-loaded')"
+        loading="eager"
+        decoding="async"
       />
 
       @if (image.caption) {

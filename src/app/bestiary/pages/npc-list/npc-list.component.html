@@ -63,6 +63,7 @@
                         [alt]="npc.name"
                         loading="lazy"
                         (error)="onPortraitError($event)"
+                        decoding="async"
                       />
                       @if (!npc.isAlive) {
                         <span class="npc-card__deceased-overlay">💀</span>

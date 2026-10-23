@@ -5,8 +5,12 @@ const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 const read = (relativePath) => fs.readFileSync(path.join(root, relativePath), 'utf8');
 const service = read('src/app/guild/services/journeyMemory.service.ts');
-const commandBar = read('src/app/guild/components/site-command-bar/site-command-bar.component.html');
-const commandComponent = read('src/app/guild/components/site-command-bar/site-command-bar.component.ts');
+const commandBar = read(
+  'src/app/guild/components/site-command-bar/site-command-bar.component.html',
+);
+const commandComponent = read(
+  'src/app/guild/components/site-command-bar/site-command-bar.component.ts',
+);
 const homepage = read('src/app/guild/pages/homepage/homepage.component.html');
 const guide = read('docs/GLOBAL-COMMAND-PALETTE.md');
 const roadmap = read('docs/ROADMAP-60-DAYS.md');

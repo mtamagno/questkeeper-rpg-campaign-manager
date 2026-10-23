@@ -7,10 +7,7 @@
 @use 'variables' as *;
 
 // --- 🔤 Font imports ---
-// Cinzel: decorative serif for headings (Google Fonts)
-// Crimson Text: readable serif for body text (Google Fonts)
-// Playfair Display: classic newspaper masthead/headline serif (Google Fonts)
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+// Web fonts are requested asynchronously from index.html so text can render immediately.
 
 // --- 📄 Base typography ---
 

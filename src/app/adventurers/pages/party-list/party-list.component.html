@@ -8,6 +8,7 @@
         [src]="imgUrl"
         alt="The adventuring party"
         loading="eager"
+        decoding="async"
       />
     }
     <div class="party-list__atmosphere" aria-hidden="true"></div>
@@ -45,6 +46,7 @@
               [src]="showcase.character.profileImageUrl"
               [alt]="showcase.character.name"
               loading="lazy"
+              decoding="async"
             />
             <div class="character-card__image-overlay"></div>
           </div>

@@ -20,6 +20,7 @@
             loading="lazy"
             (load)="$event.target.classList.add('is-loaded')"
             (error)="onThumbnailError($event, image.url)"
+            decoding="async"
           />
           @if (image.caption) {
             <span class="gallery__caption">{{ image.caption }}</span>

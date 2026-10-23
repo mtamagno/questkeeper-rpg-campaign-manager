@@ -92,6 +92,7 @@
               loading="lazy"
               (load)="$event.target.classList.add('is-loaded')"
               (error)="onImageError($event)"
+              decoding="async"
             />
             <figcaption class="gallery__label">{{ item.label }}</figcaption>
           </figure>
@@ -116,6 +117,7 @@
             loading="lazy"
             (load)="$event.target.classList.add('is-loaded')"
             (error)="onImageError($event)"
+            decoding="async"
           />
           <figcaption class="gallery__label">{{ item.label }}</figcaption>
         </figure>

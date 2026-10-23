@@ -6,6 +6,8 @@
     aria-hidden="true"
     [style.width.px]="size()"
     [style.height.px]="size()"
+    loading="eager"
+    decoding="async"
   />
   @if (label()) {
     <p class="dice-loader__label">{{ label() }}</p>

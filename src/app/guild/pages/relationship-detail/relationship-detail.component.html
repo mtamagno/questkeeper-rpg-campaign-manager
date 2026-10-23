@@ -16,6 +16,8 @@
             [src]="source.profileImageUrl ?? source.avatar.url"
             [alt]="source.name"
             (error)="$event.target.src = 'assets/images/placeholders/placeholder-portrait.svg'"
+            loading="lazy"
+            decoding="async"
           />
           <span class="rel-detail__entity-name">{{ source.name }}</span>
         </div>
@@ -36,6 +38,8 @@
             [src]="target.profileImageUrl ?? target.avatar.url"
             [alt]="target.name"
             (error)="$event.target.src = 'assets/images/placeholders/placeholder-portrait.svg'"
+            loading="lazy"
+            decoding="async"
           />
           <span class="rel-detail__entity-name">{{ target.name }}</span>
         </div>

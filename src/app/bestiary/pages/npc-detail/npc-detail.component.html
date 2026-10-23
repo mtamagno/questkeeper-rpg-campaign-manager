@@ -17,6 +17,8 @@
             [alt]="npc.name"
             (load)="isProfileLoaded.set(true)"
             (error)="onProfileImageError($event)"
+            loading="lazy"
+            decoding="async"
           />
         </div>
         <div class="npc-detail__header-info">
@@ -61,6 +63,8 @@
               [alt]="npc.name + ' full body'"
               (load)="isPortraitLoaded.set(true)"
               (error)="onPortraitImageError($event)"
+              loading="lazy"
+              decoding="async"
             />
           </div>
         }

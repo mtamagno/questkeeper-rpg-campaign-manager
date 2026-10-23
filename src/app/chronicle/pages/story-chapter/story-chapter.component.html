@@ -24,7 +24,12 @@
           @if (chunk.images.length > 0) {
             @for (image of chunk.images; track image.url) {
               <figure class="story-chapter__inline-image">
-                <img [src]="image.url" [alt]="image.alt | bilingual" loading="lazy" />
+                <img
+                  [src]="image.url"
+                  [alt]="image.alt | bilingual"
+                  loading="lazy"
+                  decoding="async"
+                />
                 @if (image.caption) {
                   <figcaption class="story-chapter__inline-caption">
                     {{ image.caption | bilingual }}
@@ -54,7 +59,12 @@
         <div class="story-chapter__gallery-grid">
           @for (image of galleryImages(); track image.url) {
             <figure class="story-chapter__gallery-item">
-              <img [src]="image.url" [alt]="image.alt | bilingual" loading="lazy" />
+              <img
+                [src]="image.url"
+                [alt]="image.alt | bilingual"
+                loading="lazy"
+                decoding="async"
+              />
               @if (image.caption) {
                 <figcaption class="story-chapter__gallery-caption">
                   {{ image.caption | bilingual }}
