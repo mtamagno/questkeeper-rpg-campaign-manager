@@ -125,9 +125,15 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ github.ref_name }}
         run: |
+          RELEASE_TITLE="$(sed -n '1s/^# //p' "docs/releases/$RELEASE_TAG.md")"
+          test -n "$RELEASE_TITLE" || {
+            echo "Release notes must begin with a Markdown title."
+            exit 1
+          }
           gh release create "$RELEASE_TAG" \
             artifacts/questkeeper-* \
             artifacts/SHA256SUMS.txt \
             --verify-tag \
-            --title "QuestKeeper ${RELEASE_TAG#v}" \
+            --title "$RELEASE_TITLE" \
+            --latest \
             --notes-file "docs/releases/$RELEASE_TAG.md"

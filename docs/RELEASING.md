@@ -19,6 +19,10 @@ credentials, transcripts, generated model files or maintainer workspaces.
   to `docs/releases/` like repository Markdown does.
 - Compatible fixes increment the patch version, compatible features increment
   the minor version and breaking changes increment the major version.
+- A release may be designated **LTS** in `package.json` through
+  `questkeeper.releaseChannel`, in its notes and in the GitHub Release title.
+  The ordinary semantic-version tag remains immutable; no moving `lts` tag is
+  used. GitHub's **Latest** marker points users to the current recommended LTS.
 
 The release workflow rejects a tag that does not match the package version or
 does not have a notes file, codename and dedicated companion asset. Patch
@@ -47,12 +51,13 @@ Before creating a tag:
 4. run `npm run verify` from a clean worktree;
 5. review the original campaign and Manager demo;
 6. confirm no private or licensed campaign material is tracked;
-7. commit and push the release candidate to `main`;
-8. create and push the annotated tag.
+7. commit the release candidate to `main`;
+8. create the annotated tag locally;
+9. push `main` and the tag together after every local gate is green.
 
 ```bash
-git tag -a v1.1.0 -m "QuestKeeper 1.1.0 · Lanternwake"
-git push origin v1.1.0
+git tag -a v1.1.3 -m "QuestKeeper 1.1.3 · Wayhold · LTS"
+git push --atomic origin main v1.1.3
 ```
 
 GitHub Actions repeats the quality gate, then publishes:

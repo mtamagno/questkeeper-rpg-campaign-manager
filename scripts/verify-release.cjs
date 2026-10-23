@@ -15,6 +15,7 @@ const releaseNotes = `docs/releases/v${packageJson.version}.md`;
 const releaseCodex = 'RELEASES.md';
 const releaseAssetDirectory = 'docs/images/releases';
 const failures = [];
+const releaseChannel = packageJson.questkeeper?.releaseChannel ?? 'stable';
 
 if (
   packageJson.version !== packageLock.version ||
@@ -46,6 +47,15 @@ if (
 
 if (!currentReleaseNotes.includes('Release companion ·')) {
   failures.push(`Release notes must introduce the v${packageJson.version} release companion.`);
+}
+
+if (releaseChannel === 'lts') {
+  if (!currentReleaseNotes.includes('Release channel · LTS')) {
+    failures.push(`LTS release notes must declare the LTS channel.`);
+  }
+  if (!currentReleaseNotes.match(/^# .+\bLTS\b/m)) {
+    failures.push(`An LTS GitHub Release title must visibly include LTS.`);
+  }
 }
 
 if (currentReleaseAssets.length === 0) {
@@ -86,6 +96,8 @@ for (const marker of [
   'git archive',
   'sha256sum',
   'gh release create',
+  'RELEASE_TITLE=',
+  '--latest',
   'actions/upload-artifact@v7',
   'actions/download-artifact@v8',
 ]) {

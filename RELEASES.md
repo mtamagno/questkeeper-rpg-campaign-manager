@@ -17,21 +17,22 @@ setting or visual identity from a commercial game.
 <table>
   <tr>
     <td width="38%" align="center" valign="middle">
-      <img src="docs/images/releases/v1.1.2-hearthrest-vesper.png" alt="Vesper Hushwing, an owlkin night steward closing an extinguished lantern" width="330">
+      <img src="docs/images/releases/v1.1.3-wayhold-tarn.png" alt="Tarn Evermark, a pangolin-inspired archive warden carrying a field journal and hooded lantern" width="330">
     </td>
     <td width="62%" valign="middle">
-      <p><strong>QuestKeeper 1.1.2 · Hearthrest</strong></p>
-      <h3>The Quiet Farewell</h3>
-      <p><strong>Vesper Hushwing</strong> · owlkin night steward</p>
-      <blockquote>“Every good path deserves a proper ending.”</blockquote>
-      <p>Vesper gives setup a visible, bilingual final step: close its local service and terminate the installer process cleanly while launched QuestKeeper apps continue their work.</p>
-      <p><a href="docs/releases/v1.1.2.md"><strong>Read the release notes →</strong></a> · <a href="https://github.com/mtamagno/questkeeper-rpg-campaign-manager/releases/tag/v1.1.2"><strong>Download 1.1.2 →</strong></a></p>
+      <p><strong>QuestKeeper 1.1.3 · Wayhold — LTS</strong></p>
+      <h3>The Steady Chronicle</h3>
+      <p><strong>Tarn Evermark</strong> · pangolin-inspired archive warden</p>
+      <blockquote>“A good road remembers every traveller.”</blockquote>
+      <p>Tarn marks QuestKeeper's first LTS release: the complete 1.1.2 feedback cycle, remembered reading, accessible navigation and measurable loading budgets in one dependable campaign home.</p>
+      <p><a href="docs/releases/v1.1.3.md"><strong>Read the release notes →</strong></a> · <a href="https://github.com/mtamagno/questkeeper-rpg-campaign-manager/releases/tag/v1.1.3"><strong>Download 1.1.3 LTS →</strong></a></p>
     </td>
   </tr>
 </table>
 
-> Twick Brasswhisker still guards the immutable 1.1.1 Reopened Door. Every
-> published companion remains part of the living codex.
+> Vesper Hushwing still guards the immutable 1.1.2 Quiet Farewell. Every
+> published companion remains part of the living codex. Read the
+> [LTS policy](docs/LTS-POLICY.md) for Wayhold's maintenance promise.
 
 ---
 
@@ -41,17 +42,18 @@ These names set the direction for the journey. A planned codename or companion
 may move before its release branch opens if community feedback changes the
 milestone; after publication, its identity is permanent.
 
-| Version   | Codename          | Chapter                 | Release companion                              | Promise                                                  | Status      |
-| --------- | ----------------- | ----------------------- | ---------------------------------------------- | -------------------------------------------------------- | ----------- |
-| **1.0.0** | **Starquill**     | The First Chronicle     | **Auri Starquill**, mothkin chronicler         | A campaign receives a beautiful, portable home.          | Released    |
-| **1.1.0** | **Lanternwake**   | The Welcoming Path      | **Fen Wickwhistle**, lantern-tailed pathfinder | Native guided setup reaches Windows, macOS and Linux.    | Released    |
-| **1.1.1** | **Hearthkey**     | The Reopened Door       | **Twick Brasswhisker**, mousekin path-mender   | Windows shortcuts survive spaces in every local path.    | Released    |
-| **1.1.2** | **Hearthrest**    | The Quiet Farewell      | **Vesper Hushwing**, owlkin night steward      | Setup closes cleanly instead of leaving a local process. | Released    |
-| **1.2.0** | **Echobloom**     | Stories With Roots      | **Morrow Bellroot**, memory gardener           | Characters grow beyond a static sheet.                   | Planned     |
-| **1.3.0** | **Moonmoot**      | Gather at the Table     | **Pip Hearthroll**, goblin table scout         | The party can prepare and catch up together.             | Planned     |
-| **1.4.0** | **Waywhisper**    | The Living Atlas        | **Orra Mosscompass**, centaur mapmaker         | People, places, clues and roads become connected.        | Planned     |
-| **1.5.0** | **Dragonbell**    | Game Night Edition      | **Vaela Emberchime**, drakekin herald          | QuestKeeper becomes the page opened during play.         | Planned     |
-| **2.0.0** | **Everchronicle** | The Party's Living Book | **Edda Runeheart**, archive guardian           | The complete campaign journey becomes one coherent home. | Destination |
+| Version   | Codename          | Chapter                 | Release companion                              | Promise                                                            | Status         |
+| --------- | ----------------- | ----------------------- | ---------------------------------------------- | ------------------------------------------------------------------ | -------------- |
+| **1.0.0** | **Starquill**     | The First Chronicle     | **Auri Starquill**, mothkin chronicler         | A campaign receives a beautiful, portable home.                    | Released       |
+| **1.1.0** | **Lanternwake**   | The Welcoming Path      | **Fen Wickwhistle**, lantern-tailed pathfinder | Native guided setup reaches Windows, macOS and Linux.              | Released       |
+| **1.1.1** | **Hearthkey**     | The Reopened Door       | **Twick Brasswhisker**, mousekin path-mender   | Windows shortcuts survive spaces in every local path.              | Released       |
+| **1.1.2** | **Hearthrest**    | The Quiet Farewell      | **Vesper Hushwing**, owlkin night steward      | Setup closes cleanly instead of leaving a local process.           | Released       |
+| **1.1.3** | **Wayhold**       | The Steady Chronicle    | **Tarn Evermark**, archive warden              | Feedback fixes, memory, access and speed become a dependable base. | Released · LTS |
+| **1.2.0** | **Echobloom**     | Stories With Roots      | **Morrow Bellroot**, memory gardener           | Characters grow beyond a static sheet.                             | Planned        |
+| **1.3.0** | **Moonmoot**      | Gather at the Table     | **Pip Hearthroll**, goblin table scout         | The party can prepare and catch up together.                       | Planned        |
+| **1.4.0** | **Waywhisper**    | The Living Atlas        | **Orra Mosscompass**, centaur mapmaker         | People, places, clues and roads become connected.                  | Planned        |
+| **1.5.0** | **Dragonbell**    | Game Night Edition      | **Vaela Emberchime**, drakekin herald          | QuestKeeper becomes the page opened during play.                   | Planned        |
+| **2.0.0** | **Everchronicle** | The Party's Living Book | **Edda Runeheart**, archive guardian           | The complete campaign journey becomes one coherent home.           | Destination    |
 
 Versions not yet listed receive a codename and companion before their release
 candidate is tagged. Patch releases are included: their companion may be a
