@@ -55,11 +55,8 @@ assert.match(styles, /&--active/);
 assert.match(styles, /prefers-reduced-motion: reduce/);
 assert.match(styles, /@include respond-below\(sm\)/);
 assert.match(roadmap, /\[x\].*global command palette navigation/);
-assert.match(guide, /does not inspect\s+protected sheets/);
-assert.match(
-  guide,
-  /Recent pages, favourites and continue-reading actions are deliberately absent/,
-);
+assert.match(guide, /does not inspect\s+protected\s+sheets/);
+assert.match(guide, /recent pages and\s+favourites as explicit local navigation metadata/);
 
 console.log(
   'Global command palette verified: complete route scopes, bilingual discovery, modal semantics, keyboard selection and focus recovery.',

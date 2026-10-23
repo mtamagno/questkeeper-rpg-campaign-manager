@@ -40,6 +40,59 @@
     </section>
   }
 
+  @if (continuePage() || favoritePages().length > 0 || recentPages().length > 0) {
+    <section class="homepage__trail" aria-labelledby="remembered-trail-title">
+      <header class="homepage__trail-heading">
+        <span>{{ lang() === 'it' ? 'Il tuo percorso' : 'Your remembered trail' }}</span>
+        <h2 id="remembered-trail-title">
+          {{ lang() === 'it' ? 'Riprendi da dove eri rimasto' : 'Return where you left off' }}
+        </h2>
+        <p>
+          {{
+            lang() === 'it'
+              ? 'Cronologia e preferiti restano soltanto su questo dispositivo.'
+              : 'History and favorites stay only on this device.'
+          }}
+        </p>
+      </header>
+
+      @if (continuePage(); as page) {
+        <a class="homepage__continue-card" [routerLink]="page.url">
+          <span class="homepage__continue-icon" aria-hidden="true">&#8634;</span>
+          <span>
+            <small>{{ lang() === 'it' ? 'Continua a leggere' : 'Continue reading' }}</small>
+            <strong>{{ page.title }}</strong>
+          </span>
+          <span aria-hidden="true">&rarr;</span>
+        </a>
+      }
+
+      <div class="homepage__trail-columns">
+        @if (favoritePages().length > 0) {
+          <nav [attr.aria-label]="lang() === 'it' ? 'Pagine preferite' : 'Favorite pages'">
+            <h3>
+              <span aria-hidden="true">&#9733;</span>
+              {{ lang() === 'it' ? 'Preferiti' : 'Favorites' }}
+            </h3>
+            @for (page of favoritePages(); track page.url) {
+              <a [routerLink]="page.url">{{ page.title }} <span aria-hidden="true">&rarr;</span></a>
+            }
+          </nav>
+        }
+        @if (recentPages().length > 0) {
+          <nav [attr.aria-label]="lang() === 'it' ? 'Pagine recenti' : 'Recent pages'">
+            <h3>
+              <span aria-hidden="true">&#8634;</span> {{ lang() === 'it' ? 'Recenti' : 'Recent' }}
+            </h3>
+            @for (page of recentPages(); track page.url) {
+              <a [routerLink]="page.url">{{ page.title }} <span aria-hidden="true">&rarr;</span></a>
+            }
+          </nav>
+        }
+      </div>
+    </section>
+  }
+
   <!-- Campaign pulse: remains useful even before the first session. -->
   @if (campaignId(); as cId) {
     <section class="homepage__pulse" aria-labelledby="campaign-pulse-title">
@@ -166,7 +219,10 @@
 
   <!-- Quick navigation links -->
   @if (campaignId(); as cId) {
-    <nav class="homepage__nav">
+    <nav
+      class="homepage__nav"
+      [attr.aria-label]="lang() === 'it' ? 'Sezioni della campagna' : 'Campaign sections'"
+    >
       <a class="homepage__nav-card" [routerLink]="['/', cId, 'party']" appSfxHover>
         <span class="homepage__nav-icon">⚔️</span>
         <span class="homepage__nav-label">{{

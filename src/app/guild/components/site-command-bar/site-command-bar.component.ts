@@ -19,6 +19,7 @@ import { LanguageService } from '@guild/services/language.service';
 import { GuidedTourService } from '@guild/services/guidedTour.service';
 import { localizeText } from '@guild/models/language.model';
 import { PwaInstallService } from '@guild/services/pwaInstall.service';
+import { JourneyMemoryService, type JourneyPage } from '@guild/services/journeyMemory.service';
 
 interface NavigationCommand {
   readonly id: string;
@@ -27,7 +28,7 @@ interface NavigationCommand {
   readonly detail: string;
   readonly url: string;
   readonly keywords: string;
-  readonly scope: 'current' | 'campaign' | 'global';
+  readonly scope: 'current' | 'campaign' | 'global' | 'memory';
 }
 
 interface BreadcrumbItem {
@@ -71,6 +72,7 @@ export class SiteCommandBarComponent {
   private readonly language = inject(LanguageService);
   private readonly guidedTour = inject(GuidedTourService);
   private readonly pwaInstall = inject(PwaInstallService);
+  private readonly journeyMemory = inject(JourneyMemoryService);
   private readonly currentUrl = signal(this.router.url);
   private readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
   private readonly paletteDialog = viewChild<ElementRef<HTMLElement>>('paletteDialog');
@@ -83,6 +85,9 @@ export class SiteCommandBarComponent {
   readonly activeCampaignId = this.campaigns.activeCampaignId;
   readonly tourStatus = this.guidedTour.status;
   readonly canInstall = this.pwaInstall.canInstall;
+  readonly continuePage = this.journeyMemory.continuePage;
+  readonly canRememberCurrent = this.journeyMemory.canRememberCurrent;
+  readonly isCurrentFavorite = this.journeyMemory.isCurrentFavorite;
 
   readonly tourActionLabel = computed((): string => {
     const it = this.isItalian();
@@ -175,6 +180,30 @@ export class SiteCommandBarComponent {
       return [...campaignEntries, ...global];
     }
     const prefix = `/${activeId}`;
+    const favoriteCommands = this.journeyMemory
+      .favoritePages()
+      .map((page: JourneyPage): NavigationCommand => ({
+        id: `favorite-${page.url}`,
+        icon: '\u2605',
+        title: page.title,
+        detail: it ? 'Pagina preferita' : 'Favorite page',
+        url: page.url,
+        keywords: `favorite favourite preferito preferita saved ${page.title}`,
+        scope: 'memory',
+      }));
+    const favoriteUrls = new Set(favoriteCommands.map((command) => command.url));
+    const recentCommands = this.journeyMemory
+      .recentPages()
+      .filter((page): boolean => !favoriteUrls.has(page.url))
+      .map((page: JourneyPage): NavigationCommand => ({
+        id: `recent-${page.url}`,
+        icon: '\u21ba',
+        title: page.title,
+        detail: it ? 'Aperta di recente' : 'Recently opened',
+        url: page.url,
+        keywords: `recent recente continue continua reading lettura ${page.title}`,
+        scope: 'memory',
+      }));
     const campaignCommands: Array<NavigationCommand> = [
       {
         id: 'current-overview',
@@ -268,6 +297,8 @@ export class SiteCommandBarComponent {
       },
     ];
     return [
+      ...favoriteCommands,
+      ...recentCommands,
       ...campaignCommands,
       ...campaignEntries.filter((command): boolean => command.url !== prefix),
       ...global,
@@ -352,6 +383,10 @@ export class SiteCommandBarComponent {
 
   async installCompanion(): Promise<void> {
     await this.pwaInstall.install();
+  }
+
+  toggleCurrentFavorite(): void {
+    this.journeyMemory.toggleCurrentFavorite();
   }
 
   private focusTour(): void {
@@ -447,6 +482,9 @@ export class SiteCommandBarComponent {
 
   commandScopeLabel(command: NavigationCommand): string {
     const it = this.isItalian();
+    if (command.scope === 'memory') {
+      return it ? 'Il tuo percorso' : 'Your trail';
+    }
     if (command.scope === 'current') {
       return it ? 'In questa campagna' : 'In this campaign';
     }

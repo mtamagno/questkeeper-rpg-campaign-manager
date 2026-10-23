@@ -82,6 +82,7 @@ __pycache__/
 !/scripts/verify-pwa.cjs
 !/scripts/verify-offline-pack.cjs
 !/scripts/verify-command-palette.cjs
+!/scripts/verify-journey-memory.cjs
 !/scripts/build-setup-binary.cjs
 
 # Internal module notes from the private project

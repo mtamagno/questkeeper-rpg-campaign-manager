@@ -190,6 +190,124 @@
     margin: 0;
   }
 
+  // --- Local reading memory: recent pages, favorites and resume point ---
+  &__trail {
+    display: grid;
+    gap: $spacing-lg;
+    padding: clamp(#{$spacing-lg}, 4vw, #{$spacing-2xl});
+    border: $border-width-thin solid var(--qk-color-border);
+    border-radius: $border-radius-lg;
+    background:
+      radial-gradient(circle at 100% 0%, var(--qk-color-accent-soft), transparent 20rem),
+      var(--qk-color-surface);
+    box-shadow: var(--qk-shadow-surface);
+  }
+
+  &__trail-heading {
+    max-width: 62ch;
+
+    > span {
+      color: var(--qk-color-accent-text);
+      font-family: $font-family-heading;
+      font-size: $font-size-xs;
+      font-weight: $font-weight-semibold;
+      letter-spacing: $letter-spacing-wider;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      margin: $spacing-xs 0;
+      color: var(--qk-color-text);
+      font-size: $font-size-2xl;
+    }
+
+    p {
+      margin: 0;
+      color: var(--qk-color-text-muted);
+    }
+  }
+
+  &__continue-card {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: $spacing-md;
+    padding: $spacing-md $spacing-lg;
+    border: $border-width-thin solid var(--qk-color-accent);
+    border-radius: $border-radius-md;
+    background: var(--qk-color-surface-raised);
+    color: var(--qk-color-text);
+    text-decoration: none;
+
+    small,
+    strong {
+      display: block;
+    }
+
+    small {
+      color: var(--qk-color-text-muted);
+      font-size: $font-size-xs;
+      letter-spacing: $letter-spacing-wide;
+      text-transform: uppercase;
+    }
+
+    strong {
+      margin-top: $spacing-xs;
+      font-family: $font-family-heading;
+    }
+
+    &:hover {
+      border-color: var(--qk-color-accent-strong);
+      box-shadow: var(--qk-shadow-accent);
+    }
+  }
+
+  &__continue-icon {
+    color: var(--qk-color-accent-text);
+    font-size: $font-size-xl;
+  }
+
+  &__trail-columns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: $spacing-md;
+
+    @include respond-below(md) {
+      grid-template-columns: 1fr;
+    }
+
+    nav {
+      display: grid;
+      align-content: start;
+      gap: $spacing-xs;
+      padding: $spacing-md;
+      border: $border-width-thin solid var(--qk-color-border);
+      border-radius: $border-radius-md;
+      background: color-mix(in srgb, var(--qk-color-canvas-deep) 58%, transparent);
+    }
+
+    h3 {
+      margin: 0 0 $spacing-xs;
+      color: var(--qk-color-text);
+      font-size: $font-size-base;
+    }
+
+    a {
+      display: flex;
+      justify-content: space-between;
+      gap: $spacing-sm;
+      padding: $spacing-sm;
+      border-radius: $border-radius-sm;
+      color: var(--qk-color-text-secondary);
+      text-decoration: none;
+
+      &:hover {
+        color: var(--qk-color-text);
+        background: var(--qk-color-accent-soft);
+      }
+    }
+  }
+
   &__metric {
     padding: $spacing-md;
     text-align: center;

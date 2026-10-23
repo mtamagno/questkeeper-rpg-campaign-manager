@@ -14,6 +14,7 @@ import { type Character, type CharacterQuote } from '@guild/models/character.mod
 import { LanguageToggleComponent } from '@guild/components/language-toggle/language-toggle.component';
 import { SfxHoverDirective } from '@guild/directives/sfxHover.directive';
 import { localizeText } from '@guild/models/language.model';
+import { JourneyMemoryService, type JourneyPage } from '@guild/services/journeyMemory.service';
 
 /** Resolved quote with its speaker's name for display. */
 interface DisplayQuote {
@@ -51,6 +52,7 @@ export class HomepageComponent {
   private readonly dataService = inject(DataService);
   private readonly campaignService = inject(CampaignService);
   private readonly languageService = inject(LanguageService);
+  private readonly journeyMemory = inject(JourneyMemoryService);
 
   /** Current language for localized interface labels. */
   readonly lang = this.languageService.currentLanguage;
@@ -75,6 +77,18 @@ export class HomepageComponent {
   readonly npcCount: Signal<number> = computed(() => this.dataService.npcs().length);
   readonly sessionCount: Signal<number> = computed(() => this.dataService.sessions().length);
   readonly mapCount: Signal<number> = computed(() => this.dataService.maps().length);
+
+  readonly continuePage = this.journeyMemory.continuePage;
+  readonly favoritePages = computed((): ReadonlyArray<JourneyPage> =>
+    this.journeyMemory.favoritePages().slice(0, 4),
+  );
+  readonly recentPages = computed((): ReadonlyArray<JourneyPage> => {
+    const favoriteUrls = new Set(this.favoritePages().map((page) => page.url));
+    return this.journeyMemory
+      .recentPages()
+      .filter((page): boolean => !favoriteUrls.has(page.url))
+      .slice(0, 4);
+  });
 
   /** Most recent session, used by the player catch-up shortcut. */
   readonly latestSessionId: Signal<string | undefined> = computed(() => {

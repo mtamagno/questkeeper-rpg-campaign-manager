@@ -781,6 +781,33 @@ constraints in the [60-day plan](ROADMAP-60-DAYS.md).
 protocol shared across setup, Manager, Companion and Session Scribe, or user
 testing shows that the state vocabulary is still ambiguous.
 
+### QK-029 — Reading memory stores navigation metadata, never campaign content
+
+**Date:** 23 October 2026
+
+**Status:** Active
+
+**Decision:** Recent pages, favourites and continue-reading state are stored
+locally per campaign as a bounded list of normalized URLs, visible page titles
+and visit timestamps. Campaign landing pages do not replace the last readable
+destination. The same state powers the campaign home and command palette.
+
+**Why:** Players need a quick return path, but copying rendered prose or private
+records into another browser store would create a hidden content cache with an
+unclear spoiler and security boundary.
+
+**Consequences:** Reading memory remains device-local, capped at twelve recent
+and twelve favourite pages per product store, and never inspects protected
+fields, page text or passwords. Route guards remain authoritative. A future
+account or contribution system must migrate this metadata explicitly rather
+than silently synchronizing browser history.
+
+**Source:** [Global command palette](GLOBAL-COMMAND-PALETTE.md), roadmap Day 05
+and acceptance journeys P-04/P-06.
+
+**Revisit when:** Cross-device profiles ship, route identities change during a
+schema migration, or user testing requires an explicit history-disable option.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD

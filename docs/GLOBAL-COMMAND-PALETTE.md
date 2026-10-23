@@ -26,14 +26,19 @@ spoiler-consent guard.
 
 ## Scope and trust boundary
 
-The palette indexes stable navigation destinations only. It does not inspect
-protected sheets, private notes, passwords or GM-only content, and it does not
-bypass route guards. Character-, NPC-, session- and place-level full-text
-search remains a later roadmap capability with its own visibility review.
+The palette indexes stable navigation destinations plus recent pages and
+favourites as explicit local navigation metadata. It does not inspect protected
+sheets, private notes, passwords or GM-only content, and it does not bypass
+route guards. Character-, NPC-, session- and place-level full-text search
+remains a later roadmap capability with its own visibility review.
 
-Recent pages, favourites and continue-reading actions are deliberately absent
-from this delivery. They are the second Day 05 task and must extend this
-palette without changing its keyboard, focus or consent contract.
+The remembered trail is separated by campaign and keeps at most twelve recent
+and twelve favourite destinations. It stores only the normalized URL, page
+title and visit time in this browser; it never stores page text, protected
+fields or passwords. Campaign home visits do not replace the last readable
+page, so **Continue reading / Continua a leggere** remains a useful return
+point. The current page can be added or removed with an accessible pressed-state
+control, while the home and command palette expose the same saved trail.
 
 ## Responsive and accessible behavior
 

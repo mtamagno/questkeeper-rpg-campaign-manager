@@ -23,6 +23,7 @@ import { AudioService } from '@guild/services/audio.service';
 import { CampaignService } from '@guild/services/campaign.service';
 import { LanguageService } from '@guild/services/language.service';
 import { localizeText } from '@guild/models/language.model';
+import { JourneyMemoryService } from '@guild/services/journeyMemory.service';
 
 /**
  * CSS selectors for elements that should automatically play the default
@@ -100,6 +101,7 @@ export class App implements OnInit {
   private readonly campaignService = inject(CampaignService);
   private readonly languageService = inject(LanguageService);
   private readonly documentTitle = inject(Title);
+  private readonly journeyMemory = inject(JourneyMemoryService);
 
   protected readonly title = 'QuestKeeper';
 
@@ -123,6 +125,7 @@ export class App implements OnInit {
   }
 
   constructor() {
+    this.journeyMemory.initialize();
     effect((): void => {
       const campaignId = this.activeCampaignId();
       const language = this.languageService.currentLanguage();

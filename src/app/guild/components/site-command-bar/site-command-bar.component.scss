@@ -67,6 +67,8 @@
   }
 
   &__campaign-switch,
+  &__continue,
+  &__favorite,
   &__install,
   &__tour,
   &__search {
@@ -82,6 +84,7 @@
     font: inherit;
     font-size: $font-size-sm;
     cursor: pointer;
+    text-decoration: none;
     transition:
       color $transition-fast,
       border-color $transition-fast,
@@ -145,6 +148,8 @@
     }
     &__campaign-name,
     &__switch-copy,
+    &__continue-label,
+    &__favorite-label,
     &__install-label,
     &__tour-label,
     &__search-label,
@@ -469,6 +474,8 @@ kbd {
   color: var(--qk-color-text);
 }
 .command-bar__campaign-switch,
+.command-bar__continue,
+.command-bar__favorite,
 .command-bar__install,
 .command-bar__tour,
 .command-bar__search {

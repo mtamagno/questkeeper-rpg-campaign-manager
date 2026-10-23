@@ -16,6 +16,40 @@
   </nav>
 
   <div class="command-bar__actions">
+    @if (continuePage(); as page) {
+      <a
+        class="command-bar__continue"
+        [routerLink]="page.url"
+        [attr.aria-label]="
+          isItalian() ? 'Continua a leggere: ' + page.title : 'Continue reading: ' + page.title
+        "
+      >
+        <span aria-hidden="true">&#8634;</span>
+        <span class="command-bar__continue-label">{{ isItalian() ? 'Continua' : 'Continue' }}</span>
+      </a>
+    }
+    @if (canRememberCurrent()) {
+      <button
+        class="command-bar__favorite"
+        type="button"
+        (click)="toggleCurrentFavorite()"
+        [attr.aria-pressed]="isCurrentFavorite()"
+        [attr.aria-label]="
+          isCurrentFavorite()
+            ? isItalian()
+              ? 'Rimuovi la pagina dai preferiti'
+              : 'Remove page from favorites'
+            : isItalian()
+              ? 'Aggiungi la pagina ai preferiti'
+              : 'Add page to favorites'
+        "
+      >
+        <span aria-hidden="true">{{ isCurrentFavorite() ? '★' : '☆' }}</span>
+        <span class="command-bar__favorite-label">{{
+          isItalian() ? 'Preferito' : 'Favorite'
+        }}</span>
+      </button>
+    }
     @if (canInstall()) {
       <button
         class="command-bar__install"
