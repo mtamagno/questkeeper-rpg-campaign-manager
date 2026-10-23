@@ -56,8 +56,8 @@ Before creating a tag:
 9. push `main` and the tag together after every local gate is green.
 
 ```bash
-git tag -a v1.1.3 -m "QuestKeeper 1.1.3 · Wayhold · LTS"
-git push --atomic origin main v1.1.3
+git tag -a v1.1.4 -m "QuestKeeper 1.1.4 · Seamkeep · LTS"
+git push --atomic origin main v1.1.4
 ```
 
 GitHub Actions repeats the quality gate, then publishes:

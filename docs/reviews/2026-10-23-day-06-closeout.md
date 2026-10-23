@@ -50,7 +50,7 @@ images before measuring their generated display and thumbnail derivatives.
   explicit lazy loading and evidence before changing a budget.
 - Cross-device profiles may later migrate favourites, but cannot silently sync
   local reading history or protected content.
-- QuestKeeper 1.1.3 packages these contracts as the first LTS release; the tag
+- QuestKeeper 1.1.4 packages these contracts as the first published LTS release; the tag
   remains immutable and future critical fixes receive a new patch version.
 
 ## Release-time runtime re-plan
@@ -61,3 +61,6 @@ was an explicit release-gate re-plan, not Day 07 work. Validation uses the
 official Node.js 26.12.1 archive and checksum. On this review date Node.js 26 is
 still Current upstream and is scheduled to enter Active LTS on 28 October 2026;
 the QuestKeeper LTS channel and the Node.js lifecycle are documented separately.
+The first `v1.1.3` packaging attempt exposed a CRLF-only Windows SEA build
+failure after Linux and macOS succeeded. Its immutable, unpublished tag is
+superseded by `v1.1.4`, whose bundling regression covers both LF and CRLF.
