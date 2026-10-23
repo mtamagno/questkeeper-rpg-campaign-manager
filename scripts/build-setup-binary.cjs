@@ -12,7 +12,34 @@ const executablePath = path.join(outputDirectory, executableName);
 const workDirectory = fs.mkdtempSync(path.join(os.tmpdir(), 'questkeeper-sea-'));
 const blobPath = path.join(workDirectory, 'questkeeper-setup.blob');
 const configPath = path.join(workDirectory, 'sea-config.json');
+const seaEntryPath = path.join(workDirectory, 'questkeeper-setup-entry.cjs');
 const postjectPath = require.resolve('postject/dist/cli.js');
+
+function createSeaEntry() {
+  const serverPath = path.join(root, 'tools', 'setup-wizard', 'server.cjs');
+  const runtimeSelectionPath = path.join(root, 'tools', 'setup-wizard', 'runtime-selection.cjs');
+  const serverSource = fs.readFileSync(serverPath, 'utf8');
+  const runtimeSelectionSource = fs.readFileSync(runtimeSelectionPath, 'utf8');
+  const runtimeImport = `const {
+  discoverNodePaths,
+  npmCliCandidates,
+  validateRuntimeCandidate,
+} = require('./runtime-selection.cjs');`;
+  if (!serverSource.includes(runtimeImport)) {
+    throw new Error('The setup server runtime-selection import could not be bundled.');
+  }
+  const embeddedRuntime = `const __questkeeperRuntimeSelection = (() => {
+  const module = { exports: {} };
+  const exports = module.exports;
+  ((module, exports) => {
+${runtimeSelectionSource}
+  })(module, exports);
+  return module.exports;
+})();
+const { discoverNodePaths, npmCliCandidates, validateRuntimeCandidate } =
+  __questkeeperRuntimeSelection;`;
+  fs.writeFileSync(seaEntryPath, serverSource.replace(runtimeImport, embeddedRuntime));
+}
 
 function hideWindowsConsole(executable) {
   const bytes = fs.readFileSync(executable);
@@ -29,11 +56,12 @@ if (Number.parseInt(process.versions.node.split('.')[0], 10) !== 26) {
 }
 
 fs.mkdirSync(outputDirectory, { recursive: true });
+createSeaEntry();
 fs.writeFileSync(
   configPath,
   JSON.stringify(
     {
-      main: path.join(root, 'tools', 'setup-wizard', 'server.cjs'),
+      main: seaEntryPath,
       output: blobPath,
       disableExperimentalSEAWarning: true,
       useSnapshot: false,

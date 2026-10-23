@@ -86,6 +86,9 @@ const checks = [
     'Node.js SEA construction and smoke test',
     builder.includes('--experimental-sea-config') &&
       builder.includes('NODE_SEA_BLOB') &&
+      builder.includes('createSeaEntry()') &&
+      builder.includes('runtime-selection.cjs') &&
+      builder.includes('seaEntryPath') &&
       builder.includes('--self-test'),
   ],
   [
