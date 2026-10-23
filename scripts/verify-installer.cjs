@@ -2,6 +2,7 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { execFileSync } = require('node:child_process');
+const { embedRuntimeSelection } = require('./lib/create-sea-entry.cjs');
 
 const root = path.resolve(__dirname, '..');
 const read = (relativePath) => fs.readFileSync(path.join(root, relativePath), 'utf8');
@@ -113,6 +114,24 @@ const checks = [
 ];
 
 const failures = checks.filter(([, passed]) => !passed).map(([label]) => `Missing ${label}.`);
+
+for (const newline of ['\n', '\r\n']) {
+  const fixture = [
+    'const {',
+    '  discoverNodePaths,',
+    '  npmCliCandidates,',
+    '  validateRuntimeCandidate,',
+    "} = require('./runtime-selection.cjs');",
+    "console.log('setup');",
+  ].join(newline);
+  const embedded = embedRuntimeSelection(fixture, 'module.exports = { ok: true };');
+  if (
+    embedded.includes("require('./runtime-selection.cjs')") ||
+    !embedded.includes('__questkeeperRuntimeSelection')
+  ) {
+    failures.push(`SEA entry bundling failed for ${newline === '\n' ? 'LF' : 'CRLF'} input.`);
+  }
+}
 
 try {
   execFileSync(process.execPath, ['--test', 'tools/setup-wizard/runtime-selection.test.cjs'], {

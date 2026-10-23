@@ -2,6 +2,7 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { execFileSync } = require('node:child_process');
+const { embedRuntimeSelection } = require('./lib/create-sea-entry.cjs');
 
 const root = path.resolve(__dirname, '..');
 const outputDirectory = path.resolve(
@@ -20,25 +21,7 @@ function createSeaEntry() {
   const runtimeSelectionPath = path.join(root, 'tools', 'setup-wizard', 'runtime-selection.cjs');
   const serverSource = fs.readFileSync(serverPath, 'utf8');
   const runtimeSelectionSource = fs.readFileSync(runtimeSelectionPath, 'utf8');
-  const runtimeImport = `const {
-  discoverNodePaths,
-  npmCliCandidates,
-  validateRuntimeCandidate,
-} = require('./runtime-selection.cjs');`;
-  if (!serverSource.includes(runtimeImport)) {
-    throw new Error('The setup server runtime-selection import could not be bundled.');
-  }
-  const embeddedRuntime = `const __questkeeperRuntimeSelection = (() => {
-  const module = { exports: {} };
-  const exports = module.exports;
-  ((module, exports) => {
-${runtimeSelectionSource}
-  })(module, exports);
-  return module.exports;
-})();
-const { discoverNodePaths, npmCliCandidates, validateRuntimeCandidate } =
-  __questkeeperRuntimeSelection;`;
-  fs.writeFileSync(seaEntryPath, serverSource.replace(runtimeImport, embeddedRuntime));
+  fs.writeFileSync(seaEntryPath, embedRuntimeSelection(serverSource, runtimeSelectionSource));
 }
 
 function hideWindowsConsole(executable) {
