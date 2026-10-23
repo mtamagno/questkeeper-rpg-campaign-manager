@@ -78,7 +78,7 @@ portable folder you control.
 3. Choose the launchers you want, let the visual setup prepare QuestKeeper, then follow the guided Manager.
 
 The standalone setup needs no prior Node.js installation. It downloads a
-private Node.js 24 runtime only from `nodejs.org`, verifies its official SHA-256
+private Node.js 26 runtime only from `nodejs.org`, verifies its official SHA-256
 checksum and keeps it inside the QuestKeeper folder. It never downloads an AI
 model without a separate choice. See the
 **[Installation Guide](docs/INSTALLATION-GUIDE.md)** for the complete platform

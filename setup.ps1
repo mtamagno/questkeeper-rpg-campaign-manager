@@ -20,9 +20,9 @@ $Copy = @{
         Hero = 'Prepare your campaign workshop'
         Intro = 'QuestKeeper can prepare everything you need without asking you to use a terminal.'
         NodeReady = 'Node.js {0} is ready.'
-        NodeMissing = 'Node.js 24 is required and will be installed from the official nodejs.org release.'
-        NodeOld = 'Node.js {0} was found. QuestKeeper will install the supported Node.js 24 release.'
-        NodeOption = 'Install Node.js 24 automatically'
+        NodeMissing = 'Node.js 26 is required and will be installed from the official nodejs.org release.'
+        NodeOld = 'Node.js {0} was found. QuestKeeper will install the supported Node.js 26 release.'
+        NodeOption = 'Install Node.js 26 automatically'
         Dependencies = 'Prepare QuestKeeper files and locked dependencies'
         ManagerShortcut = 'Create a Campaign Manager desktop shortcut'
         CompanionShortcut = 'Create a Companion desktop shortcut'
@@ -36,10 +36,10 @@ $Copy = @{
         Failure = 'Setup could not finish. Read the log below, then try again.'
         NeedNode = 'Keep automatic Node.js installation selected to continue.'
         Language = 'Italiano'
-        StepNode = 'Checking Node.js 24...'
+        StepNode = 'Checking Node.js 26...'
         StepDownload = 'Downloading the official Node.js {0} installer...'
         StepChecksum = 'Verifying the Node.js installer checksum...'
-        StepInstall = 'Installing Node.js 24. Confirm the Windows prompt if it appears...'
+        StepInstall = 'Installing Node.js 26. Confirm the Windows prompt if it appears...'
         StepDependencies = 'Installing QuestKeeper locked dependencies...'
         StepShortcuts = 'Creating desktop shortcuts...'
         StepLaunch = 'Opening Campaign Manager...'
@@ -50,9 +50,9 @@ $Copy = @{
         Hero = 'Prepara il laboratorio della campagna'
         Intro = 'QuestKeeper puo'' preparare tutto il necessario senza chiederti di usare il terminale.'
         NodeReady = 'Node.js {0} e'' pronto.'
-        NodeMissing = 'Serve Node.js 24: verra'' installato dalla distribuzione ufficiale nodejs.org.'
-        NodeOld = 'E'' stato trovato Node.js {0}. QuestKeeper installera'' la versione Node.js 24 supportata.'
-        NodeOption = 'Installa automaticamente Node.js 24'
+        NodeMissing = 'Serve Node.js 26: verra'' installato dalla distribuzione ufficiale nodejs.org.'
+        NodeOld = 'E'' stato trovato Node.js {0}. QuestKeeper installera'' la versione Node.js 26 supportata.'
+        NodeOption = 'Installa automaticamente Node.js 26'
         Dependencies = 'Prepara i file e le dipendenze bloccate di QuestKeeper'
         ManagerShortcut = 'Crea un collegamento al Campaign Manager sul desktop'
         CompanionShortcut = 'Crea un collegamento al Companion sul desktop'
@@ -66,10 +66,10 @@ $Copy = @{
         Failure = 'Il setup non e'' riuscito a terminare. Leggi il registro e riprova.'
         NeedNode = 'Lascia selezionata l''installazione automatica di Node.js per continuare.'
         Language = 'English'
-        StepNode = 'Controllo di Node.js 24...'
+        StepNode = 'Controllo di Node.js 26...'
         StepDownload = 'Download dell''installer ufficiale Node.js {0}...'
         StepChecksum = 'Verifica del checksum dell''installer Node.js...'
-        StepInstall = 'Installazione di Node.js 24. Conferma la richiesta di Windows se compare...'
+        StepInstall = 'Installazione di Node.js 26. Conferma la richiesta di Windows se compare...'
         StepDependencies = 'Installazione delle dipendenze bloccate di QuestKeeper...'
         StepShortcuts = 'Creazione dei collegamenti sul desktop...'
         StepLaunch = 'Apertura di Campaign Manager...'
@@ -100,7 +100,7 @@ function Get-NodeVersion {
 function Test-SupportedNode {
     $version = Get-NodeVersion
     if (-not $version) { return $false }
-    return ([version]$version).Major -eq 24
+    return ([version]$version).Major -eq 26
 }
 
 function Refresh-ProcessPath {
@@ -109,7 +109,7 @@ function Refresh-ProcessPath {
     $env:Path = @($machinePath, $userPath) -join ';'
 }
 
-function Install-OfficialNode24 {
+function Install-OfficialNode26 {
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     Write-Output (Get-Text 'StepNode')
     if (Test-SupportedNode) {
@@ -123,8 +123,8 @@ function Install-OfficialNode24 {
         default { 'x64' }
     }
     $releases = Invoke-RestMethod -Uri 'https://nodejs.org/dist/index.json'
-    $release = $releases | Where-Object { $_.version -match '^v24\.' } | Select-Object -First 1
-    if (-not $release) { throw 'The official Node.js 24 release index returned no compatible version.' }
+    $release = $releases | Where-Object { $_.version -match '^v26\.' } | Select-Object -First 1
+    if (-not $release) { throw 'The official Node.js 26 release index returned no compatible version.' }
     $requiredArtifact = "win-$architecture-msi"
     if ($release.files -notcontains $requiredArtifact) {
         throw "Node.js $($release.version) does not provide $requiredArtifact."
@@ -133,7 +133,7 @@ function Install-OfficialNode24 {
     $version = $release.version
     $fileName = "node-$version-$architecture.msi"
     $baseUrl = "https://nodejs.org/dist/$version"
-    $temporaryDirectory = Join-Path ([IO.Path]::GetTempPath()) "QuestKeeper-Node24-$([Guid]::NewGuid().ToString('N'))"
+    $temporaryDirectory = Join-Path ([IO.Path]::GetTempPath()) "QuestKeeper-Node26-$([Guid]::NewGuid().ToString('N'))"
     $installerPath = Join-Path $temporaryDirectory $fileName
     New-Item -ItemType Directory -Path $temporaryDirectory | Out-Null
 
@@ -188,7 +188,7 @@ function New-QuestKeeperShortcut([string]$Name, [string]$Launcher, [string]$Desc
 }
 
 function Invoke-SetupInstall {
-    if ($InstallNode) { Install-OfficialNode24 }
+    if ($InstallNode) { Install-OfficialNode26 }
     if (-not (Test-SupportedNode)) { throw (Get-Text 'NeedNode') }
     if ($InstallDependencies) { Install-LockedDependencies }
     if ($CreateManagerShortcut -or $CreateCompanionShortcut) {

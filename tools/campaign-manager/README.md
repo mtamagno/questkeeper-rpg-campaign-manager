@@ -7,7 +7,7 @@ folders or editing JSON manifests.
 ## Open it
 
 No global packages, database or online account are required. On Windows, the
-visual setup can download and verify Node.js 24 automatically.
+visual setup can download and verify Node.js 26 automatically.
 
 - Windows: double-click `setup.bat`, review the graphical checklist and choose
   **Prepare QuestKeeper**. Optional desktop shortcuts can reopen either the

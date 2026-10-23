@@ -11,6 +11,7 @@ const interfaceScript = read('tools/setup-wizard/public/setup.js');
 const builder = read('scripts/build-setup-binary.cjs');
 const workflow = read('.github/workflows/release.yml');
 const installationGuide = read('docs/INSTALLATION-GUIDE.md');
+const packageManifest = JSON.parse(read('package.json'));
 const setupBatch = read('setup.bat');
 const setupCommand = read('setup.command');
 const setupShell = read('setup.sh');
@@ -42,10 +43,19 @@ const checks = [
       wizard.includes('setupServer.close'),
   ],
   [
-    'official Node.js 24 discovery and verification',
+    'official Node.js 26 discovery and verification',
     wizard.includes('https://nodejs.org/dist/index.json') &&
+      wizard.includes('/^v26\\./') &&
       wizard.includes('SHASUMS256.txt') &&
       wizard.includes("createHash('sha256')"),
+  ],
+  [
+    'one enforced Node.js 26 runtime contract',
+    packageManifest.engines?.node === '>=26 <27' &&
+      read('.nvmrc').trim() === '26' &&
+      interfaceScript.includes('Node.js 26') &&
+      setupShell.includes('NODE_MAJOR') &&
+      setupShell.includes('!= "26"'),
   ],
   [
     'an application-owned portable runtime',
@@ -200,5 +210,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  'Cross-platform installer verified: bilingual loopback UI, validated system/private Node.js 24 selection, native SEA builds, desktop launchers and clean process shutdown.',
+  'Cross-platform installer verified: bilingual loopback UI, validated system/private Node.js 26 selection, native SEA builds, desktop launchers and clean process shutdown.',
 );

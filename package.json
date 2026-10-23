@@ -2,6 +2,9 @@
   "name": "questkeeper-rpg-campaign-manager",
   "version": "1.1.2",
   "description": "A self-hosted D&D and tabletop RPG companion for character sheets, session journals, party bonds, maps and campaign lore.",
+  "engines": {
+    "node": ">=26 <27"
+  },
   "scripts": {
     "ng": "ng",
     "manage": "node tools/campaign-manager/server.mjs",
@@ -34,7 +37,7 @@
   },
   "private": true,
   "license": "MIT",
-  "packageManager": "npm@11.11.0",
+  "packageManager": "npm@11.20.0",
   "dependencies": {
     "@angular/common": "^21.2.25",
     "@angular/compiler": "^21.2.25",

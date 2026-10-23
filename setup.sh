@@ -9,7 +9,14 @@ if [[ -x "questkeeper-setup" ]]; then
 fi
 
 if ! command -v node >/dev/null 2>&1; then
-  echo "Node.js is not installed. Install Node.js 24 from https://nodejs.org/"
+  echo "Node.js is not installed. Install Node.js 26 from https://nodejs.org/"
+  exit 1
+fi
+
+NODE_MAJOR="$(node -p "process.versions.node.split('.')[0]" 2>/dev/null || true)"
+if [[ "$NODE_MAJOR" != "26" ]]; then
+  echo "QuestKeeper requires Node.js 26; found $(node --version 2>/dev/null || echo unknown)."
+  echo "Install Node.js 26 from https://nodejs.org/ or use a native QuestKeeper release."
   exit 1
 fi
 

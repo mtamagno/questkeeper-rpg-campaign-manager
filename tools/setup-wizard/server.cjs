@@ -230,10 +230,10 @@ async function installPortableNode() {
     return existing;
   }
 
-  log('Finding the latest supported Node.js 24 release…');
+  log('Finding the latest supported Node.js 26 release…');
   const releases = JSON.parse(await fetchText('https://nodejs.org/dist/index.json'));
-  const release = releases.find((item) => /^v24\./.test(item.version));
-  if (!release) throw new Error('The official Node.js index returned no Node.js 24 release.');
+  const release = releases.find((item) => /^v26\./.test(item.version));
+  if (!release) throw new Error('The official Node.js index returned no Node.js 26 release.');
   const archive = supportedArchive(release.version);
   const baseUrl = `https://nodejs.org/dist/${release.version}`;
   const work = path.join(root, '.questkeeper', 'downloads', `node-${Date.now()}`);
@@ -286,7 +286,7 @@ async function installPortableNode() {
   }
 
   const ready = portableRuntimeStatus();
-  if (!ready.ready) throw new Error('The portable Node.js 24 runtime could not be prepared.');
+  if (!ready.ready) throw new Error('The portable Node.js 26 runtime could not be prepared.');
   log(`Portable Node.js ${ready.version} is ready.`);
   return ready;
 }

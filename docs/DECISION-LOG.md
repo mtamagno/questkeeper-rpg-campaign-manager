@@ -860,6 +860,34 @@ mobile/offline acceptance journeys.
 font package replaces the current provider, or native shells need separate
 budgets.
 
+### QK-032 — Node.js 26 is the single supported runtime line
+
+**Date:** 23 October 2026
+
+**Status:** Active
+
+**Decision:** QuestKeeper development, CI, native setup construction, private
+runtime downloads and compatible system-runtime selection all require Node.js 26. QuestKeeper 1.1.3 may be branded LTS independently, but documentation must
+describe Node.js 26 as Current until its scheduled upstream LTS transition on
+28 October 2026.
+
+**Why:** One major across every execution path removes misleading detection and
+build differences. Moving before the upstream transition lets the release be
+validated against the exact runtime it will carry, without making a false LTS
+claim.
+
+**Consequences:** `package.json`, `.nvmrc`, Actions, source launchers, the setup
+wizard and native builders enforce major 26. Historical release notes remain
+unchanged. Weekly ecosystem reviews verify the newest 26.x patch and reassess
+the baseline only through a recorded decision.
+
+**Source:** [Node.js 26 runtime contract](NODE-26-RUNTIME.md), official Node.js
+release schedule and QuestKeeper 1.1.3 release gate.
+
+**Revisit when:** Node.js 26 nears maintenance or end-of-life, a supported
+dependency changes its runtime floor, or a newer even-numbered LTS is proven in
+all native packages.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD

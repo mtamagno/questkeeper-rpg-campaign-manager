@@ -34,8 +34,8 @@ function validateRuntimeCandidate(
   const execute = (args) => run(nodePath, args, { encoding: 'utf8', windowsHide: true });
   const versionResult = execute(['--version']);
   const version = versionResult.status === 0 ? versionResult.stdout?.trim() : null;
-  if (!/^v24\./.test(version ?? '')) {
-    return { ready: false, nodePath, version, reason: 'QuestKeeper requires Node.js 24.' };
+  if (!/^v26\./.test(version ?? '')) {
+    return { ready: false, nodePath, version, reason: 'QuestKeeper requires Node.js 26.' };
   }
   const architectureResult = execute(['-p', 'process.arch']);
   const architecture =

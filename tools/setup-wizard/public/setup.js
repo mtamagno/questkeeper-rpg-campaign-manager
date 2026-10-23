@@ -7,10 +7,10 @@ const copy = {
     statusTitle: 'Your device',
     runtimeTitle: 'Choose the Node.js runtime',
     runtimeHint:
-      'Keep QuestKeeper isolated, or reuse a compatible Node.js 24 already on this device.',
+      'Keep QuestKeeper isolated, or reuse a compatible Node.js 26 already on this device.',
     privateRuntime: 'Private QuestKeeper runtime',
     privateRuntimeHint: 'Recommended. Verified and isolated inside this folder.',
-    systemRuntime: 'Reuse an existing Node.js 24',
+    systemRuntime: 'Reuse an existing Node.js 26',
     systemRuntimeHint:
       'Faster and smaller. QuestKeeper validates version, architecture and npm first.',
     detectedRuntime: 'Detected compatible runtime',
@@ -25,7 +25,7 @@ const copy = {
     launchManager: 'Open Campaign Manager when setup finishes',
     trustTitle: 'A private, verified runtime',
     trustBody:
-      'Node.js 24 is downloaded only from nodejs.org, verified against its published SHA-256 checksum and kept inside this QuestKeeper folder. No administrator access is required.',
+      'Node.js 26 is downloaded only from nodejs.org, verified against its published SHA-256 checksum and kept inside this QuestKeeper folder. No administrator access is required.',
     ready: 'Ready to begin.',
     footer: 'No AI model or remote provider is enabled by this setup.',
     prepare: 'Prepare QuestKeeper',
@@ -36,8 +36,8 @@ const copy = {
     closeFailed: 'Setup could not close cleanly. Try the button again.',
     language: 'Italiano',
     runtimeReady: 'Using {source} Node.js {version} on {platform}. QuestKeeper tools are ready.',
-    runtimeDetected: 'Compatible Node.js 24 detected on {platform}; choose whether to reuse it.',
-    runtimeMissing: 'QuestKeeper can prepare a private Node.js 24 for {platform}.',
+    runtimeDetected: 'Compatible Node.js 26 detected on {platform}; choose whether to reuse it.',
+    runtimeMissing: 'QuestKeeper can prepare a private Node.js 26 for {platform}.',
     sourcePrivate: 'private',
     sourceSystem: 'system',
     readyBadge: 'Ready',
@@ -54,10 +54,10 @@ const copy = {
     statusTitle: 'Il tuo dispositivo',
     runtimeTitle: 'Scegli il runtime Node.js',
     runtimeHint:
-      'Mantieni QuestKeeper isolato oppure riutilizza un Node.js 24 compatibile già presente sul dispositivo.',
+      'Mantieni QuestKeeper isolato oppure riutilizza un Node.js 26 compatibile già presente sul dispositivo.',
     privateRuntime: 'Runtime privato di QuestKeeper',
     privateRuntimeHint: 'Consigliato. Verificato e isolato dentro questa cartella.',
-    systemRuntime: 'Riutilizza un Node.js 24 esistente',
+    systemRuntime: 'Riutilizza un Node.js 26 esistente',
     systemRuntimeHint:
       'Più rapido e leggero. QuestKeeper verifica prima versione, architettura e npm.',
     detectedRuntime: 'Runtime compatibile rilevato',
@@ -72,7 +72,7 @@ const copy = {
     launchManager: 'Apri Campaign Manager al termine del setup',
     trustTitle: 'Una runtime privata e verificata',
     trustBody:
-      'Node.js 24 viene scaricato solo da nodejs.org, verificato con il checksum SHA-256 pubblicato e conservato dentro questa cartella QuestKeeper. Non servono privilegi di amministratore.',
+      'Node.js 26 viene scaricato solo da nodejs.org, verificato con il checksum SHA-256 pubblicato e conservato dentro questa cartella QuestKeeper. Non servono privilegi di amministratore.',
     ready: 'Tutto pronto per iniziare.',
     footer: 'Questo setup non abilita modelli AI o provider remoti.',
     prepare: 'Prepara QuestKeeper',
@@ -84,8 +84,8 @@ const copy = {
     closeFailed: 'Non è stato possibile chiudere correttamente il setup. Riprova.',
     language: 'English',
     runtimeReady: 'Node.js {version} {source} in uso su {platform}. Gli strumenti sono pronti.',
-    runtimeDetected: 'Node.js 24 compatibile rilevato su {platform}; scegli se riutilizzarlo.',
-    runtimeMissing: 'QuestKeeper può preparare un Node.js 24 privato per {platform}.',
+    runtimeDetected: 'Node.js 26 compatibile rilevato su {platform}; scegli se riutilizzarlo.',
+    runtimeMissing: 'QuestKeeper può preparare un Node.js 26 privato per {platform}.',
     sourcePrivate: 'privato',
     sourceSystem: 'di sistema',
     readyBadge: 'Pronto',
@@ -130,7 +130,7 @@ function render(status) {
   const detected = status.systemRuntimes.length > 0;
   const messageKey = ready ? 'runtimeReady' : detected ? 'runtimeDetected' : 'runtimeMissing';
   $('device-status').textContent = interpolate(copy[language][messageKey], {
-    version: status.runtime.version || '24',
+    version: status.runtime.version || '26',
     platform,
     source: copy[language][status.runtime.source === 'system' ? 'sourceSystem' : 'sourcePrivate'],
   });

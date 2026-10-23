@@ -5,7 +5,7 @@ const test = require('node:test');
 const { discoverNodePaths, validateRuntimeCandidate } = require('./runtime-selection.cjs');
 
 function fixture({
-  version = 'v24.22.0',
+  version = 'v26.12.1',
   architecture = 'x64',
   npm = '11.6.2',
   broken = false,
@@ -31,13 +31,13 @@ function fixture({
   };
 }
 
-test('validates Node 24, architecture, npm and paths containing spaces', () => {
+test('validates Node 26, architecture, npm and paths containing spaces', () => {
   const { nodePath, npmPath, options } = fixture();
   assert.deepEqual(validateRuntimeCandidate(nodePath, options), {
     ready: true,
     nodePath,
     npmCliPath: npmPath,
-    version: 'v24.22.0',
+    version: 'v26.12.1',
     architecture: 'x64',
     npmVersion: '11.6.2',
   });
@@ -45,8 +45,8 @@ test('validates Node 24, architecture, npm and paths containing spaces', () => {
 
 test('rejects wrong majors, mismatched architecture, broken binaries and missing npm', () => {
   assert.match(
-    validateRuntimeCandidate(fixture().nodePath, fixture({ version: 'v22.1.0' }).options).reason,
-    /Node\.js 24/,
+    validateRuntimeCandidate(fixture().nodePath, fixture({ version: 'v24.22.1' }).options).reason,
+    /Node\.js 26/,
   );
   assert.match(
     validateRuntimeCandidate(fixture().nodePath, fixture({ architecture: 'arm64' }).options).reason,

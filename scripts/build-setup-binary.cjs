@@ -24,8 +24,8 @@ function hideWindowsConsole(executable) {
   fs.writeFileSync(executable, bytes);
 }
 
-if (Number.parseInt(process.versions.node.split('.')[0], 10) !== 24) {
-  throw new Error(`Setup binaries must be built with Node.js 24; found ${process.version}.`);
+if (Number.parseInt(process.versions.node.split('.')[0], 10) !== 26) {
+  throw new Error(`Setup binaries must be built with Node.js 26; found ${process.version}.`);
 }
 
 fs.mkdirSync(outputDirectory, { recursive: true });

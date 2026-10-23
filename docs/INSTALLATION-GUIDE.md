@@ -9,7 +9,11 @@
 QuestKeeper runs on your computer and produces a static campaign website. A
 database, cloud account, AI provider and preinstalled Node.js are not required.
 On Windows, macOS and Linux, the graphical setup can either prepare a private
-**Node.js 24** runtime or reuse a compatible installation already on the device.
+**Node.js 26** runtime or reuse a compatible installation already on the device.
+
+Node.js 26 is the supported QuestKeeper runtime. It is currently the upstream
+Current line and is scheduled to enter Active LTS on 28 October 2026; the
+installer always resolves the newest verified Node.js 26 patch.
 
 > **Looking around first?** Open the
 > [live Companion](https://mtamagno.github.io/questkeeper-rpg-campaign-manager/)
@@ -48,7 +52,7 @@ The setup opens a bilingual English/Italian page in the default browser. It is
 served only on `127.0.0.1` and protected by a random session token. The page
 shows each optional action before it runs:
 
-- choose the recommended private Node.js 24 runtime or a compatible detected
+- choose the recommended private Node.js 26 runtime or a compatible detected
   system runtime;
 - prepare the project's locked dependencies;
 - create separate **QuestKeeper Campaign Manager** and **QuestKeeper
@@ -56,7 +60,7 @@ shows each optional action before it runs:
 - open Campaign Manager when setup finishes.
 
 For an existing runtime, QuestKeeper resolves the exact executable and checks
-Node.js major version 24, processor architecture and a working npm before it is
+Node.js major version 26, processor architecture and a working npm before it is
 offered. The chosen path is recorded in `.questkeeper/runtime-selection.json`
 and reused by setup and both launchers. If that executable later disappears or
 becomes incompatible, setup explains the fallback and prepares the private
@@ -155,7 +159,7 @@ stored as ordinary files under `src/campaigns/`.
 | The setup process remains open after setup   | In 1.1.2 or later, choose **Close setup** to terminate its local service and executable.                                              |
 | A desktop shortcut stops working             | Return the QuestKeeper folder to its original location or rerun setup to recreate links.                                              |
 | Companion shortcut does not open the browser | Check `.questkeeper/logs/companion-launch.log`; the launcher records port conflicts, missing dependencies and startup failures there. |
-| An installed Node.js is not offered          | Only working Node.js 24 installations matching the app architecture and containing npm are listed. The private option remains safe.   |
+| An installed Node.js is not offered          | Only working Node.js 26 installations matching the app architecture and containing npm are listed. The private option remains safe.   |
 | `node` is not recognized in a terminal       | This is expected when using the private option: its runtime is available to QuestKeeper without changing the system PATH.             |
 | Port 4173 is busy                            | QuestKeeper automatically tries ports through 4183; use the URL printed in the terminal.                                              |
 | The Companion does not reflect edits         | Run **Check and build site**, then refresh without cache.                                                                             |
