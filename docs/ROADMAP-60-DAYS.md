@@ -26,7 +26,7 @@ never a reason to split broken work or bypass `npm run verify`.
 | 04 · 21 Oct | [x] [`feat: make the Companion installable as a PWA`](PWA-INSTALLATION.md)             | [x] [`feat: cache recent characters and recaps for offline reading`](OFFLINE-GAME-NIGHT.md)                |
 | 05 · 22 Oct | [x] [`feat: introduce global command palette navigation`](GLOBAL-COMMAND-PALETTE.md)   | [x] [`feat: add recent pages favourites and continue-reading actions`](GLOBAL-COMMAND-PALETTE.md)          |
 | 06 · 23 Oct | [x] [`a11y: complete keyboard focus and landmark overhaul`](ACCESSIBILITY.md)          | [x] [`perf: enforce image font and initial-load budgets`](PERFORMANCE-BUDGETS.md)                          |
-| 07 · 24 Oct | [ ] `feat: publish a richer Lantern Road player journey`                               | [x] `release: ship QuestKeeper 1.1 Lanternwake` (moved to 20 Oct by explicit re-plan)                      |
+| 07 · 24 Oct | [x] [`feat: publish a richer Lantern Road player journey`](LANTERN-ROAD-DEMO.md)       | [x] `release: ship QuestKeeper 1.1 Lanternwake` (moved to 20 Oct by explicit re-plan)                      |
 
 ### Field-feedback constraints carried forward · 22 October
 

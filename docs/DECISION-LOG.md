@@ -917,6 +917,33 @@ states without using the network.
 stronger guarantees, or field evidence shows that connection/recording checks
 cannot detect a class of silent audio loss.
 
+### QK-034 — Campaign briefs derive from public evidence
+
+**Date:** 24 October 2026
+
+**Status:** Active
+
+**Decision:** The campaign-home game-night brief is a derived reading path, not
+a second campaign state. Each item must be built from public campaign, session,
+map or character fields and link back to the record that supports it. Protected
+notes, inferred secrets and unpublished drafts are never eligible inputs.
+
+**Why:** A player needs a fast answer to what changed, where the party is, which
+personal thread matters and what remains unresolved. Duplicating those answers
+would let the homepage drift away from the campaign chronicle and could expose
+information that the player-facing source deliberately hides.
+
+**Consequences:** New brief items require an evidence route and a public-data
+test. Empty campaigns retain their honest pre-session state. Future automation
+may suggest or rank public evidence, but cannot silently publish a new truth or
+read protected character fields.
+
+**Source:** [Game-night campaign brief](GAME-NIGHT-BRIEF.md) and
+[Lantern Road demo journey](LANTERN-ROAD-DEMO.md).
+
+**Revisit when:** A versioned campaign-state model can prove authorship,
+visibility and reconciliation without duplicating or weakening the chronicle.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD

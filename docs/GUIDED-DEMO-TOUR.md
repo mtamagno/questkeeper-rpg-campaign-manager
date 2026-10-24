@@ -77,5 +77,6 @@ keyboard-only completion.
   make every tour destination recover gracefully when unavailable.
 - Future navigation and continue-reading features may offer stronger shortcuts,
   but must not make the tour a prerequisite for using the Companion.
-- The richer Lantern Road demo can change the content shown at each stop without
-  changing the five-stop interaction contract silently.
+- The richer Lantern Road demo and the campaign-home game-night brief reuse the
+  same five-stop destinations and evidence routes. They may deepen what each
+  stop reveals, but cannot silently change the tour's interaction contract.

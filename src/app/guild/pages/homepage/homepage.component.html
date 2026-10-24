@@ -159,6 +159,87 @@
     </section>
   }
 
+  @if (campaignId(); as cId) {
+    @if (gameNightBrief(); as brief) {
+      <section class="homepage__brief" aria-labelledby="game-night-brief-title">
+        <header class="homepage__brief-heading">
+          <span>{{ lang() === 'it' ? 'Brief prima della sessione' : 'Before the session' }}</span>
+          <h2 id="game-night-brief-title">
+            {{ lang() === 'it' ? 'Quattro cose da ricordare' : 'Four things to remember' }}
+          </h2>
+          <p>
+            {{
+              lang() === 'it'
+                ? 'Un percorso rapido tra fatti condivisi. Ogni tappa apre la pagina completa che la sostiene.'
+                : 'A quick path through shared facts. Every step opens the full page that supports it.'
+            }}
+          </p>
+        </header>
+
+        <ol class="homepage__brief-steps">
+          <li>
+            <a [routerLink]="['/', cId, 'campaign', 'story', brief.latestSessionId]" appSfxHover>
+              <span class="homepage__brief-number" aria-hidden="true">1</span>
+              <span class="homepage__brief-label">{{
+                lang() === 'it' ? 'Cosa è cambiato' : 'What changed'
+              }}</span>
+              <strong>{{ brief.latestSessionTitle }}</strong>
+              <small>{{ brief.latestEvent }}</small>
+              <span class="homepage__brief-link">{{
+                lang() === 'it' ? 'Apri il capitolo' : 'Open the chapter'
+              }}</span>
+            </a>
+          </li>
+          <li>
+            <a [routerLink]="['/', cId, 'maps']" appSfxHover>
+              <span class="homepage__brief-number" aria-hidden="true">2</span>
+              <span class="homepage__brief-label">{{
+                lang() === 'it' ? 'Dove siete' : 'Where you are'
+              }}</span>
+              <strong>{{ brief.currentLocation }}</strong>
+              <small>{{
+                lang() === 'it'
+                  ? 'Riapri luoghi, scoperte e percorsi conosciuti.'
+                  : 'Return to known places, discoveries and routes.'
+              }}</small>
+              <span class="homepage__brief-link">{{
+                lang() === 'it' ? 'Esplora i luoghi' : 'Explore places'
+              }}</span>
+            </a>
+          </li>
+          @if (brief.characterId && brief.characterName && brief.characterThread) {
+            <li>
+              <a [routerLink]="['/', cId, 'party', brief.characterId]" appSfxHover>
+                <span class="homepage__brief-number" aria-hidden="true">3</span>
+                <span class="homepage__brief-label">{{
+                  lang() === 'it' ? 'Un filo personale' : 'A personal thread'
+                }}</span>
+                <strong>{{ brief.characterName }}</strong>
+                <small>{{ brief.characterThread }}</small>
+                <span class="homepage__brief-link">{{
+                  lang() === 'it' ? 'Apri il personaggio' : 'Open the character'
+                }}</span>
+              </a>
+            </li>
+          }
+          <li>
+            <a [routerLink]="['/', cId, 'campaign', 'story-so-far']" appSfxHover>
+              <span class="homepage__brief-number" aria-hidden="true">4</span>
+              <span class="homepage__brief-label">{{
+                lang() === 'it' ? 'Cosa conta adesso' : 'What matters now'
+              }}</span>
+              <strong>{{ lang() === 'it' ? 'La storia finora' : 'The story so far' }}</strong>
+              <small>{{ brief.storySoFar }}</small>
+              <span class="homepage__brief-link">{{
+                lang() === 'it' ? 'Leggi il riepilogo' : 'Read the recap'
+              }}</span>
+            </a>
+          </li>
+        </ol>
+      </section>
+    }
+  }
+
   <!-- Player-first shortcuts for getting back into character before game night. -->
   @if (campaignId(); as cId) {
     <section class="homepage__player-hub" aria-labelledby="player-hub-title">

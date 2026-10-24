@@ -332,6 +332,133 @@
     }
   }
 
+  // --- Four-step evidence trail for the minutes before a session ---
+  &__brief {
+    display: grid;
+    gap: $spacing-lg;
+    padding: clamp(#{$spacing-lg}, 4vw, #{$spacing-2xl});
+    overflow: hidden;
+    border: $border-width-thin solid var(--qk-color-border);
+    border-radius: $border-radius-lg;
+    background:
+      linear-gradient(90deg, transparent 49.8%, var(--qk-color-border) 50%, transparent 50.2%),
+      radial-gradient(circle at 12% 0%, var(--qk-color-accent-soft), transparent 22rem),
+      var(--qk-color-surface);
+    box-shadow: var(--qk-shadow-surface);
+  }
+
+  &__brief-heading {
+    max-width: 68ch;
+
+    > span {
+      color: var(--qk-color-accent-text);
+      font-family: $font-family-heading;
+      font-size: $font-size-xs;
+      font-weight: $font-weight-semibold;
+      letter-spacing: $letter-spacing-wider;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      margin: $spacing-xs 0;
+      color: var(--qk-color-text);
+      font-size: $font-size-2xl;
+    }
+
+    p {
+      margin: 0;
+      color: var(--qk-color-text-muted);
+    }
+  }
+
+  &__brief-steps {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: $spacing-sm;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    @include respond-below(lg) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @include respond-below(sm) {
+      grid-template-columns: 1fr;
+    }
+
+    li {
+      min-width: 0;
+    }
+
+    a {
+      position: relative;
+      display: flex;
+      height: 100%;
+      min-height: 230px;
+      flex-direction: column;
+      gap: $spacing-sm;
+      padding: $spacing-lg;
+      border: $border-width-thin solid var(--qk-color-border);
+      border-radius: $border-radius-md;
+      background: color-mix(in srgb, var(--qk-color-surface-raised) 92%, transparent);
+      color: var(--qk-color-text);
+      text-decoration: none;
+      transition:
+        transform $transition-fast,
+        border-color $transition-fast,
+        box-shadow $transition-fast;
+
+      &:hover {
+        transform: translateY(-2px);
+        border-color: var(--qk-color-accent);
+        box-shadow: var(--qk-shadow-accent);
+      }
+
+      strong {
+        font-family: $font-family-heading;
+        font-size: $font-size-lg;
+      }
+
+      small {
+        display: -webkit-box;
+        overflow: hidden;
+        color: var(--qk-color-text-muted);
+        line-height: $line-height-relaxed;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 5;
+      }
+    }
+  }
+
+  &__brief-number {
+    display: inline-grid;
+    width: 2rem;
+    height: 2rem;
+    place-items: center;
+    border: $border-width-thin solid var(--qk-color-accent);
+    border-radius: 50%;
+    color: var(--qk-color-accent-text);
+    font-family: $font-family-heading;
+    font-weight: $font-weight-bold;
+  }
+
+  &__brief-label {
+    color: var(--qk-color-text-muted);
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+    letter-spacing: $letter-spacing-wide;
+    text-transform: uppercase;
+  }
+
+  &__brief-link {
+    margin-top: auto;
+    color: var(--qk-color-accent-text);
+    font-family: $font-family-heading;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+  }
+
   // --- Player return point / game-night shortcuts ---
   &__player-hub {
     padding: clamp(#{$spacing-lg}, 4vw, #{$spacing-2xl});
