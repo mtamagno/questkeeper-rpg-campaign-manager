@@ -26,6 +26,22 @@ const overview = {
     'campaign-overview.component.html',
   ),
 };
+const sidebar = read(
+  'src',
+  'app',
+  'guild',
+  'components',
+  'sidebar',
+  'sidebar.component.html',
+);
+const commandBar = read(
+  'src',
+  'app',
+  'guild',
+  'components',
+  'site-command-bar',
+  'site-command-bar.component.ts',
+);
 const briefRoot = ['src', 'app', 'chronicle', 'components', 'game-night-brief'];
 const brief = {
   ts: read(...briefRoot, 'game-night-brief.component.ts'),
@@ -66,6 +82,15 @@ assert(
   overview.ts.includes('GameNightBriefComponent') &&
     overview.html.includes('<app-game-night-brief />'),
   'the campaign chronicle must own the game-night brief',
+);
+assert(
+  sidebar.includes('Cronache delle sessioni') && sidebar.includes('Session Chronicles'),
+  'the sidebar must expose the chronicle under the same name as its page',
+);
+assert(
+  commandBar.includes('Briefing ed eventi chiave') &&
+    commandBar.includes('Briefing and key events'),
+  'the command palette must explain what the chronicle contains',
 );
 
 for (const forbidden of [

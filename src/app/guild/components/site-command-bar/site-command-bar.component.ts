@@ -263,10 +263,10 @@ export class SiteCommandBarComponent {
       {
         id: 'current-chronicles',
         icon: '\u270e',
-        title: it ? 'Cronache della campagna' : 'Campaign chronicles',
-        detail: it ? 'Eventi e storia fin qui' : 'Events and story so far',
+        title: it ? 'Cronache delle sessioni' : 'Session chronicles',
+        detail: it ? 'Briefing ed eventi chiave' : 'Briefing and key events',
         url: `${prefix}/campaign`,
-        keywords: 'campaign storia story events eventi chronicle cronache',
+        keywords: 'campaign briefing sessioni sessions events eventi chronicle cronache',
         scope: 'current',
       },
       {

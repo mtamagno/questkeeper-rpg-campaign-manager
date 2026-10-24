@@ -26,6 +26,9 @@ existing pre-session empty state instead of showing invented context.
   phone.
 - Every summary links to its supporting chapter, map collection, character or
   complete recap.
+- The persistent Campaign menu names this destination **Session Chronicles** /
+  **Cronache delle sessioni**; the global command palette uses the same label
+  and describes it as the home of the briefing and key events.
 - Campaign home remains a concise cover with its identity, one party voice and
   four linked metrics. It does not duplicate the chronicle brief, global recent
   pages and favourites, or the persistent navigation.
