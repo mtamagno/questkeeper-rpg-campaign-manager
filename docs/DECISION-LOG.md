@@ -888,6 +888,35 @@ release schedule and QuestKeeper 1.1.3 release gate.
 dependency changes its runtime floor, or a newer even-numbered LTS is proven in
 all native packages.
 
+### QK-033 — Voice capture must be monitored, recoverable, and visible
+
+**Date:** 24 October 2026
+
+**Status:** Active
+
+**Decision:** An active Session Scribe entry is not proof that audio is still
+being captured. Every running voice session must continuously verify both the
+Discord connection and Pycord recording state, attempt bounded automatic
+reconnection into the same transcript, mark interruptions and recoveries in
+that file, and privately notify the operator when capture stops or resumes.
+
+**Why:** A Discord voice handshake can terminate while the bot process and its
+in-memory session remain alive. Treating the session dictionary as health
+silently lost roughly twenty minutes of a real game session.
+
+**Consequences:** `/stato` reports the real capture state and recovery count;
+`/ferma` also closes local workers when no voice client remains; recovery gets a
+fresh audio sink but preserves the existing buffer, participant names and file.
+Tests must distinguish connected, recording, wrong-channel and disconnected
+states without using the network.
+
+**Source:** Production incident logs from the 23 October 2026 session and the
+[Discord Scribe guide](../discord-transcriber/README.md).
+
+**Revisit when:** Pycord exposes a supported recording-disconnect callback with
+stronger guarantees, or field evidence shows that connection/recording checks
+cannot detect a class of silent audio loss.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD

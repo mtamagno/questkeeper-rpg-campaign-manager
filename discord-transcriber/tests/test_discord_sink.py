@@ -6,7 +6,7 @@ import unittest
 
 os.environ.setdefault("DISCORD_TOKEN", "test-token")
 
-from bot import DiscordAudioSink, _voice_participant_names
+from bot import DiscordAudioSink, _voice_client_is_healthy, _voice_participant_names
 
 
 class RecordingBuffer:
@@ -47,6 +47,31 @@ class ParticipantNameTests(unittest.IsolatedAsyncioTestCase):
         names = await _voice_participant_names(guild, channel)
 
         self.assertEqual(names, {42: "Bruno"})
+
+
+class VoiceHealthTests(unittest.TestCase):
+    def test_requires_connection_recording_and_expected_channel(self) -> None:
+        healthy = SimpleNamespace(
+            channel=SimpleNamespace(id=7),
+            is_connected=lambda: True,
+            is_recording=lambda: True,
+        )
+        disconnected = SimpleNamespace(
+            channel=SimpleNamespace(id=7),
+            is_connected=lambda: False,
+            is_recording=lambda: True,
+        )
+        stopped = SimpleNamespace(
+            channel=SimpleNamespace(id=7),
+            is_connected=lambda: True,
+            is_recording=lambda: False,
+        )
+
+        self.assertTrue(_voice_client_is_healthy(healthy, 7))
+        self.assertFalse(_voice_client_is_healthy(disconnected, 7))
+        self.assertFalse(_voice_client_is_healthy(stopped, 7))
+        self.assertFalse(_voice_client_is_healthy(healthy, 8))
+        self.assertFalse(_voice_client_is_healthy(None, 7))
 
 
 async def _return_async(value):

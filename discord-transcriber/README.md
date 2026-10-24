@@ -104,6 +104,9 @@ Available values:
 | `SILENCE_MS`            |        `900` | Silence that closes one utterance                      |
 | `MIN_UTTERANCE_MS`      |        `450` | Minimum accepted speech duration                       |
 | `MAX_UTTERANCE_SECONDS` |         `25` | Maximum size of one buffered segment                   |
+| `VOICE_HEALTH_SECONDS` |          `5` | Interval between voice-capture health checks           |
+| `VOICE_RECONNECT_ATTEMPTS` |      `4` | Attempts in each automatic recovery cycle              |
+| `VOICE_RECONNECT_DELAY_SECONDS` | `3` | Delay between reconnection attempts                    |
 
 For CPU use, a practical starting point is:
 
@@ -120,6 +123,12 @@ WHISPER_COMPUTE_TYPE=int8
 3. In a text channel on the same server, run `/trascrivi`.
 4. Wait for the private confirmation containing the local transcript filename.
 5. At the end, run `/ferma` and wait for the last buffered phrase to finish.
+
+The bot continuously checks that Discord remains connected **and** Pycord is
+still recording. If capture drops, it writes a status marker into the same
+transcript, privately warns the person who started the session, and attempts to
+reconnect without opening a new file. `/stato` reports the real capture state
+and automatic recovery count instead of merely checking that a session exists.
 
 Commands currently keep their original short Italian names:
 

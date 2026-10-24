@@ -54,6 +54,9 @@ class Settings:
     silence_seconds: float
     min_seconds: float
     max_seconds: float
+    voice_health_seconds: float
+    voice_reconnect_attempts: int
+    voice_reconnect_delay_seconds: float
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -69,6 +72,9 @@ class Settings:
             silence_seconds=_env_float("SILENCE_MS", 900) / 1000,
             min_seconds=_env_float("MIN_UTTERANCE_MS", 450) / 1000,
             max_seconds=_env_float("MAX_UTTERANCE_SECONDS", 25),
+            voice_health_seconds=_env_float("VOICE_HEALTH_SECONDS", 5),
+            voice_reconnect_attempts=int(os.getenv("VOICE_RECONNECT_ATTEMPTS", "4")),
+            voice_reconnect_delay_seconds=_env_float("VOICE_RECONNECT_DELAY_SECONDS", 3),
         )
 
 
@@ -104,6 +110,7 @@ class ActiveSession:
         guild_name: str,
         voice_channel_id: int,
         voice_channel_name: str,
+        owner_user_id: int,
         participant_names: dict[int, str],
         settings: Settings,
         worker: WhisperWorker,
@@ -111,6 +118,7 @@ class ActiveSession:
         self.guild_id = guild_id
         self.voice_channel_id = voice_channel_id
         self.voice_channel_name = voice_channel_name
+        self.owner_user_id = owner_user_id
         self.participant_names = participant_names
         self.names = set(participant_names.values())
         self.settings = settings
@@ -121,6 +129,10 @@ class ActiveSession:
             settings.max_seconds,
         )
         self.sink = DiscordAudioSink(self.buffer, participant_names)
+        self.state = "recording"
+        self.recovery_count = 0
+        self.recovery_lock = asyncio.Lock()
+        self.monitor_task: asyncio.Task | None = None
         self._stop = Event()
         self._file_lock = Lock()
         self._segmenter = Thread(
@@ -154,7 +166,18 @@ class ActiveSession:
         self.participant_names[user_id] = display_name
         self.names.add(display_name)
 
+    def fresh_sink(self) -> DiscordAudioSink:
+        """Create a new sink after Pycord closes the previous recording stream."""
+        self.sink = DiscordAudioSink(self.buffer, self.participant_names)
+        return self.sink
+
+    def append_system_note(self, message: str) -> None:
+        timestamp = datetime.now().strftime("%H:%M:%S")
+        with self._file_lock, self.transcript_path.open("a", encoding="utf-8") as output:
+            output.write(f"\n> **{timestamp} — recording status:** {message}\n\n")
+
     def stop(self) -> None:
+        self.state = "stopping"
         self._stop.set()
         for utterance in self.buffer.flush_all():
             self._submit(utterance)
@@ -244,6 +267,135 @@ def _consume_cancelled_task(task: asyncio.Task) -> None:
         pass
 
 
+def _voice_client_is_healthy(voice_client, expected_channel_id: int) -> bool:
+    """Return true only while Pycord is connected and actively recording."""
+    if voice_client is None:
+        return False
+    channel = getattr(voice_client, "channel", None)
+    if channel is None or getattr(channel, "id", None) != expected_channel_id:
+        return False
+    try:
+        return bool(voice_client.is_connected() and voice_client.is_recording())
+    except (AttributeError, RuntimeError):
+        return False
+
+
+async def _notify_session_owner(session: ActiveSession, message: str) -> None:
+    """Warn the operator privately when capture stops or resumes."""
+    try:
+        owner = bot.get_user(session.owner_user_id) or await bot.fetch_user(
+            session.owner_user_id
+        )
+        await owner.send(message)
+    except (discord.HTTPException, AttributeError):
+        LOGGER.warning("Could not send the session owner a private warning")
+
+
+async def _disconnect_stale_voice_client(guild: discord.Guild) -> None:
+    voice_client = guild.voice_client
+    if voice_client is None:
+        return
+    try:
+        if voice_client.is_recording():
+            voice_client.stop_recording()
+        await asyncio.wait_for(voice_client.disconnect(force=True), timeout=8.0)
+    except Exception:
+        LOGGER.exception("Could not disconnect the stale voice client cleanly")
+        _forget_partial_voice_client(guild)
+
+
+async def _recover_voice_session(guild: discord.Guild, session: ActiveSession) -> bool:
+    """Reconnect a dropped recording without replacing the transcript file."""
+    async with session.recovery_lock:
+        if sessions.get(guild.id) is not session or session.state == "stopping":
+            return False
+        if _voice_client_is_healthy(guild.voice_client, session.voice_channel_id):
+            session.state = "recording"
+            return True
+
+        session.state = "recovering"
+        session.append_system_note(
+            "Voice capture stopped; automatic recovery started."
+        )
+        await _notify_session_owner(
+            session,
+            "⚠️ Voice capture stopped. I am attempting to reconnect automatically.",
+        )
+        voice_channel = guild.get_channel(session.voice_channel_id)
+        if voice_channel is None:
+            try:
+                voice_channel = await guild.fetch_channel(session.voice_channel_id)
+            except discord.HTTPException:
+                voice_channel = None
+        if voice_channel is None:
+            session.state = "attention-required"
+            session.append_system_note(
+                "Voice channel is unavailable; automatic recovery is paused."
+            )
+            return False
+
+        for attempt in range(1, session.settings.voice_reconnect_attempts + 1):
+            if sessions.get(guild.id) is not session or session.state == "stopping":
+                return False
+            await _disconnect_stale_voice_client(guild)
+            try:
+                voice_client = await asyncio.wait_for(
+                    voice_channel.connect(timeout=12.0, reconnect=False),
+                    timeout=15.0,
+                )
+                if not getattr(voice_client, "is_dave_connection", lambda: False)():
+                    raise RuntimeError("DAVE connection is not active")
+                voice_client.start_recording(session.fresh_sink())
+                session.recovery_count += 1
+                session.state = "recording"
+                session.append_system_note(
+                    f"Voice capture recovered automatically (recovery {session.recovery_count})."
+                )
+                await _notify_session_owner(
+                    session,
+                    "✅ Voice capture recovered automatically; I am continuing in the same file.",
+                )
+                LOGGER.warning(
+                    "Session %s recovered on attempt %s",
+                    guild.id,
+                    attempt,
+                )
+                return True
+            except Exception:
+                LOGGER.exception(
+                    "Voice recovery attempt %s/%s failed for guild %s",
+                    attempt,
+                    session.settings.voice_reconnect_attempts,
+                    guild.id,
+                )
+                if attempt < session.settings.voice_reconnect_attempts:
+                    await asyncio.sleep(session.settings.voice_reconnect_delay_seconds)
+
+        session.state = "attention-required"
+        session.append_system_note(
+            "Automatic recovery failed; the monitor will keep trying."
+        )
+        await _notify_session_owner(
+            session,
+            "❌ I could not restore voice capture. Check `/stato`; the monitor will keep trying.",
+        )
+        return False
+
+
+async def _watch_voice_session(guild_id: int) -> None:
+    """Continuously detect silent recording death instead of trusting the session dict."""
+    while True:
+        await asyncio.sleep(settings.voice_health_seconds)
+        session = sessions.get(guild_id)
+        if session is None or session.state == "stopping":
+            return
+        guild = bot.get_guild(guild_id)
+        if guild is None:
+            continue
+        if not _voice_client_is_healthy(guild.voice_client, session.voice_channel_id):
+            await _recover_voice_session(guild, session)
+
+
 @bot.event
 async def on_ready() -> None:
     LOGGER.info("Connected as %s", bot.user)
@@ -281,6 +433,7 @@ async def trascrivi(ctx: discord.ApplicationContext) -> None:
     )
     participant_names = await _voice_participant_names(ctx.guild, voice_channel)
     voice_client = None
+    session = None
     try:
         connect_task = asyncio.create_task(
             voice_channel.connect(timeout=12.0, reconnect=False)
@@ -312,6 +465,7 @@ async def trascrivi(ctx: discord.ApplicationContext) -> None:
             ctx.guild.name,
             voice_channel.id,
             voice_channel.name,
+            ctx.author.id,
             participant_names,
             settings,
             worker,
@@ -319,8 +473,12 @@ async def trascrivi(ctx: discord.ApplicationContext) -> None:
         sessions[ctx.guild.id] = session
         voice_client.start_recording(session.sink)
         session.start()
+        session.monitor_task = asyncio.create_task(_watch_voice_session(ctx.guild.id))
     except asyncio.TimeoutError:
         LOGGER.exception("Voice connection timed out")
+        if session is not None and sessions.get(ctx.guild.id) is session:
+            sessions.pop(ctx.guild.id, None)
+            session.stop()
         _forget_partial_voice_client(ctx.guild)
         return await _reply(
             ctx,
@@ -329,6 +487,9 @@ async def trascrivi(ctx: discord.ApplicationContext) -> None:
         )
     except Exception:
         LOGGER.exception("Session startup failed")
+        if session is not None and sessions.get(ctx.guild.id) is session:
+            sessions.pop(ctx.guild.id, None)
+            session.stop()
         if voice_client is not None and voice_client.is_connected():
             await voice_client.disconnect(force=True)
         else:
@@ -345,9 +506,13 @@ async def trascrivi(ctx: discord.ApplicationContext) -> None:
 @bot.event
 async def on_voice_state_update(member, before, after) -> None:
     """Keep speaker names current when somebody joins during a session."""
+    session = sessions.get(member.guild.id)
+    if bot.user is not None and member.id == bot.user.id:
+        if session is not None and after.channel is None and session.state != "stopping":
+            asyncio.create_task(_recover_voice_session(member.guild, session))
+        return
     if getattr(member, "bot", False) or after.channel is None:
         return
-    session = sessions.get(member.guild.id)
     if session is not None and after.channel.id == session.voice_channel_id:
         session.add_participant(member.id, member.display_name)
 
@@ -358,13 +523,16 @@ async def ferma(ctx: discord.ApplicationContext) -> None:
         return await _reply(ctx, "This command works only inside a server.")
     session = sessions.pop(ctx.guild.id, None)
     voice_client = ctx.guild.voice_client
-    if session is None or voice_client is None:
+    if session is None:
         return await _reply(ctx, "There is no active transcription.")
 
-    if voice_client.is_recording():
-        voice_client.stop_recording()
     session.stop()
-    await voice_client.disconnect()
+    if session.monitor_task is not None:
+        session.monitor_task.cancel()
+    if voice_client is not None:
+        if voice_client.is_recording():
+            voice_client.stop_recording()
+        await voice_client.disconnect()
     await _reply(
         ctx,
         f"Transcription stopped. Local notes: `{session.transcript_path.name}`.",
@@ -375,7 +543,8 @@ async def ferma(ctx: discord.ApplicationContext) -> None:
 async def stato(ctx: discord.ApplicationContext) -> None:
     session = sessions.get(ctx.guild.id) if ctx.guild else None
     active = (
-        f"active in `{session.voice_channel_name}`; file `{session.transcript_path.name}`"
+        f"{session.state} in `{session.voice_channel_name}`; "
+        f"automatic recoveries {session.recovery_count}; file `{session.transcript_path.name}`"
         if session
         else "inactive"
     )
@@ -410,4 +579,6 @@ if __name__ == "__main__":
     finally:
         for active_session in sessions.values():
             active_session.stop()
+            if active_session.monitor_task is not None:
+                active_session.monitor_task.cancel()
         worker.stop()
