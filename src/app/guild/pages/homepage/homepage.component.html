@@ -1,6 +1,5 @@
-<!-- Homepage — Campaign landing page with hero image, title, quote, and navigation -->
+<!-- Campaign cover: identity, one party voice, and four primary destinations. -->
 <div class="homepage">
-  <!-- Hero section with random group image -->
   <section class="homepage__hero" [class.homepage__hero--fallback]="!heroImageUrl()">
     @if (heroImageUrl(); as imgUrl) {
       <img
@@ -27,9 +26,8 @@
     </div>
   </section>
 
-  <!-- Random character quote -->
   @if (randomQuote(); as quote) {
-    <section class="homepage__quote-section">
+    <section class="homepage__quote-section" aria-label="Party quote">
       <blockquote class="homepage__quote">
         <p class="homepage__quote-text">"{{ quote.text }}"</p>
         <footer class="homepage__quote-attribution">
@@ -42,60 +40,6 @@
     </section>
   }
 
-  @if (continuePage() || favoritePages().length > 0 || recentPages().length > 0) {
-    <section class="homepage__trail" aria-labelledby="remembered-trail-title">
-      <header class="homepage__trail-heading">
-        <span>{{ lang() === 'it' ? 'Il tuo percorso' : 'Your remembered trail' }}</span>
-        <h2 id="remembered-trail-title">
-          {{ lang() === 'it' ? 'Riprendi da dove eri rimasto' : 'Return where you left off' }}
-        </h2>
-        <p>
-          {{
-            lang() === 'it'
-              ? 'Cronologia e preferiti restano soltanto su questo dispositivo.'
-              : 'History and favorites stay only on this device.'
-          }}
-        </p>
-      </header>
-
-      @if (continuePage(); as page) {
-        <a class="homepage__continue-card" [routerLink]="page.url">
-          <span class="homepage__continue-icon" aria-hidden="true">&#8634;</span>
-          <span>
-            <small>{{ lang() === 'it' ? 'Continua a leggere' : 'Continue reading' }}</small>
-            <strong>{{ page.title }}</strong>
-          </span>
-          <span aria-hidden="true">&rarr;</span>
-        </a>
-      }
-
-      <div class="homepage__trail-columns">
-        @if (favoritePages().length > 0) {
-          <nav [attr.aria-label]="lang() === 'it' ? 'Pagine preferite' : 'Favorite pages'">
-            <h3>
-              <span aria-hidden="true">&#9733;</span>
-              {{ lang() === 'it' ? 'Preferiti' : 'Favorites' }}
-            </h3>
-            @for (page of favoritePages(); track page.url) {
-              <a [routerLink]="page.url">{{ page.title }} <span aria-hidden="true">&rarr;</span></a>
-            }
-          </nav>
-        }
-        @if (recentPages().length > 0) {
-          <nav [attr.aria-label]="lang() === 'it' ? 'Pagine recenti' : 'Recent pages'">
-            <h3>
-              <span aria-hidden="true">&#8634;</span> {{ lang() === 'it' ? 'Recenti' : 'Recent' }}
-            </h3>
-            @for (page of recentPages(); track page.url) {
-              <a [routerLink]="page.url">{{ page.title }} <span aria-hidden="true">&rarr;</span></a>
-            }
-          </nav>
-        }
-      </div>
-    </section>
-  }
-
-  <!-- Campaign pulse: remains useful even before the first session. -->
   @if (campaignId(); as cId) {
     <section class="homepage__pulse" aria-labelledby="campaign-pulse-title">
       <div class="homepage__pulse-copy">
@@ -132,202 +76,29 @@
                 : 'Quickly return to the heroes, encounters, and places that shaped the campaign.'
           }}
         </p>
-        <a class="homepage__pulse-cta" [routerLink]="['/', cId, 'party']">
-          {{ lang() === 'it' ? 'Incontra la compagnia' : 'Meet the party' }}
-          <span aria-hidden="true">&rarr;</span>
-        </a>
       </div>
 
-      <dl class="homepage__metrics">
-        <div class="homepage__metric">
-          <dt>{{ lang() === 'it' ? 'Avventurieri' : 'Adventurers' }}</dt>
-          <dd>{{ partyCount() }}</dd>
-        </div>
-        <div class="homepage__metric">
-          <dt>{{ lang() === 'it' ? 'Sessioni' : 'Sessions' }}</dt>
-          <dd>{{ sessionCount() }}</dd>
-        </div>
-        <div class="homepage__metric">
-          <dt>NPC</dt>
-          <dd>{{ npcCount() }}</dd>
-        </div>
-        <div class="homepage__metric">
-          <dt>{{ lang() === 'it' ? 'Luoghi' : 'Places' }}</dt>
-          <dd>{{ mapCount() }}</dd>
-        </div>
-      </dl>
+      <nav
+        class="homepage__metrics"
+        [attr.aria-label]="lang() === 'it' ? 'Destinazioni principali' : 'Primary destinations'"
+      >
+        <a class="homepage__metric" [routerLink]="['/', cId, 'party']" appSfxHover>
+          <span>{{ lang() === 'it' ? 'Avventurieri' : 'Adventurers' }}</span>
+          <strong>{{ partyCount() }}</strong>
+        </a>
+        <a class="homepage__metric" [routerLink]="['/', cId, 'npcs']" appSfxHover>
+          <span>NPC</span>
+          <strong>{{ npcCount() }}</strong>
+        </a>
+        <a class="homepage__metric" [routerLink]="['/', cId, 'campaign']" appSfxHover>
+          <span>{{ lang() === 'it' ? 'Sessioni' : 'Sessions' }}</span>
+          <strong>{{ sessionCount() }}</strong>
+        </a>
+        <a class="homepage__metric" [routerLink]="['/', cId, 'maps']" appSfxHover>
+          <span>{{ lang() === 'it' ? 'Luoghi' : 'Places' }}</span>
+          <strong>{{ mapCount() }}</strong>
+        </a>
+      </nav>
     </section>
-  }
-
-  @if (campaignId(); as cId) {
-    @if (gameNightBrief(); as brief) {
-      <section class="homepage__brief" aria-labelledby="game-night-brief-title">
-        <header class="homepage__brief-heading">
-          <span>{{ lang() === 'it' ? 'Brief prima della sessione' : 'Before the session' }}</span>
-          <h2 id="game-night-brief-title">
-            {{ lang() === 'it' ? 'Quattro cose da ricordare' : 'Four things to remember' }}
-          </h2>
-          <p>
-            {{
-              lang() === 'it'
-                ? 'Un percorso rapido tra fatti condivisi. Ogni tappa apre la pagina completa che la sostiene.'
-                : 'A quick path through shared facts. Every step opens the full page that supports it.'
-            }}
-          </p>
-        </header>
-
-        <ol class="homepage__brief-steps">
-          <li>
-            <a [routerLink]="['/', cId, 'campaign', 'story', brief.latestSessionId]" appSfxHover>
-              <span class="homepage__brief-number" aria-hidden="true">1</span>
-              <span class="homepage__brief-label">{{
-                lang() === 'it' ? 'Cosa è cambiato' : 'What changed'
-              }}</span>
-              <strong>{{ brief.latestSessionTitle }}</strong>
-              <small>{{ brief.latestEvent }}</small>
-              <span class="homepage__brief-link">{{
-                lang() === 'it' ? 'Apri il capitolo' : 'Open the chapter'
-              }}</span>
-            </a>
-          </li>
-          <li>
-            <a [routerLink]="['/', cId, 'maps']" appSfxHover>
-              <span class="homepage__brief-number" aria-hidden="true">2</span>
-              <span class="homepage__brief-label">{{
-                lang() === 'it' ? 'Dove siete' : 'Where you are'
-              }}</span>
-              <strong>{{ brief.currentLocation }}</strong>
-              <small>{{
-                lang() === 'it'
-                  ? 'Riapri luoghi, scoperte e percorsi conosciuti.'
-                  : 'Return to known places, discoveries and routes.'
-              }}</small>
-              <span class="homepage__brief-link">{{
-                lang() === 'it' ? 'Esplora i luoghi' : 'Explore places'
-              }}</span>
-            </a>
-          </li>
-          @if (brief.characterId && brief.characterName && brief.characterThread) {
-            <li>
-              <a [routerLink]="['/', cId, 'party', brief.characterId]" appSfxHover>
-                <span class="homepage__brief-number" aria-hidden="true">3</span>
-                <span class="homepage__brief-label">{{
-                  lang() === 'it' ? 'Un filo personale' : 'A personal thread'
-                }}</span>
-                <strong>{{ brief.characterName }}</strong>
-                <small>{{ brief.characterThread }}</small>
-                <span class="homepage__brief-link">{{
-                  lang() === 'it' ? 'Apri il personaggio' : 'Open the character'
-                }}</span>
-              </a>
-            </li>
-          }
-          <li>
-            <a [routerLink]="['/', cId, 'campaign', 'story-so-far']" appSfxHover>
-              <span class="homepage__brief-number" aria-hidden="true">4</span>
-              <span class="homepage__brief-label">{{
-                lang() === 'it' ? 'Cosa conta adesso' : 'What matters now'
-              }}</span>
-              <strong>{{ lang() === 'it' ? 'La storia finora' : 'The story so far' }}</strong>
-              <small>{{ brief.storySoFar }}</small>
-              <span class="homepage__brief-link">{{
-                lang() === 'it' ? 'Leggi il riepilogo' : 'Read the recap'
-              }}</span>
-            </a>
-          </li>
-        </ol>
-      </section>
-    }
-  }
-
-  <!-- Player-first shortcuts for getting back into character before game night. -->
-  @if (campaignId(); as cId) {
-    <section class="homepage__player-hub" aria-labelledby="player-hub-title">
-      <header class="homepage__player-hub-heading">
-        <span class="homepage__player-hub-kicker">
-          {{ lang() === 'it' ? 'Pronti per la sessione' : 'Ready for game night' }}
-        </span>
-        <h2 id="player-hub-title">
-          {{ lang() === 'it' ? 'Torna in personaggio' : 'Step back into character' }}
-        </h2>
-        <p>
-          {{
-            lang() === 'it'
-              ? 'Tutto ciò che serve per ricordare chi sei, cosa è successo e di chi fidarti.'
-              : 'Everything you need to remember who you are, what happened and whom you trust.'
-          }}
-        </p>
-      </header>
-      <div class="homepage__player-actions">
-        <a [routerLink]="['/', cId, 'party']" appSfxHover>
-          <span aria-hidden="true">⚔</span>
-          <strong>{{ lang() === 'it' ? 'La tua scheda' : 'Your character' }}</strong>
-          <small>{{
-            lang() === 'it' ? 'Profilo, segreti e progressione' : 'Profile, secrets and progression'
-          }}</small>
-        </a>
-        <a
-          [routerLink]="
-            latestSessionId()
-              ? ['/', cId, 'campaign', 'story', latestSessionId()]
-              : ['/', cId, 'campaign', 'story-so-far']
-          "
-          appSfxHover
-        >
-          <span aria-hidden="true">✦</span>
-          <strong>{{ lang() === 'it' ? 'Ultimo capitolo' : 'Latest chapter' }}</strong>
-          <small>{{
-            lang() === 'it' ? 'Rientra nella storia in pochi minuti' : 'Catch up in a few minutes'
-          }}</small>
-        </a>
-        <a [routerLink]="['/', cId, 'offline']" appSfxHover>
-          <span aria-hidden="true">⇩</span>
-          <strong>{{ lang() === 'it' ? 'Kit offline' : 'Offline pack' }}</strong>
-          <small>{{
-            lang() === 'it'
-              ? 'Porta con te profili e recap recenti'
-              : 'Take public profiles and recent recaps with you'
-          }}</small>
-        </a>
-        <a [routerLink]="['/', cId, 'party', 'relationships']" appSfxHover>
-          <span aria-hidden="true">◇</span>
-          <strong>{{ lang() === 'it' ? 'Legami del party' : 'Party bonds' }}</strong>
-          <small>{{
-            lang() === 'it' ? 'Affetti, tensioni e promesse' : 'Trust, tension and promises'
-          }}</small>
-        </a>
-      </div>
-    </section>
-  }
-
-  <!-- Quick navigation links -->
-  @if (campaignId(); as cId) {
-    <nav
-      class="homepage__nav"
-      [attr.aria-label]="lang() === 'it' ? 'Sezioni della campagna' : 'Campaign sections'"
-    >
-      <a class="homepage__nav-card" [routerLink]="['/', cId, 'party']" appSfxHover>
-        <span class="homepage__nav-icon">⚔️</span>
-        <span class="homepage__nav-label">{{
-          lang() === 'it' ? 'La Compagnia' : 'The Party'
-        }}</span>
-      </a>
-      <a class="homepage__nav-card" [routerLink]="['/', cId, 'campaign']" appSfxHover>
-        <span class="homepage__nav-icon">📜</span>
-        <span class="homepage__nav-label">{{ lang() === 'it' ? 'Campagna' : 'Campaign' }}</span>
-      </a>
-      <a class="homepage__nav-card" [routerLink]="['/', cId, 'npcs']" appSfxHover>
-        <span class="homepage__nav-icon">🐉</span>
-        <span class="homepage__nav-label">NPCs</span>
-      </a>
-      <a class="homepage__nav-card" [routerLink]="['/', cId, 'maps']" appSfxHover>
-        <span class="homepage__nav-icon">🗺️</span>
-        <span class="homepage__nav-label">{{ lang() === 'it' ? 'Mappe' : 'Maps' }}</span>
-      </a>
-      <a class="homepage__nav-card" [routerLink]="['/', cId, 'gallery']" appSfxHover>
-        <span class="homepage__nav-icon">🖼️</span>
-        <span class="homepage__nav-label">{{ lang() === 'it' ? 'Galleria' : 'Gallery' }}</span>
-      </a>
-    </nav>
   }
 </div>

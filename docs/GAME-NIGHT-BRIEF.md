@@ -4,7 +4,7 @@
 **Roadmap:** Day 07 — richer player journey  
 **Goals:** GN-02, GN-03 and GN-07
 
-A campaign home with at least one completed session presents a four-step brief
+The campaign chronicle presents a four-step brief above its session timeline
 for the few minutes before play:
 
 1. **What changed** — the final recorded key event, linked to its full chapter.
@@ -26,6 +26,9 @@ existing pre-session empty state instead of showing invented context.
   phone.
 - Every summary links to its supporting chapter, map collection, character or
   complete recap.
+- Campaign home remains a concise cover with its identity, one party voice and
+  four linked metrics. It does not duplicate the chronicle brief, global recent
+  pages and favourites, or the persistent navigation.
 - The feature coexists with recent pages, favourites, offline preparation and
   guided-tour progress; none is required before using the brief.
 

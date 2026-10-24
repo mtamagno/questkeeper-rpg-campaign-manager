@@ -38,7 +38,8 @@ title and visit time in this browser; it never stores page text, protected
 fields or passwords. Campaign home visits do not replace the last readable
 page, so **Continue reading / Continua a leggere** remains a useful return
 point. The current page can be added or removed with an accessible pressed-state
-control, while the home and command palette expose the same saved trail.
+control. The global command palette is the consistent access point for the
+saved trail, keeping campaign home focused on identity and primary destinations.
 
 ## Responsive and accessible behavior
 

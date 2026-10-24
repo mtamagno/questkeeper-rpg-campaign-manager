@@ -15,16 +15,18 @@ Lantern Road now behaves like a small but credible campaign rather than a set
 of placeholders. Its two chapters carry connected prose, decisions, locations,
 quotes and character memories. A focused demo guard protects that continuity.
 
-The campaign homepage also turns those records into a four-step game-night
+The campaign chronicle also turns those records into a four-step game-night
 brief: what changed, where the party is, one personal thread and what matters
 now. Every step links to its supporting public record, so the brief helps a
-returning player without becoming a competing source of truth.
+returning player without becoming a competing source of truth. Campaign home
+stays a focused cover and routes its four live counts to the relevant sections.
 
 ## Combined journey reviewed
 
 - A first-time visitor can still follow the five-stop guided tour.
-- A returning player can understand the current situation from campaign home
-  and open the supporting chapter, place, profile or full recap.
+- A returning player can enter the campaign from its concise cover, open the
+  chronicle through the Sessions metric and follow the supporting chapter,
+  place, profile or full recap from there.
 - Recent pages, favourites and offline preparation remain independent helpers;
   the new brief does not gate them or duplicate their browser memory.
 - Empty campaigns retain the existing pre-session state instead of presenting

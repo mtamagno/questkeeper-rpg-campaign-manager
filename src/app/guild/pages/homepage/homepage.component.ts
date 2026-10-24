@@ -14,26 +14,12 @@ import { type Character, type CharacterQuote } from '@guild/models/character.mod
 import { LanguageToggleComponent } from '@guild/components/language-toggle/language-toggle.component';
 import { SfxHoverDirective } from '@guild/directives/sfxHover.directive';
 import { localizeText } from '@guild/models/language.model';
-import { JourneyMemoryService, type JourneyPage } from '@guild/services/journeyMemory.service';
-import { type Session } from '@guild/models/session.model';
 
 /** Resolved quote with its speaker's name for display. */
 interface DisplayQuote {
   readonly text: string;
   readonly context: string;
   readonly characterName: string;
-}
-
-/** Public, evidence-linked context a player can scan before the session starts. */
-interface GameNightBrief {
-  readonly latestSessionId: string;
-  readonly latestSessionTitle: string;
-  readonly latestEvent: string;
-  readonly currentLocation: string;
-  readonly storySoFar: string;
-  readonly characterId: string | undefined;
-  readonly characterName: string | undefined;
-  readonly characterThread: string | undefined;
 }
 
 /**
@@ -65,7 +51,6 @@ export class HomepageComponent {
   private readonly dataService = inject(DataService);
   private readonly campaignService = inject(CampaignService);
   private readonly languageService = inject(LanguageService);
-  private readonly journeyMemory = inject(JourneyMemoryService);
 
   /** Current language for localized interface labels. */
   readonly lang = this.languageService.currentLanguage;
@@ -90,55 +75,6 @@ export class HomepageComponent {
   readonly npcCount: Signal<number> = computed(() => this.dataService.npcs().length);
   readonly sessionCount: Signal<number> = computed(() => this.dataService.sessions().length);
   readonly mapCount: Signal<number> = computed(() => this.dataService.maps().length);
-
-  readonly continuePage = this.journeyMemory.continuePage;
-  readonly favoritePages = computed((): ReadonlyArray<JourneyPage> =>
-    this.journeyMemory.favoritePages().slice(0, 4),
-  );
-  readonly recentPages = computed((): ReadonlyArray<JourneyPage> => {
-    const favoriteUrls = new Set(this.favoritePages().map((page) => page.url));
-    return this.journeyMemory
-      .recentPages()
-      .filter((page): boolean => !favoriteUrls.has(page.url))
-      .slice(0, 4);
-  });
-
-  /** Most recent session, used by catch-up links and the game-night brief. */
-  readonly latestSession: Signal<Session | undefined> = computed(() => {
-    const sessions = this.dataService.sortedSessions();
-    return sessions.length > 0 ? sessions[sessions.length - 1] : undefined;
-  });
-  readonly latestSessionId: Signal<string | undefined> = computed(() => this.latestSession()?.id);
-
-  /**
-   * Derives a concise player brief from public campaign records only.
-   * It links every statement back to the chapter, map, character or full recap.
-   */
-  readonly gameNightBrief: Signal<GameNightBrief | undefined> = computed(() => {
-    const session = this.latestSession();
-    const campaign = this.dataService.campaign();
-    if (session === undefined || campaign === undefined) {
-      return undefined;
-    }
-
-    const lang = this.languageService.currentLanguage();
-    const spotlight =
-      this.dataService.characters().find((character) => character.diary.length > 0) ??
-      this.dataService.characters()[0];
-    const latestEvent = session.keyEvents.at(-1)?.description ?? session.summary;
-
-    return {
-      latestSessionId: session.id,
-      latestSessionTitle: localizeText(session.title, lang),
-      latestEvent: localizeText(latestEvent, lang),
-      currentLocation: localizeText(session.location, lang),
-      storySoFar: localizeText(campaign.storySoFar, lang),
-      characterId: spotlight?.id,
-      characterName: spotlight?.name,
-      characterThread:
-        spotlight === undefined ? undefined : localizeText(spotlight.publicProfile.bonds, lang),
-    };
-  });
 
   /** Campaign title from the data service. */
   readonly campaignTitle: Signal<string> = computed(() => {

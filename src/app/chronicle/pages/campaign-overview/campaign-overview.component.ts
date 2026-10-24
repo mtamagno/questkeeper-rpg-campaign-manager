@@ -13,6 +13,7 @@ import { AccordionComponent } from '@guild/components/accordion/accordion.compon
 import { type BilingualText } from '@guild/models/language.model';
 import { type Session } from '@guild/models/session.model';
 import { SessionSummaryComponent } from '../../components/session-summary/session-summary.component';
+import { GameNightBriefComponent } from '../../components/game-night-brief/game-night-brief.component';
 
 /**
  * Displays all campaign sessions in chronological order.
@@ -26,6 +27,7 @@ import { SessionSummaryComponent } from '../../components/session-summary/sessio
     LanguageToggleComponent,
     BilingualTextPipe,
     AccordionComponent,
+    GameNightBriefComponent,
   ],
   templateUrl: './campaign-overview.component.html',
   styleUrl: './campaign-overview.component.scss',

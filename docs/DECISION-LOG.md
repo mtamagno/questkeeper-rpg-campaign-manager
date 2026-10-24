@@ -923,10 +923,11 @@ cannot detect a class of silent audio loss.
 
 **Status:** Active
 
-**Decision:** The campaign-home game-night brief is a derived reading path, not
-a second campaign state. Each item must be built from public campaign, session,
-map or character fields and link back to the record that supports it. Protected
-notes, inferred secrets and unpublished drafts are never eligible inputs.
+**Decision:** The game-night brief in the campaign chronicle is a derived
+reading path, not a second campaign state. Each item must be built from public
+campaign, session, map or character fields and link back to the record that
+supports it. Protected notes, inferred secrets and unpublished drafts are never
+eligible inputs.
 
 **Why:** A player needs a fast answer to what changed, where the party is, which
 personal thread matters and what remains unresolved. Duplicating those answers
@@ -943,6 +944,34 @@ read protected character fields.
 
 **Revisit when:** A versioned campaign-state model can prove authorship,
 visibility and reconciliation without duplicating or weakening the chronicle.
+
+### QK-035 — Campaign home is a cover, not a dashboard
+
+**Date:** 24 October 2026
+
+**Status:** Active
+
+**Decision:** Campaign home contains only campaign identity, one optional party
+voice and a compact pulse whose four metrics link to adventurers, NPCs,
+sessions and places. Story preparation belongs in the campaign chronicle;
+personal reading memory belongs in the global command palette; persistent
+navigation is not repeated as a card grid.
+
+**Why:** Stacking recap, reading history, player shortcuts and route cards below
+the cover made the entry point slower to scan and obscured the four destinations
+players actually need. Each capability remains useful, but not at the same
+level of the information hierarchy.
+
+**Consequences:** New homepage sections require evidence that they represent
+campaign identity or a primary destination. Counts are real links with visible
+keyboard focus. Briefs, favourites, recent pages and utilities must live in the
+focused surface that owns them instead of being duplicated on home.
+
+**Source:** User review of the Day 07 campaign home and
+[Game-night campaign brief](GAME-NIGHT-BRIEF.md).
+
+**Revisit when:** User research shows that a missing primary destination cannot
+be reached quickly through the pulse, persistent navigation or command palette.
 
 ### QK-XXX — Short decision title
 

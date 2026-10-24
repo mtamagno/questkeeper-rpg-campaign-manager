@@ -11,7 +11,6 @@ const commandBar = read(
 const commandComponent = read(
   'src/app/guild/components/site-command-bar/site-command-bar.component.ts',
 );
-const homepage = read('src/app/guild/pages/homepage/homepage.component.html');
 const guide = read('docs/GLOBAL-COMMAND-PALETTE.md');
 const roadmap = read('docs/ROADMAP-60-DAYS.md');
 
@@ -39,17 +38,9 @@ for (const phrase of [
 ]) {
   assert.ok(commandBar.includes(phrase), `Command-bar memory action is missing: ${phrase}`);
 }
-for (const phrase of [
-  'Your remembered trail',
-  'Riprendi da dove eri rimasto',
-  'History and favorites stay only on this device.',
-  'Pagine preferite',
-  'Recent pages',
-]) {
-  assert.ok(homepage.includes(phrase), `Homepage memory journey is missing: ${phrase}`);
-}
 assert.match(guide, /URL, page\s+title and visit time/);
 assert.match(guide, /never stores page text, protected\s+fields or passwords/);
+assert.match(guide, /global command palette is the consistent access point/);
 assert.match(roadmap, /\[x\].*recent pages favourites and continue-reading actions/);
 
 console.log(
