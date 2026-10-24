@@ -1031,6 +1031,34 @@ remote-consent checks, review and explicit save remain available at every step.
 **Revisit when:** Multiple volumes, collaborative journals or per-page access
 rules become a demonstrated player need.
 
+### QK-038 — Character profiles are derived story maps
+
+**Date:** 25 October 2026
+
+**Status:** Active
+
+**Decision:** A player-character profile opens with three public pillars:
+identity, bonds and memories. The view derives its copy and links from existing
+public profile, relationship, lore, notebook, quote and diary records instead
+of storing a second summary model.
+
+**Why:** The former accordion stack exposed every field but did not answer the
+player's first questions: who this person is, who matters to them and what the
+journey has changed. A connected narrative overview makes those answers
+scannable while preserving the deeper records as their sources.
+
+**Consequences:** Relationship previews include both party and NPC connections;
+memory previews link back to their artifact; missing content receives an honest
+empty state. Protected profiles, sheets and GM notes are forbidden inputs. The
+Day 08 quick-facts task may add compact facts but cannot replace these narrative
+pillars with a statistics dashboard.
+
+**Source:** [Character story profiles](CHARACTER-STORY-PROFILES.md).
+
+**Revisit when:** Player testing shows that a different first question is more
+important, or versioned memory data can improve the overview without creating a
+competing source of truth.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD

@@ -85,6 +85,7 @@ __pycache__/
 !/scripts/verify-journey-memory.cjs
 !/scripts/verify-table-moments.cjs
 !/scripts/verify-character-notebooks.cjs
+!/scripts/verify-character-story-profiles.cjs
 !/scripts/verify-accessibility.cjs
 !/scripts/verify-performance-budgets.cjs
 !/scripts/build-setup-binary.cjs

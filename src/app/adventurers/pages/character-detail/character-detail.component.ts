@@ -19,7 +19,8 @@ import { map } from 'rxjs';
 import { DataService } from '@guild/services/data.service';
 import { CampaignService } from '@guild/services/campaign.service';
 import { DEFAULT_CHARACTER_PASSWORD, type Character } from '@guild/models/character.model';
-import { type BilingualText } from '@guild/models/language.model';
+import { localizeText, type BilingualText } from '@guild/models/language.model';
+import { RELATIONSHIP_TYPE_LABELS } from '@guild/models/relationship.model';
 import { toDisplayUrl } from '@guild/services/imageUrl.service';
 import { LanguageService } from '@guild/services/language.service';
 import { BilingualTextPipe } from '@guild/components/bilingual-text/bilingual-text.pipe';
@@ -32,6 +33,19 @@ import { CharacterSheetComponent } from '../../components/character-sheet/charac
 import { SessionDiaryComponent } from '../../components/session-diary/session-diary.component';
 import { CharacterLoreChaptersComponent } from '../../components/character-lore-chapters/character-lore-chapters.component';
 import { CharacterNotebookComponent } from '../../components/character-notebook/character-notebook.component';
+
+interface ProfileBondPreview {
+  readonly key: string;
+  readonly entityId: string;
+  readonly entityPath: 'party' | 'npcs';
+  readonly name: string;
+  readonly avatarUrl: string;
+  readonly typeLabel: string;
+  readonly description: string;
+  readonly sourceId: string;
+  readonly targetId: string;
+  readonly sharedMemoryCount: number;
+}
 
 /**
  * Full character detail page.
@@ -138,22 +152,85 @@ export class CharacterDetailComponent {
     );
   });
 
-  /** Whether at least one public-profile field contains meaningful copy. */
-  readonly hasPublicProfile: Signal<boolean> = computed(() => {
-    const profile = this.character()?.publicProfile;
-    return (
-      profile !== undefined &&
-      ([profile.backstory, profile.traits, profile.ideals, profile.bonds, profile.flaws].some(
-        (value) => this.isRecorded(value),
-      ) ||
-        (profile.hobbies !== undefined && this.isRecorded(profile.hobbies)))
+  /** Public relationships involving this character, resolved to the other person. */
+  readonly profileBonds: Signal<ReadonlyArray<ProfileBondPreview>> = computed(() => {
+    const character = this.character();
+    if (character === undefined) return [];
+
+    const characters = new Map(
+      this.dataService
+        .characters()
+        .map((entry) => [
+          entry.id,
+          { name: entry.name, avatarUrl: entry.avatar.url, entityPath: 'party' as const },
+        ]),
     );
+    const npcs = new Map(
+      this.dataService
+        .npcs()
+        .map((entry) => [
+          entry.id,
+          { name: entry.name, avatarUrl: entry.avatar.url, entityPath: 'npcs' as const },
+        ]),
+    );
+    const relationships = [
+      ...this.dataService.partyRelationships(),
+      ...this.dataService.npcRelationships(),
+    ].filter(
+      (relationship) =>
+        relationship.sourceId === character.id || relationship.targetId === character.id,
+    );
+    const language = this.lang();
+    const previews: ProfileBondPreview[] = [];
+
+    for (const relationship of relationships) {
+      const entityId =
+        relationship.sourceId === character.id ? relationship.targetId : relationship.sourceId;
+      const entity = characters.get(entityId) ?? npcs.get(entityId);
+      if (entity === undefined) continue;
+      previews.push({
+        key: `${relationship.sourceId}:${relationship.targetId}`,
+        entityId,
+        entityPath: entity.entityPath,
+        name: entity.name,
+        avatarUrl: toDisplayUrl(entity.avatarUrl),
+        typeLabel: localizeText(RELATIONSHIP_TYPE_LABELS[relationship.type], language),
+        description: localizeText(relationship.description, language),
+        sourceId: relationship.sourceId,
+        targetId: relationship.targetId,
+        sharedMemoryCount: relationship.sharedEvents?.length ?? 0,
+      });
+    }
+
+    return previews;
+  });
+
+  /** Bounded bond preview; the relationship map remains the complete source. */
+  readonly visibleProfileBonds = computed(() => this.profileBonds().slice(0, 4));
+
+  /** Most recent public diary entry, used as the profile's current memory. */
+  readonly latestDiaryEntry = computed(() => {
+    const diary = this.character()?.diary ?? [];
+    return diary.length > 0 ? diary[diary.length - 1] : undefined;
   });
 
   /** Detects the shared bilingual placeholders used by not-yet-authored profiles. */
   isRecorded(value: BilingualText): boolean {
     const normalized = `${value.en} ${value.it}`.toLowerCase();
     return !normalized.includes('not yet recorded') && !normalized.includes('non ancora registrat');
+  }
+
+  /** Returns a compact, word-safe preview while preserving the full source elsewhere. */
+  profileExcerpt(value: BilingualText, maxLength = 210): string {
+    const text = localizeText(value, this.lang()).trim();
+    if (text.length <= maxLength) return text;
+    const boundary = text.lastIndexOf(' ', maxLength);
+    return `${text.slice(0, boundary > maxLength / 2 ? boundary : maxLength).trim()}…`;
+  }
+
+  /** Whether a localized profile passage needs an expandable full-text treatment. */
+  isProfileExcerpted(value: BilingualText, maxLength = 210): boolean {
+    return localizeText(value, this.lang()).trim().length > maxLength;
   }
 
   /** Formats a canonical centimetre value as metres in the selected language. */
