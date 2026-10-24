@@ -35,7 +35,7 @@
     },
     "hobbies": {
       "en": "Restoring old lanterns, sketching road signs and brewing tea before dawn.",
-      "it": "Restaurare vecchie lanterne, disegnare segnali stradali e preparare il tÃ¨ prima dell'alba."
+      "it": "Restaurare vecchie lanterne, disegnare segnali stradali e preparare il tè prima dell'alba."
     }
   },
   "privateProfile": {
@@ -85,8 +85,93 @@
     "features": ["Keen Observer", "Trail Sense"],
     "currency": { "gp": 12, "sp": 5 }
   },
-  "diary": [],
-  "sessionKnowledge": [],
-  "quotes": [],
+  "diary": [
+    {
+      "sessionId": "session-1",
+      "date": "2026-01-01",
+      "title": { "en": "Marks beneath the soot", "it": "Segni sotto la fuliggine" },
+      "content": {
+        "en": "I repaired that lantern yesterday. Someone wanted me to know they could reach the mechanism without breaking the glass.",
+        "it": "Ho riparato quella lanterna ieri. Qualcuno voleva farmi sapere che poteva raggiungere il meccanismo senza rompere il vetro."
+      }
+    },
+    {
+      "sessionId": "session-2",
+      "date": "2026-01-08",
+      "title": { "en": "The light knew me", "it": "La luce mi conosceva" },
+      "content": {
+        "en": "I showed Mira the shard. Asking for help still feels like handing someone the sharp edge, but she took it carefully.",
+        "it": "Ho mostrato la scheggia a Mira. Chiedere aiuto sembra ancora come porgere a qualcuno il lato tagliente, ma lei l'ha presa con cautela."
+      }
+    }
+  ],
+  "sessionKnowledge": [
+    {
+      "sessionId": "session-1",
+      "actions": [
+        {
+          "en": "Inspected the failed lantern and identified deliberate tool marks.",
+          "it": "Ha esaminato la lanterna spenta e riconosciuto segni intenzionali di attrezzi."
+        }
+      ],
+      "knownInfo": [
+        {
+          "en": "The lantern was extinguished without damaged glass or exhausted fuel.",
+          "it": "La lanterna è stata spenta senza danneggiare il vetro né esaurire il combustibile."
+        },
+        {
+          "en": "The compass seal inside the housing matches Mira's letter.",
+          "it": "Il sigillo a forma di bussola nell'alloggiamento coincide con quello sulla lettera di Mira."
+        }
+      ]
+    },
+    {
+      "sessionId": "session-2",
+      "actions": [
+        {
+          "en": "Read the altered road signs and caught Mira's crossing line when its anchor shifted.",
+          "it": "Ha interpretato i segnali alterati e afferrato la corda di Mira quando l'ancoraggio ha ceduto."
+        },
+        {
+          "en": "Revealed the hidden lens shard to Mira.",
+          "it": "Ha mostrato a Mira la scheggia di lente che teneva nascosta."
+        }
+      ],
+      "knownInfo": [
+        {
+          "en": "The shard responds to the Glass Beacon's cold flame.",
+          "it": "La scheggia reagisce alla fiamma fredda del Faro di Vetro."
+        },
+        {
+          "en": "The beacon's shadow points north despite the direction of its light.",
+          "it": "L'ombra del faro indica il nord indipendentemente dalla direzione della luce."
+        }
+      ]
+    }
+  ],
+  "quotes": [
+    {
+      "sessionId": "session-1",
+      "text": {
+        "en": "A light does not fail this neatly by accident.",
+        "it": "Una luce non si spegne così ordinatamente per caso."
+      },
+      "context": {
+        "en": "After opening Embercross's final lantern.",
+        "it": "Dopo aver aperto l'ultima lanterna di Crocebrace."
+      }
+    },
+    {
+      "sessionId": "session-2",
+      "text": {
+        "en": "I know how to repair a beacon. I do not know why this one knows me.",
+        "it": "So riparare un faro. Non so perché questo conosca me."
+      },
+      "context": {
+        "en": "When the hidden lens shard answered the cold flame.",
+        "it": "Quando la scheggia nascosta ha risposto alla fiamma fredda."
+      }
+    }
+  ],
   "password": "cambiami"
 }

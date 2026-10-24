@@ -10,18 +10,44 @@
   "keyEvents": [
     {
       "description": {
-        "en": "Keeper Rowan asks the party to follow the darkened road.",
-        "it": "Il custode Rowan chiede al gruppo di seguire la strada ormai buia."
+        "en": "The final road lantern went dark while rain still shone on its intact glass.",
+        "it": "L'ultima lanterna stradale si spense mentre la pioggia brillava ancora sul vetro intatto."
+      }
+    },
+    {
+      "description": {
+        "en": "Aria found fresh tool marks inside a mechanism she had repaired the previous morning.",
+        "it": "Aria trovò segni recenti di attrezzi dentro un meccanismo che aveva riparato la mattina precedente."
+      }
+    },
+    {
+      "description": {
+        "en": "Keeper Rowan asked the Wayfarers to follow the darkened road before a second light failed.",
+        "it": "Il custode Rowan chiese ai Viandanti di seguire la strada buia prima che si spegnesse una seconda luce."
       }
     }
   ],
   "location": { "en": "Embercross", "it": "Crocebrace" },
   "prose": {
-    "en": "Rain polished the stones when the final flame went out.<hr>The road beyond the gate waited in perfect darkness.",
-    "it": "La pioggia lucidava le pietre quando l'ultima fiamma si spense.<hr>Oltre il cancello, la strada attendeva nel buio assoluto."
+    "en": "Rain had polished Embercross to silver when the final road lantern went out. Its glass was whole, its reservoir full, and yet the flame folded inward as if someone had pinched it from the other side of the night. Aria opened the housing and found fresh tool marks beneath the soot—marks inside a mechanism she had repaired that morning.<hr>Mira arrived with the last courier bag from the north road and a letter whose ink had remained wet for a century. The seal on its fold matched the old compass stamped inside the lantern housing. Keeper Rowan recognized both symbols, but not their purpose. He admitted that another light had failed three nights earlier beyond the village gate, and that he had been too afraid to send anyone after it alone.<hr>The Wayfarers left before the rain stopped. Beyond the gate, the familiar road markers faced backward and the darkness between lantern posts seemed wider than distance should allow. Aria carried her mentor's unlit lantern. Mira carried the impossible letter. Neither called the journey a promise, but both walked as if one had already been made.",
+    "it": "La pioggia aveva lucidato Crocebrace fino a renderla d'argento quando l'ultima lanterna stradale si spense. Il vetro era integro, il serbatoio pieno, eppure la fiamma si ripiegò su se stessa come se qualcuno l'avesse spenta dall'altro lato della notte. Aria aprì l'alloggiamento e trovò segni recenti di attrezzi sotto la fuliggine: segni dentro un meccanismo che aveva riparato quella stessa mattina.<hr>Mira arrivò con l'ultima borsa da corriere della strada settentrionale e una lettera il cui inchiostro era rimasto fresco per un secolo. Il sigillo sulla piega coincideva con l'antica bussola impressa dentro la lanterna. Il custode Rowan riconobbe entrambi i simboli, ma non il loro scopo. Confessò che un'altra luce si era spenta tre notti prima oltre il cancello del villaggio e che aveva avuto troppa paura per mandare qualcuno a cercarla da solo.<hr>I Viandanti partirono prima che smettesse di piovere. Oltre il cancello, i segnali familiari erano rivolti all'indietro e il buio tra una lanterna e l'altra sembrava più ampio di quanto la distanza consentisse. Aria portava la lanterna spenta della sua mentore. Mira portava la lettera impossibile. Nessuna delle due definì il viaggio una promessa, ma entrambe camminarono come se ne avessero già fatta una."
   },
+  "images": [
+    {
+      "url": "images/group/hero.svg",
+      "alt": {
+        "en": "Aria and Mira leave rain-lit Embercross along the dark Lantern Road",
+        "it": "Aria e Mira lasciano Crocebrace sotto la pioggia lungo la Via delle Lanterne ormai buia"
+      },
+      "caption": {
+        "en": "The last light failed behind them. The first question waited ahead.",
+        "it": "L'ultima luce si spense alle loro spalle. La prima domanda le attendeva più avanti."
+      },
+      "afterSection": 2
+    }
+  ],
   "storySoFar": {
-    "en": "The last lantern is dark, and the road is calling.",
-    "it": "L'ultima lanterna è spenta e la strada chiama."
+    "en": "Embercross's last road lantern has failed without damage or lack of fuel. Aria and Mira left with a matching seal, a century-wet letter, and Keeper Rowan's warning that another light had already gone dark beyond the gate.",
+    "it": "L'ultima lanterna di Crocebrace si è spenta senza danni né mancanza di combustibile. Aria e Mira sono partite con un sigillo corrispondente, una lettera dall'inchiostro fresco dopo un secolo e l'avvertimento del custode Rowan: un'altra luce era già svanita oltre il cancello."
   }
 }

@@ -15,6 +15,17 @@
           "it": "La lente è incrinata dall'interno."
         },
         "sessionId": "session-1"
+      },
+      {
+        "title": {
+          "en": "Tool marks beneath the soot",
+          "it": "Segni di attrezzi sotto la fuliggine"
+        },
+        "description": {
+          "en": "Someone reached the final lantern's inner mechanism without breaking its glass.",
+          "it": "Qualcuno ha raggiunto il meccanismo interno dell'ultima lanterna senza romperne il vetro."
+        },
+        "sessionId": "session-1"
       }
     ],
     "explorationStatus": "in-progress",
@@ -36,6 +47,22 @@
         "description": {
           "en": "A pale flame burns beneath the broken lens and casts its shadow toward the mountains.",
           "it": "Una fiamma pallida arde sotto la lente spezzata e proietta la propria ombra verso le montagne."
+        },
+        "sessionId": "session-2"
+      },
+      {
+        "title": { "en": "The northbound shadow", "it": "L'ombra diretta a nord" },
+        "description": {
+          "en": "The flame's shadow ignores the light and points toward the mountains.",
+          "it": "L'ombra della fiamma ignora la luce e indica le montagne."
+        },
+        "sessionId": "session-2"
+      },
+      {
+        "title": { "en": "The compass seal", "it": "Il sigillo della bussola" },
+        "description": {
+          "en": "The beacon mechanism bears the same mark as Mira's impossible letter.",
+          "it": "Il meccanismo del faro porta lo stesso simbolo della lettera impossibile di Mira."
         },
         "sessionId": "session-2"
       }

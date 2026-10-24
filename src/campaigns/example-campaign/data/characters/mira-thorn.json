@@ -165,6 +165,15 @@
   },
   "diary": [
     {
+      "sessionId": "session-1",
+      "date": "2026-01-01",
+      "title": { "en": "A delivery without an address", "it": "Una consegna senza indirizzo" },
+      "content": {
+        "en": "The seal matched Aria's lantern. For once, moving faster would not have told me where I was going.",
+        "it": "Il sigillo coincideva con quello della lanterna di Aria. Per una volta, muovermi più in fretta non mi avrebbe detto dove stavo andando."
+      }
+    },
+    {
       "sessionId": "session-2",
       "date": "2026-01-08",
       "title": { "en": "The wrong shadow", "it": "L'ombra sbagliata" },
@@ -174,7 +183,42 @@
       }
     }
   ],
-  "sessionKnowledge": [],
+  "sessionKnowledge": [
+    {
+      "sessionId": "session-1",
+      "actions": [
+        {
+          "en": "Brought the century-wet letter to Embercross and chose to follow its matching seal.",
+          "it": "Ha portato a Crocebrace la lettera centenaria e ha scelto di seguirne il sigillo corrispondente."
+        }
+      ],
+      "knownInfo": [
+        {
+          "en": "The letter's compass seal also appears inside the failed road lantern.",
+          "it": "Il sigillo a forma di bussola sulla lettera compare anche dentro la lanterna spenta."
+        }
+      ]
+    },
+    {
+      "sessionId": "session-2",
+      "actions": [
+        {
+          "en": "Crossed the broken bridge and placed the impossible letter beside the beacon mechanism.",
+          "it": "Ha attraversato il ponte spezzato e posato la lettera impossibile accanto al meccanismo del faro."
+        }
+      ],
+      "knownInfo": [
+        {
+          "en": "The beacon and letter share a seal, while the first line is written in Mira's own hand.",
+          "it": "Il faro e la lettera condividono un sigillo, mentre la prima riga è scritta con la calligrafia di Mira."
+        },
+        {
+          "en": "Aria kept a lens shard that reacts to the beacon's flame.",
+          "it": "Aria custodiva una scheggia di lente che reagisce alla fiamma del faro."
+        }
+      ]
+    }
+  ],
   "quotes": [
     {
       "sessionId": "session-2",

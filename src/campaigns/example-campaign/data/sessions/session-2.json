@@ -19,12 +19,24 @@
         "en": "Mira crosses the broken span and retrieves a shard of the beacon lens.",
         "it": "Mira attraversa il ponte spezzato e recupera una scheggia della lente del faro."
       }
+    },
+    {
+      "description": {
+        "en": "The cold flame reacts to Aria's hidden lens shard and points its shadow north.",
+        "it": "La fiamma fredda reagisce alla scheggia di lente nascosta da Aria e proietta la propria ombra verso nord."
+      }
+    },
+    {
+      "description": {
+        "en": "Mira discovers that the impossible letter and the beacon machinery bear the same compass seal.",
+        "it": "Mira scopre che la lettera impossibile e il meccanismo del faro portano lo stesso sigillo a forma di bussola."
+      }
     }
   ],
   "location": { "en": "The Glass Beacon", "it": "Il Faro di Vetro" },
   "prose": {
-    "en": "Every road sign beyond Embercross faced the wrong direction. Aria read their scratches as a second language: not directions, but a warning.<hr>At the ravine, Mira crossed first. The ruined beacon waited on the far side, holding a white flame that gave no heat and cast its shadow toward the mountains.",
-    "it": "Ogni segnale oltre Crocebrace indicava la direzione sbagliata. Aria lesse i graffi come una seconda lingua: non indicazioni, ma un avvertimento.<hr>Al burrone, Mira attraversò per prima. Il faro in rovina attendeva dall'altro lato, custodendo una fiamma bianca priva di calore che proiettava la propria ombra verso le montagne."
+    "en": "Every road sign beyond Embercross faced the wrong direction. Aria read the scratches beneath their new bolts as a second language: not directions, but a warning assembled one stolen marker at a time. Mira wanted to move faster. Aria wanted to know who had taken the trouble to make haste dangerous. They compromised by walking quickly and stopping at every sign.<hr>The road ended at a ravine where the old bridge had dropped its centre into the river. Mira crossed first, using a courier line and the momentum Aria usually distrusted. When the anchor stone shifted, Aria caught the rope before the whole span followed it. On the far side, neither mentioned which one had been right. The ruined Glass Beacon rose above them, gathering a pale light from a sky already turning dark.<hr>Inside, a white flame burned without heat beneath the shattered lens. Its light fell evenly across the chamber, but its shadow stretched north toward the mountains. Aria's hand moved to the shard hidden in her coat. The glass answered with a faint blue pulse. She finally showed Mira what she had kept from the old beacon—and admitted that the impossible flame had once whispered her name.<hr>Mira laid the century-wet letter beside the mechanism. The same compass seal appeared beneath both. The first line, written in Mira's own hand, remained the only part she could bear to read. They now had a direction but no explanation: north, before the other valley lights failed. Behind them, Keeper Rowan waited for news. Somewhere east, Sable Finch still refused to finish a map.",
+    "it": "Ogni segnale oltre Crocebrace indicava la direzione sbagliata. Aria lesse i graffi sotto i bulloni nuovi come una seconda lingua: non indicazioni, ma un avvertimento costruito un cartello rubato alla volta. Mira voleva accelerare. Aria voleva capire chi si fosse impegnato tanto per rendere pericolosa la fretta. Raggiunsero un compromesso: camminare velocemente e fermarsi a ogni segnale.<hr>La strada terminava davanti a un burrone, dove la parte centrale del vecchio ponte era precipitata nel fiume. Mira attraversò per prima, affidandosi a una corda da corriere e a quello slancio di cui Aria diffidava. Quando la pietra d'ancoraggio cedette, Aria afferrò la corda prima che il resto della campata la seguisse. Sull'altra sponda nessuna delle due disse chi avesse avuto ragione. Il Faro di Vetro in rovina si alzava davanti a loro, raccogliendo una luce pallida da un cielo già scuro.<hr>All'interno, una fiamma bianca ardeva senza calore sotto la lente infranta. La luce cadeva uniforme nella camera, ma la sua ombra si allungava verso nord, in direzione delle montagne. La mano di Aria raggiunse la scheggia nascosta nel cappotto. Il vetro rispose con un debole impulso azzurro. Finalmente mostrò a Mira ciò che aveva conservato dal vecchio faro e confessò che la fiamma impossibile aveva già sussurrato il suo nome.<hr>Mira posò la lettera centenaria accanto al meccanismo. Su entrambi apparve lo stesso sigillo a forma di bussola. La prima riga, scritta con la calligrafia di Mira, restava l'unica parte che riusciva a leggere. Ora avevano una direzione, ma nessuna spiegazione: nord, prima che si spegnessero le altre luci della valle. Alle loro spalle, il custode Rowan attendeva notizie. Da qualche parte a est, Sable Finch si rifiutava ancora di completare una mappa."
   },
   "images": [
     {
@@ -41,7 +53,7 @@
     }
   ],
   "storySoFar": {
-    "en": "The Wayfarers found the Glass Beacon and a flame whose shadow points north.",
-    "it": "I Viandanti hanno trovato il Faro di Vetro e una fiamma la cui ombra indica il nord."
+    "en": "The Wayfarers reached the Glass Beacon. Its cold flame points north through its shadow, reacts to Aria's hidden shard, and bears the same seal as Mira's impossible letter. Their next decision is whether to follow it before more lanterns fail.",
+    "it": "I Viandanti hanno raggiunto il Faro di Vetro. La sua fiamma fredda indica il nord attraverso l'ombra, reagisce alla scheggia nascosta da Aria e porta lo stesso sigillo della lettera impossibile di Mira. Ora devono decidere se seguirla prima che si spengano altre lanterne."
   }
 }
