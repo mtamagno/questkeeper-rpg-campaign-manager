@@ -884,6 +884,90 @@ button:disabled {
   border-radius: 12px;
   background: linear-gradient(135deg, rgba(214, 182, 111, 0.07), rgba(71, 104, 90, 0.08));
 }
+.notebook-editor {
+  overflow: hidden;
+  border: 1px solid rgba(214, 182, 111, 0.32);
+  border-radius: 14px;
+  background: linear-gradient(145deg, rgba(65, 47, 30, 0.34), rgba(8, 14, 13, 0.76));
+}
+.notebook-editor__header,
+.notebook-pages-heading,
+.notebook-page-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.notebook-editor__header {
+  padding: 1rem 1.1rem;
+}
+.notebook-editor__header > div,
+.notebook-pages-heading > div {
+  display: grid;
+  gap: 0.25rem;
+}
+.notebook-editor__header small,
+.notebook-pages-heading small,
+.notebook-asset-preview figcaption {
+  color: var(--muted);
+}
+.notebook-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--gold);
+  font-weight: 700;
+}
+.notebook-editor__body {
+  display: grid;
+  gap: 1rem;
+  padding: 1.1rem;
+  border-top: 1px solid var(--line);
+}
+.notebook-editor__body[hidden] {
+  display: none;
+}
+.notebook-cover-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+.notebook-cover-card,
+.notebook-page-card {
+  display: grid;
+  gap: 0.8rem;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(6, 10, 9, 0.36);
+}
+.notebook-cover-card img {
+  width: min(100%, 220px);
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid rgba(214, 182, 111, 0.28);
+}
+.notebook-page-list {
+  display: grid;
+  gap: 1rem;
+}
+.notebook-asset-preview {
+  margin: 0;
+}
+.notebook-asset-preview img {
+  width: min(100%, 560px);
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  border-radius: 8px;
+}
+.notebook-asset-preview figcaption {
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+}
+.notebook-ai {
+  margin-top: 0.4rem;
+}
 .ai-compose > div:first-child {
   display: grid;
   gap: 0.25rem;
@@ -1156,6 +1240,16 @@ code {
 }
 .field small {
   color: var(--dim);
+}
+@media (max-width: 760px) {
+  .notebook-cover-grid {
+    grid-template-columns: 1fr;
+  }
+  .notebook-editor__header,
+  .notebook-pages-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 }
 .palette-picker {
   min-width: 0;

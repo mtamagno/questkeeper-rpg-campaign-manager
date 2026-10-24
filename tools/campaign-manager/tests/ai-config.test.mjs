@@ -9,6 +9,7 @@ import {
 } from '../ai-providers.mjs';
 import {
   buildImagePromptPlan,
+  buildNotebookPromptPlan,
   buildNotesPrompt,
   ENTITY_IMPORT_SCHEMA,
   generateDraftImages,
@@ -28,6 +29,28 @@ test('recommends a text model conservatively from RAM and CPU', () => {
     recommendModels({ ramGb: 64, logicalCores: 16, vramGb: 12 }).textModelId,
     'gemma3:27b',
   );
+});
+
+test('notebook planning is owner-specific and excludes protected character fields', () => {
+  const prompt = buildNotebookPromptPlan({
+    campaign: { campaign: { name: { en: 'Lantern Road' } }, manifestEntry: { id: 'demo' } },
+    character: {
+      id: 'mira',
+      name: 'Mira',
+      publicProfile: { traits: { en: 'Restless courier' } },
+      privateProfile: { secretBackstory: { en: 'NEVER-SHARE-THIS' } },
+    },
+    brief: 'Remember the rain-soaked northern road.',
+    styleDirectives: 'Graphite, burgundy ink, route lines and paper birds.',
+    language: 'English',
+    pageCount: 3,
+  });
+  assert.match(prompt, /Requested interior spreads: 3/);
+  assert.match(prompt, /Graphite, burgundy ink/);
+  assert.match(prompt, /Restless courier/);
+  assert.doesNotMatch(prompt, /NEVER-SHARE-THIS/);
+  assert.match(prompt, /2:3 portrait/);
+  assert.match(prompt, /3:2 landscape/);
 });
 
 test('does not recommend local image generation without enough VRAM', () => {

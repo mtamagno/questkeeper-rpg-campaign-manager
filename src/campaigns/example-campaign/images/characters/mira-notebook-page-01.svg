@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 1000" role="img" aria-labelledby="title desc">
+  <title id="title">Mira's notebook spread about the road to Embercross</title>
+  <desc id="desc">A hand-drawn two-page spread showing a courier in rain, a route map, a silver whistle and handwritten reflections.</desc>
+  <defs><linearGradient id="paper" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f0e4c8"/><stop offset="1" stop-color="#cab88f"/></linearGradient><filter id="ink"><feTurbulence baseFrequency=".8" numOctaves="2" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="1.2"/></filter></defs>
+  <rect width="1500" height="1000" fill="#251a18"/>
+  <path d="M50 35h700v930H50Q25 500 50 35zM750 35h700q25 465 0 930H750z" fill="url(#paper)" stroke="#7c5f3c" stroke-width="8"/>
+  <path d="M750 42v916" stroke="#6f573d" stroke-width="18" opacity=".45"/>
+  <g fill="none" stroke="#443d3a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" filter="url(#ink)">
+    <path d="M120 240c95-77 203-113 331-96 81 11 145 59 192 146-80 46-156 56-228 29-60-23-115-5-166 54-53 61-96 153-129 275"/>
+    <path d="M194 630c52-53 99-76 141-68 42 7 73 38 93 92M319 535l25-206 59-62 46 77-25 191M344 329l-55 95M403 300l64 108"/>
+    <path d="M331 270q47-76 94 0M321 569l-35 132M419 566l51 129"/>
+    <path d="M850 160c135 45 245 42 330-8 77-45 137-38 180 22M861 238c104 2 188 37 251 106 62 68 140 82 231 41M879 679c153-123 298-128 434-15"/>
+    <path d="M956 516l65-51 64 44 71-93 80 44"/>
+    <circle cx="1030" cy="470" r="18" fill="#443d3a"/><circle cx="1156" cy="416" r="18" fill="#443d3a"/>
+    <path d="M1260 690c-43 24-71 67-83 129 72 4 125-18 158-66-5-48-30-70-75-63zM1228 728l72 57"/>
+  </g>
+  <g fill="#803947" font-family="Georgia,serif" font-style="italic">
+    <text x="120" y="105" font-size="48">THE NORTH ROAD</text>
+    <text x="830" y="105" font-size="38">Promises travel farther than feet.</text>
+  </g>
+  <g fill="#393536" font-family="Georgia,serif" font-style="italic" font-size="29">
+    <text x="120" y="770">Rain makes every mile honest.</text><text x="120" y="812">Keep moving—but listen when the road goes quiet.</text>
+    <text x="850" y="590">The seal appears twice.</text><text x="850" y="626">That cannot be chance.</text>
+    <text x="850" y="890">Reminder: ask Aria before opening what was never addressed.</text>
+  </g>
+  <g fill="#8b3845"><circle cx="209" cy="198" r="7"/><circle cx="1235" cy="197" r="7"/><path d="M118 850c110 38 227 40 350 6" fill="none" stroke="#8b3845" stroke-width="4"/></g>
+</svg>

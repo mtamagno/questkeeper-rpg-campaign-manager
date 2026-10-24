@@ -31,6 +31,7 @@ import { PrivateProfileComponent } from '../../components/private-profile/privat
 import { CharacterSheetComponent } from '../../components/character-sheet/character-sheet.component';
 import { SessionDiaryComponent } from '../../components/session-diary/session-diary.component';
 import { CharacterLoreChaptersComponent } from '../../components/character-lore-chapters/character-lore-chapters.component';
+import { CharacterNotebookComponent } from '../../components/character-notebook/character-notebook.component';
 
 /**
  * Full character detail page.
@@ -48,6 +49,7 @@ import { CharacterLoreChaptersComponent } from '../../components/character-lore-
     CharacterSheetComponent,
     SessionDiaryComponent,
     CharacterLoreChaptersComponent,
+    CharacterNotebookComponent,
     RouterLink,
     DiceLoaderComponent,
   ],

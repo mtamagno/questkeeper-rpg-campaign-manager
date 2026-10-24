@@ -98,6 +98,10 @@ Each character JSON contains:
   public background. Each chapter has an `id`, localized `title` and `body`, an
   optional localized `period`, and an optional image with localized `alt` and
   `caption` text;
+- optional `notebook`, a password-gated, character-owned illustrated artifact.
+  It has localized title and description, optional 2:3 front/back covers,
+  ordered 3:2 interior spreads, and `styleDirectives` describing this specific
+  owner's medium, palette, handwriting, symbols and emotional variation;
 - separate square `profileImageUrl` and 2:3 `portraitImageUrl` artwork (the
   manager accepts both independently), plus a temporary spoiler password.
 
@@ -131,6 +135,53 @@ not reveal them.
   ]
 }
 ```
+
+A notebook is deliberately opt-in. Omit `notebook` entirely for a character
+who does not keep one. The Manager can build it manually or create a reviewable
+AI draft; both paths produce the same data:
+
+```json
+{
+  "notebook": {
+    "title": { "en": "Mira's Roadbook", "it": "Il taccuino di Mira" },
+    "description": {
+      "en": "Routes and unfinished deliveries.",
+      "it": "Rotte e consegne incompiute."
+    },
+    "password": "cambiami",
+    "styleDirectives": "Graphite and burgundy ink; route lines and paper birds; every spread contains Mira's first-person thought.",
+    "frontCover": {
+      "url": "images/characters/mira-notebook-front.webp",
+      "alt": "Mira's red roadbook"
+    },
+    "backCover": {
+      "url": "images/characters/mira-notebook-back.webp",
+      "alt": "Back of Mira's roadbook"
+    },
+    "pages": [
+      {
+        "id": "north-road",
+        "title": { "en": "The North Road", "it": "La strada del nord" },
+        "era": { "en": "Before the beacon", "it": "Prima del faro" },
+        "reflection": {
+          "en": "Rain makes every mile honest.",
+          "it": "La pioggia rende sincero ogni miglio."
+        },
+        "mood": "wary",
+        "image": {
+          "url": "images/characters/mira-notebook-01.webp",
+          "alt": "A sketched rainy route"
+        }
+      }
+    ]
+  }
+}
+```
+
+An interior asset is one complete two-page spread, not one page. Keep notebook
+passwords different from the character-sheet password when the audiences
+differ, and remember that client-side password gates discourage casual spoilers
+but are not encryption.
 
 The local manager is the recommended way to maintain these fields. Existing
 art is preserved when editing a character; uploading a new square profile no

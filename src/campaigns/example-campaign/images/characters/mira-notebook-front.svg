@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1200" role="img" aria-labelledby="title desc">
+  <title id="title">Mira Thorn's weathered courier notebook</title>
+  <desc id="desc">A painted crimson travel journal with brass corners, a silver road emblem and the name Mira Thorn.</desc>
+  <defs>
+    <linearGradient id="leather" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#702f38"/><stop offset=".52" stop-color="#3b1822"/><stop offset="1" stop-color="#170f18"/></linearGradient>
+    <radialGradient id="glow"><stop stop-color="#ebd799" stop-opacity=".5"/><stop offset="1" stop-color="#ebd799" stop-opacity="0"/></radialGradient>
+    <filter id="shadow"><feDropShadow dx="0" dy="18" stdDeviation="18" flood-opacity=".5"/></filter>
+  </defs>
+  <rect width="800" height="1200" fill="#15131b"/>
+  <circle cx="430" cy="510" r="330" fill="url(#glow)"/>
+  <g filter="url(#shadow)">
+    <rect x="92" y="60" width="650" height="1080" rx="36" fill="url(#leather)" stroke="#ba9b5c" stroke-width="8"/>
+    <rect x="92" y="60" width="52" height="1080" rx="20" fill="#24121b" stroke="#84673e" stroke-width="5"/>
+    <path d="M178 112h512v976H178z" fill="none" stroke="#d2b875" stroke-opacity=".52" stroke-width="3"/>
+    <path d="M121 98v1004M111 150h42M111 1048h42" stroke="#d2b875" stroke-width="5"/>
+    <g fill="#c6a869"><path d="M178 112h92v14h-78v78h-14zM690 112h-92v14h78v78h14zM178 1088h92v-14h-78v-78h-14zM690 1088h-92v-14h78v-78h14z"/></g>
+    <g transform="translate(434 490)" fill="none" stroke="#d5d9dc" stroke-linecap="round">
+      <circle r="126" stroke-width="7"/><circle r="93" stroke-width="3" opacity=".65"/>
+      <path d="M-145 26C-66-32-20-78 4-151M-2 151c41-105 88-151 151-182" stroke-width="9"/>
+      <path d="M-145 26c60 11 108 44 143 125M4-151c14 65 62 102 145 120" stroke-width="4"/>
+      <path d="M0-82l22 60 60 22-60 22L0 82l-22-60-60-22 60-22z" fill="#d5d9dc" stroke-width="3"/>
+    </g>
+    <text x="434" y="770" fill="#e2e5e7" font-family="Georgia,serif" font-size="55" text-anchor="middle" letter-spacing="7">MIRA THORN</text>
+    <text x="434" y="826" fill="#c9ad70" font-family="Georgia,serif" font-size="22" text-anchor="middle" letter-spacing="5">ROADS · RAIN · PROMISES</text>
+  </g>
+</svg>

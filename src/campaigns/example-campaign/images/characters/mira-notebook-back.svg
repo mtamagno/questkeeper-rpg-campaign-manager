@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1200" role="img" aria-labelledby="title desc">
+  <title id="title">Back cover of Mira Thorn's notebook</title>
+  <desc id="desc">The back of a painted crimson journal with a right-hand spine, brass corners and a small silver whistle emblem.</desc>
+  <defs><linearGradient id="leather" x1="1" y1="0" x2="0" y2="1"><stop stop-color="#682c36"/><stop offset=".55" stop-color="#351720"/><stop offset="1" stop-color="#160f18"/></linearGradient><filter id="shadow"><feDropShadow dx="0" dy="18" stdDeviation="18" flood-opacity=".5"/></filter></defs>
+  <rect width="800" height="1200" fill="#15131b"/>
+  <g filter="url(#shadow)">
+    <rect x="58" y="60" width="650" height="1080" rx="36" fill="url(#leather)" stroke="#ba9b5c" stroke-width="8"/>
+    <rect x="656" y="60" width="52" height="1080" rx="20" fill="#24121b" stroke="#84673e" stroke-width="5"/>
+    <path d="M110 112h512v976H110z" fill="none" stroke="#d2b875" stroke-opacity=".52" stroke-width="3"/>
+    <path d="M682 98v1004M647 150h42M647 1048h42" stroke="#d2b875" stroke-width="5"/>
+    <g fill="#c6a869"><path d="M110 112h92v14h-78v78h-14zM622 112h-92v14h78v78h14zM110 1088h92v-14h-78v-78h-14zM622 1088h-92v-14h78v-78h14z"/></g>
+    <path d="M282 480c82-65 189-64 269 2-73 16-121 64-143 145-24-80-67-129-126-147z" fill="none" stroke="#d4d9dc" stroke-width="8"/>
+    <path d="M407 392v240M349 421l58 70 59-70M335 680h144" fill="none" stroke="#c6a869" stroke-width="5" stroke-linecap="round"/>
+    <text x="366" y="790" fill="#c9ad70" font-family="Georgia,serif" font-size="26" text-anchor="middle" letter-spacing="4">THE ROAD REMEMBERS</text>
+  </g>
+</svg>

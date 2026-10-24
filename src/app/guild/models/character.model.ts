@@ -51,6 +51,49 @@ export interface CharacterPrivateProfile {
   readonly dmNotes: BilingualText;
 }
 
+/** Visual mood used to style a page from a character-owned notebook. */
+export type CharacterNotebookMood =
+  | 'joyful'
+  | 'tender'
+  | 'calm'
+  | 'hopeful'
+  | 'mysterious'
+  | 'wary'
+  | 'uneasy'
+  | 'fractured'
+  | 'grief'
+  | 'guilt'
+  | 'memory'
+  | 'time'
+  | 'music'
+  | 'renewal';
+
+/** Notebook copy may be authored in one language or localized per campaign. */
+export type CharacterNotebookText = string | BilingualText;
+
+/** One complete illustrated two-page spread from a character's notebook. */
+export interface CharacterNotebookPage {
+  readonly id: string;
+  readonly title: CharacterNotebookText;
+  readonly era: BilingualText;
+  readonly image: ImageRef;
+  readonly reflection: CharacterNotebookText;
+  readonly mood: CharacterNotebookMood;
+}
+
+/** Optional separately protected visual notebook attached to a character. */
+export interface CharacterNotebook {
+  readonly title: BilingualText;
+  readonly description: BilingualText;
+  readonly password: string;
+  /** Per-character art direction used by manual authors and AI draft tools. */
+  readonly styleDirectives?: string;
+  /** Optional 2:3 portrait covers shown before and after the spreads. */
+  readonly frontCover?: ImageRef;
+  readonly backCover?: ImageRef;
+  readonly pages: ReadonlyArray<CharacterNotebookPage>;
+}
+
 /** Ability scores block. */
 export interface AbilityScores {
   readonly strength: number;
@@ -163,6 +206,8 @@ export interface Character {
   readonly loreChapters?: ReadonlyArray<CharacterLoreChapter>;
   readonly publicProfile: CharacterPublicProfile;
   readonly privateProfile: CharacterPrivateProfile;
+  /** Optional visual journal with its own password and unlock state. */
+  readonly notebook?: CharacterNotebook;
   /** Older level snapshots. The current version always remains in `sheet`. */
   readonly sheetHistory?: ReadonlyArray<CharacterSheetSnapshot>;
   readonly sheet: CharacterSheet;

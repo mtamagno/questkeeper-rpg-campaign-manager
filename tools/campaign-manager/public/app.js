@@ -559,6 +559,83 @@ function engineSelect(name, label, role, hint) {
   return `<label class="field"><span>${escapeHtml(label)}</span><select name="${name}">${choices.length ? choices.map((item) => `<option value="${escapeHtml(item.value)}" ${item.value === selected ? 'selected' : ''}>${escapeHtml(item.label)}</option>`).join('') : '<option value="">Configure a model first</option>'}</select><small>${escapeHtml(hint)}</small></label>`;
 }
 
+const NOTEBOOK_MOODS = [
+  'joyful',
+  'tender',
+  'calm',
+  'hopeful',
+  'mysterious',
+  'wary',
+  'uneasy',
+  'fractured',
+  'grief',
+  'guilt',
+  'memory',
+  'time',
+  'music',
+  'renewal',
+];
+
+function notebookLocalizedFields(prefix, label, value, languages, options = {}) {
+  return languages
+    .map((language) =>
+      field(
+        `notebook__${prefix}__${language}`,
+        `${label} · ${languageName(language)} (${language})`,
+        localized(value, language),
+        options,
+      ),
+    )
+    .join('');
+}
+
+function notebookPageEditor(page = {}, languages = campaignLanguages(), index = 0) {
+  const pageId = page.id || `page-${index + 1}`;
+  return `<article class="notebook-page-card" data-notebook-page>
+    <div class="notebook-page-card__header"><strong>Spread ${index + 1}</strong><button class="quiet-button" type="button" data-notebook-remove-page>Remove page</button></div>
+    <div class="form-grid">
+      ${field('notebookPageId', 'Page ID', pageId, { hint: 'Stable identifier. It must be unique inside this notebook.' })}
+      ${field('notebookPageMood', 'Mood', page.mood || 'memory', { type: 'select', values: NOTEBOOK_MOODS.map((mood) => [mood, mood.charAt(0).toUpperCase() + mood.slice(1)]) })}
+      ${notebookLocalizedFields('pageTitle', 'Page title', page.title, languages)}
+      ${notebookLocalizedFields('pageEra', 'Era / chapter', page.era, languages)}
+      ${notebookLocalizedFields('pageReflection', 'Owner reflection', page.reflection, languages, { type: 'textarea', wide: true })}
+      ${field('notebookPageImage', 'Illustrated spread', '', { type: 'file', hint: 'Landscape 3:2 image containing the complete two-page spread.' })}
+      ${field('notebookPageAlt', 'Accessibility text', page.image?.alt || '', { wide: true })}
+      <input type="hidden" name="notebookPagePath" value="${escapeHtml(page.image?.url || '')}" />
+      ${page.image?.url ? `<figure class="notebook-asset-preview field--wide"><img src="${escapeHtml(campaignAsset(page.image.url))}" alt="${escapeHtml(page.image.alt || '')}" /><figcaption>Current spread · upload a file only to replace it.</figcaption></figure>` : ''}
+    </div>
+  </article>`;
+}
+
+function notebookEditor(item = {}, languages = campaignLanguages()) {
+  const notebook = item.notebook ?? {};
+  const enabled = Boolean(item.notebook);
+  const covers = [
+    ['front', 'Front cover', notebook.frontCover],
+    ['back', 'Back cover', notebook.backCover],
+  ];
+  return `<section class="notebook-editor field--wide" data-notebook-editor>
+    <div class="notebook-editor__header"><div><strong>Personal notebook</strong><small>Optional illustrated journal owned by this character.</small></div><label class="notebook-toggle"><input name="notebookEnabled" type="checkbox" ${enabled ? 'checked' : ''} data-notebook-toggle /> Give this character a notebook</label></div>
+    <div class="notebook-editor__body" data-notebook-body ${enabled ? '' : 'hidden'}>
+      <div class="form-grid">
+        ${notebookLocalizedFields('title', 'Notebook title', notebook.title, languages)}
+        ${notebookLocalizedFields('description', 'Short description', notebook.description, languages, { type: 'textarea', wide: true })}
+        ${field('notebookPassword', 'Notebook password', notebook.password || 'cambiami', { hint: 'Discourages casual spoilers; this is not encryption.' })}
+        ${field('notebookStyleDirectives', 'Character-specific art direction', notebook.styleDirectives || '', { type: 'textarea', wide: true, hint: 'Describe this owner’s medium, palette, handwriting, recurring symbols and how mood should alter the pages.' })}
+      </div>
+      <div class="notebook-cover-grid">${covers
+        .map(
+          ([key, label, cover]) =>
+            `<section class="notebook-cover-card"><strong>${label}</strong>${field(`notebook${key}Cover`, 'Cover image', '', { type: 'file', hint: 'Portrait 2:3. Front spine on the left; back spine on the right.' })}${field(`notebook${key}CoverAlt`, 'Accessibility text', cover?.alt || '')}<input type="hidden" name="notebook${key}CoverPath" value="${escapeHtml(cover?.url || '')}" />${cover?.url ? `<img src="${escapeHtml(campaignAsset(cover.url))}" alt="${escapeHtml(cover.alt || '')}" />` : ''}</section>`,
+        )
+        .join('')}</div>
+      <div class="notebook-pages-heading"><div><strong>Interior spreads</strong><small>Each image is one complete landscape opening.</small></div><button class="secondary-button" type="button" data-notebook-add-page>Add page</button></div>
+      <div class="notebook-page-list" data-notebook-pages>${(notebook.pages ?? []).map((page, index) => notebookPageEditor(page, languages, index)).join('')}</div>
+      <div class="ai-compose notebook-ai"><div><strong>Create an editable notebook with AI</strong><small>The result remains a draft. Nothing replaces this form until you review and save it.</small></div><div class="form-grid">${field('notebookBrief', 'Notebook subject', '', { type: 'textarea', wide: true, hint: 'Describe the memories, events or themes the pages may contain. Include private facts only if you intend to send them to the selected provider.' })}${field('notebookPageCount', 'Number of spreads', Math.max(1, notebook.pages?.length || 2), { type: 'number', min: 1 })}<label class="field"><span>Draft language</span><select name="notebookLanguage">${languages.map((language) => `<option value="${escapeHtml(language)}">${escapeHtml(languageName(language))} (${escapeHtml(language)})</option>`).join('')}</select></label></div><div class="ai-engine-grid">${engineSelect('notebookImagePromptEngine', 'Prompt writer', 'imagePrompt', 'Plans covers, page content and placement.')}${engineSelect('notebookImageEngine', 'Image renderer', 'image', 'Renders the cover and complete spreads.')}</div><label class="consent-check"><input name="notebookRemoteConsent" type="checkbox" /> I consent to sending this character context and notebook brief to any selected engine labelled <strong>Remote</strong>.</label><div class="action-row"><button class="primary-button" type="button" data-ai-notebook>Generate notebook draft with images</button></div><div class="ai-review" data-notebook-review hidden></div></div>
+    </div>
+  </section>`;
+}
+
 function entityAiImportPanel(type, languages) {
   const label = type === 'characters' ? 'player character' : 'NPC';
   return `<div class="ai-compose entity-ai-import field--wide"><div><strong>Import this ${label} with AI</strong><small>Use photos or screenshots of a sheet, or a public/shared Roll20 print-view URL. Every extracted field stays editable.</small></div><div class="ai-source-grid">${engineSelect('entityEngine', 'Extraction model', 'extraction', 'Only configured models with structured output and vision appear here. Public URL access also requires web capability.')}<label class="field"><span>Draft language</span><select name="entityLanguage">${languages.map((language) => `<option value="${escapeHtml(language)}">${escapeHtml(languageName(language))} (${escapeHtml(language)})</option>`).join('')}</select></label><label class="field field--wide"><span>Sheet photos or screenshots</span><input name="aiSourceImages" type="file" accept="image/png,image/jpeg,image/webp" multiple /><small>Up to four images. Private/authenticated Roll20 sheets should be imported this way.</small></label><label class="field field--wide"><span>Public Roll20 print view or source URL</span><input name="aiSourceUrl" type="url" placeholder="https://app.roll20.net/…" /><small>Optional. Signed-in pages cannot be read remotely; use screenshots instead.</small></label></div><label class="consent-check"><input name="entityRemoteConsent" type="checkbox" /> I consent to sending these sources to the selected engine when it is labelled <strong>Remote</strong>.</label><div class="action-row"><button class="primary-button" type="button" data-ai-entity="${type}">Extract editable draft</button></div><div class="ai-review" data-ai-entity-review hidden></div></div>`;
@@ -894,6 +971,8 @@ function entityForm(type, item = {}) {
           type: 'textarea',
         },
       ),
+      section('Personal notebook'),
+      notebookEditor(item, languages),
       section('Private notes'),
       ...localizedFields(
         'secret',
@@ -1035,8 +1114,7 @@ function localizedFormValue(form, prefix, fallback = '', languages = campaignLan
   );
 }
 
-async function uploadSelectedImage(inputName, category) {
-  const file = fields.querySelector(`[name="${inputName}"]`)?.files?.[0];
+async function uploadImageFile(file, category) {
   if (!file) return undefined;
   const dataUrl = await new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -1048,6 +1126,10 @@ async function uploadSelectedImage(inputName, category) {
     method: 'POST',
     body: JSON.stringify({ category, fileName: file.name, dataUrl }),
   });
+}
+
+async function uploadSelectedImage(inputName, category) {
+  return uploadImageFile(fields.querySelector(`[name="${inputName}"]`)?.files?.[0], category);
 }
 
 function fileDataUrl(file) {
@@ -1210,6 +1292,71 @@ function baseCharacter(original = {}) {
   );
 }
 
+function localizedNotebookValue(container, prefix, languages) {
+  return Object.fromEntries(
+    languages.map((language) => [
+      language,
+      container
+        .querySelector(`[name="notebook__${prefix}__${CSS.escape(language)}"]`)
+        ?.value.trim() || '',
+    ]),
+  );
+}
+
+async function buildNotebook(original = {}) {
+  const editor = fields.querySelector('[data-notebook-editor]');
+  if (!editor?.querySelector('[name="notebookEnabled"]')?.checked) return undefined;
+  const languages = campaignLanguages();
+  const notebook = {
+    ...original,
+    title: localizedNotebookValue(editor, 'title', languages),
+    description: localizedNotebookValue(editor, 'description', languages),
+    password: editor.querySelector('[name="notebookPassword"]')?.value.trim() || 'cambiami',
+    styleDirectives: editor.querySelector('[name="notebookStyleDirectives"]')?.value.trim() || '',
+  };
+  for (const key of ['front', 'back']) {
+    const uploaded = await uploadImageFile(
+      editor.querySelector(`[name="notebook${key}Cover"]`)?.files?.[0],
+      'characters',
+    );
+    const url =
+      uploaded?.path || editor.querySelector(`[name="notebook${key}CoverPath"]`)?.value.trim();
+    const property = `${key}Cover`;
+    if (url) {
+      notebook[property] = {
+        url,
+        alt: editor.querySelector(`[name="notebook${key}CoverAlt"]`)?.value.trim() || '',
+      };
+    } else delete notebook[property];
+  }
+  const pages = [];
+  const ids = new Set();
+  for (const [index, card] of [...editor.querySelectorAll('[data-notebook-page]')].entries()) {
+    const id = card.querySelector('[name="notebookPageId"]')?.value.trim() || `page-${index + 1}`;
+    if (ids.has(id)) throw new Error(`Notebook page ID “${id}” is used more than once.`);
+    ids.add(id);
+    const uploaded = await uploadImageFile(
+      card.querySelector('[name="notebookPageImage"]')?.files?.[0],
+      'characters',
+    );
+    const url = uploaded?.path || card.querySelector('[name="notebookPagePath"]')?.value.trim();
+    if (!url) throw new Error(`Add an image to notebook spread ${index + 1}.`);
+    pages.push({
+      id,
+      title: localizedNotebookValue(card, 'pageTitle', languages),
+      era: localizedNotebookValue(card, 'pageEra', languages),
+      reflection: localizedNotebookValue(card, 'pageReflection', languages),
+      mood: card.querySelector('[name="notebookPageMood"]')?.value || 'memory',
+      image: {
+        url,
+        alt: card.querySelector('[name="notebookPageAlt"]')?.value.trim() || '',
+      },
+    });
+  }
+  notebook.pages = pages;
+  return notebook;
+}
+
 async function buildEntity(type, form, original = {}) {
   const id = form.get('id')?.toString() || original.id || '';
   const languages = campaignLanguages();
@@ -1253,6 +1400,9 @@ async function buildEntity(type, form, original = {}) {
       ...item.privateProfile,
       secretBackstory: localizedFormValue(form, 'secret', '', languages),
     };
+    const notebook = await buildNotebook(item.notebook);
+    if (notebook) item.notebook = notebook;
+    else delete item.notebook;
     item.sheet = {
       ...item.sheet,
       level: Number(form.get('level')) || 1,
@@ -1726,6 +1876,71 @@ async function processEntityImport(type) {
   }
 }
 
+async function processNotebookDraft() {
+  if (state.editor?.type !== 'characters') return;
+  const form = new FormData(editorForm);
+  const button = fields.querySelector('[data-ai-notebook]');
+  const pageCount = Math.min(4, Math.max(1, Number(form.get('notebookPageCount')) || 2));
+  const language = form.get('notebookLanguage') || campaignLanguages()[0];
+  const brief = String(form.get('notebookBrief') || '').trim();
+  const styleDirectives = String(form.get('notebookStyleDirectives') || '').trim();
+  if (brief.length < 10) throw new Error('Describe what this notebook should remember first.');
+  if (styleDirectives.length < 10)
+    throw new Error('Add character-specific art direction before generating the notebook.');
+  button.disabled = true;
+  button.textContent = 'Planning and illustrating…';
+  try {
+    const result = await api(
+      `/api/campaigns/${encodeURIComponent(state.selectedId)}/ai/generate-notebook`,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          language,
+          pageCount,
+          brief,
+          styleDirectives,
+          password: form.get('notebookPassword') || 'cambiami',
+          character: {
+            id: state.editor.original?.id || form.get('id') || slugify(form.get('name')),
+            name: form.get('name'),
+            sex: localizedFormValue(form, 'sex', '', campaignLanguages()),
+            heightCm: Number(form.get('heightCm')) || undefined,
+            publicProfile: {
+              backstory: localizedFormValue(form, 'backstory', '', campaignLanguages()),
+              traits: localizedFormValue(form, 'traits', '', campaignLanguages()),
+              ideals: localizedFormValue(form, 'ideals', '', campaignLanguages()),
+              bonds: localizedFormValue(form, 'bonds', '', campaignLanguages()),
+              flaws: localizedFormValue(form, 'flaws', '', campaignLanguages()),
+              knownHistory: localizedFormValue(form, 'known', '', campaignLanguages()),
+              hobbies: localizedFormValue(form, 'hobbies', '', campaignLanguages()),
+            },
+          },
+          engines: {
+            imagePrompt: parseEngineValue(form.get('notebookImagePromptEngine')),
+            image: parseEngineValue(form.get('notebookImageEngine')),
+          },
+          remoteConsent: form.get('notebookRemoteConsent') === 'on',
+        }),
+      },
+    );
+    const currentEditor = fields.querySelector('[data-notebook-editor]');
+    currentEditor.outerHTML = notebookEditor({ notebook: result.notebook }, campaignLanguages());
+    const review = fields.querySelector('[data-notebook-review]');
+    if (review) {
+      review.hidden = false;
+      review.innerHTML = `<strong>Draft ready for review</strong><p>${escapeHtml(result.notice)}</p>`;
+    }
+    window.managerI18n?.translateTree?.(fields);
+    toast('Notebook draft created. Review every page before saving.');
+  } finally {
+    const currentButton = fields.querySelector('[data-ai-notebook]');
+    if (currentButton) {
+      currentButton.disabled = false;
+      currentButton.textContent = 'Generate notebook draft with images';
+    }
+  }
+}
+
 async function processSessionNotes(includeImages) {
   if (state.editor?.type !== 'sessions') return;
   const form = new FormData(editorForm);
@@ -2166,6 +2381,25 @@ content.addEventListener('submit', (event) => {
 });
 
 fields.addEventListener('click', (event) => {
+  const addNotebookPage = event.target.closest('[data-notebook-add-page]');
+  if (addNotebookPage) {
+    const list = fields.querySelector('[data-notebook-pages]');
+    const index = list.querySelectorAll('[data-notebook-page]').length;
+    list.insertAdjacentHTML('beforeend', notebookPageEditor({}, campaignLanguages(), index));
+    window.managerI18n?.translateTree?.(list.lastElementChild);
+    list.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+  const removeNotebookPage = event.target.closest('[data-notebook-remove-page]');
+  if (removeNotebookPage) {
+    removeNotebookPage.closest('[data-notebook-page]')?.remove();
+    return;
+  }
+  const notebookButton = event.target.closest('[data-ai-notebook]');
+  if (notebookButton) {
+    processNotebookDraft().catch((error) => toast(error.message, true));
+    return;
+  }
   const translateCampaign = event.target.closest('[data-translate-campaign]');
   if (translateCampaign) {
     processCampaignTranslation().catch((error) => toast(error.message, true));
@@ -2204,6 +2438,13 @@ fields.addEventListener('click', (event) => {
 });
 
 fields.addEventListener('change', (event) => {
+  if (event.target.matches('[data-notebook-toggle]')) {
+    const body = event.target
+      .closest('[data-notebook-editor]')
+      ?.querySelector('[data-notebook-body]');
+    if (body) body.hidden = !event.target.checked;
+    return;
+  }
   if (event.target.name === 'defaultLanguage' && event.target.closest('[data-language-picker]')) {
     const languages = normalizeLanguageCodes(
       fields.querySelector('[data-language-picker] [name="languages"]').value,

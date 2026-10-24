@@ -1,0 +1,192 @@
+<div class="notebook" [class.notebook--unlocked]="isUnlocked()">
+  @if (isUnlocked()) {
+    <header class="notebook__header">
+      <div>
+        <span class="notebook__eyebrow">{{
+          lang() === 'it' ? 'Archivio privato' : 'Private archive'
+        }}</span>
+        <h2>{{ notebook().title | bilingual }}</h2>
+        <p>{{ notebook().description | bilingual }}</p>
+      </div>
+      <button type="button" class="notebook__lock" (click)="lockNotebook()">
+        {{ lang() === 'it' ? 'Richiudi' : 'Lock again' }}
+      </button>
+    </header>
+
+    @if (slides().length > 0) {
+      <section
+        class="notebook-book"
+        tabindex="0"
+        (keydown)="onBookKeydown($event)"
+        [attr.aria-label]="
+          lang() === 'it'
+            ? 'Notebook sfogliabile di ' + characterName()
+            : characterName() + '\'s page-turning notebook'
+        "
+      >
+        @if (currentSlide(); as slide) {
+          <div
+            class="notebook-book__stage"
+            [class.notebook-book__stage--cover]="slide.kind === 'cover'"
+            [class.notebook-book__stage--front]="slide.kind === 'cover' && slide.side === 'front'"
+            [class.notebook-book__stage--back]="slide.kind === 'cover' && slide.side === 'back'"
+          >
+            @if (slide.kind === 'cover') {
+              <button
+                type="button"
+                class="notebook-book__image-link notebook-book__image-link--cover"
+                (click)="openLightbox(slide.image)"
+                [attr.aria-label]="
+                  (lang() === 'it' ? 'Ingrandisci: ' : 'Enlarge: ') + slideLabel(slide)
+                "
+              >
+                <img
+                  class="notebook-book__image"
+                  [src]="displayImageUrl(slide.image.url)"
+                  [alt]="slide.image.alt"
+                  loading="eager"
+                  decoding="async"
+                />
+              </button>
+            } @else {
+              <button
+                type="button"
+                class="notebook-book__image-link"
+                (click)="openLightbox(slide.page.image)"
+                [attr.aria-label]="
+                  (lang() === 'it' ? 'Ingrandisci: ' : 'Enlarge: ') + notebookText(slide.page.title)
+                "
+              >
+                <img
+                  class="notebook-book__image"
+                  [src]="displayImageUrl(slide.page.image.url)"
+                  [alt]="slide.page.image.alt"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </button>
+              <div class="notebook-book__entry" [attr.data-mood]="slide.page.mood">
+                <span class="notebook-book__number">
+                  {{ (slide.spreadIndex + 1).toString().padStart(2, '0') }}
+                </span>
+                <div>
+                  <span class="notebook-book__era">{{ slide.page.era | bilingual }}</span>
+                  <h3>{{ notebookText(slide.page.title) }}</h3>
+                  <blockquote>{{ notebookText(slide.page.reflection) }}</blockquote>
+                </div>
+              </div>
+            }
+
+            <button
+              type="button"
+              class="notebook-book__edge-turn notebook-book__edge-turn--previous"
+              [disabled]="!canGoPrevious()"
+              (click)="previousSlide()"
+              [attr.aria-label]="lang() === 'it' ? 'Sfoglia indietro' : 'Turn back'"
+            >
+              <span aria-hidden="true">‹</span>
+            </button>
+            <button
+              type="button"
+              class="notebook-book__edge-turn notebook-book__edge-turn--next"
+              [disabled]="!canGoNext()"
+              (click)="nextSlide()"
+              [attr.aria-label]="lang() === 'it' ? 'Sfoglia avanti' : 'Turn forward'"
+            >
+              <span aria-hidden="true">›</span>
+            </button>
+          </div>
+
+          <nav
+            class="notebook-book__controls"
+            [attr.aria-label]="lang() === 'it' ? 'Controlli del notebook' : 'Notebook controls'"
+          >
+            <button
+              type="button"
+              class="notebook-book__turn"
+              [disabled]="!canGoPrevious()"
+              (click)="previousSlide()"
+            >
+              <span aria-hidden="true">←</span
+              ><span>{{ lang() === 'it' ? 'Precedente' : 'Previous' }}</span>
+            </button>
+            <div class="notebook-book__progress">
+              <span>{{ slideLabel(slide) }}</span>
+              <div class="notebook-book__markers">
+                @for (slideIndex of slideIndexes(); track slideIndex) {
+                  <button
+                    type="button"
+                    [attr.aria-label]="markerLabel(slides()[slideIndex])"
+                    [attr.aria-current]="slideIndex === currentSlideIndex() ? 'page' : null"
+                    [class.is-current]="slideIndex === currentSlideIndex()"
+                    [class.is-cover]="slides()[slideIndex].kind === 'cover'"
+                    (click)="goToSlide(slideIndex)"
+                  ></button>
+                }
+              </div>
+            </div>
+            <button
+              type="button"
+              class="notebook-book__turn notebook-book__turn--next"
+              [disabled]="!canGoNext()"
+              (click)="nextSlide()"
+            >
+              <span>{{ lang() === 'it' ? 'Successiva' : 'Next' }}</span
+              ><span aria-hidden="true">→</span>
+            </button>
+          </nav>
+        }
+        <p class="notebook-book__hint">
+          {{
+            lang() === 'it'
+              ? 'Clicca i bordi per sfogliare e il centro per ingrandire.'
+              : 'Select the edges to turn pages and the centre to enlarge.'
+          }}
+        </p>
+      </section>
+    } @else {
+      <p class="notebook__empty">
+        {{
+          lang() === 'it'
+            ? 'Questo notebook non contiene ancora pagine.'
+            : 'This notebook has no pages yet.'
+        }}
+      </p>
+    }
+  } @else {
+    <div class="notebook__sealed">
+      <div class="notebook__seal" aria-hidden="true">{{ sealInitial() }}</div>
+      <p class="notebook__sealed-kicker">
+        {{ lang() === 'it' ? 'Proprietà di ' + characterName() : 'Property of ' + characterName() }}
+      </p>
+      <h2>{{ notebook().title | bilingual }}</h2>
+      <p>
+        {{
+          lang() === 'it'
+            ? 'Pensieri, immagini e ricordi custoditi tra queste pagine.'
+            : 'Thoughts, images, and memories kept between these pages.'
+        }}
+      </p>
+      <button type="button" class="notebook__unlock" (click)="openDialog()">
+        {{ lang() === 'it' ? 'Apri il notebook' : 'Open the notebook' }}
+      </button>
+    </div>
+  }
+</div>
+
+@if (lightboxImage()) {
+  <app-image-lightbox
+    [images]="lightboxImages()"
+    [currentIndex]="0"
+    (lightboxClose)="closeLightbox()"
+  />
+}
+
+@if (isDialogOpen()) {
+  <app-password-dialog
+    [characterName]="notebook().title | bilingual"
+    [hasError]="hasPasswordError()"
+    (passwordSubmit)="onPasswordSubmit($event)"
+    (dialogClose)="closeDialog()"
+  />
+}

@@ -170,6 +170,23 @@
       </app-accordion>
     </section>
 
+    @if (char.notebook; as notebook) {
+      <section class="character-detail__section">
+        <app-accordion
+          [title]="notebook.title | bilingual"
+          icon="📓"
+          [startOpen]="false"
+          [allowOverflow]="true"
+        >
+          <app-character-notebook
+            [characterId]="char.id"
+            [characterName]="char.name"
+            [notebook]="notebook"
+          />
+        </app-accordion>
+      </section>
+    }
+
     <!-- Private Profile (password-protected) -->
     <section class="character-detail__section">
       <app-accordion

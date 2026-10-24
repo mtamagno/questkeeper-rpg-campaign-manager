@@ -74,7 +74,7 @@ Both are corrective release work, not borrowed scope from a later roadmap day.
 | 10 · 27 Oct | [ ] `feat: build side-by-side level history comparison`            | [ ] `feat: highlight gained spells abilities gear and stat changes`     |
 | 11 · 28 Oct | [ ] `feat: add searchable spell and ability library per character` | [ ] `feat: add prepared favourites usage notes and external references` |
 | 12 · 29 Oct | [ ] `feat: redesign combat resources currency and inventory`       | [ ] `feat: add signature equipment and attunement storytelling`         |
-| 13 · 30 Oct | [ ] `feat: add public and protected personal journals`             | [ ] `feat: connect journal entries to sessions people and places`       |
+| 13 · 30 Oct | [x] `feat: add optional protected character notebooks`             | [ ] `feat: connect journal entries to sessions people and places`       |
 | 14 · 31 Oct | [ ] `feat: generate complete fantasy character dossiers`           | [ ] `feat: add print share and compact game-night PDF variants`         |
 
 ## Week 3 — The party remembers together

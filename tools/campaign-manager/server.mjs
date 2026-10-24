@@ -32,6 +32,7 @@ import {
   discoverRemoteModels,
   generateDraftImages,
   generateImagePromptsWithText,
+  generateNotebookDraftWithText,
   translateCampaignDraft,
   importEntityWithAi,
   processNotesWithText,
@@ -668,6 +669,103 @@ async function routeApi(request, response, url) {
     sendJson(response, 200, {
       ...result,
       notice: 'Draft only. Review and explicitly apply each translation before saving.',
+    });
+    return;
+  }
+  if (
+    request.method === 'POST' &&
+    parts[3] === 'ai' &&
+    parts[4] === 'generate-notebook' &&
+    parts.length === 5
+  ) {
+    const input = await readBody(request);
+    const config = await readAiConfig(PROJECT_ROOT);
+    const promptEngine = taskEngine(input.engines?.imagePrompt, config, 'imagePrompt');
+    const imageEngine = taskEngine(input.engines?.image, config, 'image');
+    if (
+      [promptEngine, imageEngine].some((engine) => isRemoteProvider(engine.provider)) &&
+      input.remoteConsent !== true
+    ) {
+      throw new Error(
+        'Confirm that this notebook brief may be sent to the selected remote provider.',
+      );
+    }
+    const campaign = await getCampaign(PROJECT_ROOT, campaignId);
+    const language = input.language || campaign.manifestEntry.defaultLanguage || 'en';
+    const planned = await generateNotebookDraftWithText({
+      config,
+      campaign,
+      character: input.character,
+      brief: input.brief,
+      styleDirectives: input.styleDirectives,
+      language,
+      pageCount: input.pageCount,
+      selection: promptEngine,
+    });
+    const prompts = [
+      { kind: 'front', prompt: planned.draft.frontCover.prompt },
+      { kind: 'back', prompt: planned.draft.backCover.prompt },
+      ...planned.draft.pages.map((page, index) => ({
+        kind: 'page',
+        index,
+        prompt: page.prompt,
+      })),
+    ];
+    const rendered = await generateDraftImages({
+      config,
+      prompts,
+      selection: imageEngine,
+      limit: prompts.length,
+    });
+    const characterStem =
+      String(input.character?.id || input.character?.name || 'character')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '') || 'character';
+    const savedImages = [];
+    for (const image of rendered.images) {
+      const suffix = image.kind === 'page' ? `page-${Number(image.index) + 1}` : image.kind;
+      const saved = await saveImage(PROJECT_ROOT, campaignId, {
+        category: 'characters',
+        fileName: `${characterStem}-notebook-${suffix}.webp`,
+        dataUrl: image.dataUrl,
+      });
+      savedImages.push({ ...image, path: saved.path, dataUrl: undefined });
+    }
+    const languages = campaign.manifestEntry.languages ?? campaign.campaign.languages ?? ['en'];
+    const localized = (value) =>
+      Object.fromEntries(
+        languages.map((code) => [code, code === language ? String(value || '') : '']),
+      );
+    const front = savedImages.find((image) => image.kind === 'front');
+    const back = savedImages.find((image) => image.kind === 'back');
+    const pages = planned.draft.pages.map((page, index) => {
+      const image = savedImages.find((entry) => entry.kind === 'page' && entry.index === index);
+      return {
+        id:
+          String(page.id || page.title || `page-${index + 1}`)
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-|-$/g, '') || `page-${index + 1}`,
+        title: localized(page.title),
+        era: localized(page.era),
+        reflection: localized(page.reflection),
+        mood: page.mood,
+        image: { url: image?.path ?? '', alt: page.alt },
+      };
+    });
+    sendJson(response, 200, {
+      notebook: {
+        title: localized(planned.draft.title),
+        description: localized(planned.draft.description),
+        password: input.password || 'cambiami',
+        styleDirectives: String(input.styleDirectives || '').trim(),
+        frontCover: { url: front?.path ?? '', alt: planned.draft.frontCover.alt },
+        backCover: { url: back?.path ?? '', alt: planned.draft.backCover.alt },
+        pages,
+      },
+      provider: { imagePrompt: promptEngine, image: imageEngine },
+      notice: 'Draft only. Review every cover, page, caption, and reflection before saving.',
     });
     return;
   }

@@ -126,6 +126,14 @@ one image cannot safely serve multiple roles.
 A character-owned notebook is an artifact written by that character, not an
 objective recap.
 
+- Notebooks are optional per character and do not share a mandatory campaign
+  aesthetic. Each owner supplies explicit art directives that remain stable
+  across their own volume.
+- A closed cover is a 2:3 portrait asset. On the opening step the front cover
+  sits on the right with empty space to its left; on the closing step the back
+  cover sits on the left with empty space to its right.
+- Every interior asset is a complete 3:2 landscape two-page spread and occupies
+  one reader step. Never place two already-complete spread images side by side.
 - Its drawing style, pressure, neatness and density follow the author's current
   emotional mood.
 - Every illustrated entry includes the character's thoughts, doubts or private
@@ -135,6 +143,9 @@ objective recap.
 - Visual evolution across pages should feel gradual and narratively motivated.
 - Handwriting remains readable; distress is expressed through composition and
   mark-making, not illegibility.
+- Use outer-edge page-turn targets, visible previous/next controls and keyboard
+  navigation. Selecting the art opens an in-page lightbox with focus return;
+  it must not navigate to a raw image URL.
 
 ### Prompt and review checklist
 

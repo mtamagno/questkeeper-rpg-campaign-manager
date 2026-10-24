@@ -55,6 +55,26 @@ Extraction creates an **editable draft** with source evidence. QuestKeeper does
 not scrape a private Roll20 sheet through your signed-in browser. Use screenshots
 for private sheets and verify names, statistics, equipment and spell choices.
 
+### Optional character notebooks
+
+Every character editor includes an optional **Personal notebook** panel. Turn
+it on only for a character who keeps an in-world journal.
+
+- **Manual:** upload the 2:3 front and back covers, add or remove complete 3:2
+  interior spreads, and edit localized titles, eras, reflections, mood and alt
+  text. Existing assets remain in place unless you upload replacements.
+- **AI-assisted:** write a notebook brief, define that character's visual
+  identity, choose the prompt-planning and image-rendering models, then generate
+  one to four editable spreads. The draft fills only the selected language, so
+  every other campaign language remains clearly available for manual or assisted
+  translation. Remote models require explicit consent.
+
+The visual identity belongs to the character, not the campaign: record medium,
+palette, handwriting, recurring objects and how the marks react to the owner's
+mood. AI output never saves or publishes itself. Review every cover, visible
+word, thought, fact and accessibility description, then use the normal
+**Save** button.
+
 ## Turn notes into a session
 
 The session editor accepts handwritten-note transcriptions, ordinary digital

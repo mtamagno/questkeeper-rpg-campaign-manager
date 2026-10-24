@@ -94,6 +94,62 @@
     'Suggested automatically from the name.': 'Suggerito automaticamente dal nome.',
     Name: 'Nome',
     Player: 'Giocatore',
+    'Personal notebook': 'Taccuino personale',
+    'Optional illustrated journal owned by this character.':
+      'Diario illustrato opzionale appartenente a questo personaggio.',
+    'Give this character a notebook': 'Assegna un taccuino a questo personaggio',
+    'Notebook title': 'Titolo del taccuino',
+    'Short description': 'Descrizione breve',
+    'Notebook password': 'Password del taccuino',
+    'Character-specific art direction': 'Direzione artistica specifica del personaggio',
+    'Describe this owner’s medium, palette, handwriting, recurring symbols and how mood should alter the pages.':
+      'Descrivi tecnica, palette, grafia, simboli ricorrenti e come l’umore del proprietario deve trasformare le pagine.',
+    'Front cover': 'Copertina anteriore',
+    'Back cover': 'Copertina posteriore',
+    'Cover image': 'Immagine di copertina',
+    'Portrait 2:3. Front spine on the left; back spine on the right.':
+      'Formato verticale 2:3. Dorso a sinistra sul fronte e a destra sul retro.',
+    'Accessibility text': 'Testo accessibile',
+    'Interior spreads': 'Aperture interne',
+    'Each image is one complete landscape opening.':
+      'Ogni immagine raffigura un’apertura orizzontale completa.',
+    'Add page': 'Aggiungi pagina',
+    'Remove page': 'Rimuovi pagina',
+    'Page ID': 'ID pagina',
+    'Stable identifier. It must be unique inside this notebook.':
+      'Identificatore stabile. Deve essere univoco nel taccuino.',
+    Mood: 'Atmosfera',
+    'Page title': 'Titolo della pagina',
+    'Era / chapter': 'Periodo / capitolo',
+    'Owner reflection': 'Pensiero del proprietario',
+    'Illustrated spread': 'Apertura illustrata',
+    'Landscape 3:2 image containing the complete two-page spread.':
+      'Immagine orizzontale 3:2 che contiene l’intera apertura di due pagine.',
+    'Create an editable notebook with AI': 'Crea un taccuino modificabile con l’AI',
+    'The result remains a draft. Nothing replaces this form until you review and save it.':
+      'Il risultato resta una bozza. Nulla viene salvato finché non lo controlli e confermi.',
+    'Notebook subject': 'Contenuto del taccuino',
+    'Describe the memories, events or themes the pages may contain. Include private facts only if you intend to send them to the selected provider.':
+      'Descrivi ricordi, eventi o temi delle pagine. Inserisci fatti privati solo se vuoi inviarli al provider scelto.',
+    'Number of spreads': 'Numero di aperture',
+    'Draft language': 'Lingua della bozza',
+    'Prompt writer': 'Autore dei prompt',
+    'Plans covers, page content and placement.': 'Progetta copertine, contenuti e composizione.',
+    'Image renderer': 'Generatore di immagini',
+    'Renders the cover and complete spreads.': 'Genera copertine e aperture complete.',
+    'Generate notebook draft with images': 'Genera la bozza illustrata del taccuino',
+    'Draft ready for review': 'Bozza pronta per la revisione',
+    'Planning and illustrating…': 'Progettazione e illustrazione…',
+    'Notebook draft created. Review every page before saving.':
+      'Bozza del taccuino creata. Controlla ogni pagina prima di salvare.',
+    'Describe what this notebook should remember first.':
+      'Descrivi prima ciò che il taccuino deve ricordare.',
+    'Add character-specific art direction before generating the notebook.':
+      'Aggiungi la direzione artistica del personaggio prima di generare il taccuino.',
+    'Current spread · upload a file only to replace it.':
+      'Apertura attuale · carica un file solo per sostituirla.',
+    'I consent to sending this character context and notebook brief to any selected engine labelled':
+      'Acconsento a inviare il contesto del personaggio e il brief del taccuino a ogni motore selezionato indicato come',
     'Class / archetype': 'Classe / archetipo',
     'Species / ancestry': 'Specie / ascendenza',
     'Alignment / outlook': 'Allineamento / visione',
@@ -397,6 +453,8 @@
     if (match) return `Richiesta ${match[1]} non riuscita (${match[2]})${match[3]}`;
     match = source.match(/^Level (\d+)$/);
     if (match) return `Livello ${match[1]}`;
+    match = source.match(/^Spread (\d+)$/);
+    if (match) return `Apertura ${match[1]}`;
     match = source.match(
       /^Saved\. The (heroic|gothic|neutral) palette will appear when the Companion reloads or regains focus\.$/,
     );
@@ -404,11 +462,12 @@
       const names = { heroic: 'eroica', gothic: 'gotica', neutral: 'neutrale' };
       return `Salvato. La palette ${names[match[1]]} apparirà quando il Companion si ricarica o torna in primo piano.`;
     }
-    match = source.match(/^(.+) · (English|Italian) \(([^)]+)\)$/);
+    match = source.match(/^(.+) · (.+) \(([^)]+)\)$/);
     if (match)
-      return `${it[match[1]] || match[1]} · ${match[2] === 'Italian' ? 'Italiano' : 'English'} (${match[3]})`;
-    match = source.match(/^(English|Italian) \(([^)]+)\)$/);
-    if (match) return `${match[1] === 'Italian' ? 'Italiano' : 'English'} (${match[2]})`;
+      return `${it[match[1]] || match[1]} · ${match[2] === 'Italian' ? 'Italiano' : match[2] === 'English' ? 'Inglese' : match[2]} (${match[3]})`;
+    match = source.match(/^(English|Italian|inglese|italiano) \(([^)]+)\)$/i);
+    if (match)
+      return `${match[1].toLowerCase().startsWith('ital') ? 'Italiano' : 'Inglese'} (${match[2]})`;
     return source;
   }
 

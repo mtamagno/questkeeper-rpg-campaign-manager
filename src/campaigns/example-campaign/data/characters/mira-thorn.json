@@ -83,6 +83,48 @@
       "it": "Piegare uccelli di carta, raccogliere proverbi sul tempo e sfidare in corsa chiunque sia disposto a perdere."
     }
   },
+  "notebook": {
+    "title": {
+      "en": "Mira's Roadbook",
+      "it": "Il taccuino di viaggio di Mira"
+    },
+    "description": {
+      "en": "Routes, weather, unfinished deliveries and the thoughts Mira cannot fit inside a letter.",
+      "it": "Rotte, tempo atmosferico, consegne incompiute e i pensieri che Mira non riesce a far entrare in una lettera."
+    },
+    "password": "cambiami",
+    "styleDirectives": "Energetic graphite and burgundy ink on weather-stained courier paper. Route lines, rain marks, folded-paper birds and silver whistle motifs recur throughout. Handwriting becomes compressed and angular when Mira feels trapped, broad and wind-swept when she feels hopeful. Every spread must include one candid first-person thought from Mira.",
+    "frontCover": {
+      "url": "images/characters/mira-notebook-front.svg",
+      "alt": "Crimson courier notebook with Mira Thorn's name in silver"
+    },
+    "backCover": {
+      "url": "images/characters/mira-notebook-back.svg",
+      "alt": "Back of Mira Thorn's crimson courier notebook"
+    },
+    "pages": [
+      {
+        "id": "the-north-road",
+        "title": {
+          "en": "The North Road",
+          "it": "La strada del nord"
+        },
+        "era": {
+          "en": "Before the Glass Beacon",
+          "it": "Prima del Faro di Vetro"
+        },
+        "reflection": {
+          "en": "Rain makes every mile honest. Keep moving—but listen when the road goes quiet.",
+          "it": "La pioggia rende sincero ogni miglio. Continua a muoverti, ma ascolta quando la strada tace."
+        },
+        "mood": "wary",
+        "image": {
+          "url": "images/characters/mira-notebook-page-01.svg",
+          "alt": "Mira's sketched two-page spread with a rain-soaked courier, route map and silver whistle"
+        }
+      }
+    ]
+  },
   "privateProfile": {
     "secretBackstory": {
       "en": "One letter in the red case is addressed to Mira in her own handwriting.",

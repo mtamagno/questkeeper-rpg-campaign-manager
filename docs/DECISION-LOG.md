@@ -1000,6 +1000,37 @@ empty collection is an honest supported state.
 original transcript excerpt, explicit approval and translated presentation as
 separate provenance fields.
 
+### QK-037 — Character notebooks are optional, personal artifacts
+
+**Date:** 25 October 2026
+
+**Status:** Active
+
+**Decision:** Any player character may optionally own a password-gated
+illustrated notebook. All notebooks share one reader and one data contract, but
+each character owns separate covers, pages, reflections and art directives.
+Campaign Manager supports equivalent manual and AI-assisted authoring paths.
+AI planning and rendering remain separate selectable roles and return an
+editable draft rather than publishing automatically.
+
+**Why:** The first production notebook proved that an in-world artifact can
+preserve a character's subjective memory better than an objective chronicle. Making the
+capability reusable avoids a one-character component, while keeping it opt-in
+prevents every profile from acquiring an artifact that does not fit its owner.
+
+**Consequences:** Covers use 2:3 portrait assets, interior images are complete
+3:2 spreads, and every automatic draft needs character-specific style
+directives. The planner receives public character context only unless the Game
+Master deliberately types additional facts into the brief. Manual editing,
+remote-consent checks, review and explicit save remain available at every step.
+
+**Source:** [Campaign content guide](CONTENT-GUIDE.md#characters),
+[Manager guide](MANAGER-GUIDE.md#optional-character-notebooks) and
+[design guide](DESIGN-AND-ART-GUIDE.md#personal-journals-and-notebooks).
+
+**Revisit when:** Multiple volumes, collaborative journals or per-page access
+rules become a demonstrated player need.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD

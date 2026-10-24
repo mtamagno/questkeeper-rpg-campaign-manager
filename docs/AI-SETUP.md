@@ -161,6 +161,28 @@ the source contains them. Missing or ambiguous facts stay empty or are listed
 as review notes. The normal form remains open afterward: nothing enters the
 campaign until the Game Master reviews and saves it.
 
+## Create an optional character notebook
+
+Open a character, enable **Personal notebook**, and write two separate inputs:
+
+1. the **notebook subject**, which limits the memories and events the draft may
+   use;
+2. **character-specific art direction**, which defines medium, palette,
+   handwriting, recurring symbols and how this character's mood changes the
+   page.
+
+Choose an `imagePrompt` model to plan two 2:3 covers and one to four complete
+3:2 spreads, then choose an `image` model to render them. These may be different
+local or remote providers. The planner receives only the character's public
+profile plus the brief you enter; protected profile fields are not added
+automatically. A brief can itself contain secrets, so remote consent applies to
+the complete text you type.
+
+Generated assets are stored in the selected campaign's character-image folder
+and returned to the still-open form as a draft. Review visible writing,
+chronology, character voice, art continuity, alt text and accidental spoilers.
+Nothing becomes character data until the Game Master chooses **Save**.
+
 ## Security and privacy boundaries
 
 - Campaign Manager binds to localhost and accepts local-provider URLs only on

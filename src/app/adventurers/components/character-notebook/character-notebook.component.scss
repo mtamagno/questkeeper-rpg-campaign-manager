@@ -1,0 +1,485 @@
+@use 'sass:color';
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+
+.notebook {
+  position: relative;
+
+  &__sealed {
+    @include flex-center;
+    @include flex-column;
+    min-height: 320px;
+    padding: $spacing-2xl;
+    overflow: hidden;
+    border: $border-width-thin solid rgba($color-gold, 0.34);
+    border-radius: $border-radius-lg;
+    background:
+      radial-gradient(circle at 50% 18%, rgba($color-gold-dark, 0.16), transparent 36%),
+      linear-gradient(145deg, rgba($color-bg-elevated, 0.96), rgba($color-bg-void, 0.98));
+    text-align: center;
+
+    &::before,
+    &::after {
+      position: absolute;
+      inset: $spacing-md;
+      border: $border-width-thin solid rgba($color-gold-dark, 0.18);
+      content: '';
+      pointer-events: none;
+    }
+
+    &::after {
+      inset: $spacing-lg;
+      border-style: dashed;
+    }
+
+    h2 {
+      position: relative;
+      margin: $spacing-sm 0;
+      color: $color-gold-light;
+      font-family: $font-family-heading;
+      font-size: $font-size-2xl;
+    }
+
+    p {
+      position: relative;
+      max-width: 620px;
+      margin: 0;
+      color: $color-text-secondary;
+      line-height: $line-height-relaxed;
+    }
+  }
+
+  &__seal {
+    position: relative;
+    display: grid;
+    width: 72px;
+    height: 72px;
+    place-items: center;
+    border: 2px solid rgba($color-parchment-light, 0.35);
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, $color-danger-light, $color-danger 56%, #3e080d);
+    box-shadow:
+      0 8px 24px rgba(#000, 0.42),
+      inset 0 0 0 5px rgba(#000, 0.12);
+    color: $color-parchment-light;
+    font-family: $font-family-heading;
+    font-size: $font-size-2xl;
+  }
+
+  &__sealed-kicker,
+  &__eyebrow {
+    color: $color-gold;
+    font-family: $font-family-heading;
+    font-size: $font-size-xs;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  &__unlock,
+  &__lock {
+    position: relative;
+    margin-top: $spacing-lg;
+    padding: $spacing-sm $spacing-xl;
+    border: $border-width-thin solid $color-gold-dark;
+    border-radius: $border-radius-pill;
+    background: rgba($color-gold-dark, 0.18);
+    color: $color-gold-light;
+    font-family: $font-family-heading;
+    font-weight: $font-weight-semibold;
+    cursor: pointer;
+    @include transition-colors;
+
+    &:hover,
+    &:focus-visible {
+      border-color: $color-gold;
+      background: $color-gold-dark;
+      color: $color-text-primary;
+    }
+
+    &:focus-visible {
+      outline: $border-width-default solid $color-gold-light;
+      outline-offset: 3px;
+    }
+  }
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: $spacing-xl;
+    margin-bottom: $spacing-xl;
+
+    h2 {
+      margin: $spacing-xs 0;
+      color: $color-gold-light;
+      font-family: $font-family-heading;
+      font-size: $font-size-2xl;
+    }
+
+    p {
+      max-width: 760px;
+      margin: 0;
+      color: $color-text-secondary;
+      line-height: $line-height-relaxed;
+    }
+
+    @include respond-below(md) {
+      flex-direction: column;
+    }
+  }
+
+  &__lock {
+    flex: 0 0 auto;
+    margin-top: 0;
+  }
+
+  &__empty {
+    padding: $spacing-xl;
+    border: $border-width-thin dashed $color-border-strong;
+    border-radius: $border-radius-md;
+    color: $color-text-muted;
+    text-align: center;
+  }
+}
+
+.notebook-book {
+  position: relative;
+  max-width: 1240px;
+  margin: 0 auto;
+  outline: none;
+
+  &:focus-visible &__stage {
+    box-shadow: $shadow-xl, $shadow-glow-gold-strong;
+  }
+
+  &__stage {
+    position: relative;
+    padding: clamp($spacing-sm, 1.8vw, $spacing-lg);
+    overflow: hidden;
+    border: $border-width-default solid rgba($color-gold-dark, 0.62);
+    border-radius: $border-radius-lg;
+    background:
+      radial-gradient(circle at 50% 0%, rgba($color-gold, 0.13), transparent 34%),
+      linear-gradient(
+        145deg,
+        color.adjust($color-leather, $lightness: -16%),
+        $color-leather 52%,
+        color.adjust($color-leather, $lightness: -22%)
+      );
+    box-shadow:
+      $shadow-xl,
+      inset 0 0 0 3px rgba($color-parchment-dark, 0.08);
+    animation: notebook-slide-reveal $transition-slow both;
+
+    &--cover {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      aspect-ratio: 4 / 3;
+      background: linear-gradient(135deg, #100d24, #1b0d1c 52%, #280d16);
+
+      &::after {
+        position: absolute;
+        inset: $spacing-sm calc(50% - 1px) $spacing-sm auto;
+        width: 2px;
+        background: linear-gradient(transparent, rgba($color-gold-dark, 0.38), transparent);
+        box-shadow:
+          10px 0 30px rgba(#000, 0.46),
+          -10px 0 30px rgba(#000, 0.3);
+        content: '';
+      }
+    }
+
+    &--front .notebook-book__image-link--cover {
+      grid-column: 2;
+    }
+
+    &--back .notebook-book__image-link--cover {
+      grid-column: 1;
+    }
+  }
+
+  &__image-link {
+    position: relative;
+    z-index: 1;
+    display: block;
+    width: 100%;
+    padding: 0;
+    overflow: hidden;
+    border: $border-width-thin solid rgba($color-parchment-dark, 0.36);
+    border-radius: $border-radius-sm;
+    background: $color-bg-void;
+    box-shadow: $shadow-lg;
+    cursor: zoom-in;
+
+    &:focus-visible {
+      outline: $border-width-default solid $color-gold-light;
+      outline-offset: 4px;
+    }
+
+    &--cover {
+      grid-row: 1;
+      height: 100%;
+
+      .notebook-book__image {
+        height: 100%;
+        aspect-ratio: auto;
+      }
+    }
+  }
+
+  &__image {
+    display: block;
+    width: 100%;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+    transition:
+      transform $transition-slow,
+      filter $transition-base;
+
+    &:hover {
+      transform: scale(1.008);
+      filter: brightness(1.035);
+    }
+  }
+
+  &__edge-turn {
+    position: absolute;
+    z-index: 4;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    width: clamp(42px, 6vw, 76px);
+    align-items: center;
+    padding: $spacing-xs;
+    border: 0;
+    color: $color-parchment-light;
+    cursor: pointer;
+    opacity: 0.58;
+    transition:
+      opacity $transition-fast,
+      background $transition-fast;
+
+    span {
+      display: grid;
+      width: 36px;
+      height: 52px;
+      place-items: center;
+      border: $border-width-thin solid rgba($color-gold, 0.38);
+      border-radius: $border-radius-pill;
+      background: rgba($color-bg-void, 0.68);
+      font-size: $font-size-2xl;
+    }
+
+    &:hover,
+    &:focus-visible {
+      opacity: 1;
+    }
+
+    &:focus-visible {
+      outline: $border-width-default solid $color-gold-light;
+      outline-offset: -4px;
+    }
+
+    &:disabled {
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    &--previous {
+      left: 0;
+      justify-content: flex-start;
+      background: linear-gradient(90deg, rgba($color-bg-void, 0.52), transparent);
+    }
+
+    &--next {
+      right: 0;
+      justify-content: flex-end;
+      background: linear-gradient(270deg, rgba($color-bg-void, 0.52), transparent);
+    }
+  }
+
+  &__entry {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: $spacing-lg;
+    margin-top: $spacing-sm;
+    padding: $spacing-md $spacing-lg $spacing-sm;
+    border-top: 3px solid $color-gold-dark;
+    background: linear-gradient(90deg, rgba($color-bg-void, 0.32), transparent 70%);
+
+    &[data-mood='uneasy'],
+    &[data-mood='fractured'],
+    &[data-mood='wary'] {
+      border-top-color: $color-warning;
+    }
+
+    &[data-mood='grief'],
+    &[data-mood='guilt'] {
+      border-top-color: $color-danger;
+    }
+
+    &[data-mood='renewal'],
+    &[data-mood='hopeful'] {
+      border-top-color: $color-success;
+    }
+
+    h3 {
+      margin: $spacing-2xs 0 0;
+      color: $color-parchment-light;
+      font-family: $font-family-heading;
+      font-size: clamp($font-size-lg, 2vw, $font-size-xl);
+    }
+
+    blockquote {
+      margin: $spacing-sm 0 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: $color-text-secondary;
+      font-style: italic;
+      line-height: $line-height-relaxed;
+    }
+  }
+
+  &__number {
+    color: rgba($color-parchment-light, 0.42);
+    font-family: $font-family-heading;
+    font-size: $font-size-2xl;
+  }
+
+  &__era {
+    color: $color-gold;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+    letter-spacing: $letter-spacing-wide;
+    text-transform: uppercase;
+  }
+
+  &__controls {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: $spacing-md;
+    margin-top: $spacing-lg;
+  }
+
+  &__turn {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-sm;
+    width: max-content;
+    padding: $spacing-sm $spacing-lg;
+    border: $border-width-thin solid $color-gold-dark;
+    border-radius: $border-radius-pill;
+    background: rgba($color-gold-dark, 0.16);
+    color: $color-gold-light;
+    font-family: $font-family-heading;
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: $border-width-default solid $color-gold-light;
+      outline-offset: 3px;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.34;
+    }
+
+    &--next {
+      justify-self: end;
+    }
+  }
+
+  &__progress {
+    min-width: min(360px, 42vw);
+    color: $color-text-muted;
+    font-family: $font-family-heading;
+    font-size: $font-size-xs;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  &__markers {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: $spacing-xs;
+    margin-top: $spacing-sm;
+
+    button {
+      width: 14px;
+      height: 4px;
+      padding: 0;
+      border: 0;
+      border-radius: $border-radius-pill;
+      background: $color-border-strong;
+      cursor: pointer;
+
+      &.is-cover {
+        height: 7px;
+        border: 1px solid rgba($color-gold, 0.58);
+        background: transparent;
+      }
+
+      &.is-current {
+        width: 30px;
+        background: $color-gold;
+      }
+    }
+  }
+
+  &__hint {
+    margin: $spacing-md 0 0;
+    color: $color-text-muted;
+    font-size: $font-size-sm;
+    text-align: center;
+  }
+
+  @include respond-below(sm) {
+    &__edge-turn {
+      width: 46px;
+    }
+
+    &__entry {
+      gap: $spacing-sm;
+      padding-inline: $spacing-sm;
+    }
+
+    &__controls {
+      gap: $spacing-sm;
+    }
+
+    &__turn {
+      padding-inline: $spacing-md;
+
+      span:not([aria-hidden='true']) {
+        display: none;
+      }
+    }
+
+    &__progress {
+      min-width: 0;
+    }
+  }
+}
+
+@keyframes notebook-slide-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(5px) scale(0.997);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .notebook-book__stage {
+    animation: none;
+  }
+}
