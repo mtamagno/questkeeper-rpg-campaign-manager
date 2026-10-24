@@ -94,19 +94,19 @@ cp discord-transcriber/.env.example discord-transcriber/.env
 
 Available values:
 
-| Variable                |      Default | Purpose                                                |
-| ----------------------- | -----------: | ------------------------------------------------------ |
-| `DISCORD_TOKEN`         | `replace-me` | Secret bot token                                       |
-| `WHISPER_MODEL`         |   `large-v3` | faster-whisper model                                   |
-| `WHISPER_DEVICE`        |       `cuda` | `cuda` or `cpu`                                        |
-| `WHISPER_COMPUTE_TYPE`  |    `float16` | GPU/CPU precision                                      |
-| `WHISPER_LANGUAGE`      |         `en` | Spoken-language code, such as `en`, `it`, `es` or `de` |
-| `SILENCE_MS`            |        `900` | Silence that closes one utterance                      |
-| `MIN_UTTERANCE_MS`      |        `450` | Minimum accepted speech duration                       |
-| `MAX_UTTERANCE_SECONDS` |         `25` | Maximum size of one buffered segment                   |
-| `VOICE_HEALTH_SECONDS` |          `5` | Interval between voice-capture health checks           |
-| `VOICE_RECONNECT_ATTEMPTS` |      `4` | Attempts in each automatic recovery cycle              |
-| `VOICE_RECONNECT_DELAY_SECONDS` | `3` | Delay between reconnection attempts                    |
+| Variable                        |      Default | Purpose                                                |
+| ------------------------------- | -----------: | ------------------------------------------------------ |
+| `DISCORD_TOKEN`                 | `replace-me` | Secret bot token                                       |
+| `WHISPER_MODEL`                 |   `large-v3` | faster-whisper model                                   |
+| `WHISPER_DEVICE`                |       `cuda` | `cuda` or `cpu`                                        |
+| `WHISPER_COMPUTE_TYPE`          |    `float16` | GPU/CPU precision                                      |
+| `WHISPER_LANGUAGE`              |         `en` | Spoken-language code, such as `en`, `it`, `es` or `de` |
+| `SILENCE_MS`                    |        `900` | Silence that closes one utterance                      |
+| `MIN_UTTERANCE_MS`              |        `450` | Minimum accepted speech duration                       |
+| `MAX_UTTERANCE_SECONDS`         |         `25` | Maximum size of one buffered segment                   |
+| `VOICE_HEALTH_SECONDS`          |          `5` | Interval between voice-capture health checks           |
+| `VOICE_RECONNECT_ATTEMPTS`      |          `4` | Attempts in each automatic recovery cycle              |
+| `VOICE_RECONNECT_DELAY_SECONDS` |          `3` | Delay between reconnection attempts                    |
 
 For CPU use, a practical starting point is:
 
