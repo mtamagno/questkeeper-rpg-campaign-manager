@@ -46,6 +46,28 @@
       "afterSection": 2
     }
   ],
+  "tableMoments": [
+    {
+      "id": "backward-signs",
+      "speaker": "Mira's player",
+      "quote": {
+        "en": "If the road signs are facing backwards, we're either lost or the road is.",
+        "it": "Se i cartelli guardano al contrario, o ci siamo persi noi oppure si è persa la strada."
+      },
+      "context": {
+        "en": "The table tried to decide whether an impossible road still counted as a navigation problem.",
+        "it": "Il tavolo cercava di decidere se una strada impossibile fosse ancora un problema di orientamento."
+      }
+    },
+    {
+      "id": "terrible-manners",
+      "speaker": "Aria's player",
+      "quote": {
+        "en": "I repaired it this morning. The saboteur has excellent timing and terrible manners.",
+        "it": "L'ho riparata stamattina. Il sabotatore ha un tempismo eccellente e delle pessime maniere."
+      }
+    }
+  ],
   "storySoFar": {
     "en": "Embercross's last road lantern has failed without damage or lack of fuel. Aria and Mira left with a matching seal, a century-wet letter, and Keeper Rowan's warning that another light had already gone dark beyond the gate.",
     "it": "L'ultima lanterna di Crocebrace si è spenta senza danni né mancanza di combustibile. Aria e Mira sono partite con un sigillo corrispondente, una lettera dall'inchiostro fresco dopo un secolo e l'avvertimento del custode Rowan: un'altra luce era già svanita oltre il cancello."

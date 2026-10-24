@@ -44,6 +44,7 @@ const ROUTE_LABELS: Readonly<Record<string, { readonly it: string; readonly en: 
   npcs: { it: 'PNG', en: 'NPCs' },
   campaign: { it: 'Campagna', en: 'Campaign' },
   'story-so-far': { it: 'La storia fin qui', en: 'Story so far' },
+  'table-moments': { it: 'Momenti al tavolo', en: 'Around the Table' },
   story: { it: 'Cronache', en: 'Chronicles' },
   maps: { it: 'Luoghi', en: 'Places' },
   gallery: { it: 'Galleria', en: 'Gallery' },
@@ -276,6 +277,15 @@ export class SiteCommandBarComponent {
         detail: it ? "Riprendi il filo dell'avventura" : 'Catch up with the adventure',
         url: `${prefix}/campaign/story-so-far`,
         keywords: 'story storia recap catch up riassunto fin qui',
+        scope: 'current',
+      },
+      {
+        id: 'current-table-moments',
+        icon: '\ud83c\udfad',
+        title: it ? 'Momenti al tavolo' : 'Around the Table',
+        detail: it ? 'Battute e ricordi fuori personaggio' : 'Out-of-character jokes and memories',
+        url: `${prefix}/campaign/table-moments`,
+        keywords: 'table moments tavolo battute jokes funny ooc off character ricordi memories',
         scope: 'current',
       },
       {

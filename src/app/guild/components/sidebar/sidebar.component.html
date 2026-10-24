@@ -211,6 +211,15 @@
 
         <a
           class="sidebar__section-link"
+          [routerLink]="['/', cId, 'campaign', 'table-moments']"
+          routerLinkActive="sidebar__section-link--active"
+          (click)="close()"
+        >
+          🎭 {{ isItalian() ? 'Momenti al tavolo' : 'Around the Table' }}
+        </a>
+
+        <a
+          class="sidebar__section-link"
           [routerLink]="['/', cId, 'maps']"
           routerLinkActive="sidebar__section-link--active"
           (click)="close()"

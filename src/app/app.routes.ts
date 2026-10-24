@@ -84,6 +84,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'campaign/table-moments',
+        loadComponent: () =>
+          import('./chronicle/pages/table-moments/table-moments.component').then(
+            (m) => m.TableMomentsComponent,
+          ),
+      },
+      {
         path: 'campaign/story/:id',
         loadComponent: () =>
           import('./chronicle/pages/story-chapter/story-chapter.component').then(

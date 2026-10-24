@@ -29,6 +29,18 @@ export interface SessionImage {
   readonly afterSection?: number;
 }
 
+/** A curated out-of-character memory from the people around the table. */
+export interface TableMoment {
+  /** Stable identifier within the session. */
+  readonly id: string;
+  /** Public display name chosen for the person who said it. */
+  readonly speaker: string;
+  /** The approved quotation, translated without changing its meaning. */
+  readonly quote: BilingualText;
+  /** Optional short explanation of why the table laughed. */
+  readonly context?: BilingualText;
+}
+
 /** A campaign session — the DM's recap of what happened. */
 export interface Session {
   readonly id: string;
@@ -42,4 +54,6 @@ export interface Session {
   readonly images?: ReadonlyArray<SessionImage>;
   /** Short cumulative recap snippet for the "Story So Far" page. Keep it dense and spoiler-free. */
   readonly storySoFar?: BilingualText;
+  /** Curated OOC memories. These are explicitly separate from campaign canon. */
+  readonly tableMoments?: ReadonlyArray<TableMoment>;
 }

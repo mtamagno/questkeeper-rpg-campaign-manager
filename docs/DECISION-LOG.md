@@ -973,6 +973,33 @@ focused surface that owns them instead of being duplicated on home.
 **Revisit when:** User research shows that a missing primary destination cannot
 be reached quickly through the pulse, persistent navigation or command palette.
 
+### QK-036 — Table memories are not campaign canon
+
+**Date:** 24 October 2026
+
+**Status:** Active
+
+**Decision:** Memorable out-of-character jokes and comments live in the
+dedicated Around the Table page through optional `Session.tableMoments` data.
+They remain visibly separate from key events, character dialogue, story prose
+and cumulative recaps. Only words actually said and approved for publication
+may appear as quotations.
+
+**Why:** A campaign is also remembered through the people playing it, but
+placing table talk inside the chronicle would create false canon and could
+publish a real person's words without the intended context or consent.
+
+**Consequences:** Every table moment carries a stable ID, a public speaker name,
+bilingual quotation and optional context. AI may identify candidates for human
+review but cannot fabricate, silently rewrite or auto-publish quotations. An
+empty collection is an honest supported state.
+
+**Source:** User experience review and [Around the Table memories](TABLE-MOMENTS.md).
+
+**Revisit when:** The Manager gains a review workflow that can preserve an
+original transcript excerpt, explicit approval and translated presentation as
+separate provenance fields.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD

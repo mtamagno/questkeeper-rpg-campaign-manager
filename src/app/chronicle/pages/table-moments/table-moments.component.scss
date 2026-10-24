@@ -1,0 +1,198 @@
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+
+:host {
+  display: block;
+}
+
+.table-moments {
+  @include flex-column;
+  gap: $spacing-xl;
+  width: min(100%, 900px);
+  margin: 0 auto;
+  animation: fade-in-up $transition-base;
+
+  &__header {
+    text-align: center;
+  }
+
+  &__heading-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $spacing-lg;
+    flex-wrap: wrap;
+  }
+
+  &__title {
+    margin: 0;
+    color: $color-gold-light;
+    font-family: $font-family-heading;
+    font-size: $font-size-3xl;
+    letter-spacing: $letter-spacing-wide;
+    @include text-gold-glow;
+  }
+
+  &__subtitle {
+    max-width: 680px;
+    margin: $spacing-xs auto 0;
+    color: $color-text-secondary;
+    font-size: $font-size-md;
+    font-style: italic;
+    line-height: $line-height-relaxed;
+  }
+
+  &__loading {
+    padding: $spacing-xl;
+    text-align: center;
+  }
+
+  &__boundary {
+    display: flex;
+    gap: $spacing-sm;
+    align-items: flex-start;
+    padding: $spacing-md $spacing-lg;
+    border: $border-width-thin solid rgba($color-gold, 0.35);
+    border-radius: $border-radius-md;
+    background: rgba($color-gold, 0.06);
+    color: $color-text-secondary;
+
+    p {
+      margin: 0;
+      line-height: $line-height-relaxed;
+    }
+  }
+
+  &__sessions,
+  &__quotes {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  &__sessions {
+    @include flex-column;
+    gap: $spacing-xl;
+  }
+
+  &__session {
+    @include surface-parchment;
+    padding: $spacing-xl;
+  }
+
+  &__session-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: $spacing-md;
+    padding-bottom: $spacing-md;
+    border-bottom: $border-width-thin solid rgba($color-leather, 0.35);
+
+    h2 {
+      margin: $spacing-2xs 0 0;
+      color: $color-text-inverse;
+      font-family: $font-family-heading;
+      font-size: $font-size-xl;
+    }
+
+    time {
+      color: $color-text-muted;
+      font-size: $font-size-sm;
+      white-space: nowrap;
+    }
+  }
+
+  &__session-kicker {
+    margin: 0;
+    color: $color-gold;
+    font-family: $font-family-heading;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+    letter-spacing: $letter-spacing-wide;
+    text-transform: uppercase;
+  }
+
+  &__quotes {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: $spacing-md;
+    margin-top: $spacing-lg;
+  }
+
+  &__quote-card {
+    padding: $spacing-lg;
+    border: $border-width-thin solid rgba($color-leather, 0.3);
+    border-radius: $border-radius-md;
+    background: rgba(255, 255, 255, 0.035);
+
+    figure {
+      margin: 0;
+    }
+
+    blockquote {
+      margin: 0;
+      color: $color-text-primary;
+      font-family: $font-family-heading;
+      font-size: $font-size-md;
+      font-style: italic;
+      line-height: $line-height-relaxed;
+    }
+
+    figcaption {
+      margin-top: $spacing-sm;
+      color: $color-gold;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-semibold;
+    }
+  }
+
+  &__context {
+    margin: $spacing-md 0 0;
+    padding-top: $spacing-sm;
+    border-top: $border-width-thin dashed rgba($color-leather, 0.25);
+    color: $color-text-secondary;
+    font-size: $font-size-sm;
+    line-height: $line-height-base;
+  }
+
+  &__story-link {
+    display: inline-block;
+    margin-top: $spacing-lg;
+    color: $color-gold;
+    font-family: $font-family-heading;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+      color: $color-gold-light;
+      text-decoration: underline;
+    }
+
+    &:focus-visible {
+      outline: $border-width-default solid $color-gold;
+      outline-offset: $spacing-2xs;
+    }
+  }
+
+  &__empty {
+    width: 100%;
+  }
+}
+
+@include respond-below(md) {
+  .table-moments {
+    &__quotes {
+      grid-template-columns: 1fr;
+    }
+
+    &__session {
+      padding: $spacing-lg;
+    }
+
+    &__session-header {
+      flex-direction: column;
+    }
+  }
+}
