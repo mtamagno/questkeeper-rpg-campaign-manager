@@ -35,6 +35,11 @@ The story profile is a derived view. It introduces no second character schema:
 Relationship cards link to both the other person's public profile and the full
 relationship record. The carousel contains the complete public set without
 growing the page vertically; the relationship map remains the canonical overview.
+The whole carousel is hosted in the same closable accordion used by the other
+profile sections. Each card has one canonical relationship type and zero or more
+directional feelings for the profile being viewed. A feeling includes its
+five-step intensity and an evidence-based reason; a second participant's feelings
+belong to that participant's card and to the full relationship page.
 Known-story references link back to the artifact that supports them. Counts are
 navigation cues, not new facts.
 

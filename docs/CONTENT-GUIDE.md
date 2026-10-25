@@ -202,8 +202,50 @@ optional category. Maps contain localized descriptions, image arrays,
 discoveries and exploration status.
 
 Relationship files contain directed edges between existing character/NPC IDs.
+`party-relationships.json` connects player characters; `npc-relationships.json`
+may connect an NPC with a player character or another NPC.
 Supported types are defined in
 `src/app/guild/models/relationship.model.ts`. Empty arrays are valid.
+
+Keep one `type` for the relationship itself. Record the emotions inside optional
+directional `perspectives`: each participant can hold any number of simultaneous
+feelings, including conflicting ones. Every feeling needs a short bilingual
+label, an intensity from 1 to 5 and a concrete bilingual reason supported by a
+published event. Do not duplicate a perspective to make a bond look mutual.
+
+```json
+{
+  "sourceId": "aria-vale",
+  "targetId": "mira-thorn",
+  "type": "friendship",
+  "description": { "en": "A dependable partnership.", "it": "Una collaborazione affidabile." },
+  "isBidirectional": true,
+  "perspectives": [
+    {
+      "entityId": "aria-vale",
+      "feelings": [
+        {
+          "label": { "en": "Trust", "it": "Fiducia" },
+          "intensity": 5,
+          "reason": {
+            "en": "Mira crossed the broken span using Aria's route without hesitation.",
+            "it": "Mira ha attraversato il ponte spezzato seguendo senza esitazione la rotta di Aria."
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+`description` summarizes the relationship; `perspectives` explains how each
+person currently experiences it. Update the latter when new notes provide
+evidence, while `sharedEvents` and `evolution` preserve how it changed.
+
+NPC-to-NPC relationships are always public party knowledge, not omniscient GM
+truth. Add `partyPerception` with a `certainty` of `observed`, `reported` or
+`inferred`, plus a bilingual `basis` naming the event that supports the party's
+reading. If the group has no evidence yet, do not publish the relationship.
 
 ## Images
 

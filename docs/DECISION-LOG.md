@@ -1061,6 +1061,36 @@ replace the opening identity summary with a statistics dashboard.
 important, or versioned memory data can improve the overview without creating a
 competing source of truth.
 
+### QK-039 — Relationships separate bond type, feelings and party knowledge
+
+**Date:** 25 October 2026
+
+**Status:** Active
+
+**Decision:** Every relationship has one canonical bond type, while each
+participant may hold any number of directional feelings with its own strength
+and evidence-based reason. NPC-to-party and NPC-to-NPC relationships may appear
+only as the party's current reading, labelled as observed, reported or inferred
+and accompanied by the event evidence that supports it.
+
+**Why:** A single label such as friendship or distrust describes the social
+shape of a bond but cannot express mixed or asymmetric emotions. NPC networks
+also become accidental Game Master spoilers when deductions are presented as
+omniscient facts.
+
+**Consequences:** Character profiles use a closable card carousel; relationship
+details show one perspective card per participant and every recorded feeling.
+AI-assisted note processing may propose PC-PC, PC-NPC and NPC-NPC links, but it
+must preserve uncertainty, cite visible evidence and never expose private canon.
+Missing feelings or uncertain links remain missing instead of being invented.
+
+**Source:** [Character story profiles](CHARACTER-STORY-PROFILES.md) and
+[campaign content guide](CONTENT-GUIDE.md#relationships).
+
+**Revisit when:** The product gains explicit Game Master-only relationship
+layers or players need to compare how the perceived relationship changed over
+time.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD

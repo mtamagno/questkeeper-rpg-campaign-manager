@@ -216,37 +216,23 @@
     text-transform: uppercase;
   }
 
-  &__section--bonds {
-    scroll-margin-top: 7rem;
-    overflow: hidden;
-    background:
-      radial-gradient(circle at 100% 0%, rgba($color-gold-dark, 0.12), transparent 34%),
-      linear-gradient(150deg, rgba($color-bg-surface, 0.98), rgba($color-bg-deep, 0.96));
-  }
-
-  &__bonds-header {
+  &__bonds-toolbar {
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
     gap: $spacing-lg;
     margin-bottom: $spacing-lg;
 
-    h2 {
-      margin: 0;
-      color: $color-gold-light;
-      font-family: $font-family-heading;
-      font-size: $font-size-xl;
-      letter-spacing: $letter-spacing-wide;
-    }
-
-    p:last-child {
-      margin: $spacing-xs 0 0;
-      color: $color-text-secondary;
-    }
-
     @include respond-below(md) {
       align-items: flex-start;
     }
+  }
+
+  &__bonds-intro {
+    max-width: 720px;
+    margin: $spacing-xs 0 0;
+    color: $color-text-secondary;
+    line-height: $line-height-relaxed;
   }
 
   &__carousel-controls {
@@ -290,17 +276,20 @@
     padding: 0 0 $spacing-sm;
     overflow-x: auto;
     overscroll-behavior-inline: contain;
-    scroll-behavior: smooth;
+    scroll-behavior: auto;
     scroll-padding-inline: $spacing-xs;
     scroll-snap-type: inline proximity;
     scrollbar-color: $color-gold-dark rgba($color-bg-void, 0.35);
     list-style: none;
 
-    > .character-detail__bond {
-      width: clamp(300px, 40vw, 420px);
-      min-height: 190px;
+    > .character-detail__bond-card {
+      width: clamp(340px, 43vw, 480px);
       flex: 0 0 auto;
       scroll-snap-align: start;
+
+      @include respond-below(sm) {
+        width: min(100%, 360px);
+      }
     }
 
     &:focus-visible {
@@ -308,6 +297,169 @@
       outline-offset: 5px;
       border-radius: $border-radius-sm;
     }
+  }
+
+  &__bond-card {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+    min-height: 100%;
+    padding: $spacing-lg;
+    border: $border-width-thin solid $color-border-default;
+    border-radius: $border-radius-md;
+    background:
+      radial-gradient(circle at 100% 0%, rgba($color-gold-dark, 0.12), transparent 38%),
+      rgba($color-bg-void, 0.22);
+    box-shadow: $shadow-sm;
+  }
+
+  &__bond-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $spacing-sm;
+  }
+
+  &__bond-person {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-sm;
+    min-width: 0;
+    color: $color-gold-light;
+    text-decoration: none;
+
+    img {
+      width: 54px;
+      height: 54px;
+      flex: 0 0 auto;
+      border: $border-width-thin solid $color-border-accent;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    strong {
+      display: block;
+      overflow: hidden;
+      font-family: $font-family-heading;
+      font-size: $font-size-md;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    &:hover strong {
+      color: $color-gold;
+    }
+  }
+
+  &__bond-type {
+    flex: 0 0 auto;
+    padding: $spacing-2xs $spacing-sm;
+    border: $border-width-thin solid $color-border-accent;
+    border-radius: $border-radius-pill;
+    color: $color-text-accent;
+    font-family: $font-family-heading;
+    font-size: $font-size-xs;
+    letter-spacing: $letter-spacing-wide;
+    text-transform: uppercase;
+  }
+
+  &__bond-description {
+    margin: 0;
+    color: $color-text-primary;
+    line-height: $line-height-relaxed;
+  }
+
+  &__feelings {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+    padding-top: $spacing-md;
+    border-top: $border-width-thin solid $color-border-subtle;
+
+    > h3 {
+      margin: 0;
+      color: $color-text-muted;
+      font-family: $font-family-heading;
+      font-size: $font-size-xs;
+      letter-spacing: $letter-spacing-wide;
+      text-transform: uppercase;
+    }
+  }
+
+  &__feeling {
+    padding: $spacing-sm;
+    border-radius: $border-radius-sm;
+    background: rgba($color-bg-surface, 0.62);
+
+    p {
+      margin: $spacing-xs 0 0;
+      color: $color-text-secondary;
+      font-size: $font-size-sm;
+      line-height: $line-height-relaxed;
+    }
+  }
+
+  &__feeling-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $spacing-sm;
+
+    > strong {
+      color: $color-parchment-light;
+      font-family: $font-family-heading;
+      font-size: $font-size-sm;
+    }
+  }
+
+  &__feeling-meter {
+    display: inline-flex;
+    gap: 4px;
+
+    i {
+      width: 14px;
+      height: 5px;
+      border-radius: $border-radius-pill;
+      background: $color-border-default;
+
+      &.is-active {
+        background: $color-gold;
+        box-shadow: 0 0 8px rgba($color-gold, 0.2);
+      }
+    }
+  }
+
+  &__feelings-empty {
+    margin: 0;
+    padding: $spacing-sm $spacing-md;
+    border-left: $border-width-thick solid $color-border-subtle;
+    color: $color-text-muted;
+    font-size: $font-size-sm;
+    font-style: italic;
+  }
+
+  &__bond-link,
+  &__story-route {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-xs;
+    color: $color-text-link;
+    font-family: $font-family-heading;
+    font-size: $font-size-sm;
+    letter-spacing: $letter-spacing-wide;
+    text-decoration: none;
+
+    &:hover {
+      color: $color-text-link-hover;
+    }
+  }
+
+  &__bond-link {
+    margin-top: auto;
+  }
+
+  &__story-route {
+    margin-top: $spacing-md;
   }
 
   &__history-copy {

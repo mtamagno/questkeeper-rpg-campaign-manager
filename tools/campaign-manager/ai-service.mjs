@@ -270,6 +270,17 @@ export function buildNotesPrompt({ campaign, notes, language, includeImages }) {
       summary: item.summary,
       storySoFar: item.storySoFar,
     })),
+    relationships: [
+      ...(campaign.partyRelationships ?? []),
+      ...(campaign.npcRelationships ?? []),
+    ].map((item) => ({
+      sourceId: item.sourceId,
+      targetId: item.targetId,
+      type: item.type,
+      description: item.description,
+      perspectives: item.perspectives ?? [],
+      partyPerception: item.partyPerception ?? null,
+    })),
   };
   return [
     `Write in ${language}. Turn the Game Master's raw session notes into an editable campaign draft.`,
@@ -277,6 +288,11 @@ export function buildNotesPrompt({ campaign, notes, language, includeImages }) {
     'Do not invent outcomes, identities, dialogue, rules, or secrets. If uncertain, omit the claim and add a review suggestion.',
     'Keep the summary concise. Write atmospheric but readable prose. Separate major prose scenes with <hr>.',
     'Every suggested profile or relationship update must quote a short supporting fragment in evidence.',
+    'For a relationship suggestion, preserve exactly one canonical relationship type for the pair. Do not turn feelings into additional relationship types.',
+    'Treat feelings as directional and plural: suggest zero or more feelings for each evidenced participant, each with a short label, an intensity from 1 to 5, and a concrete reason grounded in the notes.',
+    'Feelings may coexist or conflict. Do not make them reciprocal unless the notes support both points of view, and never infer an unspoken feeling merely to complete both sides.',
+    'Relationship suggestions may connect two player characters, a player character and an NPC, or two NPCs.',
+    'For every suggested NPC-to-NPC relationship, state whether the party observed it, was told about it, or inferred it, and give the concrete basis. Describe only the party-facing interpretation, never private GM truth.',
     'Return an empty imagePrompts array. Illustration planning is a separate, independently selectable review step.',
     `Campaign context:\n${JSON.stringify(context)}`,
     `Raw notes:\n${notes}`,

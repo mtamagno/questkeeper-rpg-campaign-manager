@@ -133,6 +133,17 @@ request never falls back to another model, provider or privacy destination.
 
 Raw notes are working material and are not copied into the public session JSON.
 Profile, location and relationship suggestions are not applied automatically.
+For relationship suggestions, the selected prose model receives the existing
+relationship records and must keep exactly one type per pair. Feelings are a
+separate directional list: each evidenced person may have any number of feelings,
+and every proposed feeling must include a label, a 1-5 intensity and a reason
+grounded in the uploaded notes. Conflicting feelings are valid; invented symmetry
+is not. The Game Master reviews these suggestions before editing the relationship
+record.
+The same workflow can suggest NPC-to-NPC bonds. Those suggestions must label the
+party's knowledge as observed, reported or inferred and cite its basis; an AI
+must never expose or invent a private GM relationship as if the characters knew
+it.
 Generated images are stored in the campaign only when requested. Prompt
 planning happens separately from prose writing, image positions are clamped to
 real `<hr>`-separated scenes, and the resulting structured image entries are

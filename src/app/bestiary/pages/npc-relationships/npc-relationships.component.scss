@@ -60,6 +60,37 @@
     font-style: italic;
   }
 
+  &__knowledge-note {
+    display: flex;
+    align-items: flex-start;
+    gap: $spacing-sm;
+    max-width: 760px;
+    margin: $spacing-lg auto 0;
+    padding: $spacing-md $spacing-lg;
+    border: $border-width-thin solid $color-border-default;
+    border-radius: $border-radius-md;
+    color: $color-text-secondary;
+    background: rgba($color-bg-void, 0.22);
+    text-align: left;
+
+    > span {
+      color: $color-gold;
+      font-size: $font-size-lg;
+    }
+
+    p {
+      margin: 0;
+      line-height: $line-height-relaxed;
+    }
+
+    strong {
+      display: block;
+      margin-bottom: $spacing-2xs;
+      color: $color-parchment-light;
+      font-family: $font-family-heading;
+    }
+  }
+
   // --- Node type legend ---
   &__node-legend {
     display: flex;

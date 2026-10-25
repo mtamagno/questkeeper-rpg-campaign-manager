@@ -8,6 +8,50 @@
       "it": "Aria pianifica ogni miglio; Mira fa in modo che lo percorrano davvero. I loro ritmi opposti sono diventati una collaborazione affidabile."
     },
     "isBidirectional": true,
+    "perspectives": [
+      {
+        "entityId": "aria-vale",
+        "feelings": [
+          {
+            "label": { "en": "Trust", "it": "Fiducia" },
+            "intensity": 5,
+            "reason": {
+              "en": "Mira commits to Aria's careful routes even when the road gives them little time to verify every mark.",
+              "it": "Mira si affida alle rotte prudenti di Aria anche quando la strada concede poco tempo per verificare ogni segno."
+            }
+          },
+          {
+            "label": { "en": "Fond exasperation", "it": "Affettuosa esasperazione" },
+            "intensity": 3,
+            "reason": {
+              "en": "Mira's instinct to move first regularly interrupts the perfect plan, but also keeps it from becoming only a plan.",
+              "it": "L'istinto di Mira a muoversi per prima interrompe spesso il piano perfetto, ma impedisce anche che resti soltanto un piano."
+            }
+          }
+        ]
+      },
+      {
+        "entityId": "mira-thorn",
+        "feelings": [
+          {
+            "label": { "en": "Reliance", "it": "Affidamento" },
+            "intensity": 5,
+            "reason": {
+              "en": "Aria sees the old signs that Mira would otherwise cross too quickly; together they make speed survivable.",
+              "it": "Aria vede i vecchi segnali che Mira attraverserebbe troppo in fretta; insieme rendono la velocità sostenibile."
+            }
+          },
+          {
+            "label": { "en": "Restless affection", "it": "Affetto impaziente" },
+            "intensity": 4,
+            "reason": {
+              "en": "Mira values Aria's care even while urging her to close the map and take the next step.",
+              "it": "Mira apprezza la cura di Aria anche mentre la invita a chiudere la mappa e compiere il passo successivo."
+            }
+          }
+        ]
+      }
+    ],
     "sharedEvents": [
       {
         "sessionId": "session-2",

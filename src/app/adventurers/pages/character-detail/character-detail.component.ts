@@ -10,10 +10,9 @@ import {
   computed,
   signal,
   effect,
-  ViewChild,
-  type ElementRef,
   type Signal,
 } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
@@ -47,6 +46,13 @@ interface ProfileBondPreview {
   readonly sourceId: string;
   readonly targetId: string;
   readonly sharedMemoryCount: number;
+  readonly feelings: ReadonlyArray<ProfileBondFeeling>;
+}
+
+interface ProfileBondFeeling {
+  readonly label: string;
+  readonly intensity: number;
+  readonly reason: string;
 }
 
 /**
@@ -78,9 +84,7 @@ export class CharacterDetailComponent {
   private readonly dataService = inject(DataService);
   private readonly campaignService = inject(CampaignService);
   private readonly languageService = inject(LanguageService);
-
-  @ViewChild('bondCarousel')
-  private bondCarousel?: ElementRef<HTMLElement>;
+  private readonly document = inject(DOCUMENT);
 
   /** Current display language for page chrome and section labels. */
   readonly lang = this.languageService.currentLanguage;
@@ -204,6 +208,14 @@ export class CharacterDetailComponent {
         sourceId: relationship.sourceId,
         targetId: relationship.targetId,
         sharedMemoryCount: relationship.sharedEvents?.length ?? 0,
+        feelings:
+          (relationship.perspectives ?? [])
+            .find((perspective) => perspective.entityId === character.id)
+            ?.feelings.map((feeling) => ({
+              label: localizeText(feeling.label, language),
+              intensity: this.normalizeFeelingIntensity(feeling.intensity),
+              reason: localizeText(feeling.reason, language),
+            })) ?? [],
       });
     }
 
@@ -244,13 +256,26 @@ export class CharacterDetailComponent {
 
   /** Moves the relationship rail by one readable viewport while keeping native scrolling. */
   scrollBondCarousel(direction: -1 | 1): void {
-    const carousel = this.bondCarousel?.nativeElement;
-    if (carousel === undefined) return;
-    carousel.scrollBy({
-      left: direction * Math.max(carousel.clientWidth * 0.82, 280),
-      behavior: 'smooth',
-    });
+    const carousel = this.document.getElementById('profile-bond-track');
+    if (carousel === null) return;
+    const firstCard = carousel.querySelector<HTMLElement>('.character-detail__bond-card');
+    const gap = Number.parseFloat(getComputedStyle(carousel).columnGap) || 0;
+    const step =
+      firstCard === null ? Math.max(carousel.clientWidth * 0.82, 280) : firstCard.offsetWidth + gap;
+    const maxScroll = Math.max(0, carousel.scrollWidth - carousel.clientWidth);
+    // Assigning scrollLeft is deliberately deterministic here. Smooth scrolling
+    // combined with scroll snapping can be cancelled on narrow touch viewports,
+    // leaving the carousel apparently unresponsive.
+    carousel.scrollLeft = Math.min(maxScroll, Math.max(0, carousel.scrollLeft + direction * step));
   }
+
+  /** Keeps author-provided feeling ratings inside the documented five-step scale. */
+  normalizeFeelingIntensity(value: number): number {
+    return Math.min(5, Math.max(1, Math.round(value)));
+  }
+
+  /** Five stable steps used by the accessible feeling-strength meter. */
+  readonly feelingScale = [1, 2, 3, 4, 5] as const;
 
   /** Formats a canonical centimetre value as metres in the selected language. */
   formatHeight(heightCm: number): string {

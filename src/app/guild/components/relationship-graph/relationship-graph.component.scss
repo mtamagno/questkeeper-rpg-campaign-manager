@@ -95,6 +95,16 @@
     margin: 0;
   }
 
+  &__tooltip-perception {
+    display: block;
+    margin-top: $spacing-xs;
+    padding-top: $spacing-xs;
+    border-top: $border-width-thin solid $color-border-subtle;
+    color: $color-text-muted;
+    font-size: $font-size-xs;
+    font-style: italic;
+  }
+
   // --- Focus mode mini-tooltip (appears above centered node) ---
   &__focus-tooltip {
     position: absolute;

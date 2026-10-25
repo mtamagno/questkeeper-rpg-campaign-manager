@@ -27,7 +27,9 @@
         <span class="rel-detail__bond-icon">⚡</span>
         <span class="rel-detail__bond-type">{{ relationshipTypeLabel() }}</span>
         @if (rel.isBidirectional) {
-          <span class="rel-detail__bond-bidi">↔ Mutual</span>
+          <span class="rel-detail__bond-bidi"
+            >↔ {{ lang() === 'it' ? 'Reciproco' : 'Mutual' }}</span
+          >
         }
       </div>
 
@@ -49,12 +51,91 @@
     <!-- Description -->
     <section class="rel-detail__section">
       <p class="rel-detail__description">{{ rel.description | bilingual }}</p>
+      @if (rel.partyPerception; as perception) {
+        <aside class="rel-detail__party-perception">
+          <span>
+            {{ lang() === 'it' ? 'Lettura del gruppo' : "Party's reading" }} ·
+            {{ partyPerceptionLabel() }}
+          </span>
+          <strong>
+            {{
+              lang() === 'it'
+                ? 'Questa è la relazione che il gruppo crede di aver compreso.'
+                : 'This is the relationship the party believes it understands.'
+            }}
+          </strong>
+          <p>{{ perception.basis | bilingual }}</p>
+        </aside>
+      }
     </section>
+
+    <!-- A single bond type can contain several directional feelings per person. -->
+    @if (perspectives().length > 0) {
+      <section class="rel-detail__section" aria-labelledby="relationship-feelings-heading">
+        <h2 id="relationship-feelings-heading" class="rel-detail__section-title">
+          💠 {{ lang() === 'it' ? 'Come vivono questo legame' : 'How they experience this bond' }}
+        </h2>
+        <p class="rel-detail__section-intro">
+          {{
+            lang() === 'it'
+              ? 'Il rapporto ha un solo tipo, ma ogni persona può provare più sentimenti contemporaneamente.'
+              : 'The bond has one type, but each person can hold several feelings at the same time.'
+          }}
+        </p>
+        <div class="rel-detail__perspectives">
+          @for (perspective of perspectives(); track perspective.entity.id) {
+            <article class="rel-detail__perspective">
+              <header class="rel-detail__perspective-header">
+                <img
+                  [src]="perspective.entity.profileImageUrl ?? perspective.entity.avatar.url"
+                  [alt]="perspective.entity.name"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div>
+                  <span>{{
+                    lang() === 'it' ? 'Punto di vista di' : 'From the point of view of'
+                  }}</span>
+                  <h3>{{ perspective.entity.name }}</h3>
+                </div>
+              </header>
+              <div class="rel-detail__feeling-list">
+                @for (feeling of perspective.feelings; track feeling.label.en) {
+                  <div class="rel-detail__feeling-card">
+                    <div class="rel-detail__feeling-heading">
+                      <strong>{{ feeling.label | bilingual }}</strong>
+                      <span
+                        class="rel-detail__feeling-meter"
+                        role="img"
+                        [attr.aria-label]="
+                          (lang() === 'it' ? 'Intensità ' : 'Intensity ') +
+                          normalizeFeelingIntensity(feeling.intensity) +
+                          (lang() === 'it' ? ' su 5' : ' out of 5')
+                        "
+                      >
+                        @for (step of feelingScale; track step) {
+                          <i
+                            [class.is-active]="step <= normalizeFeelingIntensity(feeling.intensity)"
+                          ></i>
+                        }
+                      </span>
+                    </div>
+                    <p>{{ feeling.reason | bilingual }}</p>
+                  </div>
+                }
+              </div>
+            </article>
+          }
+        </div>
+      </section>
+    }
 
     <!-- Shared Events Timeline -->
     @if (sharedEvents().length > 0) {
       <section class="rel-detail__section">
-        <h2 class="rel-detail__section-title">📜 Shared Events</h2>
+        <h2 class="rel-detail__section-title">
+          📜 {{ lang() === 'it' ? 'Momenti condivisi' : 'Shared Events' }}
+        </h2>
         <div class="rel-detail__timeline">
           @for (event of sharedEvents(); track event.sessionId) {
             <div class="rel-detail__event">
@@ -73,7 +154,9 @@
     <!-- Quotes -->
     @if (quotes().length > 0) {
       <section class="rel-detail__section">
-        <h2 class="rel-detail__section-title">💬 Memorable Words</h2>
+        <h2 class="rel-detail__section-title">
+          💬 {{ lang() === 'it' ? 'Parole memorabili' : 'Memorable Words' }}
+        </h2>
         <div class="rel-detail__quotes">
           @for (quote of quotes(); track quote.sessionId + quote.speakerId) {
             <blockquote class="rel-detail__quote">
@@ -90,7 +173,9 @@
     <!-- Evolution -->
     @if (evolution().length > 0) {
       <section class="rel-detail__section">
-        <h2 class="rel-detail__section-title">📈 Relationship Evolution</h2>
+        <h2 class="rel-detail__section-title">
+          📈 {{ lang() === 'it' ? 'Evoluzione del legame' : 'Relationship Evolution' }}
+        </h2>
         <div class="rel-detail__evolution">
           @for (evo of evolution(); track evo.sessionId + evo.toType) {
             <div class="rel-detail__evo-entry">
@@ -117,20 +202,28 @@
         class="rel-detail__back-link"
         [routerLink]="['/', campaignId() ?? '', 'party', 'relationships']"
       >
-        ← Back to Relationships
+        ← {{ lang() === 'it' ? 'Torna alle relazioni' : 'Back to Relationships' }}
       </a>
     </div>
   </article>
 } @else {
   <div class="rel-detail__not-found">
     <span class="rel-detail__not-found-icon">🔮</span>
-    <p class="rel-detail__not-found-title">Relationship not found</p>
-    <p class="rel-detail__not-found-text">The threads of fate between these two remain unseen.</p>
+    <p class="rel-detail__not-found-title">
+      {{ lang() === 'it' ? 'Relazione non trovata' : 'Relationship not found' }}
+    </p>
+    <p class="rel-detail__not-found-text">
+      {{
+        lang() === 'it'
+          ? 'I fili del destino tra queste due persone restano invisibili.'
+          : 'The threads of fate between these two remain unseen.'
+      }}
+    </p>
     <a
       class="rel-detail__back-link"
       [routerLink]="['/', campaignId() ?? '', 'party', 'relationships']"
     >
-      ← Back to Relationships
+      ← {{ lang() === 'it' ? 'Torna alle relazioni' : 'Back to Relationships' }}
     </a>
   </div>
 }

@@ -158,111 +158,147 @@
       </section>
     }
 
-    <!-- Live relationships follow the personal chapters without lengthening the page vertically. -->
+    <!-- Live relationships follow the personal chapters in a closable card carousel. -->
     @if (profileBonds().length > 0) {
-      <section
-        id="profile-bonds"
-        class="character-detail__section character-detail__section--bonds"
-        aria-labelledby="profile-bonds-heading"
-      >
-        <header class="character-detail__bonds-header">
-          <div>
-            <p class="character-detail__section-eyebrow">
-              {{
-                lang() === 'it'
-                  ? 'Compagni, incontri, promesse'
-                  : 'Companions, encounters, promises'
-              }}
-            </p>
-            <h2 id="profile-bonds-heading">
-              {{ lang() === 'it' ? 'Legami in viaggio' : 'Bonds along the road' }}
-            </h2>
-            <p>
-              {{
-                lang() === 'it'
-                  ? 'Scorri le persone che hanno lasciato un segno nella sua storia.'
-                  : 'Browse the people who have left a mark on their story.'
-              }}
-            </p>
-          </div>
-          @if (profileBonds().length > 1) {
-            <div class="character-detail__carousel-controls">
-              <button
-                type="button"
-                (click)="scrollBondCarousel(-1)"
-                [attr.aria-label]="lang() === 'it' ? 'Legami precedenti' : 'Previous bonds'"
-                aria-controls="profile-bond-track"
-              >
-                ←
-              </button>
-              <button
-                type="button"
-                (click)="scrollBondCarousel(1)"
-                [attr.aria-label]="lang() === 'it' ? 'Legami successivi' : 'Next bonds'"
-                aria-controls="profile-bond-track"
-              >
-                →
-              </button>
+      <section id="profile-bonds" class="character-detail__section">
+        <app-accordion
+          [title]="lang() === 'it' ? 'Legami in viaggio' : 'Bonds along the road'"
+          icon="🕸️"
+          [startOpen]="false"
+          [allowOverflow]="true"
+        >
+          <div class="character-detail__bonds-toolbar">
+            <div>
+              <p class="character-detail__section-eyebrow">
+                {{
+                  lang() === 'it'
+                    ? 'Compagni, incontri, promesse'
+                    : 'Companions, encounters, promises'
+                }}
+              </p>
+              <p class="character-detail__bonds-intro">
+                {{
+                  lang() === 'it'
+                    ? 'Ogni carta racconta il legame e i sentimenti, anche contraddittori, che questo personaggio prova.'
+                    : 'Each card tells the bond and the sometimes conflicting feelings this character holds.'
+                }}
+              </p>
             </div>
-          }
-        </header>
-        <ul
-          #bondCarousel
-          id="profile-bond-track"
-          class="character-detail__bond-carousel"
-          tabindex="0"
-          [attr.aria-label]="lang() === 'it' ? 'Legami del personaggio' : 'Character bonds'"
-        >
-          @for (bond of profileBonds(); track bond.key) {
-            <li class="character-detail__bond">
-              <a
-                class="character-detail__bond-person"
-                [routerLink]="['/', campaignId() ?? '', bond.entityPath, bond.entityId]"
-              >
-                <img [src]="bond.avatarUrl" alt="" loading="lazy" decoding="async" />
-                <span
-                  ><strong>{{ bond.name }}</strong
-                  ><small>{{ bond.typeLabel }}</small></span
+            @if (profileBonds().length > 1) {
+              <div class="character-detail__carousel-controls">
+                <button
+                  type="button"
+                  (click)="scrollBondCarousel(-1)"
+                  [attr.aria-label]="lang() === 'it' ? 'Legami precedenti' : 'Previous bonds'"
+                  aria-controls="profile-bond-track"
                 >
-              </a>
-              <p>{{ bond.description }}</p>
-              <a
-                class="character-detail__bond-link"
-                [routerLink]="[
-                  '/',
-                  campaignId() ?? '',
-                  'relationships',
-                  bond.sourceId,
-                  bond.targetId,
-                ]"
-              >
-                {{ lang() === 'it' ? 'Segui questo legame' : 'Follow this bond' }}
-                @if (bond.sharedMemoryCount > 0) {
-                  <span>
-                    · {{ bond.sharedMemoryCount }}
+                  ←
+                </button>
+                <button
+                  type="button"
+                  (click)="scrollBondCarousel(1)"
+                  [attr.aria-label]="lang() === 'it' ? 'Legami successivi' : 'Next bonds'"
+                  aria-controls="profile-bond-track"
+                >
+                  →
+                </button>
+              </div>
+            }
+          </div>
+          <ul
+            #bondCarousel
+            id="profile-bond-track"
+            class="character-detail__bond-carousel"
+            tabindex="0"
+            [attr.aria-label]="lang() === 'it' ? 'Legami del personaggio' : 'Character bonds'"
+          >
+            @for (bond of profileBonds(); track bond.key) {
+              <li class="character-detail__bond-card">
+                <header class="character-detail__bond-card-header">
+                  <a
+                    class="character-detail__bond-person"
+                    [routerLink]="['/', campaignId() ?? '', bond.entityPath, bond.entityId]"
+                  >
+                    <img [src]="bond.avatarUrl" alt="" loading="lazy" decoding="async" />
+                    <span
+                      ><strong>{{ bond.name }}</strong></span
+                    >
+                  </a>
+                  <span class="character-detail__bond-type">{{ bond.typeLabel }}</span>
+                </header>
+                <p class="character-detail__bond-description">{{ bond.description }}</p>
+                @if (bond.feelings.length > 0) {
+                  <div class="character-detail__feelings">
+                    <h3>{{ lang() === 'it' ? 'Cosa prova' : 'How they feel' }}</h3>
+                    @for (feeling of bond.feelings; track feeling.label) {
+                      <article class="character-detail__feeling">
+                        <div class="character-detail__feeling-heading">
+                          <strong>{{ feeling.label }}</strong>
+                          <span
+                            class="character-detail__feeling-meter"
+                            role="img"
+                            [attr.aria-label]="
+                              (lang() === 'it' ? 'Intensità ' : 'Intensity ') +
+                              feeling.intensity +
+                              (lang() === 'it' ? ' su 5' : ' out of 5')
+                            "
+                          >
+                            @for (step of feelingScale; track step) {
+                              <i [class.is-active]="step <= feeling.intensity"></i>
+                            }
+                          </span>
+                        </div>
+                        <p>{{ feeling.reason }}</p>
+                      </article>
+                    }
+                  </div>
+                } @else {
+                  <p class="character-detail__feelings-empty">
                     {{
-                      bond.sharedMemoryCount === 1
-                        ? lang() === 'it'
-                          ? 'memoria'
-                          : 'memory'
-                        : lang() === 'it'
-                          ? 'memorie'
-                          : 'memories'
+                      lang() === 'it'
+                        ? 'I sentimenti di questo punto di vista non sono ancora stati registrati.'
+                        : 'The feelings from this point of view have not been recorded yet.'
                     }}
-                  </span>
+                  </p>
                 }
-              </a>
-            </li>
-          }
-        </ul>
-        <a
-          class="character-detail__story-route"
-          [routerLink]="['/', campaignId() ?? '', 'party', 'relationships']"
-        >
-          {{ lang() === 'it' ? 'Apri la mappa completa' : 'Open the complete map' }}
-          <span>· {{ profileBonds().length }}</span>
-          <span aria-hidden="true">→</span>
-        </a>
+                <a
+                  class="character-detail__bond-link"
+                  [routerLink]="[
+                    '/',
+                    campaignId() ?? '',
+                    'relationships',
+                    bond.sourceId,
+                    bond.targetId,
+                  ]"
+                >
+                  {{ lang() === 'it' ? 'Apri la relazione' : 'Open relationship' }}
+                  @if (bond.sharedMemoryCount > 0) {
+                    <span>
+                      · {{ bond.sharedMemoryCount }}
+                      {{
+                        bond.sharedMemoryCount === 1
+                          ? lang() === 'it'
+                            ? 'memoria'
+                            : 'memory'
+                          : lang() === 'it'
+                            ? 'memorie'
+                            : 'memories'
+                      }}
+                    </span>
+                  }
+                </a>
+              </li>
+            }
+          </ul>
+          <a
+            class="character-detail__story-route"
+            [routerLink]="['/', campaignId() ?? '', 'party', 'relationships']"
+          >
+            {{ lang() === 'it' ? 'Apri la mappa completa' : 'Open the complete map' }}
+            <span>· {{ profileBonds().length }}</span>
+            <span aria-hidden="true">→</span>
+          </a>
+        </app-accordion>
       </section>
     }
 

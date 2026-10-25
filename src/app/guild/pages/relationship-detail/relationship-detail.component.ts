@@ -17,6 +17,8 @@ import {
   type SharedEvent,
   type RelationshipQuote,
   type RelationshipEvolution,
+  type RelationshipFeeling,
+  PARTY_PERCEPTION_LABELS,
   RELATIONSHIP_TYPE_LABELS,
 } from '@guild/models/relationship.model';
 import { type Character, type ImageRef } from '@guild/models/character.model';
@@ -33,6 +35,11 @@ interface EntityInfo {
   readonly name: string;
   readonly avatar: ImageRef;
   readonly profileImageUrl: string | undefined;
+}
+
+interface ResolvedRelationshipPerspective {
+  readonly entity: EntityInfo;
+  readonly feelings: ReadonlyArray<RelationshipFeeling>;
 }
 
 /**
@@ -52,6 +59,12 @@ export class RelationshipDetailComponent {
   private readonly dataService = inject(DataService);
   private readonly languageService = inject(LanguageService);
   private readonly campaignService = inject(CampaignService);
+
+  /** Current display language for headings and relationship labels. */
+  readonly lang = this.languageService.currentLanguage;
+
+  /** Stable five-step scale shared by every feeling-strength meter. */
+  readonly feelingScale = [1, 2, 3, 4, 5] as const;
 
   /** Active campaign ID for building route links. */
   readonly campaignId: Signal<string | undefined> = this.campaignService.activeCampaignId;
@@ -84,6 +97,14 @@ export class RelationshipDetailComponent {
     }
     const label = RELATIONSHIP_TYPE_LABELS[rel.type];
     return localizeText(label, this.languageService.currentLanguage());
+  });
+
+  /** Localized evidence level for the party's public reading of the relationship. */
+  readonly partyPerceptionLabel: Signal<string> = computed(() => {
+    const perception = this.relationship()?.partyPerception;
+    return perception === undefined
+      ? ''
+      : PARTY_PERCEPTION_LABELS[perception.certainty][this.languageService.currentLanguage()];
   });
 
   /** Source entity info (character or NPC). */
@@ -119,6 +140,15 @@ export class RelationshipDetailComponent {
     () => this.relationship()?.evolution ?? [],
   );
 
+  /** Directional emotional readings, resolved to the person who holds them. */
+  readonly perspectives: Signal<ReadonlyArray<ResolvedRelationshipPerspective>> = computed(() => {
+    const perspectives = this.relationship()?.perspectives ?? [];
+    return perspectives.flatMap((perspective) => {
+      const entity = this.resolveEntity(perspective.entityId);
+      return entity === undefined ? [] : [{ entity, feelings: perspective.feelings }];
+    });
+  });
+
   /** Whether data is still loading. */
   readonly isLoading: Signal<boolean> = this.dataService.isLoading;
 
@@ -144,6 +174,11 @@ export class RelationshipDetailComponent {
       return type;
     }
     return localizeText(label, this.languageService.currentLanguage());
+  }
+
+  /** Keeps author-provided feeling ratings inside the documented five-step scale. */
+  normalizeFeelingIntensity(value: number): number {
+    return Math.min(5, Math.max(1, Math.round(value)));
   }
 
   /**

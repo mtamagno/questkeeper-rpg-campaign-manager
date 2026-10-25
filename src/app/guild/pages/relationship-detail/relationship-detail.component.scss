@@ -14,7 +14,7 @@
 .rel-detail {
   @include flex-column;
   gap: $spacing-2xl;
-  max-width: 800px;
+  max-width: 1100px;
   margin: 0 auto;
   animation: fade-in-up $transition-base;
 
@@ -103,6 +103,140 @@
     line-height: $line-height-relaxed;
     font-style: italic;
     margin: 0;
+  }
+
+  &__party-perception {
+    display: grid;
+    gap: $spacing-xs;
+    padding: $spacing-md $spacing-lg;
+    border: $border-width-thin solid $color-border-accent;
+    border-left: $border-width-thick solid $color-gold;
+    border-radius: $border-radius-sm;
+    background: rgba($color-gold-dark, 0.08);
+
+    > span {
+      color: $color-gold;
+      font-family: $font-family-heading;
+      font-size: $font-size-xs;
+      letter-spacing: $letter-spacing-wide;
+      text-transform: uppercase;
+    }
+
+    > strong {
+      color: $color-parchment-light;
+      font-family: $font-family-heading;
+      font-size: $font-size-md;
+    }
+
+    > p {
+      margin: 0;
+      color: $color-text-secondary;
+      line-height: $line-height-relaxed;
+    }
+  }
+
+  &__section-intro {
+    max-width: 760px;
+    margin: 0;
+    color: $color-text-secondary;
+    line-height: $line-height-relaxed;
+  }
+
+  &__perspectives {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+    gap: $spacing-lg;
+  }
+
+  &__perspective {
+    @include surface-card;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+    padding: $spacing-lg;
+    background:
+      radial-gradient(circle at 100% 0%, rgba($color-gold-dark, 0.12), transparent 38%),
+      $color-bg-surface;
+  }
+
+  &__perspective-header {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    padding-bottom: $spacing-md;
+    border-bottom: $border-width-thin solid $color-border-subtle;
+
+    img {
+      width: 58px;
+      height: 58px;
+      border: $border-width-thin solid $color-border-accent;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    span {
+      color: $color-text-muted;
+      font-size: $font-size-xs;
+      letter-spacing: $letter-spacing-wide;
+      text-transform: uppercase;
+    }
+
+    h3 {
+      margin: $spacing-2xs 0 0;
+      color: $color-gold-light;
+      font-family: $font-family-heading;
+      font-size: $font-size-lg;
+    }
+  }
+
+  &__feeling-list {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+
+  &__feeling-card {
+    padding: $spacing-md;
+    border: $border-width-thin solid $color-border-subtle;
+    border-radius: $border-radius-sm;
+    background: rgba($color-bg-void, 0.24);
+
+    p {
+      margin: $spacing-xs 0 0;
+      color: $color-text-secondary;
+      font-size: $font-size-sm;
+      line-height: $line-height-relaxed;
+    }
+  }
+
+  &__feeling-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $spacing-sm;
+
+    strong {
+      color: $color-parchment-light;
+      font-family: $font-family-heading;
+      font-size: $font-size-sm;
+    }
+  }
+
+  &__feeling-meter {
+    display: inline-flex;
+    gap: 4px;
+
+    i {
+      width: 16px;
+      height: 5px;
+      border-radius: $border-radius-pill;
+      background: $color-border-default;
+
+      &.is-active {
+        background: $color-gold;
+        box-shadow: 0 0 8px rgba($color-gold, 0.2);
+      }
+    }
   }
 
   // --- Timeline ---

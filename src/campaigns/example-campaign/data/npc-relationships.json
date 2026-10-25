@@ -7,7 +7,30 @@
       "en": "Rowan taught Aria how to read the old road lights.",
       "it": "Rowan ha insegnato ad Aria a leggere le antiche luci stradali."
     },
-    "isBidirectional": true
+    "isBidirectional": true,
+    "perspectives": [
+      {
+        "entityId": "aria-vale",
+        "feelings": [
+          {
+            "label": { "en": "Gratitude", "it": "Gratitudine" },
+            "intensity": 5,
+            "reason": {
+              "en": "Rowan gave Aria the first language she could use to make sense of the old road lights.",
+              "it": "Rowan ha dato ad Aria il primo linguaggio con cui comprendere le antiche luci stradali."
+            }
+          },
+          {
+            "label": { "en": "Responsibility", "it": "Responsabilità" },
+            "intensity": 4,
+            "reason": {
+              "en": "She feels responsible for carrying the lesson carefully rather than treating it as a trick she owns.",
+              "it": "Sente la responsabilità di custodire con cura quell'insegnamento, senza trattarlo come un trucco che le appartiene."
+            }
+          }
+        ]
+      }
+    ]
   },
   {
     "sourceId": "mira-thorn",
@@ -17,6 +40,100 @@
       "en": "Sable once charted a safe route through a storm that should have swallowed Mira's courier company.",
       "it": "Sable tracciò una rotta sicura attraverso una tempesta che avrebbe dovuto inghiottire la compagnia di corrieri di Mira."
     },
-    "isBidirectional": true
+    "isBidirectional": true,
+    "perspectives": [
+      {
+        "entityId": "mira-thorn",
+        "feelings": [
+          {
+            "label": { "en": "Respect", "it": "Rispetto" },
+            "intensity": 5,
+            "reason": {
+              "en": "Sable found a safe route through a storm that had already defeated every obvious choice.",
+              "it": "Sable trovò una rotta sicura attraverso una tempesta che aveva già sconfitto ogni scelta ovvia."
+            }
+          },
+          {
+            "label": { "en": "Curiosity", "it": "Curiosità" },
+            "intensity": 3,
+            "reason": {
+              "en": "Mira still wants to understand what Sable saw in the storm that everyone else missed.",
+              "it": "Mira vuole ancora capire cosa Sable abbia visto nella tempesta e che tutti gli altri hanno mancato."
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sourceId": "keeper-rowan",
+    "targetId": "sable-finch",
+    "type": "alliance",
+    "description": {
+      "en": "Rowan preserves the old road lights; Sable tests whether their routes still survive the weather. Their methods disagree more often than their purpose.",
+      "it": "Rowan custodisce le antiche luci stradali; Sable verifica se le loro rotte resistono ancora al maltempo. I loro metodi divergono più spesso del loro scopo."
+    },
+    "isBidirectional": true,
+    "partyPerception": {
+      "certainty": "observed",
+      "basis": {
+        "en": "Aria and Mira watched Rowan and Sable compare the restored bridge marks after the crossing, correcting the same map from different evidence.",
+        "it": "Aria e Mira hanno visto Rowan e Sable confrontare i segni del ponte restaurato dopo l'attraversamento, correggendo la stessa mappa a partire da prove diverse."
+      }
+    },
+    "perspectives": [
+      {
+        "entityId": "keeper-rowan",
+        "feelings": [
+          {
+            "label": { "en": "Professional trust", "it": "Fiducia professionale" },
+            "intensity": 4,
+            "reason": {
+              "en": "Sable returns with direct evidence from roads Rowan can now study only through records and lantern reports.",
+              "it": "Sable torna con prove dirette da strade che Rowan può ormai studiare soltanto attraverso registri e rapporti sulle lanterne."
+            }
+          },
+          {
+            "label": { "en": "Concern", "it": "Preoccupazione" },
+            "intensity": 3,
+            "reason": {
+              "en": "Sable accepts weather and distance as costs of certainty more readily than Rowan considers safe.",
+              "it": "Sable accetta il maltempo e la distanza come prezzo della certezza più facilmente di quanto Rowan ritenga sicuro."
+            }
+          }
+        ]
+      },
+      {
+        "entityId": "sable-finch",
+        "feelings": [
+          {
+            "label": { "en": "Respect", "it": "Rispetto" },
+            "intensity": 4,
+            "reason": {
+              "en": "Rowan's archive lets Sable distinguish a genuinely lost road from one merely hidden by a season.",
+              "it": "L'archivio di Rowan permette a Sable di distinguere una strada davvero perduta da una soltanto nascosta da una stagione."
+            }
+          },
+          {
+            "label": { "en": "Impatience", "it": "Impazienza" },
+            "intensity": 2,
+            "reason": {
+              "en": "Sable would rather test the next mile than spend another evening reconciling two versions of the same map.",
+              "it": "Sable preferirebbe verificare il miglio successivo piuttosto che passare un'altra sera a conciliare due versioni della stessa mappa."
+            }
+          }
+        ]
+      }
+    ],
+    "sharedEvents": [
+      {
+        "sessionId": "session-2",
+        "title": { "en": "Two readings of one bridge", "it": "Due letture dello stesso ponte" },
+        "description": {
+          "en": "After the crossing, the party saw Rowan and Sable combine archive marks and storm damage into one corrected route.",
+          "it": "Dopo l'attraversamento, il gruppo ha visto Rowan e Sable unire i segni d'archivio e i danni della tempesta in un'unica rotta corretta."
+        }
+      }
+    ]
   }
 ]

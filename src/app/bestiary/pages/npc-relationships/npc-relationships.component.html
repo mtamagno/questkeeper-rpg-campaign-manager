@@ -30,6 +30,20 @@
         }}
       </p>
 
+      <aside class="npc-relationships__knowledge-note">
+        <span aria-hidden="true">◈</span>
+        <p>
+          <strong>{{
+            lang() === 'it' ? 'Ciò che il gruppo crede' : 'What the party believes'
+          }}</strong>
+          {{
+            lang() === 'it'
+              ? 'Questa rete include rapporti tra PNG e con il party, ma mostra soltanto ciò che i personaggi hanno osservato, sentito raccontare o dedotto dagli eventi.'
+              : 'This web includes bonds between NPCs and with the party, but shows only what the characters observed, were told, or inferred from events.'
+          }}
+        </p>
+      </aside>
+
       @if (relationships().length > 0) {
         <div class="npc-relationships__node-legend">
           <span class="npc-relationships__node-legend-item npc-relationships__node-legend-item--pc">

@@ -20,8 +20,14 @@ const component = fs.readFileSync(
   path.join(componentRoot, 'character-detail.component.ts'),
   'utf8',
 );
+const relationshipModel = fs.readFileSync(
+  path.join(projectRoot, 'src', 'app', 'guild', 'models', 'relationship.model.ts'),
+  'utf8',
+);
 const failures = [];
 let characterCount = 0;
+let feelingCount = 0;
+let npcToNpcCount = 0;
 
 function assert(condition, message) {
   if (!condition) failures.push(message);
@@ -64,8 +70,17 @@ assert(
 );
 assert(
   template.includes('@for (bond of profileBonds(); track bond.key)') &&
-    component.includes('scrollBondCarousel'),
-  'Relationships need one horizontally navigable carousel backed by the public records.',
+    component.includes('scrollBondCarousel') &&
+    template.includes(
+      "[title]=\"lang() === 'it' ? 'Legami in viaggio' : 'Bonds along the road'\"",
+    ) &&
+    template.includes('bond.feelings'),
+  'Relationships need one closable card carousel with directional feelings.',
+);
+assert(
+  relationshipModel.includes('RelationshipPerspective') &&
+    relationshipModel.includes('ReadonlyArray<RelationshipFeeling>'),
+  'Relationship data must keep one bond type with a plural directional feeling model.',
 );
 assert(
   !template.includes('href="#') && template.includes('fragment="profile-bonds"'),
@@ -87,6 +102,7 @@ assert(
 
 for (const campaign of campaigns) {
   const campaignRoot = path.join(campaignsRoot, campaign.id);
+  const npcIds = new Set();
   const characterRoot = path.join(campaignRoot, 'data', 'characters');
   const manifestPath = path.join(characterRoot, 'manifest.json');
   if (!fs.existsSync(manifestPath)) continue;
@@ -106,9 +122,72 @@ for (const campaign of campaigns) {
     assert(Array.isArray(character.diary), `${label} diary must remain a public array.`);
     assert(Array.isArray(character.quotes), `${label} quotes must remain a public array.`);
   }
+
+  const npcRoot = path.join(campaignRoot, 'data', 'npcs');
+  const npcManifestPath = path.join(npcRoot, 'manifest.json');
+  if (fs.existsSync(npcManifestPath)) {
+    const npcManifest = JSON.parse(fs.readFileSync(npcManifestPath, 'utf8'));
+    for (const fileName of npcManifest) {
+      const npc = JSON.parse(fs.readFileSync(path.join(npcRoot, fileName), 'utf8'));
+      npcIds.add(npc.id);
+    }
+  }
+
+  for (const relationshipFile of ['party-relationships.json', 'npc-relationships.json']) {
+    const relationshipPath = path.join(campaignRoot, 'data', relationshipFile);
+    if (!fs.existsSync(relationshipPath)) continue;
+    const relationships = JSON.parse(fs.readFileSync(relationshipPath, 'utf8'));
+    for (const relationship of relationships) {
+      const label = `${campaign.id}/${relationship.sourceId}->${relationship.targetId}`;
+      assert(typeof relationship.type === 'string', `${label} needs one relationship type.`);
+      if (npcIds.has(relationship.sourceId) && npcIds.has(relationship.targetId)) {
+        npcToNpcCount += 1;
+        assert(
+          relationship.partyPerception,
+          `${label} NPC-to-NPC bond needs the party's evidence boundary.`,
+        );
+      }
+      if (relationship.partyPerception) {
+        assert(
+          ['observed', 'reported', 'inferred'].includes(relationship.partyPerception.certainty),
+          `${label} party perception needs a supported certainty.`,
+        );
+        const basis = relationship.partyPerception.basis;
+        assert(
+          basis && typeof basis.en === 'string' && typeof basis.it === 'string',
+          `${label} party perception basis must be bilingual.`,
+        );
+      }
+      for (const perspective of relationship.perspectives ?? []) {
+        assert(
+          perspective.entityId === relationship.sourceId ||
+            perspective.entityId === relationship.targetId,
+          `${label} perspective must belong to one participant.`,
+        );
+        assert(Array.isArray(perspective.feelings), `${label} feelings must be an array.`);
+        for (const feeling of perspective.feelings ?? []) {
+          feelingCount += 1;
+          assert(
+            Number.isInteger(feeling.intensity) && feeling.intensity >= 1 && feeling.intensity <= 5,
+            `${label} feeling intensity must be an integer from 1 to 5.`,
+          );
+          for (const field of ['label', 'reason']) {
+            assert(
+              feeling[field] &&
+                typeof feeling[field].en === 'string' &&
+                typeof feeling[field].it === 'string',
+              `${label} feeling ${field} must be bilingual.`,
+            );
+          }
+        }
+      }
+    }
+  }
 }
 
 assert(characterCount > 0, 'At least one campaign character must exercise the story profile.');
+assert(feelingCount > 0, 'At least one relationship must exercise plural directional feelings.');
+assert(npcToNpcCount > 0, 'At least one NPC-to-NPC relationship must exercise party perception.');
 
 if (failures.length) {
   console.error(failures.map((failure) => `- ${failure}`).join('\n'));
@@ -116,5 +195,5 @@ if (failures.length) {
 }
 
 console.log(
-  `Character story profiles verified across ${campaigns.length} campaign(s) and ${characterCount} character(s).`,
+  `Character story profiles verified across ${campaigns.length} campaign(s), ${characterCount} character(s), ${feelingCount} relationship feelings and ${npcToNpcCount} NPC-to-NPC bonds.`,
 );

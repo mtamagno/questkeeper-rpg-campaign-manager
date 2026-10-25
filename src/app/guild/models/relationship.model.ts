@@ -31,6 +31,8 @@ export type RelationshipType = (typeof RELATIONSHIP_TYPES)[keyof typeof RELATION
  * @param sharedEvents - Key moments that shaped this relationship.
  * @param quotes - Memorable dialogue between the two characters.
  * @param evolution - How the relationship changed over time.
+ * @param perspectives - Directional feelings held by each person in the relationship.
+ * @param partyPerception - How the party knows or infers this public relationship.
  */
 export interface Relationship {
   readonly sourceId: string;
@@ -41,6 +43,56 @@ export interface Relationship {
   readonly sharedEvents?: ReadonlyArray<SharedEvent>;
   readonly quotes?: ReadonlyArray<RelationshipQuote>;
   readonly evolution?: ReadonlyArray<RelationshipEvolution>;
+  readonly perspectives?: ReadonlyArray<RelationshipPerspective>;
+  readonly partyPerception?: PartyRelationshipPerception;
+}
+
+/** How strongly the public relationship is supported by the party's experience. */
+export const PARTY_PERCEPTION_CERTAINTIES = {
+  OBSERVED: 'observed',
+  REPORTED: 'reported',
+  INFERRED: 'inferred',
+} as const;
+
+export type PartyPerceptionCertainty =
+  (typeof PARTY_PERCEPTION_CERTAINTIES)[keyof typeof PARTY_PERCEPTION_CERTAINTIES];
+
+/**
+ * Makes the public epistemic boundary explicit, especially for NPC-to-NPC bonds.
+ * It records what the party has observed, been told or reasonably inferred,
+ * never private GM truth.
+ */
+export interface PartyRelationshipPerception {
+  readonly certainty: PartyPerceptionCertainty;
+  readonly basis: BilingualText;
+}
+
+/** Bilingual labels for the source of a party assessment. */
+export const PARTY_PERCEPTION_LABELS: Readonly<Record<PartyPerceptionCertainty, BilingualText>> = {
+  observed: { en: 'Observed', it: 'Osservata' },
+  reported: { en: 'Reported', it: 'Riferita' },
+  inferred: { en: 'Inferred', it: 'Dedotta' },
+} as const;
+
+/**
+ * One person's current emotional reading of a relationship.
+ * A relationship keeps one canonical type, while each participant may hold
+ * several simultaneous, independently rated feelings.
+ */
+export interface RelationshipPerspective {
+  /** Entity whose point of view is being recorded. */
+  readonly entityId: string;
+  /** Feelings currently supported by published campaign evidence. */
+  readonly feelings: ReadonlyArray<RelationshipFeeling>;
+}
+
+/** A named feeling, its strength and the concrete reason behind it. */
+export interface RelationshipFeeling {
+  readonly label: BilingualText;
+  /** Narrative intensity from 1 (faint) to 5 (defining). */
+  readonly intensity: number;
+  /** Evidence-based explanation; never an unevidenced personality inference. */
+  readonly reason: BilingualText;
 }
 
 /**

@@ -165,6 +165,11 @@
           <p class="relationship-graph__tooltip-desc">
             {{ edge.relationship.description | bilingual }}
           </p>
+          @if (edge.relationship.partyPerception) {
+            <span class="relationship-graph__tooltip-perception">
+              ◈ {{ lang() === 'it' ? 'Lettura del gruppo' : "Party's reading" }}
+            </span>
+          }
         </div>
       }
     </div>
