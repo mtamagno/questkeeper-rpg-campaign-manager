@@ -28,18 +28,18 @@ function assert(condition, message) {
 }
 
 for (const marker of [
-  'character-detail__story-profile',
-  'profile-identity',
+  'profile-overview',
+  'personal-chapters',
   'profile-bonds',
+  'character-detail__bond-carousel',
   'profile-memories',
-  'character-detail__story-jump',
-  'character-detail__bond-list',
-  'character-detail__memory-paths',
+  'character-detail__history-links',
+  'id="diary"',
 ]) {
   assert(template.includes(marker), `Character story profile is missing ${marker}.`);
 }
 
-const storyStart = template.indexOf('<!-- Story profile:');
+const storyStart = template.indexOf('<!-- Public profile:');
 const storyEnd = template.indexOf('<!-- Personal lore:');
 const storySource = template.slice(storyStart, storyEnd);
 assert(
@@ -63,12 +63,26 @@ assert(
   'Memory previews must stay derived, compact and linked to their source.',
 );
 assert(
-  component.includes('visibleProfileBonds') && component.includes('.slice(0, 4)'),
-  'Bond previews must stay bounded while the relationship map remains complete.',
+  template.includes('@for (bond of profileBonds(); track bond.key)') &&
+    component.includes('scrollBondCarousel'),
+  'Relationships need one horizontally navigable carousel backed by the public records.',
 );
 assert(
-  !storySource.includes('href="#') && storySource.includes('fragment="profile-identity"'),
-  'In-profile navigation must preserve the active Angular campaign route.',
+  !template.includes('href="#') && template.includes('fragment="profile-bonds"'),
+  'In-profile references must preserve the active Angular campaign route.',
+);
+
+const overviewIndex = template.indexOf('id="profile-overview"');
+const chaptersIndex = template.indexOf('id="personal-chapters"');
+const bondsIndex = template.indexOf('id="profile-bonds"');
+const memoriesIndex = template.indexOf('id="profile-memories"');
+const diaryIndex = template.indexOf('id="diary"');
+assert(
+  overviewIndex < chaptersIndex &&
+    chaptersIndex < bondsIndex &&
+    bondsIndex < memoriesIndex &&
+    memoriesIndex < diaryIndex,
+  'Profile hierarchy must remain glance, chapters, bond carousel, known story and diary.',
 );
 
 for (const campaign of campaigns) {

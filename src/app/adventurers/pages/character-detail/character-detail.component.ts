@@ -10,6 +10,8 @@ import {
   computed,
   signal,
   effect,
+  ViewChild,
+  type ElementRef,
   type Signal,
 } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -76,6 +78,9 @@ export class CharacterDetailComponent {
   private readonly dataService = inject(DataService);
   private readonly campaignService = inject(CampaignService);
   private readonly languageService = inject(LanguageService);
+
+  @ViewChild('bondCarousel')
+  private bondCarousel?: ElementRef<HTMLElement>;
 
   /** Current display language for page chrome and section labels. */
   readonly lang = this.languageService.currentLanguage;
@@ -205,9 +210,6 @@ export class CharacterDetailComponent {
     return previews;
   });
 
-  /** Bounded bond preview; the relationship map remains the complete source. */
-  readonly visibleProfileBonds = computed(() => this.profileBonds().slice(0, 4));
-
   /** Most recent public diary entry, used as the profile's current memory. */
   readonly latestDiaryEntry = computed(() => {
     const diary = this.character()?.diary ?? [];
@@ -220,6 +222,18 @@ export class CharacterDetailComponent {
     return !normalized.includes('not yet recorded') && !normalized.includes('non ancora registrat');
   }
 
+  /** Whether the compact public summary contains at least one authored field. */
+  hasAtAGlanceProfile(character: Character): boolean {
+    return (
+      this.isRecorded(character.publicProfile.traits) ||
+      this.isRecorded(character.publicProfile.ideals) ||
+      this.isRecorded(character.publicProfile.bonds) ||
+      this.isRecorded(character.publicProfile.flaws) ||
+      (character.publicProfile.hobbies !== undefined &&
+        this.isRecorded(character.publicProfile.hobbies))
+    );
+  }
+
   /** Returns a compact, word-safe preview while preserving the full source elsewhere. */
   profileExcerpt(value: BilingualText, maxLength = 210): string {
     const text = localizeText(value, this.lang()).trim();
@@ -228,9 +242,14 @@ export class CharacterDetailComponent {
     return `${text.slice(0, boundary > maxLength / 2 ? boundary : maxLength).trim()}…`;
   }
 
-  /** Whether a localized profile passage needs an expandable full-text treatment. */
-  isProfileExcerpted(value: BilingualText, maxLength = 210): boolean {
-    return localizeText(value, this.lang()).trim().length > maxLength;
+  /** Moves the relationship rail by one readable viewport while keeping native scrolling. */
+  scrollBondCarousel(direction: -1 | 1): void {
+    const carousel = this.bondCarousel?.nativeElement;
+    if (carousel === undefined) return;
+    carousel.scrollBy({
+      left: direction * Math.max(carousel.clientWidth * 0.82, 280),
+      behavior: 'smooth',
+    });
   }
 
   /** Formats a canonical centimetre value as metres in the selected language. */

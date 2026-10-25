@@ -84,254 +84,62 @@
       </div>
     </header>
 
-    <!-- Story profile: one connected reading path through identity, bonds and memory. -->
-    <section class="character-detail__story-profile" aria-labelledby="story-profile-heading">
-      <header class="character-detail__story-header">
-        <p class="character-detail__story-eyebrow">
-          {{ lang() === 'it' ? 'Ritratto narrativo' : 'Story profile' }}
-        </p>
-        <h2 id="story-profile-heading">
-          {{ lang() === 'it' ? 'Identità, legami e memorie' : 'Identity, bonds & memories' }}
-        </h2>
-        <p>
+    <!-- Public profile: compact identity before the longer story sections. -->
+    <section id="profile-overview" class="character-detail__section">
+      <app-accordion
+        [title]="lang() === 'it' ? 'Il personaggio in breve' : 'Character at a Glance'"
+        icon="✦"
+        [startOpen]="true"
+      >
+        <p class="character-detail__section-intro">
           {{
             lang() === 'it'
-              ? 'Chi è oggi, le persone che contano e ciò che il viaggio ha lasciato con sé.'
-              : 'Who they are now, the people who matter and what the journey has left behind.'
+              ? 'Personalità, principi, legami e fragilità: ciò che serve per riconoscerlo subito.'
+              : 'Personality, principles, bonds and vulnerabilities: what you need to recognize them at once.'
           }}
         </p>
-      </header>
-
-      <nav
-        class="character-detail__story-jump"
-        [attr.aria-label]="lang() === 'it' ? 'Parti del ritratto' : 'Story profile sections'"
-      >
-        <a [routerLink]="[]" fragment="profile-identity"
-          ><span>01</span>{{ lang() === 'it' ? 'Identità' : 'Identity' }}</a
-        >
-        <a [routerLink]="[]" fragment="profile-bonds"
-          ><span>02</span>{{ lang() === 'it' ? 'Legami' : 'Bonds' }}</a
-        >
-        <a [routerLink]="[]" fragment="profile-memories"
-          ><span>03</span>{{ lang() === 'it' ? 'Memorie' : 'Memories' }}</a
-        >
-      </nav>
-
-      <div class="character-detail__story-grid">
-        <article id="profile-identity" class="character-detail__story-card">
-          <div class="character-detail__story-card-heading">
-            <span aria-hidden="true">✦</span>
-            <div>
-              <p>{{ lang() === 'it' ? 'La bussola interiore' : 'The inner compass' }}</p>
-              <h3>{{ lang() === 'it' ? 'Identità' : 'Identity' }}</h3>
+        <div class="character-detail__profile-grid">
+          @if (isRecorded(char.publicProfile.traits)) {
+            <div class="character-detail__profile-item">
+              <h3>{{ lang() === 'it' ? 'Tratti caratteriali' : 'Personality Traits' }}</h3>
+              <p>{{ char.publicProfile.traits | bilingual }}</p>
             </div>
-          </div>
+          }
           @if (isRecorded(char.publicProfile.ideals)) {
-            <p class="character-detail__story-lead">{{ char.publicProfile.ideals | bilingual }}</p>
-          } @else if (isRecorded(char.publicProfile.traits)) {
-            <p class="character-detail__story-lead">
-              {{ profileExcerpt(char.publicProfile.traits) }}
-            </p>
-          } @else {
-            <p class="character-detail__story-empty">
-              {{
-                lang() === 'it'
-                  ? 'Un’identità ancora da raccontare.'
-                  : 'An identity yet to be told.'
-              }}
-            </p>
+            <div class="character-detail__profile-item">
+              <h3>{{ lang() === 'it' ? 'Ideali' : 'Ideals' }}</h3>
+              <p>{{ char.publicProfile.ideals | bilingual }}</p>
+            </div>
           }
-
-          <details class="character-detail__story-details">
-            <summary>
-              {{ lang() === 'it' ? 'Apri il ritratto completo' : 'Open the full portrait' }}
-            </summary>
-            <div class="character-detail__profile-grid">
-              @if (!char.loreChapters?.length && isRecorded(char.publicProfile.backstory)) {
-                <div class="character-detail__profile-item">
-                  <h4>{{ lang() === 'it' ? 'Origini' : 'Origins' }}</h4>
-                  <p>{{ char.publicProfile.backstory | bilingual }}</p>
-                </div>
-              }
-              @if (isRecorded(char.publicProfile.traits)) {
-                <div class="character-detail__profile-item">
-                  <h4>{{ lang() === 'it' ? 'Temperamento' : 'Temperament' }}</h4>
-                  <p>{{ char.publicProfile.traits | bilingual }}</p>
-                </div>
-              }
-              @if (isRecorded(char.publicProfile.flaws)) {
-                <div class="character-detail__profile-item">
-                  <h4>{{ lang() === 'it' ? 'Fragilità' : 'Vulnerabilities' }}</h4>
-                  <p>{{ char.publicProfile.flaws | bilingual }}</p>
-                </div>
-              }
-              @if (char.publicProfile.hobbies && isRecorded(char.publicProfile.hobbies)) {
-                <div class="character-detail__profile-item">
-                  <h4>{{ lang() === 'it' ? 'Abitudini e interessi' : 'Habits & interests' }}</h4>
-                  <p>{{ char.publicProfile.hobbies | bilingual }}</p>
-                </div>
-              }
-            </div>
-          </details>
-        </article>
-
-        <article id="profile-bonds" class="character-detail__story-card">
-          <div class="character-detail__story-card-heading">
-            <span aria-hidden="true">◇</span>
-            <div>
-              <p>{{ lang() === 'it' ? 'Ciò che trattiene' : 'What holds fast' }}</p>
-              <h3>{{ lang() === 'it' ? 'Legami' : 'Bonds' }}</h3>
-            </div>
-          </div>
           @if (isRecorded(char.publicProfile.bonds)) {
-            <p class="character-detail__story-lead">{{ char.publicProfile.bonds | bilingual }}</p>
-          } @else {
-            <p class="character-detail__story-empty">
-              {{
-                lang() === 'it'
-                  ? 'I legami devono ancora prendere forma.'
-                  : 'These bonds are still taking shape.'
-              }}
-            </p>
-          }
-
-          @if (profileBonds().length > 0) {
-            <ul class="character-detail__bond-list">
-              @for (bond of visibleProfileBonds(); track bond.key) {
-                <li class="character-detail__bond">
-                  <a
-                    class="character-detail__bond-person"
-                    [routerLink]="['/', campaignId() ?? '', bond.entityPath, bond.entityId]"
-                  >
-                    <img [src]="bond.avatarUrl" alt="" loading="lazy" decoding="async" />
-                    <span
-                      ><strong>{{ bond.name }}</strong
-                      ><small>{{ bond.typeLabel }}</small></span
-                    >
-                  </a>
-                  <p>{{ bond.description }}</p>
-                  <a
-                    class="character-detail__bond-link"
-                    [routerLink]="[
-                      '/',
-                      campaignId() ?? '',
-                      'relationships',
-                      bond.sourceId,
-                      bond.targetId,
-                    ]"
-                  >
-                    {{ lang() === 'it' ? 'Segui questo legame' : 'Follow this bond' }}
-                    @if (bond.sharedMemoryCount > 0) {
-                      <span>
-                        · {{ bond.sharedMemoryCount }}
-                        {{
-                          bond.sharedMemoryCount === 1
-                            ? lang() === 'it'
-                              ? 'memoria'
-                              : 'memory'
-                            : lang() === 'it'
-                              ? 'memorie'
-                              : 'memories'
-                        }}
-                      </span>
-                    }
-                  </a>
-                </li>
-              }
-            </ul>
-          }
-          <a
-            class="character-detail__story-route"
-            [routerLink]="['/', campaignId() ?? '', 'party', 'relationships']"
-          >
-            {{ lang() === 'it' ? 'Esplora tutti i legami' : 'Explore every bond' }}
-            @if (profileBonds().length > 0) {
-              <span>· {{ profileBonds().length }}</span>
-            }
-            <span aria-hidden="true">→</span>
-          </a>
-        </article>
-
-        <article id="profile-memories" class="character-detail__story-card">
-          <div class="character-detail__story-card-heading">
-            <span aria-hidden="true">❖</span>
-            <div>
-              <p>{{ lang() === 'it' ? 'Ciò che rimane' : 'What remains' }}</p>
-              <h3>{{ lang() === 'it' ? 'Memorie' : 'Memories' }}</h3>
+            <div class="character-detail__profile-item">
+              <h3>{{ lang() === 'it' ? 'Legami' : 'Bonds' }}</h3>
+              <p>{{ char.publicProfile.bonds | bilingual }}</p>
             </div>
-          </div>
-          @if (isRecorded(char.publicProfile.knownHistory)) {
-            <p class="character-detail__story-lead">
-              {{ profileExcerpt(char.publicProfile.knownHistory) }}
-            </p>
-            @if (isProfileExcerpted(char.publicProfile.knownHistory)) {
-              <details
-                class="character-detail__story-details character-detail__story-details--memory"
-              >
-                <summary>
-                  {{
-                    lang() === 'it'
-                      ? 'Leggi tutta la memoria conosciuta'
-                      : 'Read the full known memory'
-                  }}
-                </summary>
-                <p>{{ char.publicProfile.knownHistory | bilingual }}</p>
-              </details>
-            }
-          } @else {
-            <p class="character-detail__story-empty">
-              {{
-                lang() === 'it'
-                  ? 'Il viaggio non ha ancora lasciato memorie pubbliche.'
-                  : 'The journey has not left a public memory yet.'
-              }}
-            </p>
           }
-
-          @if (latestDiaryEntry(); as latestMemory) {
-            <a class="character-detail__latest-memory" [routerLink]="[]" fragment="diary">
-              <span>{{ lang() === 'it' ? 'Memoria più recente' : 'Latest memory' }}</span>
-              <strong>{{ latestMemory.title | bilingual }}</strong>
-              <small>{{ profileExcerpt(latestMemory.content, 130) }}</small>
-            </a>
+          @if (isRecorded(char.publicProfile.flaws)) {
+            <div class="character-detail__profile-item">
+              <h3>{{ lang() === 'it' ? 'Fragilità' : 'Vulnerabilities' }}</h3>
+              <p>{{ char.publicProfile.flaws | bilingual }}</p>
+            </div>
           }
-
-          <nav
-            class="character-detail__memory-paths"
-            [attr.aria-label]="lang() === 'it' ? 'Percorsi nelle memorie' : 'Memory paths'"
-          >
-            @if (char.loreChapters?.length) {
-              <a [routerLink]="[]" fragment="personal-chapters"
-                >{{ lang() === 'it' ? 'Capitoli' : 'Chapters' }}
-                <span>{{ char.loreChapters?.length }}</span></a
-              >
-            }
-            @if (char.notebook) {
-              <a [routerLink]="[]" fragment="notebook"
-                >{{ lang() === 'it' ? 'Taccuino' : 'Notebook' }}
-                <span>{{ char.notebook.pages.length }}</span></a
-              >
-            }
-            @if (char.quotes.length > 0) {
-              <a [routerLink]="[]" fragment="quotes"
-                >{{ lang() === 'it' ? 'Citazioni' : 'Quotes' }}
-                <span>{{ char.quotes.length }}</span></a
-              >
-            }
-            @if (char.diary.length > 0) {
-              <a [routerLink]="[]" fragment="diary"
-                >{{ lang() === 'it' ? 'Diario' : 'Diary' }} <span>{{ char.diary.length }}</span></a
-              >
-            }
-          </nav>
-          <a
-            class="character-detail__story-route"
-            [routerLink]="['/', campaignId() ?? '', 'campaign']"
-          >
-            {{ lang() === 'it' ? 'Continua nella cronaca →' : 'Continue in the chronicle →' }}
-          </a>
-        </article>
-      </div>
+          @if (char.publicProfile.hobbies && isRecorded(char.publicProfile.hobbies)) {
+            <div class="character-detail__profile-item character-detail__profile-item--wide">
+              <h3>{{ lang() === 'it' ? 'Abitudini e passatempi' : 'Habits & Pastimes' }}</h3>
+              <p>{{ char.publicProfile.hobbies | bilingual }}</p>
+            </div>
+          }
+        </div>
+        @if (!hasAtAGlanceProfile(char)) {
+          <p class="character-detail__profile-empty">
+            {{
+              lang() === 'it'
+                ? 'Il profilo pubblico deve ancora essere raccontato.'
+                : 'The public profile is still waiting to be told.'
+            }}
+          </p>
+        }
+      </app-accordion>
     </section>
 
     <!-- Personal lore: illustrated, public chapters before the shared adventure -->
@@ -347,6 +155,114 @@
             [characterName]="char.name"
           />
         </app-accordion>
+      </section>
+    }
+
+    <!-- Live relationships follow the personal chapters without lengthening the page vertically. -->
+    @if (profileBonds().length > 0) {
+      <section
+        id="profile-bonds"
+        class="character-detail__section character-detail__section--bonds"
+        aria-labelledby="profile-bonds-heading"
+      >
+        <header class="character-detail__bonds-header">
+          <div>
+            <p class="character-detail__section-eyebrow">
+              {{
+                lang() === 'it'
+                  ? 'Compagni, incontri, promesse'
+                  : 'Companions, encounters, promises'
+              }}
+            </p>
+            <h2 id="profile-bonds-heading">
+              {{ lang() === 'it' ? 'Legami in viaggio' : 'Bonds along the road' }}
+            </h2>
+            <p>
+              {{
+                lang() === 'it'
+                  ? 'Scorri le persone che hanno lasciato un segno nella sua storia.'
+                  : 'Browse the people who have left a mark on their story.'
+              }}
+            </p>
+          </div>
+          @if (profileBonds().length > 1) {
+            <div class="character-detail__carousel-controls">
+              <button
+                type="button"
+                (click)="scrollBondCarousel(-1)"
+                [attr.aria-label]="lang() === 'it' ? 'Legami precedenti' : 'Previous bonds'"
+                aria-controls="profile-bond-track"
+              >
+                ←
+              </button>
+              <button
+                type="button"
+                (click)="scrollBondCarousel(1)"
+                [attr.aria-label]="lang() === 'it' ? 'Legami successivi' : 'Next bonds'"
+                aria-controls="profile-bond-track"
+              >
+                →
+              </button>
+            </div>
+          }
+        </header>
+        <ul
+          #bondCarousel
+          id="profile-bond-track"
+          class="character-detail__bond-carousel"
+          tabindex="0"
+          [attr.aria-label]="lang() === 'it' ? 'Legami del personaggio' : 'Character bonds'"
+        >
+          @for (bond of profileBonds(); track bond.key) {
+            <li class="character-detail__bond">
+              <a
+                class="character-detail__bond-person"
+                [routerLink]="['/', campaignId() ?? '', bond.entityPath, bond.entityId]"
+              >
+                <img [src]="bond.avatarUrl" alt="" loading="lazy" decoding="async" />
+                <span
+                  ><strong>{{ bond.name }}</strong
+                  ><small>{{ bond.typeLabel }}</small></span
+                >
+              </a>
+              <p>{{ bond.description }}</p>
+              <a
+                class="character-detail__bond-link"
+                [routerLink]="[
+                  '/',
+                  campaignId() ?? '',
+                  'relationships',
+                  bond.sourceId,
+                  bond.targetId,
+                ]"
+              >
+                {{ lang() === 'it' ? 'Segui questo legame' : 'Follow this bond' }}
+                @if (bond.sharedMemoryCount > 0) {
+                  <span>
+                    · {{ bond.sharedMemoryCount }}
+                    {{
+                      bond.sharedMemoryCount === 1
+                        ? lang() === 'it'
+                          ? 'memoria'
+                          : 'memory'
+                        : lang() === 'it'
+                          ? 'memorie'
+                          : 'memories'
+                    }}
+                  </span>
+                }
+              </a>
+            </li>
+          }
+        </ul>
+        <a
+          class="character-detail__story-route"
+          [routerLink]="['/', campaignId() ?? '', 'party', 'relationships']"
+        >
+          {{ lang() === 'it' ? 'Apri la mappa completa' : 'Open the complete map' }}
+          <span>· {{ profileBonds().length }}</span>
+          <span aria-hidden="true">→</span>
+        </a>
       </section>
     }
 
@@ -437,6 +353,74 @@
               </blockquote>
             }
           </div>
+        </app-accordion>
+      </section>
+    }
+
+    <!-- Known history and its evidence sit together immediately before the session diary. -->
+    @if (isRecorded(char.publicProfile.knownHistory)) {
+      <section id="profile-memories" class="character-detail__section">
+        <app-accordion
+          [title]="lang() === 'it' ? 'Cosa sa il gruppo' : 'What the Party Knows'"
+          icon="📖"
+          [startOpen]="false"
+        >
+          <div class="character-detail__history-copy">
+            <p>{{ char.publicProfile.knownHistory | bilingual }}</p>
+          </div>
+          <p class="character-detail__history-sources-title">
+            {{
+              lang() === 'it'
+                ? 'Ritrova le fonti di questa storia'
+                : 'Return to the sources of this story'
+            }}
+          </p>
+          <nav
+            class="character-detail__history-links"
+            [attr.aria-label]="lang() === 'it' ? 'Riferimenti della storia' : 'Story references'"
+          >
+            @if (char.loreChapters?.length) {
+              <a [routerLink]="[]" fragment="personal-chapters">
+                <span aria-hidden="true">🧭</span>
+                {{ lang() === 'it' ? 'Capitoli personali' : 'Personal chapters' }}
+                <strong>{{ char.loreChapters?.length }}</strong>
+              </a>
+            }
+            @if (profileBonds().length > 0) {
+              <a [routerLink]="[]" fragment="profile-bonds">
+                <span aria-hidden="true">🕸️</span>
+                {{ lang() === 'it' ? 'Legami' : 'Bonds' }}
+                <strong>{{ profileBonds().length }}</strong>
+              </a>
+            }
+            @if (char.notebook) {
+              <a [routerLink]="[]" fragment="notebook">
+                <span aria-hidden="true">📓</span>
+                {{ lang() === 'it' ? 'Taccuino' : 'Notebook' }}
+                <strong>{{ char.notebook.pages.length }}</strong>
+              </a>
+            }
+            @if (char.quotes.length > 0) {
+              <a [routerLink]="[]" fragment="quotes">
+                <span aria-hidden="true">💬</span>
+                {{ lang() === 'it' ? 'Citazioni' : 'Quotes' }}
+                <strong>{{ char.quotes.length }}</strong>
+              </a>
+            }
+            <a [routerLink]="['/', campaignId() ?? '', 'campaign']">
+              <span aria-hidden="true">📜</span>
+              {{ lang() === 'it' ? 'Cronaca completa' : 'Full chronicle' }}
+            </a>
+          </nav>
+          @if (latestDiaryEntry(); as latestMemory) {
+            <a class="character-detail__latest-memory" [routerLink]="[]" fragment="diary">
+              <span>{{
+                lang() === 'it' ? 'Ultima memoria registrata' : 'Latest recorded memory'
+              }}</span>
+              <strong>{{ latestMemory.title | bilingual }}</strong>
+              <small>{{ profileExcerpt(latestMemory.content, 130) }}</small>
+            </a>
+          }
         </app-accordion>
       </section>
     }

@@ -1037,21 +1037,23 @@ rules become a demonstrated player need.
 
 **Status:** Active
 
-**Decision:** A player-character profile opens with three public pillars:
-identity, bonds and memories. The view derives its copy and links from existing
-public profile, relationship, lore, notebook, quote and diary records instead
-of storing a second summary model.
+**Decision:** A player-character profile opens with a compact at-a-glance identity,
+then progresses through personal chapters, a horizontal relationship carousel and
+a known-story section immediately before the diary. The view derives its copy and
+links from existing public profile, relationship, lore, notebook, quote and diary
+records instead of storing a second summary model.
 
 **Why:** The former accordion stack exposed every field but did not answer the
-player's first questions: who this person is, who matters to them and what the
-journey has changed. A connected narrative overview makes those answers
-scannable while preserving the deeper records as their sources.
+player's first questions, but presenting all three answers in one large opening
+surface displaced the familiar summary and repeated later sections. Progressive
+disclosure keeps identity immediate while placing bonds and memories beside the
+artifacts that give them context.
 
-**Consequences:** Relationship previews include both party and NPC connections;
-memory previews link back to their artifact; missing content receives an honest
-empty state. Protected profiles, sheets and GM notes are forbidden inputs. The
-Day 08 quick-facts task may add compact facts but cannot replace these narrative
-pillars with a statistics dashboard.
+**Consequences:** Relationship previews include both party and NPC connections in
+one scrollable rail; known history links back to its supporting artifacts; missing
+content receives an honest empty state. Protected profiles, sheets and GM notes
+are forbidden inputs. The Day 08 quick-facts task may add compact facts but cannot
+replace the opening identity summary with a statistics dashboard.
 
 **Source:** [Character story profiles](CHARACTER-STORY-PROFILES.md).
 

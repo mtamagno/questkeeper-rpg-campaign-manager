@@ -5,14 +5,15 @@
 
 ## Player outcome
 
-The profile now opens with one connected, public reading path:
+The profile now follows a progressive public reading path:
 
-1. **Identity** — the value that guides the character and an expandable portrait
-   of temperament, vulnerabilities, habits and legacy origin copy.
-2. **Bonds** — the character's written anchors plus up to four published party
-   or NPC relationships, linked to the other person and the complete map.
-3. **Memories** — known history, the latest diary memory and direct paths to
-   personal chapters, notebooks, quotes and the complete diary.
+1. **At a glance** — the familiar open summary of traits, ideals, written bonds,
+   vulnerabilities and habits immediately follows the visual hero.
+2. **Personal chapters** — illustrated origins remain the first long-form story.
+3. **Bonds along the road** — every published party or NPC relationship lives in
+   one horizontal, keyboard-scrollable carousel linked to the complete map.
+4. **Known story** — public history and its evidence links sit together near the
+   end of the profile, immediately before the session diary.
 
 This layer sits between the portrait hero and the deeper artifacts. It provides
 orientation without moving protected sheets, secrets or GM notes into the public
@@ -22,20 +23,20 @@ profile.
 
 The story profile is a derived view. It introduces no second character schema:
 
-| Surface           | Existing source                                        |
-| ----------------- | ------------------------------------------------------ |
-| Inner compass     | `publicProfile.ideals`, falling back to traits         |
-| Full portrait     | traits, flaws, hobbies and legacy backstory            |
-| Written anchors   | `publicProfile.bonds`                                  |
-| People who matter | party and NPC relationship records                     |
-| Known memory      | `publicProfile.knownHistory`                           |
-| Latest memory     | final published diary entry                            |
-| Memory paths      | lore chapters, notebook pages, quotes and diary counts |
+| Surface           | Existing source                                              |
+| ----------------- | ------------------------------------------------------------ |
+| At-a-glance copy  | traits, ideals, bonds, flaws and hobbies                     |
+| Personal chapters | lore chapters, with legacy backstory fallback in production  |
+| People who matter | party and NPC relationship records                           |
+| Known story       | `publicProfile.knownHistory`                                 |
+| Latest memory     | final published diary entry                                  |
+| Story references  | lore chapters, relationships, notebook, quotes and chronicle |
 
 Relationship cards link to both the other person's public profile and the full
-relationship record. The overview is intentionally capped at four cards while
-the route label reports the complete count. Memory previews link back to the
-artifact that supports them. Counts are navigation cues, not new facts.
+relationship record. The carousel contains the complete public set without
+growing the page vertically; the relationship map remains the canonical overview.
+Known-story references link back to the artifact that supports them. Counts are
+navigation cues, not new facts.
 
 ## Editorial rules
 
@@ -44,17 +45,16 @@ artifact that supports them. Counts are navigation cues, not new facts.
 - Do not infer affection, conflict or shared events from prose.
 - Do not summarize private profiles, character sheets or GM notes into this view.
 - Keep origin chapters, notebooks, quotes and diaries authoritative; the profile
-  only previews and connects them.
-- Long known-history copy is shortened at a word boundary, with the complete text
-  available in an accessible native disclosure.
+  only connects them.
+- Keep the first screen concise. Known history belongs with its evidence near the
+  diary, not inside the opening summary.
 
 ## Responsive and accessible behavior
 
-The three numbered jump links remain keyboard-accessible and target stable
-section landmarks. Cards reflow from three columns to the available width
-without horizontal scrolling. Native `details` elements retain full keyboard
-and assistive-technology support. Relationship portraits keep meaningful names,
-focus rings remain visible and every compact memory path has a text label.
+The relationship rail supports buttons, keyboard focus, native horizontal
+scrolling and scroll snap. Compact identity fields reflow to one column on narrow
+screens. Stable section landmarks preserve in-page references, focus rings remain
+visible and every known-story reference has a text label.
 
 ## Scope boundary
 
@@ -64,7 +64,7 @@ without turning the story profile into a stat dashboard.
 
 ## Verification
 
-`npm run test:character-profiles` checks the three public landmarks, relationship
-and diary derivation, protected-data boundary and required public profile fields
-across every campaign character. The full verification gate adds formatting,
-TypeScript, accessibility, build and performance checks.
+`npm run test:character-profiles` checks the ordered public hierarchy, relationship
+carousel and diary derivation, protected-data boundary and required public profile
+fields across every campaign character. The full verification gate adds
+formatting, TypeScript, accessibility, build and performance checks.
