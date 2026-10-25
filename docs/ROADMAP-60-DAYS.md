@@ -77,6 +77,12 @@ Both are corrective release work, not borrowed scope from a later roadmap day.
 | 13 · 30 Oct | [x] `feat: add optional protected character notebooks`                                          | [ ] `feat: connect journal entries to sessions people and places`                                  |
 | 14 · 31 Oct | [ ] `feat: generate complete fantasy character dossiers`                                        | [ ] `feat: add print share and compact game-night PDF variants`                                    |
 
+Days 09-12 are also the integrated stabilization window for
+[QuestKeeper 1.1.5 Storyforge](releases/v1.1.5-plan.md). The release plan maps
+all open 1.1.4 feedback issues onto these existing outcomes, keeps one issue per
+PR and adds a hard Thursday verification/freeze gate without borrowing the Day
+13 or Day 14 work.
+
 ## Week 3 — The party remembers together
 
 | Day         | Commit 1                                                      | Commit 2                                                               |
