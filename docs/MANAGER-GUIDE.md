@@ -55,6 +55,18 @@ Extraction creates an **editable draft** with source evidence. QuestKeeper does
 not scrape a private Roll20 sheet through your signed-in browser. Use screenshots
 for private sheets and verify names, statistics, equipment and spell choices.
 
+### Story highlights
+
+The character form includes optional lists for **Quick facts**, **Signature
+items** and **Favourite moments**. Add only small public details that help a
+player recognise the person behind the sheet. Signature items explain meaning
+rather than repeating inventory; every favourite moment must select a public
+source and provide a readable link label. IDs are generated automatically.
+
+Assisted imports follow the same form. They may propose a highlight only when
+the uploaded or shared source states it, and every proposal remains editable
+until you press **Save**.
+
 ### Optional character notebooks
 
 Every character editor includes an optional **Personal notebook** panel. Turn

@@ -98,6 +98,19 @@
               : 'Personality, principles, bonds and vulnerabilities: what you need to recognize them at once.'
           }}
         </p>
+        @if (char.publicProfile.quickFacts?.length) {
+          <dl
+            class="character-detail__quick-facts"
+            [attr.aria-label]="lang() === 'it' ? 'Fatti rapidi' : 'Quick facts'"
+          >
+            @for (fact of char.publicProfile.quickFacts; track fact.id) {
+              <div class="character-detail__quick-fact">
+                <dt>{{ fact.label | bilingual }}</dt>
+                <dd>{{ fact.value | bilingual }}</dd>
+              </div>
+            }
+          </dl>
+        }
         <div class="character-detail__profile-grid">
           @if (isRecorded(char.publicProfile.traits)) {
             <div class="character-detail__profile-item">
@@ -298,6 +311,82 @@
             <span>· {{ profileBonds().length }}</span>
             <span aria-hidden="true">→</span>
           </a>
+        </app-accordion>
+      </section>
+    }
+
+    <!-- Small story anchors: meaningful possessions and subjective, sourced memories. -->
+    @if (
+      (char.publicProfile.signatureItems?.length ?? 0) > 0 ||
+      (char.publicProfile.favouriteMoments?.length ?? 0) > 0
+    ) {
+      <section id="profile-highlights" class="character-detail__section">
+        <app-accordion
+          [title]="
+            lang() === 'it' ? 'Oggetti e momenti del cuore' : 'Keepsakes & Favourite Moments'
+          "
+          icon="✧"
+          [startOpen]="false"
+        >
+          <p class="character-detail__section-intro">
+            {{
+              lang() === 'it'
+                ? 'Piccoli dettagli scelti dal personaggio, con un rimando alla storia che li rende importanti.'
+                : 'Small details chosen by the character, with a path back to the story that made them matter.'
+            }}
+          </p>
+          <div class="character-detail__highlight-columns">
+            @if (char.publicProfile.signatureItems?.length) {
+              <section class="character-detail__highlight-group">
+                <h3>{{ lang() === 'it' ? 'Oggetti significativi' : 'Signature Items' }}</h3>
+                <div class="character-detail__highlight-list">
+                  @for (item of char.publicProfile.signatureItems; track item.id) {
+                    <article
+                      class="character-detail__highlight-card character-detail__highlight-card--item"
+                    >
+                      <span class="character-detail__highlight-mark" aria-hidden="true">✦</span>
+                      <div>
+                        <h4>{{ item.name | bilingual }}</h4>
+                        <p>{{ item.description | bilingual }}</p>
+                        @if (item.source; as source) {
+                          <a
+                            [routerLink]="storySourceRoute(source)"
+                            [fragment]="storySourceFragment(source)"
+                          >
+                            {{ source.label | bilingual }} <span aria-hidden="true">→</span>
+                          </a>
+                        }
+                      </div>
+                    </article>
+                  }
+                </div>
+              </section>
+            }
+            @if (char.publicProfile.favouriteMoments?.length) {
+              <section class="character-detail__highlight-group">
+                <h3>{{ lang() === 'it' ? 'Momenti preferiti' : 'Favourite Moments' }}</h3>
+                <div class="character-detail__highlight-list">
+                  @for (moment of char.publicProfile.favouriteMoments; track moment.id) {
+                    <article
+                      class="character-detail__highlight-card character-detail__highlight-card--moment"
+                    >
+                      <span class="character-detail__highlight-mark" aria-hidden="true">❦</span>
+                      <div>
+                        <h4>{{ moment.title | bilingual }}</h4>
+                        <p>{{ moment.summary | bilingual }}</p>
+                        <a
+                          [routerLink]="storySourceRoute(moment.source)"
+                          [fragment]="storySourceFragment(moment.source)"
+                        >
+                          {{ moment.source.label | bilingual }} <span aria-hidden="true">→</span>
+                        </a>
+                      </div>
+                    </article>
+                  }
+                </div>
+              </section>
+            }
+          </div>
         </app-accordion>
       </section>
     }

@@ -54,6 +54,64 @@
     }
   ],
   "publicProfile": {
+    "quickFacts": [
+      {
+        "id": "comfort-weather",
+        "label": { "en": "Favourite weather", "it": "Tempo preferito" },
+        "value": { "en": "Rain with a road ahead", "it": "Pioggia e una strada davanti" }
+      },
+      {
+        "id": "cannot-resist",
+        "label": { "en": "Cannot resist", "it": "Non resiste a" },
+        "value": { "en": "An honest race", "it": "Una gara leale" }
+      },
+      {
+        "id": "road-sign",
+        "label": { "en": "Known by", "it": "La riconosci da" },
+        "value": { "en": "A silver whistle", "it": "Un fischietto d'argento" }
+      }
+    ],
+    "signatureItems": [
+      {
+        "id": "red-letter-case",
+        "name": { "en": "Weatherproof red case", "it": "Custodia rossa impermeabile" },
+        "description": {
+          "en": "It holds every letter Mira could not deliver: promises delayed, never discarded.",
+          "it": "Contiene ogni lettera che Mira non è riuscita a consegnare: promesse rimandate, mai abbandonate."
+        },
+        "source": {
+          "kind": "chapter",
+          "id": "the-north-road",
+          "label": { "en": "Read The North Road", "it": "Leggi La strada del nord" }
+        }
+      },
+      {
+        "id": "silver-whistle",
+        "name": { "en": "Silver whistle", "it": "Fischietto d'argento" },
+        "description": {
+          "en": "Its clear note reaches an inn door before Mira does and tells old friends that the road held.",
+          "it": "La sua nota limpida raggiunge la porta della locanda prima di Mira e annuncia ai vecchi amici che la strada ha retto."
+        }
+      }
+    ],
+    "favouriteMoments": [
+      {
+        "id": "door-opened-in-the-rain",
+        "title": {
+          "en": "The door that opened in the rain",
+          "it": "La porta aperta sotto la pioggia"
+        },
+        "summary": {
+          "en": "After miles of washed-out road, an isolated innkeeper heard the whistle and opened the door before the message was even raised.",
+          "it": "Dopo miglia di strada franata, un locandiere isolato sentì il fischietto e aprì la porta prima ancora che il messaggio venisse sollevato."
+        },
+        "source": {
+          "kind": "chapter",
+          "id": "the-north-road",
+          "label": { "en": "Return to The North Road", "it": "Torna a La strada del nord" }
+        }
+      }
+    ],
     "backstory": {
       "en": "Mira carried messages between isolated valley towns, racing storms and washed-out roads. She joined Aria after delivering a letter written in ink that had not dried in a century.",
       "it": "Mira trasportava messaggi tra i villaggi isolati della valle, sfidando tempeste e strade franate. Si è unita ad Aria dopo aver consegnato una lettera scritta con inchiostro che non si asciugava da un secolo."

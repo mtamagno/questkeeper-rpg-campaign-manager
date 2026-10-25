@@ -31,6 +31,40 @@ export interface CharacterLoreChapter {
   readonly image?: CharacterLoreImage;
 }
 
+/** Public artifact that can substantiate a character memory without duplicating it. */
+export type CharacterStorySourceKind = 'chapter' | 'notebook' | 'diary' | 'quote' | 'chronicle';
+
+export interface CharacterStoryReference {
+  readonly kind: CharacterStorySourceKind;
+  /** Chapter/page/session/story ID when a more precise source is available. */
+  readonly id?: string;
+  /** Human-readable source label; the route remains derived from `kind`. */
+  readonly label: BilingualText;
+}
+
+/** A compact, non-mechanical fact that helps recognise a character quickly. */
+export interface CharacterQuickFact {
+  readonly id: string;
+  readonly label: BilingualText;
+  readonly value: BilingualText;
+}
+
+/** A meaningful possession described as part of the character's story, not inventory state. */
+export interface CharacterSignatureItem {
+  readonly id: string;
+  readonly name: BilingualText;
+  readonly description: BilingualText;
+  readonly source?: CharacterStoryReference;
+}
+
+/** A character-owned recollection linked back to a published public source. */
+export interface CharacterFavouriteMoment {
+  readonly id: string;
+  readonly title: BilingualText;
+  readonly summary: BilingualText;
+  readonly source: CharacterStoryReference;
+}
+
 /** Public profile — lore the party knows about this character. */
 export interface CharacterPublicProfile {
   readonly backstory: BilingualText;
@@ -41,6 +75,12 @@ export interface CharacterPublicProfile {
   readonly knownHistory: BilingualText;
   /** Everyday interests, comforts and habits established during play. */
   readonly hobbies?: BilingualText;
+  /** Short authored facts for the compact opening profile. */
+  readonly quickFacts?: ReadonlyArray<CharacterQuickFact>;
+  /** Story-significant possessions; never inferred from the mechanical inventory. */
+  readonly signatureItems?: ReadonlyArray<CharacterSignatureItem>;
+  /** Subjective favourite memories with an explicit public evidence link. */
+  readonly favouriteMoments?: ReadonlyArray<CharacterFavouriteMoment>;
 }
 
 /** Private profile — secrets only the player and DM know. */

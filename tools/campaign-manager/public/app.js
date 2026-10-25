@@ -636,6 +636,80 @@ function notebookEditor(item = {}, languages = campaignLanguages()) {
   </section>`;
 }
 
+const STORY_SOURCE_KINDS = [
+  ['none', 'No linked source'],
+  ['chapter', 'Personal chapter'],
+  ['notebook', 'Notebook'],
+  ['diary', 'Session diary'],
+  ['quote', 'Character quote'],
+  ['chronicle', 'Campaign chronicle'],
+];
+
+function storyLocalizedFields(prefix, label, value, languages, options = {}) {
+  return languages
+    .map((language) =>
+      field(
+        `story__${prefix}__${language}`,
+        `${label} Â· ${languageName(language)} (${language})`,
+        localized(value, language),
+        options,
+      ),
+    )
+    .join('');
+}
+
+function storyHighlightCard(kind, item = {}, languages = campaignLanguages(), index = 0) {
+  const source = item.source ?? {};
+  const definitions = {
+    quickFacts: {
+      title: `Quick fact ${index + 1}`,
+      fields: `${storyLocalizedFields('label', 'Label', item.label, languages)}${storyLocalizedFields('value', 'Value', item.value, languages)}`,
+    },
+    signatureItems: {
+      title: `Signature item ${index + 1}`,
+      fields: `${storyLocalizedFields('name', 'Item name', item.name, languages)}${storyLocalizedFields('description', 'Why it matters', item.description, languages, { type: 'textarea', wide: true })}${field('storySourceKind', 'Public story source', source.kind ?? 'none', { type: 'select', values: STORY_SOURCE_KINDS })}${field('storySourceId', 'Source ID', source.id ?? '', { hint: 'Optional chapter, notebook page, session or chronicle ID.' })}${storyLocalizedFields('sourceLabel', 'Source link label', source.label, languages)}`,
+    },
+    favouriteMoments: {
+      title: `Favourite moment ${index + 1}`,
+      fields: `${storyLocalizedFields('title', 'Moment title', item.title, languages)}${storyLocalizedFields('summary', 'Why it matters', item.summary, languages, { type: 'textarea', wide: true })}${field('storySourceKind', 'Public story source', source.kind ?? 'diary', { type: 'select', values: STORY_SOURCE_KINDS.filter(([value]) => value !== 'none') })}${field('storySourceId', 'Source ID', source.id ?? '', { hint: 'Optional chapter, notebook page, session or chronicle ID.' })}${storyLocalizedFields('sourceLabel', 'Source link label', source.label, languages)}`,
+    },
+  };
+  const definition = definitions[kind];
+  return `<article class="story-highlight-card" data-story-card data-story-kind="${kind}">
+    <div class="story-highlight-card__header"><strong>${definition.title}</strong><button class="quiet-button" type="button" data-story-remove>Remove</button></div>
+    <input type="hidden" name="storyId" value="${escapeHtml(item.id || '')}" />
+    <div class="form-grid">${definition.fields}</div>
+  </article>`;
+}
+
+function storyHighlightsEditor(item = {}, languages = campaignLanguages()) {
+  const profile = item.publicProfile ?? {};
+  const groups = [
+    ['quickFacts', 'Quick facts', 'Short non-mechanical details for the profile opening.'],
+    [
+      'signatureItems',
+      'Signature items',
+      'Meaningful possessions, separate from mechanical inventory.',
+    ],
+    [
+      'favouriteMoments',
+      'Favourite moments',
+      'Subjective memories that always point to a public source.',
+    ],
+  ];
+  return `<section class="story-highlights-editor field--wide" data-story-highlights-editor>
+    <div class="story-highlights-editor__intro"><strong>Story highlights</strong><small>Optional details that make the public profile personal without turning it into a statistics dashboard.</small></div>
+    ${groups
+      .map(
+        ([kind, title, hint]) => `<section class="story-highlight-group">
+          <div class="story-highlight-group__header"><div><strong>${title}</strong><small>${hint}</small></div><button class="secondary-button" type="button" data-story-add="${kind}">Add</button></div>
+          <div class="story-highlight-list" data-story-list="${kind}">${(profile[kind] ?? []).map((entry, index) => storyHighlightCard(kind, entry, languages, index)).join('')}</div>
+        </section>`,
+      )
+      .join('')}
+  </section>`;
+}
+
 function entityAiImportPanel(type, languages) {
   const label = type === 'characters' ? 'player character' : 'NPC';
   return `<div class="ai-compose entity-ai-import field--wide"><div><strong>Import this ${label} with AI</strong><small>Use photos or screenshots of a sheet, or a public/shared Roll20 print-view URL. Every extracted field stays editable.</small></div><div class="ai-source-grid">${engineSelect('entityEngine', 'Extraction model', 'extraction', 'Only configured models with structured output and vision appear here. Public URL access also requires web capability.')}<label class="field"><span>Draft language</span><select name="entityLanguage">${languages.map((language) => `<option value="${escapeHtml(language)}">${escapeHtml(languageName(language))} (${escapeHtml(language)})</option>`).join('')}</select></label><label class="field field--wide"><span>Sheet photos or screenshots</span><input name="aiSourceImages" type="file" accept="image/png,image/jpeg,image/webp" multiple /><small>Up to four images. Private/authenticated Roll20 sheets should be imported this way.</small></label><label class="field field--wide"><span>Public Roll20 print view or source URL</span><input name="aiSourceUrl" type="url" placeholder="https://app.roll20.net/…" /><small>Optional. Signed-in pages cannot be read remotely; use screenshots instead.</small></label></div><label class="consent-check"><input name="entityRemoteConsent" type="checkbox" /> I consent to sending these sources to the selected engine when it is labelled <strong>Remote</strong>.</label><div class="action-row"><button class="primary-button" type="button" data-ai-entity="${type}">Extract editable draft</button></div><div class="ai-review" data-ai-entity-review hidden></div></div>`;
@@ -971,6 +1045,8 @@ function entityForm(type, item = {}) {
           type: 'textarea',
         },
       ),
+      section('Story highlights'),
+      storyHighlightsEditor(item, languages),
       section('Personal notebook'),
       notebookEditor(item, languages),
       section('Private notes'),
@@ -1357,6 +1433,76 @@ async function buildNotebook(original = {}) {
   return notebook;
 }
 
+function storyLocalizedValue(card, prefix, languages) {
+  return Object.fromEntries(
+    languages.map((language) => [
+      language,
+      card.querySelector(`[name="story__${prefix}__${CSS.escape(language)}"]`)?.value.trim() || '',
+    ]),
+  );
+}
+
+function buildStoryHighlights() {
+  const editor = fields.querySelector('[data-story-highlights-editor]');
+  const languages = campaignLanguages();
+  const result = { quickFacts: [], signatureItems: [], favouriteMoments: [] };
+  const usedIds = new Set();
+  for (const [index, card] of [
+    ...(editor?.querySelectorAll('[data-story-card]') ?? []),
+  ].entries()) {
+    const kind = card.dataset.storyKind;
+    const identityPrefix =
+      kind === 'quickFacts' ? 'label' : kind === 'signatureItems' ? 'name' : 'title';
+    const identity = storyLocalizedValue(card, identityPrefix, languages);
+    const hasIdentity = Object.values(identity).some(Boolean);
+    if (!hasIdentity) continue;
+    const requestedId = card.querySelector('[name="storyId"]')?.value.trim();
+    const baseId =
+      requestedId || slugify(Object.values(identity).find(Boolean)) || `highlight-${index + 1}`;
+    let id = baseId;
+    for (let suffix = 2; usedIds.has(id); suffix += 1) id = `${baseId}-${suffix}`;
+    usedIds.add(id);
+    if (kind === 'quickFacts') {
+      result.quickFacts.push({
+        id,
+        label: identity,
+        value: storyLocalizedValue(card, 'value', languages),
+      });
+      continue;
+    }
+    const sourceKind = card.querySelector('[name="storySourceKind"]')?.value || 'none';
+    const sourceId = card.querySelector('[name="storySourceId"]')?.value.trim();
+    const sourceLabel = storyLocalizedValue(card, 'sourceLabel', languages);
+    const source =
+      sourceKind === 'none'
+        ? undefined
+        : {
+            kind: sourceKind,
+            ...(sourceId ? { id: sourceId } : {}),
+            label: sourceLabel,
+          };
+    if (kind === 'signatureItems') {
+      result.signatureItems.push({
+        id,
+        name: identity,
+        description: storyLocalizedValue(card, 'description', languages),
+        ...(source ? { source } : {}),
+      });
+      continue;
+    }
+    if (!source || !Object.values(source.label).some(Boolean)) {
+      throw new Error('Every favourite moment needs a public source and link label.');
+    }
+    result.favouriteMoments.push({
+      id,
+      title: identity,
+      summary: storyLocalizedValue(card, 'summary', languages),
+      source,
+    });
+  }
+  return result;
+}
+
 async function buildEntity(type, form, original = {}) {
   const id = form.get('id')?.toString() || original.id || '';
   const languages = campaignLanguages();
@@ -1396,6 +1542,11 @@ async function buildEntity(type, form, original = {}) {
       knownHistory: localizedFormValue(form, 'known', '', languages),
       hobbies: localizedFormValue(form, 'hobbies', '', languages),
     };
+    const storyHighlights = buildStoryHighlights();
+    for (const key of ['quickFacts', 'signatureItems', 'favouriteMoments']) {
+      if (storyHighlights[key].length) item.publicProfile[key] = storyHighlights[key];
+      else delete item.publicProfile[key];
+    }
     item.privateProfile = {
       ...item.privateProfile,
       secretBackstory: localizedFormValue(form, 'secret', '', languages),
@@ -1861,6 +2012,47 @@ async function processEntityImport(type) {
     for (const [prefix, value] of Object.entries(localizedValues))
       setFormValue(`loc__${prefix}__${language}`, value);
     if (type === 'characters') {
+      const localizedDraft = (value) => ({ [language]: value || '' });
+      const storyEditor = fields.querySelector('[data-story-highlights-editor]');
+      if (storyEditor) {
+        storyEditor.outerHTML = storyHighlightsEditor(
+          {
+            publicProfile: {
+              quickFacts: (draft.quickFacts ?? []).map((entry) => ({
+                id: '',
+                label: localizedDraft(entry.label),
+                value: localizedDraft(entry.value),
+              })),
+              signatureItems: (draft.signatureItems ?? []).map((entry) => ({
+                id: '',
+                name: localizedDraft(entry.name),
+                description: localizedDraft(entry.description),
+                ...(entry.sourceKind && entry.sourceKind !== 'none'
+                  ? {
+                      source: {
+                        kind: entry.sourceKind,
+                        ...(entry.sourceId ? { id: entry.sourceId } : {}),
+                        label: localizedDraft(entry.sourceLabel),
+                      },
+                    }
+                  : {}),
+              })),
+              favouriteMoments: (draft.favouriteMoments ?? []).map((entry) => ({
+                id: '',
+                title: localizedDraft(entry.title),
+                summary: localizedDraft(entry.summary),
+                source: {
+                  kind: entry.sourceKind || 'diary',
+                  ...(entry.sourceId ? { id: entry.sourceId } : {}),
+                  label: localizedDraft(entry.sourceLabel),
+                },
+              })),
+            },
+          },
+          campaignLanguages(),
+        );
+        window.managerI18n?.translateTree?.(fields.querySelector('[data-story-highlights-editor]'));
+      }
       for (const [ability, value] of Object.entries(draft.abilityScores ?? {}))
         setFormValue(`ability__${ability}`, value || 10);
       for (const key of ['savingThrows', 'skills', 'languages', 'equipment', 'features'])
@@ -2381,6 +2573,21 @@ content.addEventListener('submit', (event) => {
 });
 
 fields.addEventListener('click', (event) => {
+  const addStoryHighlight = event.target.closest('[data-story-add]');
+  if (addStoryHighlight) {
+    const kind = addStoryHighlight.dataset.storyAdd;
+    const list = fields.querySelector(`[data-story-list="${kind}"]`);
+    const index = list?.querySelectorAll('[data-story-card]').length ?? 0;
+    list?.insertAdjacentHTML('beforeend', storyHighlightCard(kind, {}, campaignLanguages(), index));
+    window.managerI18n?.translateTree?.(list?.lastElementChild);
+    list?.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+  const removeStoryHighlight = event.target.closest('[data-story-remove]');
+  if (removeStoryHighlight) {
+    removeStoryHighlight.closest('[data-story-card]')?.remove();
+    return;
+  }
   const addNotebookPage = event.target.closest('[data-notebook-add-page]');
   if (addNotebookPage) {
     const list = fields.querySelector('[data-notebook-pages]');

@@ -1091,6 +1091,32 @@ Missing feelings or uncertain links remain missing instead of being invented.
 layers or players need to compare how the perceived relationship changed over
 time.
 
+### QK-040 — Story highlights are authored, subjective and evidence-linked
+
+**Date:** 25 October 2026
+
+**Status:** Active
+
+**Decision:** Character profiles may add optional quick facts, signature items
+and favourite moments. These are public authored records with stable IDs;
+favourite moments always cite a typed public story source, while signature items
+remain distinct from mechanical inventory.
+
+**Why:** Small personal details make profiles worth revisiting, but deriving them
+from statistics, equipment or dramatic events would turn interpretation into
+false canon and repeat information already owned elsewhere.
+
+**Consequences:** Quick facts remain inside the compact opening; items and moments
+share one closable section. Manager and assisted import use the same editable
+contract, and AI cannot infer preference or story significance. Day 12 equipment
+storytelling and Day 17 party memories must extend these IDs and evidence links
+rather than introduce competing fields.
+
+**Source:** [Character story highlights](CHARACTER-STORY-HIGHLIGHTS.md).
+
+**Revisit when:** Players need private favourites, per-player disagreement or a
+campaign-wide memory curation workflow.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD

@@ -968,6 +968,48 @@ button:disabled {
 .notebook-ai {
   margin-top: 0.4rem;
 }
+.story-highlights-editor {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid rgba(214, 182, 111, 0.28);
+  border-radius: 14px;
+  background: linear-gradient(145deg, rgba(65, 47, 30, 0.24), rgba(8, 14, 13, 0.68));
+}
+.story-highlights-editor__intro,
+.story-highlight-group__header > div {
+  display: grid;
+  gap: 0.25rem;
+}
+.story-highlights-editor small,
+.story-highlight-group small {
+  color: var(--muted);
+}
+.story-highlight-group {
+  display: grid;
+  gap: 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+}
+.story-highlight-group__header,
+.story-highlight-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.story-highlight-list {
+  display: grid;
+  gap: 0.75rem;
+}
+.story-highlight-card {
+  display: grid;
+  gap: 0.8rem;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(6, 10, 9, 0.36);
+}
 .ai-compose > div:first-child {
   display: grid;
   gap: 0.25rem;
@@ -1246,7 +1288,8 @@ code {
     grid-template-columns: 1fr;
   }
   .notebook-editor__header,
-  .notebook-pages-heading {
+  .notebook-pages-heading,
+  .story-highlight-group__header {
     align-items: flex-start;
     flex-direction: column;
   }

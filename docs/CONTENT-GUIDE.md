@@ -102,6 +102,11 @@ Each character JSON contains:
   It has localized title and description, optional 2:3 front/back covers,
   ordered 3:2 interior spreads, and `styleDirectives` describing this specific
   owner's medium, palette, handwriting, symbols and emotional variation;
+- optional public-profile `quickFacts`, `signatureItems` and `favouriteMoments`.
+  Every entry has a stable ID and localized copy. Signature items describe story
+  meaning rather than inventory state; favourite moments require a typed public
+  source (`chapter`, `notebook`, `diary`, `quote` or `chronicle`) and localized
+  link label;
 - separate square `profileImageUrl` and 2:3 `portraitImageUrl` artwork (the
   manager accepts both independently), plus a temporary spoiler password.
 
@@ -111,6 +116,12 @@ background into a visual sequence instead of repeating that summary as one
 large block. Keep secrets, unrevealed motives and GM-only facts in
 `privateProfile`; image content, alt text and captions in public chapters must
 not reveal them.
+
+Story highlights are optional. Omit empty collections. Do not infer them from
+statistics or equipment, and do not label an event as a favourite unless the
+character's writing, dialogue or player explicitly supports that preference.
+See [Character story highlights](CHARACTER-STORY-HIGHLIGHTS.md) for the full
+source and review contract.
 
 ```json
 {

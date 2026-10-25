@@ -19,7 +19,11 @@ import { map } from 'rxjs';
 
 import { DataService } from '@guild/services/data.service';
 import { CampaignService } from '@guild/services/campaign.service';
-import { DEFAULT_CHARACTER_PASSWORD, type Character } from '@guild/models/character.model';
+import {
+  DEFAULT_CHARACTER_PASSWORD,
+  type Character,
+  type CharacterStoryReference,
+} from '@guild/models/character.model';
 import { localizeText, type BilingualText } from '@guild/models/language.model';
 import { RELATIONSHIP_TYPE_LABELS } from '@guild/models/relationship.model';
 import { toDisplayUrl } from '@guild/services/imageUrl.service';
@@ -252,6 +256,27 @@ export class CharacterDetailComponent {
     if (text.length <= maxLength) return text;
     const boundary = text.lastIndexOf(' ', maxLength);
     return `${text.slice(0, boundary > maxLength / 2 ? boundary : maxLength).trim()}…`;
+  }
+
+  /** Keeps story-source routing derived and safe instead of accepting arbitrary authored URLs. */
+  storySourceRoute(source: CharacterStoryReference): ReadonlyArray<string> {
+    if (source.kind === 'chronicle') {
+      return source.id
+        ? ['/', this.campaignId() ?? '', 'campaign', 'story', source.id]
+        : ['/', this.campaignId() ?? '', 'campaign'];
+    }
+    return [];
+  }
+
+  /** Maps a public story source to its existing in-profile landmark. */
+  storySourceFragment(source: CharacterStoryReference): string | undefined {
+    const fragments: Partial<Record<CharacterStoryReference['kind'], string>> = {
+      chapter: 'personal-chapters',
+      notebook: 'notebook',
+      diary: 'diary',
+      quote: 'quotes',
+    };
+    return fragments[source.kind];
   }
 
   /** Moves the relationship rail by one readable viewport while keeping native scrolling. */

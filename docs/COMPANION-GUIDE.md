@@ -28,7 +28,8 @@ Every campaign can include:
 
 - **Overview:** premise, current state, latest memories and party entry points.
 - **Party:** public character profiles, portraits, biography, personality,
-  hobbies and personal lore chapters.
+  hobbies, quick facts, meaningful objects, favourite moments and personal lore
+  chapters.
 - **Private sheet:** password-protected statistics, equipment, currency,
   features and prepared spells, including links to descriptions where supplied.
 - **Progression:** previous level snapshots and a fantasy-styled PDF export.

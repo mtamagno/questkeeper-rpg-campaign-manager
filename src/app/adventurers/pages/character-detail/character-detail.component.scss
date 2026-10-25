@@ -533,6 +533,123 @@
     gap: $spacing-lg;
   }
 
+  &__quick-facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-sm;
+    margin: 0 0 $spacing-xl;
+  }
+
+  &__quick-fact {
+    min-width: min(100%, 170px);
+    padding: $spacing-sm $spacing-md;
+    border: $border-width-thin solid $color-border-default;
+    border-radius: $border-radius-pill;
+    background: rgba($color-bg-void, 0.24);
+
+    dt {
+      color: $color-text-muted;
+      font-family: $font-family-heading;
+      font-size: $font-size-xs;
+      letter-spacing: $letter-spacing-wide;
+      text-transform: uppercase;
+    }
+
+    dd {
+      margin: $spacing-2xs 0 0;
+      color: $color-parchment-light;
+      line-height: $line-height-base;
+    }
+  }
+
+  &__highlight-columns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: $spacing-xl;
+
+    @include respond-below(md) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__highlight-group {
+    min-width: 0;
+
+    > h3 {
+      margin: 0 0 $spacing-md;
+      color: $color-gold;
+      font-family: $font-family-heading;
+      font-size: $font-size-sm;
+      letter-spacing: $letter-spacing-wide;
+      text-transform: uppercase;
+    }
+  }
+
+  &__highlight-list {
+    display: grid;
+    gap: $spacing-sm;
+  }
+
+  &__highlight-card {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: $spacing-md;
+    padding: $spacing-md;
+    border: $border-width-thin solid $color-border-default;
+    border-radius: $border-radius-md;
+    background: rgba($color-bg-void, 0.22);
+
+    h4 {
+      margin: 0;
+      color: $color-parchment-light;
+      font-family: $font-family-heading;
+      font-size: $font-size-md;
+    }
+
+    p {
+      margin: $spacing-xs 0 0;
+      color: $color-text-secondary;
+      line-height: $line-height-relaxed;
+    }
+
+    a {
+      display: inline-flex;
+      gap: $spacing-xs;
+      margin-top: $spacing-sm;
+      color: $color-text-link;
+      font-family: $font-family-heading;
+      font-size: $font-size-sm;
+      text-decoration: none;
+
+      &:hover {
+        color: $color-text-link-hover;
+      }
+
+      &:focus-visible {
+        outline: 2px solid $color-gold-light;
+        outline-offset: 3px;
+      }
+    }
+
+    &--moment {
+      border-color: rgba($color-gold-dark, 0.52);
+      background:
+        radial-gradient(circle at 100% 0%, rgba($color-gold-dark, 0.13), transparent 46%),
+        rgba($color-bg-void, 0.22);
+    }
+  }
+
+  &__highlight-mark {
+    display: grid;
+    width: 2rem;
+    height: 2rem;
+    place-items: center;
+    border: $border-width-thin solid $color-border-accent;
+    border-radius: 50%;
+    color: $color-gold-light;
+    background: rgba($color-gold-dark, 0.12);
+  }
+
   &__profile-empty {
     margin: 0;
     padding: $spacing-lg;

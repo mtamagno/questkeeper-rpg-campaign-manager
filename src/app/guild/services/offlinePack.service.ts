@@ -77,6 +77,37 @@ function publicCharacterSnapshot(character: Character): OfflineCharacterSnapshot
       ...(character.publicProfile.hobbies === undefined
         ? {}
         : { hobbies: { ...character.publicProfile.hobbies } }),
+      ...(character.publicProfile.quickFacts === undefined
+        ? {}
+        : {
+            quickFacts: character.publicProfile.quickFacts.map((fact) => ({
+              ...fact,
+              label: { ...fact.label },
+              value: { ...fact.value },
+            })),
+          }),
+      ...(character.publicProfile.signatureItems === undefined
+        ? {}
+        : {
+            signatureItems: character.publicProfile.signatureItems.map((item) => ({
+              ...item,
+              name: { ...item.name },
+              description: { ...item.description },
+              ...(item.source === undefined
+                ? {}
+                : { source: { ...item.source, label: { ...item.source.label } } }),
+            })),
+          }),
+      ...(character.publicProfile.favouriteMoments === undefined
+        ? {}
+        : {
+            favouriteMoments: character.publicProfile.favouriteMoments.map((moment) => ({
+              ...moment,
+              title: { ...moment.title },
+              summary: { ...moment.summary },
+              source: { ...moment.source, label: { ...moment.source.label } },
+            })),
+          }),
     },
   };
 }

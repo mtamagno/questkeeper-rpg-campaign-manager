@@ -63,9 +63,10 @@ visible and every known-story reference has a text label.
 
 ## Scope boundary
 
-This task does not add the Day 08 quick-facts, signature-item or favourite-moment
-schema. Those belong to the second scheduled task and must extend this hierarchy
-without turning the story profile into a stat dashboard.
+The second Day 08 task now extends this hierarchy with optional
+[story highlights](CHARACTER-STORY-HIGHLIGHTS.md): quick facts remain compact,
+while sourced items and favourite moments sit in a closable section instead of
+turning the opening profile into a statistics dashboard.
 
 ## Verification
 
