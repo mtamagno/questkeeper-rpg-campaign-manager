@@ -8,6 +8,8 @@ import { normalizeProviderModels, REMOTE_PROVIDER_REGISTRY } from './ai-provider
 
 const execFileAsync = promisify(execFile);
 
+export const AI_SETUP_STATES = Object.freeze(['unseen', 'deferred', 'manual', 'draft', 'complete']);
+
 export const TEXT_MODELS = Object.freeze([
   {
     id: 'qwen3:1.7b',
@@ -60,6 +62,7 @@ export const IMAGE_MODELS = Object.freeze([
 ]);
 
 const DEFAULT_CONFIG = Object.freeze({
+  setupState: 'unseen',
   setupComplete: false,
   roles: {
     prose: { provider: 'off', model: '' },
@@ -148,7 +151,17 @@ function roleSelection(value, fallback) {
   };
 }
 
+export function normalizeAiSetupState(input = {}, previous = {}) {
+  if (AI_SETUP_STATES.includes(input.setupState)) return input.setupState;
+  if (input.setupComplete === true) return 'complete';
+  if (AI_SETUP_STATES.includes(previous.setupState) && input.setupComplete === undefined) {
+    return previous.setupState;
+  }
+  return 'unseen';
+}
+
 export function normalizeAiConfig(input = {}, previous = cloneDefaults()) {
+  const setupState = normalizeAiSetupState(input, previous);
   const textProvider = ['off', 'ollama', 'openai'].includes(input.text?.provider)
     ? input.text.provider
     : 'off';
@@ -230,7 +243,8 @@ export function normalizeAiConfig(input = {}, previous = cloneDefaults()) {
     ? legacyImage
     : (previous.roles?.image ?? legacyImage);
   return {
-    setupComplete: Boolean(input.setupComplete),
+    setupState,
+    setupComplete: setupState === 'complete',
     roles: {
       prose: roleSelection(input.roles?.prose, textRoleFallback),
       extraction: roleSelection(input.roles?.extraction, extractionRoleFallback),
@@ -292,6 +306,28 @@ export async function writeAiConfig(projectRoot, input) {
   await mkdir(dirname(path), { recursive: true });
   await writeFile(path, `${JSON.stringify(config, null, 2)}\n`, { mode: 0o600 });
   return config;
+}
+
+export async function writeAiSetupState(projectRoot, setupState) {
+  if (!AI_SETUP_STATES.includes(setupState)) throw new Error('Unknown AI setup state.');
+  const previous = await readAiConfig(projectRoot);
+  const roles =
+    setupState === 'manual'
+      ? Object.fromEntries(
+          Object.keys(previous.roles).map((role) => [role, { provider: 'off', model: '' }]),
+        )
+      : previous.roles;
+  return writeAiConfig(projectRoot, {
+    ...previous,
+    setupState,
+    setupComplete: setupState === 'complete',
+    roles,
+    text: { ...previous.text, provider: setupState === 'manual' ? 'off' : previous.text.provider },
+    image: {
+      ...previous.image,
+      provider: setupState === 'manual' ? 'off' : previous.image.provider,
+    },
+  });
 }
 
 export function publicAiConfig(config) {

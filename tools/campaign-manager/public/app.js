@@ -30,6 +30,8 @@ const state = {
   projectMode: false,
   scribeMode: false,
   aiMode: false,
+  aiConfigureExpanded: false,
+  firstRunEvaluated: false,
   advancedMode: localStorage.getItem('questkeeper-manager-advanced') === 'true',
   myCharacters: readMyCharacters(),
   project: {
@@ -141,7 +143,7 @@ function setMenuOpen(open) {
   mobileMenu.setAttribute('aria-expanded', String(open));
 }
 
-async function loadState({ selectFirst = false } = {}) {
+async function loadState({ selectFirst = false, allowFirstRunPrompt = false } = {}) {
   const result = await api('/api/state');
   state.campaigns = result.campaigns;
   state.project = {
@@ -158,7 +160,13 @@ async function loadState({ selectFirst = false } = {}) {
     state.selectedId = result.campaigns[0].id;
     state.campaign = await api(`/api/campaigns/${encodeURIComponent(state.selectedId)}`);
   }
-  if (!result.ai?.config?.setupComplete) state.aiMode = true;
+  if (allowFirstRunPrompt && !state.firstRunEvaluated) {
+    state.firstRunEvaluated = true;
+    if ((result.ai?.config?.setupState ?? 'unseen') === 'unseen') {
+      state.aiMode = true;
+      state.aiConfigureExpanded = false;
+    }
+  }
   renderSidebar();
   render();
 }
@@ -192,6 +200,28 @@ function renderSidebar() {
         )
         .join('')
     : '<div class="empty">No campaigns found.</div>';
+  renderAiSetupNavigation();
+}
+
+function renderAiSetupNavigation() {
+  const button = document.querySelector('#show-ai-setup');
+  const status = document.querySelector('#ai-setup-state');
+  if (!button || !status) return;
+  const setupState = state.project.ai?.config?.setupState ?? 'unseen';
+  const hasError = Object.entries(state.project.jobs ?? {}).some(
+    ([kind, job]) => kind.startsWith('ai-') && job?.status === 'failed',
+  );
+  const labels = {
+    unseen: 'Choose setup',
+    deferred: 'Remind me later',
+    manual: 'Manual mode',
+    draft: 'Draft saved',
+    complete: 'Ready',
+  };
+  status.textContent = hasError ? 'Needs attention' : (labels[setupState] ?? labels.unseen);
+  button.dataset.setupState = hasError ? 'error' : setupState;
+  button.classList.toggle('is-incomplete', setupState !== 'complete');
+  button.classList.toggle('is-error', hasError);
 }
 
 function renderCompanionAction() {
@@ -1774,6 +1804,19 @@ function remoteProviderCard(provider, saved) {
   return `<section class="project-panel ai-provider-card"><span class="eyebrow">Remote provider · ${escapeHtml(provider.transport)}</span><h3>${escapeHtml(provider.label)}</h3><p>Register only models and capabilities verified for your account. Unknown capabilities remain unavailable to task selectors.</p><label class="field"><span>API base URL</span><input name="${prefix}baseUrl" type="url" value="${escapeHtml(saved.baseUrl)}" /></label><label class="field"><span>API key</span><input name="${prefix}apiKey" type="password" autocomplete="off" placeholder="${saved.keyConfigured ? 'Saved locally · leave blank to keep it' : 'Paste a provider key'}" /></label><label class="consent-check"><input name="${prefix}removeApiKey" type="checkbox" /> Remove the saved key</label><label class="field"><span>Model catalog and capabilities</span><textarea name="${prefix}models">${escapeHtml(providerModelLines(saved.models))}</textarea><small>One per line: <code>model-id | text,structured-output,vision,image-prompt,image-generation,web</code>.</small></label><div class="provider-help"><a href="${escapeHtml(provider.docsUrl)}" target="_blank" rel="noreferrer">API docs ↗</a><a href="${escapeHtml(provider.privacyUrl)}" target="_blank" rel="noreferrer">Privacy ↗</a><a href="${escapeHtml(provider.pricingUrl)}" target="_blank" rel="noreferrer">Pricing ↗</a></div><div class="action-row"><button class="secondary-button" type="button" data-ai-action="discover-provider" data-provider="${escapeHtml(provider.id)}">Discover models</button><button class="secondary-button" type="button" data-ai-action="test-provider" data-provider="${escapeHtml(provider.id)}">Test provider</button></div></section>`;
 }
 
+function renderAiFirstRunChoice() {
+  document.querySelector('#page-title').textContent = 'Choose how you create';
+  content.innerHTML = `
+    <div class="ai-onboarding">
+      <section class="ai-hero"><div class="ai-hero__sigil" aria-hidden="true">✧</div><div><span class="eyebrow">Optional tools, never a gate</span><h2>How should QuestKeeper help?</h2><p>Campaigns, characters and sessions always work by hand. Choose AI now, keep everything manual, or decide another day.</p></div></section>
+      <div class="choice-grid ai-onboarding__choices">
+        <section class="project-panel"><span class="eyebrow">Guided setup</span><h3>Configure now</h3><p>Choose local or remote providers and a model for each task. Nothing runs or leaves this computer without your action.</p><button class="primary-button" type="button" data-ai-onboarding="configure">Configure now</button></section>
+        <section class="project-panel"><span class="eyebrow">No AI required</span><h3>Use manual mode</h3><p>Write and edit everything yourself. AI setup stays available here if you change your mind later.</p><button class="secondary-button" type="button" data-ai-onboarding="manual">Use manual mode</button></section>
+        <section class="project-panel"><span class="eyebrow">Decide later</span><h3>Remind me later</h3><p>Continue with the Campaign Manager now. QuestKeeper remembers this choice and will not redirect you after saves.</p><button class="secondary-button" type="button" data-ai-onboarding="deferred">Remind me later</button></section>
+      </div>
+    </div>`;
+}
+
 function renderAiSetup() {
   document.querySelector('#page-title').textContent = 'AI setup';
   const ai = state.project.ai;
@@ -1782,6 +1825,10 @@ function renderAiSetup() {
     return;
   }
   const { config, hardware, recommendations, models } = ai;
+  if (config.setupState === 'unseen' && !state.aiConfigureExpanded) {
+    renderAiFirstRunChoice();
+    return;
+  }
   const selectedImageModel =
     models.image.find((model) => model.id === recommendations.imageModelId) ?? models.image[0];
   const textJob = state.project.jobs['ai-text-model'];
@@ -1803,12 +1850,12 @@ function renderAiSetup() {
       </div>
       <section><span class="eyebrow">Remote provider library</span><h2>Bring the accounts you already use</h2><p>Keys stay in the ignored local configuration and are never returned to this page. Capability tags determine which task selectors can offer each model.</p><div class="choice-grid ai-provider-grid">${(ai.registry ?? []).map((provider) => remoteProviderCard(provider, config.providers[provider.id])).join('')}</div></section>
       <section class="privacy-panel"><strong>No silent cloud fallback.</strong><p>Local endpoints are restricted to this computer. API keys stay in the ignored <code>.campaign-manager/</code> folder and are never returned to the browser. Before a remote task, the Manager asks for consent again.</p></section>
-      <div class="setup-footer"><button class="primary-button" type="submit">${config.setupComplete ? 'Save provider & model library' : 'Save choices and continue'}</button><span>All generated content opens as an editable draft.</span></div>
+      <div class="setup-footer"><div class="action-row"><button class="primary-button" type="submit">${config.setupComplete ? 'Save provider & model library' : 'Save choices and continue'}</button><button class="secondary-button" type="button" data-ai-save="draft">Save draft</button><button class="secondary-button" type="button" data-ai-onboarding="reset">Reset setup choice</button></div><span>All generated content opens as an editable draft.</span></div>
       ${activeLog ? `<pre class="job-log">${escapeHtml(activeLog.logs)}</pre>` : ''}
     </form>`;
 }
 
-function aiSetupPayload(form, complete = true) {
+function aiSetupPayload(form, setupState = 'complete') {
   const lines = (name) =>
     String(form.get(name) || '')
       .split(/[\n,]/)
@@ -1849,7 +1896,8 @@ function aiSetupPayload(form, complete = true) {
     }),
   );
   return {
-    setupComplete: complete,
+    setupState,
+    setupComplete: setupState === 'complete',
     roles,
     providers,
     text: {
@@ -1868,24 +1916,52 @@ function aiSetupPayload(form, complete = true) {
   };
 }
 
-async function saveAiSetup(complete = true) {
+async function saveAiSetup(setupState = 'complete') {
   const formElement = document.querySelector('#ai-setup-form');
   const form = new FormData(formElement);
   await api('/api/ai/setup', {
     method: 'PUT',
-    body: JSON.stringify(aiSetupPayload(form, complete)),
+    body: JSON.stringify(aiSetupPayload(form, setupState)),
   });
+  if (setupState === 'complete') state.aiMode = false;
   await loadState();
-  if (complete) state.aiMode = false;
   render();
-  toast('AI choices saved locally.');
+  toast(setupState === 'complete' ? 'AI choices saved locally.' : 'AI setup draft saved locally.');
+}
+
+async function chooseAiSetupPath(setupState) {
+  if (setupState === 'configure') {
+    state.aiConfigureExpanded = true;
+    renderAiSetup();
+    return;
+  }
+  const nextState = setupState === 'reset' ? 'unseen' : setupState;
+  await api('/api/ai/setup-state', {
+    method: 'PUT',
+    body: JSON.stringify({ setupState: nextState }),
+  });
+  state.aiConfigureExpanded = setupState !== 'reset';
+  state.aiMode = setupState === 'reset';
+  await loadState();
+  toast(
+    setupState === 'manual'
+      ? 'Manual authoring selected. AI remains optional.'
+      : setupState === 'deferred'
+        ? 'AI setup postponed. QuestKeeper will not interrupt your work.'
+        : 'AI setup choice reset.',
+  );
 }
 
 async function runAiSetupAction(action, providerId = '') {
   const form = new FormData(document.querySelector('#ai-setup-form'));
   await api('/api/ai/setup', {
     method: 'PUT',
-    body: JSON.stringify(aiSetupPayload(form, state.project.ai.config.setupComplete)),
+    body: JSON.stringify(
+      aiSetupPayload(
+        form,
+        state.project.ai.config.setupState === 'complete' ? 'complete' : 'draft',
+      ),
+    ),
   });
   if (action === 'discover-provider') {
     const result = await api('/api/ai/models/discover', {
@@ -2489,6 +2565,7 @@ document.querySelector('#show-scribe').addEventListener('click', () => {
 });
 document.querySelector('#show-ai-setup').addEventListener('click', () => {
   state.aiMode = true;
+  state.aiConfigureExpanded = state.project.ai?.config?.setupState !== 'unseen';
   state.scribeMode = false;
   state.projectMode = false;
   setMenuOpen(false);
@@ -2527,6 +2604,16 @@ document
   .addEventListener('click', () => quitManager().catch((error) => toast(error.message, true)));
 
 content.addEventListener('click', async (event) => {
+  const onboarding = event.target.closest('[data-ai-onboarding]');
+  if (onboarding) {
+    chooseAiSetupPath(onboarding.dataset.aiOnboarding).catch((error) => toast(error.message, true));
+    return;
+  }
+  const aiSave = event.target.closest('[data-ai-save]');
+  if (aiSave) {
+    saveAiSetup(aiSave.dataset.aiSave).catch((error) => toast(error.message, true));
+    return;
+  }
   const aiAction = event.target.closest('[data-ai-action]');
   if (aiAction) {
     runAiSetupAction(aiAction.dataset.aiAction, aiAction.dataset.provider).catch((error) =>
@@ -2638,7 +2725,7 @@ content.addEventListener('change', (event) => {
 content.addEventListener('submit', (event) => {
   if (event.target.id !== 'ai-setup-form') return;
   event.preventDefault();
-  saveAiSetup(true).catch((error) => toast(error.message, true));
+  saveAiSetup('complete').catch((error) => toast(error.message, true));
 });
 
 fields.addEventListener('click', (event) => {
@@ -2774,7 +2861,7 @@ editorForm.addEventListener('submit', (event) => {
 document.querySelector('#dialog-close').addEventListener('click', () => dialog.close());
 document.querySelector('#dialog-cancel').addEventListener('click', () => dialog.close());
 
-loadState({ selectFirst: true }).catch((error) => {
+loadState({ selectFirst: true, allowFirstRunPrompt: true }).catch((error) => {
   content.innerHTML = `<div class="empty">${escapeHtml(error.message)}</div>`;
   toast(error.message, true);
 });

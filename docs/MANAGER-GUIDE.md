@@ -113,6 +113,13 @@ No generated result publishes itself.
 
 ## Optional AI setup
 
+On the first run, choose **Configure now**, **Use manual mode** or **Remind me
+later**. Manual and deferred choices persist across saves, reloads and Manager
+restarts; they never block ordinary authoring. Provider changes can be saved as
+a draft, and the sidebar shows whether setup is ready, deferred, manual,
+incomplete or needs attention. **Reset setup choice** returns to the three-path
+prompt without deleting saved provider details.
+
 Open **AI setup** from the sidebar at any time—not only during installation.
 The hardware scan recommends practical choices based on CPU, RAM and detected
 graphics memory.
