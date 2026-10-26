@@ -154,6 +154,176 @@
     }
   }
 
+  &__comparison {
+    margin-top: $spacing-lg;
+    padding: $spacing-md;
+    background: rgba($color-bg-deep, 0.72);
+    border: $border-width-thin solid $color-border-subtle;
+    border-radius: $border-radius-sm;
+  }
+
+  &__comparison-heading {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: $spacing-lg;
+    margin-bottom: $spacing-md;
+
+    span {
+      color: $color-gold;
+      font-family: $font-family-heading;
+      font-size: $font-size-xs;
+      letter-spacing: $letter-spacing-wider;
+      text-transform: uppercase;
+    }
+
+    h4 {
+      margin: $spacing-2xs 0 0;
+      color: $color-parchment-light;
+      font-family: $font-family-heading;
+      font-size: $font-size-md;
+    }
+
+    p {
+      max-width: 420px;
+      margin: 0;
+      color: $color-text-muted;
+      font-size: $font-size-xs;
+      text-align: right;
+    }
+  }
+
+  &__comparison-selectors {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    gap: $spacing-sm;
+    align-items: end;
+    margin-bottom: $spacing-md;
+
+    label {
+      display: grid;
+      gap: $spacing-xs;
+
+      span {
+        color: $color-text-muted;
+        font-size: $font-size-xs;
+        letter-spacing: $letter-spacing-wide;
+        text-transform: uppercase;
+      }
+    }
+
+    select {
+      width: 100%;
+      min-height: 44px;
+      padding: $spacing-sm $spacing-md;
+      color: $color-text-primary;
+      background: $color-bg-surface;
+      border: $border-width-thin solid $color-border-default;
+      border-radius: $border-radius-sm;
+
+      &:focus-visible {
+        outline: 2px solid $color-gold-light;
+        outline-offset: 2px;
+      }
+    }
+  }
+
+  &__comparison-arrow {
+    padding-bottom: 0.65rem;
+    color: $color-gold;
+    font-size: $font-size-lg;
+  }
+
+  &__comparison-scroll {
+    overflow-x: auto;
+    border: $border-width-thin solid $color-border-subtle;
+    border-radius: $border-radius-sm;
+
+    &:focus-visible {
+      outline: 2px solid $color-gold-light;
+      outline-offset: 2px;
+    }
+  }
+
+  &__comparison-grid {
+    min-width: 620px;
+  }
+
+  &__comparison-row {
+    display: grid;
+    grid-template-columns: minmax(150px, 0.85fr) repeat(2, minmax(190px, 1fr));
+
+    > * {
+      padding: $spacing-sm $spacing-md;
+      border-right: $border-width-thin solid $color-border-subtle;
+      border-bottom: $border-width-thin solid $color-border-subtle;
+
+      &:last-child {
+        border-right: 0;
+      }
+    }
+
+    > :first-child {
+      color: $color-text-muted;
+      font-size: $font-size-xs;
+      letter-spacing: $letter-spacing-wide;
+      text-transform: uppercase;
+    }
+
+    > :not(:first-child) {
+      color: $color-text-primary;
+    }
+
+    &:last-child > * {
+      border-bottom: 0;
+    }
+
+    &[data-group='core'] > *,
+    &[data-group='collections'] > * {
+      background: rgba($color-gold, 0.035);
+    }
+
+    &--header {
+      background: rgba($color-gold, 0.1);
+
+      strong {
+        display: grid;
+        gap: 2px;
+        color: $color-gold-light;
+        font-family: $font-family-heading;
+
+        small {
+          color: $color-text-muted;
+          font-family: $font-family-body;
+          font-size: 0.65rem;
+          letter-spacing: $letter-spacing-wide;
+          text-transform: uppercase;
+        }
+      }
+    }
+  }
+
+  &__comparison-empty {
+    padding: $spacing-lg;
+    color: $color-text-secondary;
+    text-align: center;
+    background: rgba($color-gold, 0.045);
+    border: $border-width-thin dashed $color-border-default;
+    border-radius: $border-radius-sm;
+
+    strong {
+      color: $color-gold-light;
+      font-family: $font-family-heading;
+    }
+
+    p {
+      margin: $spacing-xs auto 0;
+      max-width: 520px;
+      color: $color-text-muted;
+      font-size: $font-size-sm;
+    }
+  }
+
   &__chapter-title,
   &__origin {
     margin: $spacing-md 0 0;
@@ -216,6 +386,7 @@
     padding: $spacing-md;
 
     &__heading,
+    &__comparison-heading,
     &__changes {
       align-items: flex-start;
       flex-direction: column;
@@ -224,6 +395,18 @@
 
     &__heading p {
       text-align: left;
+    }
+
+    &__comparison-heading p {
+      text-align: left;
+    }
+
+    &__comparison-selectors {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    &__comparison-arrow {
+      display: none;
     }
 
     &__summary-status {

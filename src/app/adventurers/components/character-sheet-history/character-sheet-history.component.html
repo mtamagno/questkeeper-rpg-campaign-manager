@@ -71,6 +71,118 @@
     }
   </div>
 
+  <section class="sheet-history__comparison" aria-labelledby="sheet-comparison-title">
+    <div class="sheet-history__comparison-heading">
+      <div>
+        <span>{{
+          isItalian() ? 'Due capitoli, gli stessi valori' : 'Two chapters, the same values'
+        }}</span>
+        <h4 id="sheet-comparison-title">
+          {{ isItalian() ? 'Confronta i livelli' : 'Compare levels' }}
+        </h4>
+      </div>
+      <p>
+        {{
+          isItalian()
+            ? 'Scegli due schede per leggerle sulla stessa riga, senza perdere il contesto.'
+            : 'Choose two sheets and read matching values on the same row without losing context.'
+        }}
+      </p>
+    </div>
+
+    @if (snapshots().length > 1) {
+      <div class="sheet-history__comparison-selectors">
+        <label>
+          <span>{{ isItalian() ? 'Prima scheda' : 'Earlier sheet' }}</span>
+          <select (change)="selectComparison('before', $event)">
+            @for (snapshot of snapshots(); track snapshot.sheet.level) {
+              <option
+                [value]="snapshot.sheet.level"
+                [disabled]="snapshot.sheet.level === comparisonTargetLevel()"
+                [selected]="snapshot.sheet.level === comparisonBaseLevel()"
+              >
+                {{ comparisonTitle(snapshot) }}
+              </option>
+            }
+          </select>
+        </label>
+        <span class="sheet-history__comparison-arrow" aria-hidden="true">→</span>
+        <label>
+          <span>{{ isItalian() ? 'Scheda successiva' : 'Later sheet' }}</span>
+          <select (change)="selectComparison('after', $event)">
+            @for (snapshot of snapshots(); track snapshot.sheet.level) {
+              <option
+                [value]="snapshot.sheet.level"
+                [disabled]="snapshot.sheet.level === comparisonBaseLevel()"
+                [selected]="snapshot.sheet.level === comparisonTargetLevel()"
+              >
+                {{ comparisonTitle(snapshot) }}
+              </option>
+            }
+          </select>
+        </label>
+      </div>
+
+      @if (comparisonSnapshots(); as compared) {
+        @if (compared.before && compared.after) {
+          <div
+            class="sheet-history__comparison-scroll"
+            tabindex="0"
+            [attr.aria-label]="
+              isItalian()
+                ? 'Confronto affiancato delle schede selezionate'
+                : 'Side-by-side comparison of selected sheets'
+            "
+          >
+            <div class="sheet-history__comparison-grid" role="table" aria-live="polite">
+              <div
+                class="sheet-history__comparison-row sheet-history__comparison-row--header"
+                role="row"
+              >
+                <span role="columnheader">{{ isItalian() ? 'Voce' : 'Field' }}</span>
+                <strong role="columnheader">
+                  <small
+                    >{{ isItalian() ? 'Livello' : 'Level' }}
+                    {{ compared.before.sheet.level }}</small
+                  >
+                  {{ comparisonTitle(compared.before) }}
+                </strong>
+                <strong role="columnheader">
+                  <small
+                    >{{ isItalian() ? 'Livello' : 'Level' }} {{ compared.after.sheet.level }}</small
+                  >
+                  {{ comparisonTitle(compared.after) }}
+                </strong>
+              </div>
+              @for (comparison of comparisonRows(); track comparison.id) {
+                <div
+                  class="sheet-history__comparison-row"
+                  [attr.data-group]="comparison.group"
+                  role="row"
+                >
+                  <span role="rowheader">{{ comparison.label }}</span>
+                  <span role="cell">{{ comparison.before }}</span>
+                  <span role="cell">{{ comparison.after }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      }
+    } @else {
+      <div class="sheet-history__comparison-empty">
+        <strong>{{ isItalian() ? 'Serve un altro capitolo' : 'One more chapter needed' }}</strong>
+        <p>
+          {{
+            isItalian()
+              ? 'Il confronto apparirà quando verrà registrata la scheda del prossimo livello.'
+              : 'The comparison will appear when the next level sheet is recorded.'
+          }}
+        </p>
+      </div>
+    }
+  </section>
+
   @if (selectedSnapshot()?.title; as title) {
     <p class="sheet-history__chapter-title">
       {{ isItalian() ? title.it : title.en }}
