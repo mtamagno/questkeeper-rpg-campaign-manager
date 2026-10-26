@@ -21,6 +21,7 @@ import { localizeText } from '@guild/models/language.model';
 import { PwaInstallService } from '@guild/services/pwaInstall.service';
 import { JourneyMemoryService, type JourneyPage } from '@guild/services/journeyMemory.service';
 import { activeElement, restoreFocus, trapTabKey } from '@guild/utils/focusTrap';
+import { MyCharacterService } from '@guild/services/myCharacter.service';
 
 interface NavigationCommand {
   readonly id: string;
@@ -75,6 +76,7 @@ export class SiteCommandBarComponent {
   private readonly guidedTour = inject(GuidedTourService);
   private readonly pwaInstall = inject(PwaInstallService);
   private readonly journeyMemory = inject(JourneyMemoryService);
+  private readonly myCharacterService = inject(MyCharacterService);
   private readonly currentUrl = signal(this.router.url);
   private readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
   private readonly paletteDialog = viewChild<ElementRef<HTMLElement>>('paletteDialog');
@@ -90,6 +92,8 @@ export class SiteCommandBarComponent {
   readonly continuePage = this.journeyMemory.continuePage;
   readonly canRememberCurrent = this.journeyMemory.canRememberCurrent;
   readonly isCurrentFavorite = this.journeyMemory.isCurrentFavorite;
+  readonly myCharacter = this.myCharacterService.character;
+  readonly myCharacterRoute = this.myCharacterService.route;
 
   readonly tourActionLabel = computed((): string => {
     const it = this.isItalian();
@@ -207,6 +211,24 @@ export class SiteCommandBarComponent {
         scope: 'memory',
       }));
     const campaignCommands: Array<NavigationCommand> = [
+      {
+        id: 'current-my-character',
+        icon: '\u2726',
+        title:
+          this.myCharacter()?.name ?? (it ? 'Scegli il mio personaggio' : 'Choose my character'),
+        detail: this.myCharacter()
+          ? it
+            ? 'Torna subito al mio profilo'
+            : 'Return straight to my profile'
+          : it
+            ? 'Imposta una volta il tuo accesso rapido'
+            : 'Set your quick return once',
+        url: this.myCharacter()?.id
+          ? `${prefix}/party/${this.myCharacter()!.id}`
+          : `${prefix}/party`,
+        keywords: 'my character mio personaggio profile profilo return torna player giocatore',
+        scope: 'current',
+      },
       {
         id: 'current-overview',
         icon: '\u2605',

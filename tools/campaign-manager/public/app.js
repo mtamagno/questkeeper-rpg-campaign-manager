@@ -5,6 +5,22 @@ const dialog = document.querySelector('#editor-dialog');
 const editorForm = document.querySelector('#editor-form');
 const fields = document.querySelector('#dialog-fields');
 const mobileMenu = document.querySelector('#mobile-menu');
+const MY_CHARACTERS_KEY = 'questkeeper-manager-my-characters:v1';
+
+function readMyCharacters() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(MY_CHARACTERS_KEY) || '{}');
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {};
+    return Object.fromEntries(
+      Object.entries(parsed).filter(
+        ([campaignId, characterId]) =>
+          campaignId.trim() && typeof characterId === 'string' && characterId.trim(),
+      ),
+    );
+  } catch {
+    return {};
+  }
+}
 
 const state = {
   campaigns: [],
@@ -15,6 +31,7 @@ const state = {
   scribeMode: false,
   aiMode: false,
   advancedMode: localStorage.getItem('questkeeper-manager-advanced') === 'true',
+  myCharacters: readMyCharacters(),
   project: {
     dependenciesReady: false,
     companion: { action: 'prepare', label: 'Start Companion', status: 'Preparation required' },
@@ -26,6 +43,31 @@ const state = {
   },
   editor: null,
 };
+
+function selectedMyCharacter() {
+  const characterId = state.selectedId ? state.myCharacters[state.selectedId] : undefined;
+  return state.campaign?.characters.find((character) => character.id === characterId);
+}
+
+function setMyCharacter(characterId) {
+  if (!state.selectedId) return;
+  if (state.myCharacters[state.selectedId] === characterId) {
+    delete state.myCharacters[state.selectedId];
+  } else {
+    state.myCharacters[state.selectedId] = characterId;
+  }
+  localStorage.setItem(MY_CHARACTERS_KEY, JSON.stringify(state.myCharacters));
+  render();
+}
+
+function myCharacterCompanionUrl(baseUrl) {
+  const character = selectedMyCharacter();
+  if (!character || !state.selectedId) return baseUrl;
+  const url = new URL(baseUrl, window.location.href);
+  const root = url.pathname.replace(/\/+$/, '');
+  url.pathname = `${root}/${encodeURIComponent(state.selectedId)}/party/${encodeURIComponent(character.id)}`;
+  return url.toString();
+}
 
 function escapeHtml(value = '') {
   return String(value)
@@ -161,6 +203,9 @@ function renderCompanionAction() {
   const button = document.querySelector('#open-companion');
   const status = document.querySelector('#companion-state');
   button.textContent = control.label;
+  if (control.action === 'open' && selectedMyCharacter()) {
+    button.textContent = 'Open my character';
+  }
   button.dataset.companionAction = control.action;
   button.disabled = control.action === 'wait';
   button.title = control.status;
@@ -249,6 +294,7 @@ function renderTab() {
 
 function renderOverview() {
   const { campaign, characters, npcs, sessions, maps } = state.campaign;
+  const myCharacter = selectedMyCharacter();
   return `
     <div class="metrics">
       ${[
@@ -264,6 +310,7 @@ function renderOverview() {
         .join('')}
     </div>
     <div class="overview-grid">
+      <section class="project-panel my-character-panel"><span class="eyebrow">Quick return</span><h3>${myCharacter ? escapeHtml(entityName('characters', myCharacter)) : 'Choose my character'}</h3><p>${myCharacter ? 'The Manager will open this profile directly whenever the Companion is ready.' : 'Choose your character once from the Characters tab to make every return immediate.'}</p>${myCharacter ? `<button class="primary-button" data-action="open-my-character">Open my character</button>` : `<button class="secondary-button" data-action="show-characters">Choose from the party</button>`}</section>
       <section class="project-panel"><span class="eyebrow">The story so far</span><h2>${escapeHtml(localized(campaign.name))}</h2><p>${escapeHtml(localized(campaign.storySoFar) || 'Your running campaign recap will appear here.')}</p></section>
       <section class="project-panel"><h3>Table details</h3><dl class="detail-list"><div><dt>Game Master</dt><dd>${escapeHtml(campaign.dungeonMaster)}</dd></div><div><dt>Party</dt><dd>${escapeHtml(campaign.partyName)}</dd></div><div><dt>System</dt><dd>${escapeHtml(campaign.edition)}</dd></div><div><dt>Started</dt><dd>${escapeHtml(campaign.startDate)}</dd></div></dl></section>
     </div>`;
@@ -297,13 +344,15 @@ function renderEntities(type, title, addLabel) {
         ? `<div class="card-grid">${items
             .map(
               (item) => `
-      <article class="card"><div class="card__top"><span class="card__avatar">${escapeHtml(entityName(type, item).charAt(0).toUpperCase() || '✦')}</span><div class="card__menu"><button data-action="edit-entity" data-type="${type}" data-id="${escapeHtml(item.id)}">Edit</button><button data-action="delete-entity" data-type="${type}" data-id="${escapeHtml(item.id)}">Remove</button></div></div><h3>${escapeHtml(entityName(type, item))}</h3><p>${escapeHtml(entityDescription(type, item)).slice(0, 180)}</p><div class="card__meta">${entityTags(
+      <article class="card ${type === 'characters' && selectedMyCharacter()?.id === item.id ? 'card--my-character' : ''}"><div class="card__top"><span class="card__avatar">${escapeHtml(entityName(type, item).charAt(0).toUpperCase() || '✦')}</span><div class="card__menu"><button data-action="edit-entity" data-type="${type}" data-id="${escapeHtml(item.id)}">Edit</button><button data-action="delete-entity" data-type="${type}" data-id="${escapeHtml(item.id)}">Remove</button></div></div><h3>${escapeHtml(entityName(type, item))}</h3><p>${escapeHtml(entityDescription(type, item)).slice(0, 180)}</p><div class="card__meta">${entityTags(
         type,
         item,
       )
         .filter(Boolean)
         .map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`)
-        .join('')}</div></article>`,
+        .join(
+          '',
+        )}</div>${type === 'characters' ? `<button class="card__my-character" data-action="set-my-character" data-id="${escapeHtml(item.id)}" aria-pressed="${selectedMyCharacter()?.id === item.id}">${selectedMyCharacter()?.id === item.id ? 'My character · change' : 'This is my character'}</button>` : ''}</article>`,
             )
             .join('')}</div>`
         : `<div class="empty">Nothing here yet. Choose “${addLabel}” to begin.</div>`
@@ -2463,7 +2512,7 @@ document.querySelector('#open-companion').addEventListener('click', (event) => {
     return;
   }
   if (action === 'open') {
-    window.open(state.project.companion.url, '_blank', 'noopener');
+    window.open(myCharacterCompanionUrl(state.project.companion.url), '_blank', 'noopener');
     return;
   }
   if (action === 'wait') {
@@ -2519,6 +2568,26 @@ content.addEventListener('click', async (event) => {
         state.projectMode = false;
         state.tab = 'sessions';
         renderCampaign();
+      }
+      if (action.dataset.action === 'show-characters') {
+        state.tab = 'characters';
+        renderCampaign();
+      }
+      if (action.dataset.action === 'set-my-character') {
+        setMyCharacter(action.dataset.id);
+        toast(
+          selectedMyCharacter()
+            ? 'My character saved on this device.'
+            : 'My character shortcut cleared.',
+        );
+      }
+      if (action.dataset.action === 'open-my-character') {
+        const companion = state.project.companion;
+        if (companion?.action !== 'open') {
+          toast('Start the Companion first.', true);
+        } else {
+          window.open(myCharacterCompanionUrl(companion.url), '_blank', 'noopener');
+        }
       }
       if (action.dataset.action === 'add-entity') openEntityEditor(action.dataset.type);
       if (action.dataset.action === 'edit-entity')

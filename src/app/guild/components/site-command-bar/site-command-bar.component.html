@@ -16,6 +16,26 @@
   </nav>
 
   <div class="command-bar__actions">
+    @if (activeCampaignId(); as campaignId) {
+      <a
+        class="command-bar__my-character"
+        [routerLink]="myCharacterRoute() ?? ['/', campaignId, 'party']"
+        [attr.aria-label]="
+          myCharacter()
+            ? isItalian()
+              ? 'Apri il mio personaggio: ' + myCharacter()!.name
+              : 'Open my character: ' + myCharacter()!.name
+            : isItalian()
+              ? 'Scegli il mio personaggio'
+              : 'Choose my character'
+        "
+      >
+        <span aria-hidden="true">✦</span>
+        <span class="command-bar__my-character-label">
+          {{ isItalian() ? 'Personaggio' : 'Character' }}
+        </span>
+      </a>
+    }
     @if (continuePage(); as page) {
       <a
         class="command-bar__continue"
