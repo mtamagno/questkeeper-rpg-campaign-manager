@@ -28,6 +28,7 @@ import { localizeText, type BilingualText } from '@guild/models/language.model';
 import { RELATIONSHIP_TYPE_LABELS } from '@guild/models/relationship.model';
 import { toDisplayUrl } from '@guild/services/imageUrl.service';
 import { LanguageService } from '@guild/services/language.service';
+import { CharacterReadingPositionService } from '@guild/services/characterReadingPosition.service';
 import { BilingualTextPipe } from '@guild/components/bilingual-text/bilingual-text.pipe';
 import { LanguageToggleComponent } from '@guild/components/language-toggle/language-toggle.component';
 import { DiceLoaderComponent } from '@guild/components/dice-loader/dice-loader.component';
@@ -89,6 +90,7 @@ export class CharacterDetailComponent {
   private readonly campaignService = inject(CampaignService);
   private readonly languageService = inject(LanguageService);
   private readonly document = inject(DOCUMENT);
+  private readonly readingPosition = inject(CharacterReadingPositionService);
 
   /** Current display language for page chrome and section labels. */
   readonly lang = this.languageService.currentLanguage;
@@ -98,6 +100,14 @@ export class CharacterDetailComponent {
 
   /** Active campaign ID for building route links. */
   readonly campaignId: Signal<string | undefined> = this.campaignService.activeCampaignId;
+
+  hasSheetReadingPosition(characterId: string): boolean {
+    return this.readingPosition.hasSheetPosition(this.campaignId(), characterId);
+  }
+
+  hasNotebookReadingPosition(characterId: string): boolean {
+    return this.readingPosition.hasNotebookPosition(this.campaignId(), characterId);
+  }
 
   /** Character ID from route params. */
   private readonly characterId: Signal<string | undefined> = toSignal(

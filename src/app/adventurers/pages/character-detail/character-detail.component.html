@@ -396,7 +396,7 @@
         <app-accordion
           [title]="notebook.title | bilingual"
           icon="📓"
-          [startOpen]="false"
+          [startOpen]="hasNotebookReadingPosition(char.id)"
           [allowOverflow]="true"
         >
           <app-character-notebook
@@ -429,7 +429,7 @@
       <app-accordion
         [title]="lang() === 'it' ? 'Scheda personaggio' : 'Character Sheet'"
         icon="📋"
-        [startOpen]="false"
+        [startOpen]="hasSheetReadingPosition(char.id)"
         [allowOverflow]="true"
       >
         <app-character-sheet

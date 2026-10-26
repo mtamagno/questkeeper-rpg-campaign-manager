@@ -4,6 +4,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   input,
   signal,
@@ -22,6 +23,8 @@ import { ImageLightboxComponent } from '@guild/components/image-lightbox/image-l
 import { PasswordDialogComponent } from '@guild/components/password-dialog/password-dialog.component';
 import { LanguageService } from '@guild/services/language.service';
 import { PasswordService } from '@guild/services/password.service';
+import { CampaignService } from '@guild/services/campaign.service';
+import { CharacterReadingPositionService } from '@guild/services/characterReadingPosition.service';
 import { toDisplayUrl } from '@guild/services/imageUrl.service';
 
 type NotebookSlide =
@@ -49,6 +52,9 @@ type NotebookSlide =
 export class CharacterNotebookComponent {
   private readonly passwordService = inject(PasswordService);
   private readonly languageService = inject(LanguageService);
+  private readonly campaignService = inject(CampaignService);
+  private readonly readingPosition = inject(CharacterReadingPositionService);
+  private restoredIdentity = '';
 
   readonly characterId = input.required<string>();
   readonly characterName = input.required<string>();
@@ -99,6 +105,24 @@ export class CharacterNotebookComponent {
     () => this.characterName().trim().charAt(0).toLocaleUpperCase() || '✦',
   );
 
+  private readonly restoreReadingPosition = effect(() => {
+    const campaignId = this.campaignService.activeCampaignId();
+    const characterId = this.characterId();
+    const unlocked = this.isUnlocked();
+    const slides = this.slides();
+    const identity = `${campaignId ?? ''}:${characterId}`;
+
+    if (!unlocked) {
+      this.restoredIdentity = '';
+      return;
+    }
+    if (this.restoredIdentity === identity) return;
+
+    const remembered = this.readingPosition.get(campaignId, characterId)?.notebookSlide ?? 0;
+    this.currentSlideIndex.set(Math.min(remembered, Math.max(0, slides.length - 1)));
+    this.restoredIdentity = identity;
+  });
+
   openDialog(): void {
     this.hasPasswordError.set(false);
     this.isDialogOpen.set(true);
@@ -128,15 +152,21 @@ export class CharacterNotebookComponent {
   }
 
   previousSlide(): void {
-    this.currentSlideIndex.update((index) => Math.max(0, index - 1));
+    this.goToSlide(this.currentSlideIndex() - 1);
   }
 
   nextSlide(): void {
-    this.currentSlideIndex.update((index) => Math.min(this.slides().length - 1, index + 1));
+    this.goToSlide(this.currentSlideIndex() + 1);
   }
 
   goToSlide(slideIndex: number): void {
-    this.currentSlideIndex.set(slideIndex);
+    const safeIndex = Math.max(0, Math.min(this.slides().length - 1, slideIndex));
+    this.currentSlideIndex.set(safeIndex);
+    this.readingPosition.rememberNotebook(
+      this.campaignService.activeCampaignId(),
+      this.characterId(),
+      safeIndex,
+    );
   }
 
   openLightbox(image: ImageRef): void {

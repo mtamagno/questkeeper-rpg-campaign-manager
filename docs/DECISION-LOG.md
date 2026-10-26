@@ -1224,6 +1224,31 @@ and [Campaign Manager guide](MANAGER-GUIDE.md#optional-ai-setup).
 
 **Revisit when:** QuestKeeper adds accounts or a cross-device preference model.
 
+### QK-045 — Protected reading memory stores coordinates, never content
+
+**Date:** 26 October 2026
+
+**Status:** Active
+
+**Decision:** Character reading memory is a separate device-local preference
+containing only campaign ID, character ID, an allow-listed sheet anchor, an
+optional notebook slide index and a timestamp. Restoration happens only after
+the ordinary protected component has been unlocked.
+
+**Why:** Players should return to the page they were reading without turning
+navigation history into a copy of protected notes or an authentication bypass.
+
+**Consequences:** Accordions may reopen to reveal the normal lock screen, but
+QuestKeeper never persists passwords, unlock state, titles, prose or images.
+Malformed anchors are discarded and page indices are clamped to current data.
+This preference remains independent from My Character and general journey
+history.
+
+**Source:** [Character reading position](CHARACTER-READING-POSITION.md).
+
+**Revisit when:** Account-backed synchronization introduces an explicit threat
+model and encrypted storage contract for private campaign data.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD
