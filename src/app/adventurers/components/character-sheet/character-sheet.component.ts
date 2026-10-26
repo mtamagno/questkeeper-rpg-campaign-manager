@@ -6,6 +6,8 @@
 import {
   Component,
   ChangeDetectionStrategy,
+  HostListener,
+  effect,
   inject,
   input,
   signal,
@@ -24,6 +26,11 @@ import {
 } from '@guild/models/character.model';
 import { LanguageService } from '@guild/services/language.service';
 import { CampaignService } from '@guild/services/campaign.service';
+import {
+  CharacterReadingPositionService,
+  SAFE_SHEET_ANCHORS,
+  type SafeSheetAnchor,
+} from '@guild/services/characterReadingPosition.service';
 import { PasswordDialogComponent } from '@guild/components/password-dialog/password-dialog.component';
 import { SPELL_CATEGORIES } from '@arcana/constants/spells.constants';
 import { SPELL_SCHOOLS, isSpellEntry, type SpellEntry } from '@arcana/models/compendium.model';
@@ -91,6 +98,10 @@ export class CharacterSheetComponent {
   private readonly passwordService = inject(PasswordService);
   private readonly languageService = inject(LanguageService);
   private readonly campaignService = inject(CampaignService);
+  private readonly readingPosition = inject(CharacterReadingPositionService);
+  private restoredIdentity = '';
+  private scrollFrame: number | undefined;
+  private isRestoringPosition = false;
 
   /** Shared terminology profile used by the Companion and PDF export. */
   readonly rulesetProfile = this.campaignService.activeRuleset;
@@ -170,6 +181,27 @@ export class CharacterSheetComponent {
   readonly isUnlocked: Signal<boolean> = computed(() =>
     this.passwordService.isUnlocked(this.characterId())(),
   );
+
+  private readonly restoreReadingPosition = effect(() => {
+    const campaignId = this.campaignService.activeCampaignId();
+    const characterId = this.characterId();
+    const unlocked = this.isUnlocked();
+    const identity = `${campaignId ?? ''}:${characterId}`;
+    if (!unlocked) {
+      this.restoredIdentity = '';
+      return;
+    }
+    if (this.restoredIdentity === identity) return;
+    this.restoredIdentity = identity;
+
+    const anchor = this.readingPosition.get(campaignId, characterId)?.sheetAnchor;
+    if (anchor === undefined) return;
+    this.isRestoringPosition = true;
+    setTimeout(() => {
+      this.scrollToSection(anchor, false);
+      setTimeout(() => (this.isRestoringPosition = false), 500);
+    });
+  });
 
   /** Whether the character sheet is empty (not yet compiled). */
   readonly isSheetEmpty: Signal<boolean> = computed(() => {
@@ -308,10 +340,43 @@ export class CharacterSheetComponent {
   }
 
   /** Scrolls to a section without causing an Angular route navigation. */
-  scrollToSection(section: string): void {
+  scrollToSection(section: string, remember = true): void {
+    if (!SAFE_SHEET_ANCHORS.includes(section as SafeSheetAnchor)) return;
+    if (remember) {
+      this.readingPosition.rememberSheet(
+        this.campaignService.activeCampaignId(),
+        this.characterId(),
+        section as SafeSheetAnchor,
+      );
+    }
     document
       .getElementById(`character-sheet-${section}-${this.characterId()}`)
       ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  @HostListener('window:scroll')
+  rememberVisibleSection(): void {
+    if (!this.isUnlocked() || this.isRestoringPosition || this.scrollFrame !== undefined) return;
+    this.scrollFrame = requestAnimationFrame(() => {
+      this.scrollFrame = undefined;
+      const visible = SAFE_SHEET_ANCHORS.map((anchor) => ({
+        anchor,
+        element: document.getElementById(`character-sheet-${anchor}-${this.characterId()}`),
+      }))
+        .filter((entry) => entry.element !== null)
+        .map((entry) => ({
+          ...entry,
+          distance: Math.abs(entry.element!.getBoundingClientRect().top - 160),
+        }))
+        .sort((a, b) => a.distance - b.distance)[0];
+      if (visible !== undefined) {
+        this.readingPosition.rememberSheet(
+          this.campaignService.activeCampaignId(),
+          this.characterId(),
+          visible.anchor,
+        );
+      }
+    });
   }
 
   /** Builds and downloads a three-page illustrated PDF in the active language. */

@@ -26,6 +26,7 @@
     "test:command-palette": "node scripts/verify-command-palette.cjs",
     "test:journey-memory": "node scripts/verify-journey-memory.cjs",
     "test:my-character": "node scripts/verify-my-character.cjs",
+    "test:character-reading-position": "node scripts/verify-character-reading-position.cjs",
     "test:demo": "node scripts/verify-lantern-road.cjs",
     "test:game-night-brief": "node scripts/verify-game-night-brief.cjs",
     "test:table-moments": "node scripts/verify-table-moments.cjs",
@@ -40,7 +41,7 @@
     "format": "prettier --write . --ignore-unknown",
     "format:check": "prettier --check . --ignore-unknown",
     "typecheck": "tsc --noEmit -p tsconfig.app.json",
-    "verify": "npm run lint && npm run format:check && npm run typecheck && npm run test:design-system && npm run test:first-visit && npm run test:guided-tour && npm run test:pwa && npm run test:offline && npm run test:command-palette && npm run test:journey-memory && npm run test:my-character && npm run test:demo && npm run test:game-night-brief && npm run test:table-moments && npm run test:notebooks && npm run test:character-profiles && npm run test:accessibility && npm run test:installer && npm run test:release && npm run test:manager && npm run test:entity-ids && npm run test:transcriber && npm run build && npm run test:performance",
+    "verify": "npm run lint && npm run format:check && npm run typecheck && npm run test:design-system && npm run test:first-visit && npm run test:guided-tour && npm run test:pwa && npm run test:offline && npm run test:command-palette && npm run test:journey-memory && npm run test:my-character && npm run test:character-reading-position && npm run test:demo && npm run test:game-night-brief && npm run test:table-moments && npm run test:notebooks && npm run test:character-profiles && npm run test:accessibility && npm run test:installer && npm run test:release && npm run test:manager && npm run test:entity-ids && npm run test:transcriber && npm run build && npm run test:performance",
     "generate:thumbs": "node scripts/generate-thumbnails.cjs",
     "generate:display": "node scripts/generate-display-images.cjs"
   },
