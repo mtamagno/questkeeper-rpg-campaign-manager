@@ -291,6 +291,39 @@ body::before {
   padding-top: 1rem;
   border-top: 1px solid var(--line);
 }
+.ai-setup-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  text-align: left;
+}
+.ai-setup-link small {
+  color: #c9ad6c;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+.ai-setup-link[data-setup-state='complete'] small {
+  color: #86d89f;
+}
+.ai-setup-link.is-error small {
+  color: var(--danger);
+}
+.ai-onboarding {
+  display: grid;
+  gap: 1.2rem;
+}
+.ai-onboarding__choices .project-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+.ai-onboarding__choices .project-panel p {
+  flex: 1;
+  margin: 0;
+  color: var(--muted);
+}
 
 .workspace {
   min-width: 0;

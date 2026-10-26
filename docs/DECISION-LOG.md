@@ -1200,6 +1200,30 @@ and [Campaign Manager guide](MANAGER-GUIDE.md#local-runtime-and-preview-reliabil
 **Revisit when:** Node exposes a stable cross-platform package-manager launch
 API or QuestKeeper replaces npm for distributed runtime jobs.
 
+### QK-044 — Optional AI setup is a remembered choice, not a navigation gate
+
+**Date:** 26 October 2026
+
+**Status:** Active
+
+**Decision:** QuestKeeper persists an explicit AI setup state: unseen,
+deferred, manual, draft or complete. Only the first explicit application entry
+may open the choice screen automatically. Background state refreshes never
+change the active workspace.
+
+**Why:** A single `setupComplete` boolean made optional AI behave like a
+mandatory prerequisite and redirected Game Masters after unrelated saves.
+
+**Consequences:** Manual authoring is permanently usable without provider
+configuration; partial provider work can be saved as a draft; navigation shows
+non-blocking status and errors; reset reopens the choice without erasing stored
+provider details or secrets.
+
+**Source:** [Issue #20](https://github.com/mtamagno/questkeeper-rpg-campaign-manager/issues/20)
+and [Campaign Manager guide](MANAGER-GUIDE.md#optional-ai-setup).
+
+**Revisit when:** QuestKeeper adds accounts or a cross-device preference model.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD

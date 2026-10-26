@@ -11,6 +11,35 @@
     'Campaign sections': 'Sezioni della campagna',
     'Import backup': 'Importa backup',
     'AI setup': 'Configurazione AI',
+    'Choose setup': 'Scegli configurazione',
+    'Remind me later': 'Ricordamelo più tardi',
+    'Manual mode': 'Modalità manuale',
+    'Draft saved': 'Bozza salvata',
+    'Needs attention': 'Richiede attenzione',
+    'Choose how you create': 'Scegli come creare',
+    'Optional tools, never a gate': 'Strumenti opzionali, mai un ostacolo',
+    'How should QuestKeeper help?': 'Come dovrebbe aiutarti QuestKeeper?',
+    'Campaigns, characters and sessions always work by hand. Choose AI now, keep everything manual, or decide another day.':
+      'Campagne, personaggi e sessioni funzionano sempre anche manualmente. Configura ora l’AI, mantieni tutto manuale oppure decidi un altro giorno.',
+    'Guided setup': 'Configurazione guidata',
+    'Configure now': 'Configura ora',
+    'Choose local or remote providers and a model for each task. Nothing runs or leaves this computer without your action.':
+      'Scegli provider locali o remoti e un modello per ogni attività. Nulla viene eseguito o lascia questo computer senza una tua azione.',
+    'No AI required': 'Nessuna AI necessaria',
+    'Use manual mode': 'Usa la modalità manuale',
+    'Write and edit everything yourself. AI setup stays available here if you change your mind later.':
+      'Scrivi e modifica tutto personalmente. La configurazione AI resterà disponibile qui se cambierai idea.',
+    'Decide later': 'Decidi più tardi',
+    'Continue with the Campaign Manager now. QuestKeeper remembers this choice and will not redirect you after saves.':
+      'Continua ora con il Gestore campagne. QuestKeeper ricorderà la scelta e non ti reindirizzerà dopo i salvataggi.',
+    'Save draft': 'Salva bozza',
+    'Reset setup choice': 'Reimposta scelta iniziale',
+    'AI setup draft saved locally.': 'Bozza della configurazione AI salvata in locale.',
+    'Manual authoring selected. AI remains optional.':
+      'Creazione manuale selezionata. L’AI resta opzionale.',
+    'AI setup postponed. QuestKeeper will not interrupt your work.':
+      'Configurazione AI rimandata. QuestKeeper non interromperà il tuo lavoro.',
+    'AI setup choice reset.': 'Scelta della configurazione AI reimpostata.',
     'Discord Session Scribe': 'Trascrittore Discord',
     'Preview & publish': 'Anteprima e pubblicazione',
     'Close campaign list': 'Chiudi elenco campagne',

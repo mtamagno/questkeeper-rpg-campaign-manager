@@ -26,6 +26,7 @@ import {
   TEXT_MODELS,
   validateComfyRoot,
   writeAiConfig,
+  writeAiSetupState,
 } from './ai-config.mjs';
 import {
   discoverLocalModels,
@@ -574,6 +575,11 @@ async function routeApi(request, response, url) {
   }
   if (request.method === 'PUT' && url.pathname === '/api/ai/setup') {
     const config = await writeAiConfig(PROJECT_ROOT, await readBody(request));
+    sendJson(response, 200, { config: publicAiConfig(config) });
+    return;
+  }
+  if (request.method === 'PUT' && url.pathname === '/api/ai/setup-state') {
+    const config = await writeAiSetupState(PROJECT_ROOT, (await readBody(request)).setupState);
     sendJson(response, 200, { config: publicAiConfig(config) });
     return;
   }
