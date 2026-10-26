@@ -1299,6 +1299,30 @@ and [Lightbox image lifecycle](LIGHTBOX-LIFECYCLE.md).
 **Revisit when:** The application adopts a centralized media loader with
 cancelable requests and decoded-image caching.
 
+### QK-048 — Level comparison preserves row correspondence
+
+**Date:** 26 October 2026
+
+**Status:** Active
+
+**Decision:** Historical character sheets compare two independently selected,
+immutable level snapshots in one row-aligned table. Narrow screens preserve the
+same two value columns through a labelled horizontal reading region while the
+level selectors stack above it.
+
+**Why:** Replacing the whole sheet makes exact historical values hard to scan,
+while stacking complete snapshots separates related fields and obscures which
+values belong together.
+
+**Consequences:** This first layer stays neutral and factual; Day 10's second
+task owns gained, lost and changed emphasis. Characters need two unique level
+snapshots before comparison appears, and duplicate levels fail validation.
+
+**Source:** [Side-by-side level history](LEVEL-HISTORY-COMPARISON.md).
+
+**Revisit when:** A future ruleset requires non-tabular values that cannot keep
+meaningful row correspondence.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD
