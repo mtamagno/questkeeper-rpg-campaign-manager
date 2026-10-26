@@ -449,6 +449,21 @@
     'Editable draft created. Review it before saving.':
       'Bozza modificabile creata. Controllala prima di salvare.',
     'Saved. Your Companion is up to date.': 'Salvato. Il tuo Companion è aggiornato.',
+    'Open my character': 'Apri il mio personaggio',
+    'My character': 'Il mio personaggio',
+    'My character · change': 'Il mio personaggio · cambia',
+    'This is my character': 'Questo è il mio personaggio',
+    'Choose my character': 'Scegli il mio personaggio',
+    'Choose from the party': 'Scegli dal gruppo',
+    'Quick return': 'Accesso rapido',
+    'The Manager will open this profile directly whenever the Companion is ready.':
+      'Il Gestore aprirà direttamente questo profilo ogni volta che il Companion è pronto.',
+    'Choose your character once from the Characters tab to make every return immediate.':
+      'Scegli una volta il tuo personaggio dalla scheda Personaggi per rendere immediato ogni ritorno.',
+    'My character saved on this device.':
+      'Il mio personaggio è stato salvato su questo dispositivo.',
+    'My character shortcut cleared.': 'Accesso rapido al mio personaggio rimosso.',
+    'Start the Companion first.': 'Avvia prima il Companion.',
   };
 
   const textMemory = new WeakMap();

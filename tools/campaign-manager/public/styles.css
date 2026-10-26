@@ -606,6 +606,24 @@ button:disabled {
   display: flex;
   flex-direction: column;
 }
+.card--my-character {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--gold) 42%, transparent);
+}
+.card__my-character {
+  margin-top: 0.85rem;
+  padding: 0.62rem 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(10, 14, 13, 0.65);
+  color: var(--muted);
+}
+.card__my-character:hover,
+.card__my-character:focus-visible,
+.card__my-character[aria-pressed='true'] {
+  border-color: var(--gold);
+  color: var(--gold);
+}
 .card__top {
   display: flex;
   justify-content: space-between;

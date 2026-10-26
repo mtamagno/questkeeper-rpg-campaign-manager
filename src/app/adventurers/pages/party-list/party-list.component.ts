@@ -15,6 +15,7 @@ import { LanguageToggleComponent } from '@guild/components/language-toggle/langu
 import { DiceLoaderComponent } from '@guild/components/dice-loader/dice-loader.component';
 import { SfxHoverDirective } from '@guild/directives/sfxHover.directive';
 import { localizeText, type SupportedLanguage } from '@guild/models/language.model';
+import { MyCharacterService } from '@guild/services/myCharacter.service';
 
 /** Character card display data with a pre-picked random quote. */
 interface CharacterShowcase {
@@ -89,12 +90,16 @@ export class PartyListComponent {
   private readonly dataService = inject(DataService);
   private readonly campaignService = inject(CampaignService);
   private readonly languageService = inject(LanguageService);
+  private readonly myCharacter = inject(MyCharacterService);
 
   /** Current display language for interface copy. */
   readonly lang = this.languageService.currentLanguage;
 
   /** Active campaign ID for building route links. */
   readonly campaignId: Signal<string | undefined> = this.campaignService.activeCampaignId;
+
+  /** Character remembered as the player's own on this device. */
+  readonly myCharacterId = this.myCharacter.characterId;
 
   /** Whether data is still loading. */
   readonly isLoading: Signal<boolean> = this.dataService.isLoading;
@@ -120,4 +125,14 @@ export class PartyListComponent {
     const lang = this.languageService.currentLanguage();
     return buildShowcases(characters, lang);
   });
+
+  toggleMyCharacter(characterId: string): void {
+    const campaignId = this.campaignId();
+    if (campaignId === undefined) return;
+    if (this.myCharacterId() === characterId) {
+      this.myCharacter.clear(campaignId);
+      return;
+    }
+    this.myCharacter.select(campaignId, characterId);
+  }
 }

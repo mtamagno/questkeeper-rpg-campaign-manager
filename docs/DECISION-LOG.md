@@ -1147,6 +1147,32 @@ and AI workflows continue to edit canonical relationship records only.
 testing shows that two perspectives need progressive disclosure on very dense
 NPC networks.
 
+### QK-042 — My Character is an explicit device-local identity shortcut
+
+**Date:** 26 October 2026
+
+**Status:** Active
+
+**Decision:** A player explicitly chooses one public character per campaign and
+device. QuestKeeper stores only campaign/entity IDs and exposes one-action
+profile links in the Companion and Campaign Manager. It never infers ownership
+from a name, image, recent visit or protected data.
+
+**Why:** Returning players need a stable answer to “where is my character?” but
+QuestKeeper has no account system and must not convert navigation history into
+identity or copy private-sheet content into preference storage.
+
+**Consequences:** Missing selections lead to the party chooser; invalid IDs are
+ignored; changing or clearing the choice is visible. Day 09 reading-position
+memory may key safe anchors by the selected public ID but must remain a separate
+preference and preserve the same content boundary.
+
+**Source:** [My Character quick return](MY-CHARACTER.md) and acceptance journey
+P-03 in [Game Night acceptance journeys](GAME-NIGHT-ACCEPTANCE-JOURNEYS.md).
+
+**Revisit when:** QuestKeeper gains user accounts, shared player packages or
+device synchronization with an explicit identity and privacy model.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD

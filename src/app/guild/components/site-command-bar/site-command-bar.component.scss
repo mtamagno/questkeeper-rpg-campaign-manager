@@ -67,6 +67,7 @@
   }
 
   &__campaign-switch,
+  &__my-character,
   &__continue,
   &__favorite,
   &__install,
@@ -148,6 +149,7 @@
     }
     &__campaign-name,
     &__switch-copy,
+    &__my-character-label,
     &__continue-label,
     &__favorite-label,
     &__install-label,
@@ -474,6 +476,7 @@ kbd {
   color: var(--qk-color-text);
 }
 .command-bar__campaign-switch,
+.command-bar__my-character,
 .command-bar__continue,
 .command-bar__favorite,
 .command-bar__install,

@@ -37,6 +37,7 @@
         <article
           class="character-card"
           [class.character-card--pending]="!showcase.isReady"
+          [class.character-card--mine]="myCharacterId() === showcase.character.id"
           appSfxHover
         >
           <!-- Profile image as card hero -->
@@ -77,6 +78,25 @@
                 <span class="character-card__player-name">{{ showcase.character.playerName }}</span>
               </p>
             }
+
+            <button
+              class="character-card__claim"
+              type="button"
+              [class.character-card__claim--active]="myCharacterId() === showcase.character.id"
+              [attr.aria-pressed]="myCharacterId() === showcase.character.id"
+              (click)="toggleMyCharacter(showcase.character.id)"
+            >
+              <span aria-hidden="true">✦</span>
+              {{
+                myCharacterId() === showcase.character.id
+                  ? lang() === 'it'
+                    ? 'Il mio personaggio · cambia'
+                    : 'My character · change'
+                  : lang() === 'it'
+                    ? 'Questo è il mio personaggio'
+                    : 'This is my character'
+              }}
+            </button>
 
             <!-- Quick stats -->
             @if (showcase.isReady) {
