@@ -1285,6 +1285,25 @@ code {
 .dialog__header h2 {
   margin: 0.15rem 0 0;
 }
+.dialog__error {
+  margin: 1rem 1.3rem 0;
+  padding: 0.9rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--danger) 70%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--danger) 16%, #111716);
+  color: var(--ink);
+}
+.dialog__error:focus {
+  outline: 3px solid var(--gold-bright);
+  outline-offset: 2px;
+}
+.dialog__error p {
+  margin: 0.35rem 0;
+}
+.dialog__error a {
+  color: var(--gold-bright);
+  font-weight: 700;
+}
 .dialog__footer {
   justify-content: end;
   border-top: 1px solid var(--line);

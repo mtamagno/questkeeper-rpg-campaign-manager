@@ -4,6 +4,7 @@ const campaignList = document.querySelector('#campaign-list');
 const dialog = document.querySelector('#editor-dialog');
 const editorForm = document.querySelector('#editor-form');
 const fields = document.querySelector('#dialog-fields');
+const dialogError = document.querySelector('#dialog-error');
 const mobileMenu = document.querySelector('#mobile-menu');
 const MY_CHARACTERS_KEY = 'questkeeper-manager-my-characters:v1';
 
@@ -115,6 +116,29 @@ function toast(message, error = false) {
   element.textContent = message;
   document.querySelector('#toast-region').append(element);
   setTimeout(() => element.remove(), 4200);
+}
+
+function clearDialogError() {
+  dialogError.hidden = true;
+  dialogError.textContent = '';
+}
+
+function showDialogError(message, invalidField) {
+  const safeMessage = String(message || translate('The entry could not be saved.')).slice(0, 500);
+  dialogError.innerHTML = `<strong>${escapeHtml(translate('Could not save your changes'))}</strong><p>${escapeHtml(safeMessage)}</p>`;
+  if (invalidField) {
+    invalidField.id ||= `dialog-invalid-${Date.now()}`;
+    const link = document.createElement('a');
+    link.href = `#${invalidField.id}`;
+    link.textContent = translate('Review the first invalid field');
+    link.addEventListener('click', (event) => {
+      event.preventDefault();
+      invalidField.focus();
+    });
+    dialogError.append(link);
+  }
+  dialogError.hidden = false;
+  dialogError.focus();
 }
 
 function translate(message) {
@@ -795,6 +819,7 @@ function entityAiImportPanel(type, languages) {
 }
 
 function openDialog({ title, eyebrow, html, editor }) {
+  clearDialogError();
   document.querySelector('#dialog-title').textContent = title;
   document.querySelector('#dialog-eyebrow').textContent = eyebrow;
   fields.innerHTML = `<div class="form-grid">${html}</div>`;
@@ -2849,17 +2874,34 @@ fields.addEventListener('keydown', (event) => {
 editorForm.addEventListener('submit', (event) => {
   event.preventDefault();
   const save = document.querySelector('#dialog-save');
+  if (save.disabled) return;
+  clearDialogError();
+  const invalidField = editorForm.querySelector(':invalid');
+  if (invalidField) {
+    showDialogError(
+      translate('Check the highlighted field before saving. Your draft is still here.'),
+      invalidField,
+    );
+    return;
+  }
   save.disabled = true;
   save.textContent = 'Saving…';
   saveEditor()
-    .catch((error) => toast(error.message, true))
+    .catch((error) => showDialogError(error.message))
     .finally(() => {
       save.disabled = false;
       save.textContent = 'Save';
     });
 });
-document.querySelector('#dialog-close').addEventListener('click', () => dialog.close());
-document.querySelector('#dialog-cancel').addEventListener('click', () => dialog.close());
+editorForm.addEventListener('input', clearDialogError);
+document.querySelector('#dialog-close').addEventListener('click', () => {
+  clearDialogError();
+  dialog.close();
+});
+document.querySelector('#dialog-cancel').addEventListener('click', () => {
+  clearDialogError();
+  dialog.close();
+});
 
 loadState({ selectFirst: true, allowFirstRunPrompt: true }).catch((error) => {
   content.innerHTML = `<div class="empty">${escapeHtml(error.message)}</div>`;
