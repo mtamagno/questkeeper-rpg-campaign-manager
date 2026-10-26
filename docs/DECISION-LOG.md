@@ -1274,6 +1274,31 @@ source files. Custom systems retain their edition label.
 **Revisit when:** Campaign identity moves to a database-backed account model or
 ruleset profiles gain explicit user-selectable editions.
 
+### QK-047 — Lightbox semantics follow the selected asset lifecycle
+
+**Date:** 26 October 2026
+
+**Status:** Active
+
+**Decision:** Each lightbox selection owns a monotonically numbered request.
+QuestKeeper clears the prior bitmap before presenting new caption semantics,
+announces loading politely, and accepts load/error events only from the current
+request.
+
+**Why:** Source changes alone allow slow or failed media to leave old pixels
+under a new caption and position, especially during rapid keyboard navigation.
+
+**Consequences:** Cached images still reveal through their load event; slow
+images show a skeleton; failures expose retry and adjacent navigation; stale
+events cannot overwrite current state. Gallery and notebook consumers share
+the same component and contract.
+
+**Source:** [Issue #33](https://github.com/mtamagno/questkeeper-rpg-campaign-manager/issues/33)
+and [Lightbox image lifecycle](LIGHTBOX-LIFECYCLE.md).
+
+**Revisit when:** The application adopts a centralized media loader with
+cancelable requests and decoded-image caching.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD

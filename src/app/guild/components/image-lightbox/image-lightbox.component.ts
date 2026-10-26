@@ -6,9 +6,11 @@
 import {
   Component,
   ChangeDetectionStrategy,
+  effect,
   input,
   output,
   computed,
+  signal,
   type Signal,
   HostListener,
   type AfterViewInit,
@@ -48,6 +50,7 @@ export class ImageLightboxComponent implements AfterViewInit, OnDestroy {
   private readonly dialog = viewChild.required<ElementRef<HTMLElement>>('lightboxDialog');
   private readonly closeButton = viewChild.required<ElementRef<HTMLButtonElement>>('closeButton');
   private readonly previouslyFocused = activeElement();
+  private requestVersion = 0;
   readonly isItalian = this.language.isItalian;
   /** All images in the gallery. */
   readonly images = input.required<ReadonlyArray<ImageRef>>();
@@ -66,6 +69,35 @@ export class ImageLightboxComponent implements AfterViewInit, OnDestroy {
     const imgs = this.images();
     const idx = this.currentIndex();
     return imgs[idx];
+  });
+
+  readonly loadRequest = signal<{ readonly version: number; readonly image: ImageRef } | undefined>(
+    undefined,
+  );
+  readonly loadState = signal<'loading' | 'loaded' | 'error'>('loading');
+
+  private readonly watchSelection = effect(() => {
+    const image = this.currentImage();
+    if (image === undefined) {
+      this.loadRequest.set(undefined);
+      return;
+    }
+    this.requestVersion += 1;
+    this.loadState.set('loading');
+    this.loadRequest.set({ version: this.requestVersion, image });
+  });
+
+  readonly loadingMessage = computed(() => {
+    const position = this.positionLabel();
+    if (this.loadState() === 'loaded') {
+      return this.isItalian() ? `Immagine ${position} caricata` : `Image ${position} loaded`;
+    }
+    if (this.loadState() === 'error') {
+      return this.isItalian()
+        ? `Impossibile caricare l'immagine ${position}`
+        : `Could not load image ${position}`;
+    }
+    return this.isItalian() ? `Caricamento immagine ${position}` : `Loading image ${position}`;
   });
 
   /** Whether there is a previous image to navigate to. */
@@ -87,6 +119,33 @@ export class ImageLightboxComponent implements AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     restoreFocus(this.previouslyFocused);
+  }
+
+  onImageLoad(version: number): void {
+    if (this.loadRequest()?.version !== version) return;
+    this.loadState.set('loaded');
+  }
+
+  onImageError(version: number): void {
+    if (this.loadRequest()?.version !== version) return;
+    this.loadState.set('error');
+  }
+
+  retryImage(): void {
+    const image = this.currentImage();
+    if (image === undefined) return;
+    this.requestVersion += 1;
+    this.loadState.set('loading');
+    this.loadRequest.set({ version: this.requestVersion, image });
+  }
+
+  safeFileName(image: ImageRef): string {
+    try {
+      const path = new URL(image.url, window.location.href).pathname;
+      return decodeURIComponent(path.split('/').filter(Boolean).at(-1) ?? 'image').slice(0, 80);
+    } catch {
+      return 'image';
+    }
   }
 
   /** Navigates to the previous image. */
