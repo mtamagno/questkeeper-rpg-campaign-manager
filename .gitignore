@@ -89,6 +89,7 @@ __pycache__/
 !/scripts/verify-accessibility.cjs
 !/scripts/verify-performance-budgets.cjs
 !/scripts/build-setup-binary.cjs
+!/scripts/materialize-user-campaigns.cjs
 
 # Internal module notes from the private project
 /src/app/**/README.md

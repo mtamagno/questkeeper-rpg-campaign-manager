@@ -22,7 +22,7 @@ use **Test connection** before the first release.
 **Build & publish now** performs a fresh production build and uploads the
 generated browser files to the chosen remote folder. It overwrites matching
 files but does not delete unrelated remote files. The password is stored only
-in `.campaign-manager/publishing.json`, which is ignored by Git and never
+in the protected QuestKeeper configuration root, which is outside Git and never
 returned to the browser after saving.
 
 Plain FTP is also available for legacy hosts, but it sends both credentials

@@ -19,7 +19,11 @@ from transcriber import TranscriptionJob, WhisperWorker
 
 
 BOT_DIR = Path(__file__).resolve().parent
-load_dotenv(BOT_DIR / ".env")
+ENV_FILE = Path(os.getenv("QUESTKEEPER_SCRIBE_ENV", BOT_DIR / ".env")).expanduser()
+load_dotenv(ENV_FILE)
+TRANSCRIPTS_DIR = Path(
+    os.getenv("QUESTKEEPER_TRANSCRIPTS_DIR", BOT_DIR / "transcripts")
+).expanduser()
 
 logging.basicConfig(
     level=logging.INFO,
@@ -144,7 +148,7 @@ class ActiveSession:
         stamp = started.strftime("%Y-%m-%d_%H-%M-%S")
         channel_slug = _safe_filename(voice_channel_name)
         self.transcript_path = (
-            BOT_DIR / "transcripts" / f"{stamp}_{channel_slug}_{guild_id}.md"
+            TRANSCRIPTS_DIR / f"{stamp}_{channel_slug}_{guild_id}.md"
         )
         self.transcript_path.parent.mkdir(parents=True, exist_ok=True)
         participants = ", ".join(sorted(self.names, key=str.casefold)) or "none"

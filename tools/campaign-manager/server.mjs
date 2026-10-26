@@ -55,9 +55,15 @@ import { probeCompanion, resolveCompanionControl } from './companion-status.mjs'
 import { publicLanguageCatalog } from './language-catalog.mjs';
 import { publicRulesetProfiles } from './ruleset-profiles.mjs';
 import { formatSpawnFailure, resolveNpmInvocation } from './runtime-command.mjs';
+import storagePaths from '../storage-paths.cjs';
+
+const { materializeCampaigns, prepareStorage, publicStorageSummary, resolveStoragePaths } =
+  storagePaths;
 
 const MANAGER_ROOT = dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = resolve(MANAGER_ROOT, '..', '..');
+await prepareStorage(PROJECT_ROOT);
+const STORAGE_PATHS = resolveStoragePaths(PROJECT_ROOT);
 const COMPANION_PORT = Number(process.env.QUESTKEEPER_COMPANION_PORT || 4200);
 const COMPANION_URL = `http://127.0.0.1:${COMPANION_PORT}`;
 const PUBLIC_ROOT = join(MANAGER_ROOT, 'public');
@@ -333,7 +339,7 @@ async function transcriberStatus() {
   let configured = false;
   let environmentReady = false;
   try {
-    const config = await readFile(join(TRANSCRIBER_ROOT, '.env'), 'utf8');
+    const config = await readFile(STORAGE_PATHS.scribeEnvFile, 'utf8');
     configFilePresent = true;
     const token = config.match(/^DISCORD_TOKEN\s*=\s*(.+)$/m)?.[1]?.trim();
     configured = Boolean(token && token !== 'replace-me');
@@ -354,7 +360,7 @@ async function transcriberStatus() {
     configFilePresent,
     configured,
     environmentReady,
-    transcriptDirectory: 'discord-transcriber/transcripts/',
+    transcriptDirectory: STORAGE_PATHS.transcriptsRoot,
   };
 }
 
@@ -376,6 +382,7 @@ async function startJob(kind) {
   if (kind === 'transcriber' && !(await transcriberStatus()).configured) {
     throw new Error('Configure discord-transcriber/.env before starting Discord Scribe.');
   }
+  if (['build', 'preview'].includes(kind)) await materializeCampaigns(PROJECT_ROOT);
   const command = commandForJob(kind);
   const job = {
     kind,
@@ -393,7 +400,14 @@ async function startJob(kind) {
     child = spawn(command.command, command.args, {
       cwd: command.cwd,
       windowsHide: true,
-      env: { ...process.env, BROWSER: 'none' },
+      env: {
+        ...process.env,
+        BROWSER: 'none',
+        QUESTKEEPER_SCRIBE_ENV: STORAGE_PATHS.scribeEnvFile,
+        QUESTKEEPER_TRANSCRIPTS_DIR: STORAGE_PATHS.transcriptsRoot,
+        QUESTKEEPER_LOG_DIR: STORAGE_PATHS.logsRoot,
+        ...(command.env ?? {}),
+      },
     });
   } catch (error) {
     appendLog(job, `\n${formatSpawnFailure(command.displayName ?? kind, command, error)}\n`);
@@ -481,6 +495,7 @@ async function projectStatus() {
       models: { text: TEXT_MODELS, image: IMAGE_MODELS },
     },
     publishing: publicPublishingConfig(publishingConfig),
+    storage: publicStorageSummary(STORAGE_PATHS),
   };
 }
 
@@ -512,7 +527,7 @@ async function serveCampaignAsset(response, pathname) {
   const prefix = '/campaign-assets/';
   if (!pathname.startsWith(prefix)) return false;
   const requested = decodeURIComponent(pathname.slice(prefix.length));
-  const root = join(PROJECT_ROOT, 'src', 'campaigns');
+  const root = STORAGE_PATHS.campaignsRoot;
   const path = resolve(root, requested);
   const rel = relative(root, path);
   if (!requested || rel.startsWith('..') || rel === '..') return false;
@@ -640,6 +655,7 @@ async function routeApi(request, response, url) {
       throw new Error('Confirm the unencrypted FTP warning, or choose FTPS.');
     const job = startBackgroundJob('ftp-publish', async (currentJob) => {
       appendLog(currentJob, 'Building and validating the production site…\n');
+      await materializeCampaigns(PROJECT_ROOT);
       await runLoggedCommand(
         resolveNpmInvocation(['run', 'build']),
         PROJECT_ROOT,

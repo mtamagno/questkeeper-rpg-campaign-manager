@@ -9,6 +9,9 @@ import {
 } from './entity-identity.mjs';
 import { normalizeCampaignLanguages, normalizeLanguageTag } from './language-catalog.mjs';
 import { normalizeGameSystem } from './ruleset-profiles.mjs';
+import storagePaths from '../storage-paths.cjs';
+
+const { resolveStoragePaths } = storagePaths;
 
 const ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const ENTITY_TYPE_SET = new Set(ENTITY_TYPES);
@@ -136,7 +139,7 @@ export async function writeJson(path, value) {
 }
 
 export function campaignsRoot(projectRoot) {
-  return join(projectRoot, 'src', 'campaigns');
+  return resolveStoragePaths(projectRoot).campaignsRoot;
 }
 
 function campaignRoot(projectRoot, campaignId) {
@@ -330,7 +333,7 @@ export async function updateCampaign(projectRoot, campaignId, input) {
 
 async function moveToTrash(projectRoot, source, label) {
   if (!(await exists(source))) return;
-  const trash = join(projectRoot, '.campaign-manager', 'trash', `${nowStamp()}-${label}`);
+  const trash = join(resolveStoragePaths(projectRoot).trashRoot, `${nowStamp()}-${label}`);
   await mkdir(dirname(trash), { recursive: true });
   await rename(source, trash);
 }

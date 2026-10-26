@@ -5,8 +5,10 @@ import { dirname, join, resolve } from 'node:path';
 import { promisify } from 'node:util';
 
 import { normalizeProviderModels, REMOTE_PROVIDER_REGISTRY } from './ai-providers.mjs';
+import storagePaths from '../storage-paths.cjs';
 
 const execFileAsync = promisify(execFile);
+const { resolveStoragePaths } = storagePaths;
 
 export const AI_SETUP_STATES = Object.freeze(['unseen', 'deferred', 'manual', 'draft', 'complete']);
 
@@ -105,7 +107,7 @@ function cloneDefaults() {
 }
 
 function configPath(projectRoot) {
-  return join(projectRoot, '.campaign-manager', 'ai-config.json');
+  return resolveStoragePaths(projectRoot).aiConfigFile;
 }
 
 function httpLocalhost(value, fallback) {

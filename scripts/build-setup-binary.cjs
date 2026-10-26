@@ -2,7 +2,7 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { execFileSync } = require('node:child_process');
-const { embedRuntimeSelection } = require('./lib/create-sea-entry.cjs');
+const { embedRuntimeSelection, embedStoragePaths } = require('./lib/create-sea-entry.cjs');
 
 const root = path.resolve(__dirname, '..');
 const outputDirectory = path.resolve(
@@ -19,9 +19,17 @@ const postjectPath = require.resolve('postject/dist/cli.js');
 function createSeaEntry() {
   const serverPath = path.join(root, 'tools', 'setup-wizard', 'server.cjs');
   const runtimeSelectionPath = path.join(root, 'tools', 'setup-wizard', 'runtime-selection.cjs');
+  const storagePathsPath = path.join(root, 'tools', 'storage-paths.cjs');
   const serverSource = fs.readFileSync(serverPath, 'utf8');
   const runtimeSelectionSource = fs.readFileSync(runtimeSelectionPath, 'utf8');
-  fs.writeFileSync(seaEntryPath, embedRuntimeSelection(serverSource, runtimeSelectionSource));
+  const storagePathsSource = fs.readFileSync(storagePathsPath, 'utf8');
+  fs.writeFileSync(
+    seaEntryPath,
+    embedStoragePaths(
+      embedRuntimeSelection(serverSource, runtimeSelectionSource),
+      storagePathsSource,
+    ),
+  );
 }
 
 function hideWindowsConsole(executable) {

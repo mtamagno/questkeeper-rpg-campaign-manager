@@ -63,7 +63,7 @@ block of text.
 Add a provider key, review its API/privacy/pricing links and test the account.
 OpenAI and xAI use the compatible adapter documented by each provider; Gemini
 uses its native API. Keys are written only to
-`.campaign-manager/ai-config.json`, which is ignored by Git, and are never
+the protected QuestKeeper configuration root, which is outside Git, and are never
 returned to the browser after saving. Leave the key field blank to retain it,
 or tick **Remove the saved key** to delete it explicitly.
 
@@ -198,7 +198,7 @@ Nothing becomes character data until the Game Master chooses **Save**.
 
 - Campaign Manager binds to localhost and accepts local-provider URLs only on
   `localhost`, `127.0.0.1` or `::1`.
-- API keys and setup choices live under the Git-ignored `.campaign-manager/`
+- API keys and setup choices live under the protected configuration
   directory. Never copy that file into an issue or commit.
 - Notes are sent only after pressing a processing button. Remote providers
   receive them only after the per-task checkbox is selected.
