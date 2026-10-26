@@ -53,9 +53,12 @@ import {
 import { probeCompanion, resolveCompanionControl } from './companion-status.mjs';
 import { publicLanguageCatalog } from './language-catalog.mjs';
 import { publicRulesetProfiles } from './ruleset-profiles.mjs';
+import { formatSpawnFailure, resolveNpmInvocation } from './runtime-command.mjs';
 
 const MANAGER_ROOT = dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = resolve(MANAGER_ROOT, '..', '..');
+const COMPANION_PORT = Number(process.env.QUESTKEEPER_COMPANION_PORT || 4200);
+const COMPANION_URL = `http://127.0.0.1:${COMPANION_PORT}`;
 const PUBLIC_ROOT = join(MANAGER_ROOT, 'public');
 const TRANSCRIBER_ROOT = join(PROJECT_ROOT, 'discord-transcriber');
 const TOKEN = randomBytes(24).toString('hex');
@@ -142,12 +145,24 @@ function startBackgroundJob(kind, work) {
   return job;
 }
 
-async function runLoggedCommand(command, args, cwd, job) {
+async function runLoggedCommand(invocation, cwd, job, label) {
   await new Promise((resolveRun, rejectRun) => {
-    const child = spawn(command, args, { cwd, windowsHide: true, env: { ...process.env } });
+    let child;
+    try {
+      child = spawn(invocation.command, invocation.args, {
+        cwd,
+        windowsHide: true,
+        env: { ...process.env },
+      });
+    } catch (error) {
+      rejectRun(new Error(formatSpawnFailure(label, invocation, error)));
+      return;
+    }
     child.stdout.on('data', (data) => appendLog(job, data.toString()));
     child.stderr.on('data', (data) => appendLog(job, data.toString()));
-    child.once('error', rejectRun);
+    child.once('error', (error) =>
+      rejectRun(new Error(formatSpawnFailure(label, invocation, error))),
+    );
     child.once('close', (code) =>
       code === 0 ? resolveRun() : rejectRun(new Error(`Build exited with code ${code}.`)),
     );
@@ -266,15 +281,32 @@ async function downloadImageModel(input) {
 }
 
 function commandForJob(kind) {
-  const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
-  if (kind === 'install') return { command: npm, args: ['ci'], cwd: PROJECT_ROOT };
-  if (kind === 'build') return { command: npm, args: ['run', 'build'], cwd: PROJECT_ROOT };
+  if (kind === 'install')
+    return {
+      ...resolveNpmInvocation(['ci']),
+      cwd: PROJECT_ROOT,
+      displayName: 'dependency install',
+    };
+  if (kind === 'build')
+    return {
+      ...resolveNpmInvocation(['run', 'build']),
+      cwd: PROJECT_ROOT,
+      displayName: 'production build',
+    };
   if (kind === 'preview') {
     return {
-      command: npm,
-      args: ['run', 'start', '--', '--host', '127.0.0.1', '--port', '4200'],
+      ...resolveNpmInvocation([
+        'run',
+        'start',
+        '--',
+        '--host',
+        '127.0.0.1',
+        '--port',
+        String(COMPANION_PORT),
+      ]),
       cwd: PROJECT_ROOT,
-      url: 'http://127.0.0.1:4200',
+      url: COMPANION_URL,
+      displayName: 'Companion preview',
     };
   }
   if (kind === 'transcriber') {
@@ -329,16 +361,16 @@ async function startJob(kind) {
   const current = jobs.get(kind);
   if (current && ['running', 'stopping'].includes(current.status)) return current;
   if (kind === 'preview') {
-    const probe = await probeCompanion();
+    const probe = await probeCompanion(globalThis.fetch, COMPANION_URL);
     if (probe.questKeeper) {
       return {
         kind,
         status: 'success',
-        logs: 'Reused the Companion already running on port 4200.\n',
+        logs: `Reused the Companion already running on port ${COMPANION_PORT}.\n`,
         updatedAt: new Date().toISOString(),
       };
     }
-    if (probe.reachable) throw new Error('Port 4200 is used by another application.');
+    if (probe.reachable) throw new Error(`Port ${COMPANION_PORT} is used by another application.`);
   }
   if (kind === 'transcriber' && !(await transcriberStatus()).configured) {
     throw new Error('Configure discord-transcriber/.env before starting Discord Scribe.');
@@ -351,19 +383,30 @@ async function startJob(kind) {
     startedAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     url: command.url,
+    runtimePath: command.runtimePath,
+    commandDisplay: command.display,
   };
-  const child = spawn(command.command, command.args, {
-    cwd: command.cwd,
-    windowsHide: true,
-    env: { ...process.env, BROWSER: 'none' },
-  });
-  job.process = child;
   jobs.set(kind, job);
+  let child;
+  try {
+    child = spawn(command.command, command.args, {
+      cwd: command.cwd,
+      windowsHide: true,
+      env: { ...process.env, BROWSER: 'none' },
+    });
+  } catch (error) {
+    appendLog(job, `\n${formatSpawnFailure(command.displayName ?? kind, command, error)}\n`);
+    job.errorCode = typeof error?.code === 'string' ? error.code : 'UNKNOWN_SPAWN_ERROR';
+    job.status = 'failed';
+    return job;
+  }
+  job.process = child;
   children.add(child);
   child.stdout.on('data', (data) => appendLog(job, data.toString()));
   child.stderr.on('data', (data) => appendLog(job, data.toString()));
   child.on('error', (error) => {
-    appendLog(job, `\n${error.message}\n`);
+    appendLog(job, `\n${formatSpawnFailure(command.displayName ?? kind, command, error)}\n`);
+    job.errorCode = typeof error?.code === 'string' ? error.code : 'UNKNOWN_SPAWN_ERROR';
     job.status = 'failed';
   });
   child.on('close', (code) => {
@@ -419,7 +462,8 @@ async function projectStatus() {
   const companion = resolveCompanionControl({
     dependenciesReady,
     job: jobState.preview,
-    probe: await probeCompanion(),
+    probe: await probeCompanion(globalThis.fetch, COMPANION_URL),
+    url: COMPANION_URL,
   });
   return {
     dependenciesReady,
@@ -589,9 +633,13 @@ async function routeApi(request, response, url) {
     if (config.protocol === 'ftp' && input.insecureConsent !== true)
       throw new Error('Confirm the unencrypted FTP warning, or choose FTPS.');
     const job = startBackgroundJob('ftp-publish', async (currentJob) => {
-      const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
       appendLog(currentJob, 'Building and validating the production site…\n');
-      await runLoggedCommand(npm, ['run', 'build'], PROJECT_ROOT, currentJob);
+      await runLoggedCommand(
+        resolveNpmInvocation(['run', 'build']),
+        PROJECT_ROOT,
+        currentJob,
+        'publishing build',
+      );
       const output = await buildOutputDirectory();
       await stat(output);
       await uploadBuild(config, output, (message) => appendLog(currentJob, message));

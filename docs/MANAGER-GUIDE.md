@@ -147,6 +147,21 @@ Read the [Discord Scribe guide](../discord-transcriber/README.md) before first u
 
 ## Preview, validate and recover
 
+### Local runtime and preview reliability
+
+QuestKeeper launches npm through the selected Node runtime's `npm-cli.js`
+instead of spawning a Windows `.cmd` shim. This keeps system and private
+runtimes reliable when the installation path contains spaces and avoids
+`shell: true` command-injection behavior. The same resolver is used for
+dependency installation, local preview, production builds and direct
+publishing builds.
+
+If process creation fails, the job log identifies the action, runtime path,
+safe command display and platform error code, then offers a setup/retry action.
+Environment variables, tokens and saved provider or publishing secrets are not
+included. Repeated preview clicks reuse the running job, and quitting the
+Manager stops the complete preview process tree.
+
 Use **Check and build site** before publishing. Errors identify malformed or
 missing content; automatic backups make edits recoverable. **Launch site** opens
 the real local Companion so you can check mobile layout, links, spoilers and
