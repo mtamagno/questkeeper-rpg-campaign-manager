@@ -108,9 +108,11 @@ export function inferRulesetId(edition = '') {
 export function normalizeGameSystem(value, edition = '') {
   const id = value?.id || inferRulesetId(edition);
   const profile = resolveRulesetProfile(id);
+  const normalizedEdition =
+    profile.id === 'generic' ? String(value?.edition ?? edition ?? '').trim() : profile.names.en;
   return {
     id: profile.id,
-    edition: String(value?.edition ?? edition ?? ''),
+    edition: normalizedEdition,
     customLabels:
       profile.id === 'generic' && value?.customLabels && typeof value.customLabels === 'object'
         ? value.customLabels

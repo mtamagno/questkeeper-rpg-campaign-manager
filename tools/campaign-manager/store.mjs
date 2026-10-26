@@ -61,6 +61,43 @@ function normalizeCampaignPalette(value, fallback = 'heroic') {
   return palette;
 }
 
+function slugifyCampaignName(value) {
+  return String(value ?? '')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 52);
+}
+
+function stableNameHash(value) {
+  let hash = 2166136261;
+  for (const character of String(value ?? '')) {
+    hash ^= character.codePointAt(0);
+    hash = Math.imul(hash, 16777619);
+  }
+  return (hash >>> 0).toString(36);
+}
+
+export function generateCampaignId(manifest, name, defaultLanguage, requestedId) {
+  const used = new Set((manifest ?? []).map((entry) => entry.id));
+  if (String(requestedId ?? '').trim()) {
+    const requested = validateId(String(requestedId).trim(), 'Campaign ID');
+    if (used.has(requested)) throw new Error(`Campaign "${requested}" already exists.`);
+    return requested;
+  }
+  const label = String(name?.[defaultLanguage] ?? '').trim();
+  const readable = slugifyCampaignName(label);
+  const base = readable || `campaign-${stableNameHash(label)}`;
+  if (!used.has(base)) return base;
+  for (let suffix = 2; suffix < 10_000; suffix += 1) {
+    const candidate = `${base}-${suffix}`;
+    if (!used.has(candidate)) return candidate;
+  }
+  throw new Error('Could not generate a unique campaign ID.');
+}
+
 function assertDefaultLocalizedValue(value, defaultLanguage, label) {
   if (!String(value?.[defaultLanguage] ?? '').trim()) {
     throw new Error(`${label} is required in the default language (${defaultLanguage}).`);
@@ -182,17 +219,16 @@ export async function getCampaign(projectRoot, campaignId) {
 }
 
 export async function createCampaign(projectRoot, input) {
-  const id = validateId(input.id, 'Campaign ID');
-  const root = campaignRoot(projectRoot, id);
-  if (await exists(root)) throw new Error(`Campaign "${id}" already exists.`);
   const languages = normalizeLanguages(input.languages);
   const defaultLanguage = defaultCampaignLanguage(input.defaultLanguage, languages);
   assertDefaultLocalizedValue(input.name, defaultLanguage, 'Campaign name');
 
   const manifestPath = join(campaignsRoot(projectRoot), 'campaigns.json');
   const manifest = await readJson(manifestPath, []);
-  if (manifest.some((entry) => entry.id === id))
-    throw new Error(`Campaign "${id}" already exists.`);
+  const id = generateCampaignId(manifest, input.name, defaultLanguage, input.id);
+  const root = campaignRoot(projectRoot, id);
+  if (await exists(root)) throw new Error(`Campaign "${id}" already exists.`);
+  const gameSystem = normalizeGameSystem(input.gameSystem, input.edition);
 
   const base = join(root, 'data');
   await Promise.all([
@@ -215,14 +251,14 @@ export async function createCampaign(projectRoot, input) {
     description: input.description ?? { [defaultLanguage]: '' },
     thumbnail: '',
     status: input.status ?? { [defaultLanguage]: 'In progress' },
-    gameSystem: normalizeGameSystem(input.gameSystem, input.edition),
+    gameSystem,
   };
   const campaign = {
     name: input.name,
     description: input.description ?? { [defaultLanguage]: '' },
     languages,
     defaultLanguage,
-    edition: input.edition?.trim() || 'Your ruleset',
+    edition: gameSystem.edition || 'Custom RPG',
     gameSystem: entry.gameSystem,
     startDate: input.startDate || new Date().toISOString().slice(0, 10),
     dungeonMaster: input.dungeonMaster?.trim() || 'Game Master',
@@ -451,6 +487,7 @@ export async function importCampaign(projectRoot, bundle) {
     name: bundle.manifestEntry.name,
     description: bundle.manifestEntry.description,
     status: bundle.manifestEntry.status,
+    gameSystem: bundle.campaign?.gameSystem ?? bundle.manifestEntry?.gameSystem,
     edition: bundle.campaign?.edition,
     startDate: bundle.campaign?.startDate,
     dungeonMaster: bundle.campaign?.dungeonMaster,
