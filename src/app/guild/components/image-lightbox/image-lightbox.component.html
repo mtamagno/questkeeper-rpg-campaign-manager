@@ -20,23 +20,44 @@
     ✕
   </button>
 
-  @if (currentImage(); as image) {
-    <!-- Main image -->
-    <div class="lightbox__content">
-      <img
-        class="lightbox__image"
-        [src]="image.url"
-        [alt]="image.alt"
-        (load)="$event.target.classList.add('is-loaded')"
-        loading="eager"
-        decoding="async"
-      />
+  @if (loadRequest(); as selectedRequest) {
+    @for (request of [selectedRequest]; track request.version) {
+      <div class="lightbox__content" [attr.aria-busy]="loadState() === 'loading'">
+        @if (loadState() === 'loading') {
+          <div class="lightbox__loader" aria-hidden="true"><span></span></div>
+        }
 
-      @if (image.caption) {
-        <p class="lightbox__caption">{{ image.caption }}</p>
-      }
-    </div>
+        @if (loadState() === 'error') {
+          <div class="lightbox__error">
+            <strong>{{ isItalian() ? 'Immagine non disponibile' : 'Image unavailable' }}</strong>
+            <p>{{ safeFileName(request.image) }}</p>
+            <button type="button" (click)="retryImage(); $event.stopPropagation()">
+              {{ isItalian() ? 'Riprova' : 'Retry' }}
+            </button>
+          </div>
+        } @else {
+          <img
+            class="lightbox__image"
+            [class.is-loaded]="loadState() === 'loaded'"
+            [src]="request.image.url"
+            [alt]="request.image.alt"
+            (load)="onImageLoad(request.version)"
+            (error)="onImageError(request.version)"
+            loading="eager"
+            decoding="async"
+          />
+        }
+
+        @if (loadState() === 'loaded' && request.image.caption) {
+          <p class="lightbox__caption">{{ request.image.caption }}</p>
+        }
+      </div>
+    }
   }
+
+  <p class="lightbox__status" role="status" aria-live="polite" aria-atomic="true">
+    {{ loadingMessage() }}
+  </p>
 
   <!-- Navigation -->
   @if (images().length > 1) {
