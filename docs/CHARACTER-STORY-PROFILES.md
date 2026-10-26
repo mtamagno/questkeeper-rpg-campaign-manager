@@ -43,12 +43,23 @@ belong to that participant's card and to the full relationship page.
 Known-story references link back to the artifact that supports them. Counts are
 navigation cues, not new facts.
 
+NPC dossiers consume the same canonical relationship records. Their closable
+**Known relationships** section shows both recorded perspectives together,
+because the reader is inspecting the subject rather than speaking as that NPC.
+NPC feelings are phrased as what the party believes the NPC seems to feel;
+NPC-to-NPC cards also display the observed, reported or inferred certainty and
+its public evidence. Unresolved/private participants are omitted, while a valid
+NPC with no published link receives an explicit empty state and a route to the
+complete NPC network.
+
 ## Editorial rules
 
 - Use public character and relationship fields only.
 - A profile may honestly show an unwritten identity, forming bond or empty memory.
 - Do not infer affection, conflict or shared events from prose.
 - Do not summarize private profiles, character sheets or GM notes into this view.
+- Never copy relationship prose into an NPC record. Character and NPC previews
+  must derive from `party-relationships.json` and `npc-relationships.json`.
 - Keep origin chapters, notebooks, quotes and diaries authoritative; the profile
   only connects them.
 - Keep the first screen concise. Known history belongs with its evidence near the
@@ -70,7 +81,8 @@ turning the opening profile into a statistics dashboard.
 
 ## Verification
 
-`npm run test:character-profiles` checks the ordered public hierarchy, relationship
-carousel and diary derivation, protected-data boundary and required public profile
-fields across every campaign character. The full verification gate adds
-formatting, TypeScript, accessibility, build and performance checks.
+`npm run test:character-profiles` checks the ordered public hierarchy,
+character carousel, NPC relationship cards, both directional perspectives,
+party-perception boundary, resolved participants, empty-state route and diary
+derivation across every campaign. The full verification gate adds formatting,
+TypeScript, accessibility, build and performance checks.

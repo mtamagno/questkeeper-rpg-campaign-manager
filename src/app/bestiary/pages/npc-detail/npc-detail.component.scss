@@ -214,6 +214,270 @@
     }
   }
 
+  // --- Public relationship context ---
+  &__relationships-heading {
+    max-width: 760px;
+    margin-bottom: $spacing-lg;
+
+    p {
+      margin: 0;
+      color: $color-text-secondary;
+      line-height: $line-height-relaxed;
+    }
+  }
+
+  &__relationships-eyebrow {
+    margin-bottom: $spacing-xs !important;
+    color: $color-gold !important;
+    font-family: $font-family-heading;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+    letter-spacing: $letter-spacing-wider;
+    text-transform: uppercase;
+  }
+
+  &__relationship-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
+    gap: $spacing-lg;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__relationship-card {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+    min-width: 0;
+    padding: $spacing-lg;
+    border: $border-width-thin solid $color-border-subtle;
+    border-radius: $border-radius-md;
+    background:
+      linear-gradient(145deg, rgba($color-gold-dark, 0.1), transparent 42%),
+      rgba($color-bg-void, 0.42);
+    box-shadow: $shadow-sm;
+  }
+
+  &__relationship-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $spacing-sm;
+
+    @include respond-below(sm) {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+  }
+
+  &__relationship-person {
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+    gap: $spacing-sm;
+    color: $color-gold-light;
+    text-decoration: none;
+
+    img {
+      width: 50px;
+      height: 50px;
+      flex: 0 0 auto;
+      border: $border-width-thin solid $color-border-accent;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    strong {
+      overflow-wrap: anywhere;
+    }
+
+    &:hover {
+      color: $color-gold;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--qk-color-focus, #{$color-gold-light});
+      outline-offset: 4px;
+      border-radius: $border-radius-sm;
+    }
+  }
+
+  &__relationship-type {
+    flex: 0 0 auto;
+    padding: $spacing-2xs $spacing-sm;
+    border: $border-width-thin solid $color-border-accent;
+    border-radius: $border-radius-pill;
+    color: $color-gold-light;
+    font-family: $font-family-heading;
+    font-size: $font-size-xs;
+    letter-spacing: $letter-spacing-wide;
+    text-transform: uppercase;
+  }
+
+  &__relationship-description {
+    margin: 0;
+    color: $color-text-primary;
+    line-height: $line-height-relaxed;
+  }
+
+  &__perception {
+    padding: $spacing-sm $spacing-md;
+    border-left: $border-width-thick solid $color-gold-dark;
+    background: rgba($color-bg-elevated, 0.72);
+
+    strong {
+      color: $color-gold;
+      font-family: $font-family-heading;
+      font-size: $font-size-xs;
+      letter-spacing: $letter-spacing-wide;
+      text-transform: uppercase;
+    }
+
+    p {
+      margin: $spacing-2xs 0 0;
+      color: $color-text-secondary;
+      font-size: $font-size-sm;
+      line-height: $line-height-relaxed;
+    }
+  }
+
+  &__perspectives {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: $spacing-sm;
+
+    @include respond-below(sm) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__perspective {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+    min-width: 0;
+    padding: $spacing-sm;
+    border: $border-width-thin solid rgba($color-border-subtle, 0.75);
+    border-radius: $border-radius-sm;
+    background: rgba($color-bg-surface, 0.48);
+
+    > h3 {
+      margin: 0;
+      color: $color-text-secondary;
+      font-family: $font-family-heading;
+      font-size: $font-size-xs;
+      letter-spacing: $letter-spacing-wide;
+      line-height: $line-height-base;
+      text-transform: uppercase;
+    }
+  }
+
+  &__feeling {
+    padding-top: $spacing-sm;
+    border-top: $border-width-thin solid rgba($color-border-subtle, 0.55);
+
+    &:first-of-type {
+      padding-top: 0;
+      border-top: 0;
+    }
+
+    p {
+      margin: $spacing-2xs 0 0;
+      color: $color-text-secondary;
+      font-size: $font-size-sm;
+      line-height: $line-height-relaxed;
+    }
+  }
+
+  &__feeling-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $spacing-xs;
+
+    strong {
+      color: $color-text-primary;
+      font-size: $font-size-sm;
+    }
+  }
+
+  &__feeling-meter {
+    display: inline-flex;
+    flex: 0 0 auto;
+    gap: 4px;
+
+    i {
+      width: 7px;
+      height: 7px;
+      border: $border-width-thin solid $color-border-accent;
+      border-radius: 50%;
+      background: transparent;
+
+      &.is-active {
+        background: $color-gold;
+        box-shadow: 0 0 7px rgba($color-gold, 0.62);
+      }
+    }
+  }
+
+  &__perspective-empty {
+    margin: 0;
+    color: $color-text-muted;
+    font-size: $font-size-sm;
+    font-style: italic;
+    line-height: $line-height-relaxed;
+  }
+
+  &__relationship-link,
+  &__network-link {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    gap: $spacing-xs;
+    color: $color-gold-light;
+    font-family: $font-family-heading;
+    text-decoration: none;
+
+    &:hover {
+      color: $color-gold;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--qk-color-focus, #{$color-gold-light});
+      outline-offset: 4px;
+      border-radius: $border-radius-sm;
+    }
+  }
+
+  &__relationship-link {
+    margin-top: auto;
+  }
+
+  &__network-link {
+    margin-top: $spacing-lg;
+  }
+
+  &__relationships-empty {
+    min-height: 150px;
+    padding: $spacing-xl;
+    border: $border-width-thin dashed $color-border-subtle;
+    border-radius: $border-radius-md;
+    background: rgba($color-bg-void, 0.28);
+
+    > span {
+      color: $color-gold-dark;
+      font-size: $font-size-2xl;
+    }
+
+    p {
+      max-width: 560px;
+      margin: $spacing-xs auto 0;
+    }
+  }
+
   // --- Loading / not found states ---
   &__loading,
   &__not-found {

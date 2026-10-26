@@ -1117,6 +1117,36 @@ rather than introduce competing fields.
 **Revisit when:** Players need private favourites, per-player disagreement or a
 campaign-wide memory curation workflow.
 
+### QK-041 — NPC dossiers derive the party's perceived relationship context
+
+**Date:** 25 October 2026
+
+**Status:** Active
+
+**Decision:** Every public NPC dossier derives its relationship cards from the
+canonical party/NPC relationship collections. It shows both recorded
+perspectives together, labels NPC feelings as the party's current reading and
+displays certainty plus evidence for NPC-to-NPC links. It never stores a second
+NPC-local relationship summary.
+
+**Why:** Requiring readers to leave an NPC dossier and reconstruct its edges
+from a full graph hides useful context. Copying that context into the NPC would
+solve discoverability by creating conflicting sources and could expose private
+Game Master truth as fact.
+
+**Consequences:** Unresolved or unpublished participants are skipped completely;
+an NPC without public links has an honest empty state. Cards link to the other
+public profile, the complete relationship record and the NPC network. Manager
+and AI workflows continue to edit canonical relationship records only.
+
+**Source:** [Issue #39](https://github.com/mtamagno/questkeeper-rpg-campaign-manager/issues/39),
+[character story profiles](CHARACTER-STORY-PROFILES.md) and
+[campaign content guide](CONTENT-GUIDE.md#relationships).
+
+**Revisit when:** A Game Master-only relationship layer is introduced or player
+testing shows that two perspectives need progressive disclosure on very dense
+NPC networks.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD
