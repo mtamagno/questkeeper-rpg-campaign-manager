@@ -1249,6 +1249,31 @@ history.
 **Revisit when:** Account-backed synchronization introduces an explicit threat
 model and encrypted storage contract for private campaign data.
 
+### QK-046 — Human campaign choices own technical identity
+
+**Date:** 26 October 2026
+
+**Status:** Active
+
+**Decision:** New campaign IDs are generated once from the default-language
+name and receive a numeric collision suffix when needed. The normal editor
+hides the ID; Advanced mode may override it only before first save and may
+inspect the stable value later. Known ruleset profiles own their display
+edition, while free text remains available only to Generic/custom systems.
+
+**Why:** Campaign setup should ask for table meaning, not storage formatting or
+the same game system twice.
+
+**Consequences:** Create and import share the store normalizer; existing IDs
+never follow later name edits; Unicode-only names use a deterministic hashed
+fallback; legacy edition-only data is inferred at read time without rewriting
+source files. Custom systems retain their edition label.
+
+**Source:** [Issue #22](https://github.com/mtamagno/questkeeper-rpg-campaign-manager/issues/22).
+
+**Revisit when:** Campaign identity moves to a database-backed account model or
+ruleset profiles gain explicit user-selectable editions.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD

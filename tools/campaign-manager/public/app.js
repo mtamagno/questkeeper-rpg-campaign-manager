@@ -366,7 +366,7 @@ function renderOverview() {
     <div class="overview-grid">
       <section class="project-panel my-character-panel"><span class="eyebrow">Quick return</span><h3>${myCharacter ? escapeHtml(entityName('characters', myCharacter)) : 'Choose my character'}</h3><p>${myCharacter ? 'The Manager will open this profile directly whenever the Companion is ready.' : 'Choose your character once from the Characters tab to make every return immediate.'}</p>${myCharacter ? `<button class="primary-button" data-action="open-my-character">Open my character</button>` : `<button class="secondary-button" data-action="show-characters">Choose from the party</button>`}</section>
       <section class="project-panel"><span class="eyebrow">The story so far</span><h2>${escapeHtml(localized(campaign.name))}</h2><p>${escapeHtml(localized(campaign.storySoFar) || 'Your running campaign recap will appear here.')}</p></section>
-      <section class="project-panel"><h3>Table details</h3><dl class="detail-list"><div><dt>Game Master</dt><dd>${escapeHtml(campaign.dungeonMaster)}</dd></div><div><dt>Party</dt><dd>${escapeHtml(campaign.partyName)}</dd></div><div><dt>System</dt><dd>${escapeHtml(campaign.edition)}</dd></div><div><dt>Started</dt><dd>${escapeHtml(campaign.startDate)}</dd></div></dl></section>
+      <section class="project-panel"><h3>Table details</h3><dl class="detail-list"><div><dt>Game Master</dt><dd>${escapeHtml(campaign.dungeonMaster)}</dd></div><div><dt>Party</dt><dd>${escapeHtml(campaign.partyName)}</dd></div><div><dt>System</dt><dd>${escapeHtml(campaign.gameSystem?.edition || campaign.edition)}</dd></div><div><dt>Started</dt><dd>${escapeHtml(campaign.startDate)}</dd></div></dl></section>
     </div>`;
 }
 
@@ -556,6 +556,10 @@ function rulesetPicker(value = { id: 'generic', customLabels: {} }) {
   ]
     .map(([key, fallback]) => field(`rulesetLabel__${key}`, fallback, labels[key] ?? fallback))
     .join('')}</div></details>`;
+}
+
+function customEditionField(value = '', rulesetId = 'generic') {
+  return `<div class="field field--wide" data-custom-edition ${rulesetId === 'generic' ? '' : 'hidden'}>${field('edition', 'Custom system / edition', value, { hint: 'Only needed for a generic or homebrew ruleset.' })}</div>`;
 }
 
 function activeIdentityFields() {
@@ -835,10 +839,11 @@ function campaignForm(campaign) {
   const languages = editing ? campaignLanguages() : ['en'];
   if (!editing) {
     return [
-      field('id', 'Campaign ID', '', {
-        required: true,
-        hint: 'Lowercase letters, numbers and hyphens only.',
-      }),
+      state.advancedMode
+        ? field('id', 'Campaign ID override', '', {
+            hint: 'Optional before first save. Leave blank to generate it from the campaign name.',
+          })
+        : '',
       field('startDate', 'Start date', new Date().toISOString().slice(0, 10), { type: 'date' }),
       section('Languages'),
       campaignLanguagePicker(languages, 'en'),
@@ -850,19 +855,21 @@ function campaignForm(campaign) {
       ),
       section('Game system'),
       rulesetPicker({ id: 'generic', customLabels: {} }),
+      customEditionField('', 'generic'),
       palettePicker('heroic'),
       section('Your table'),
       field('dungeonMaster', 'Game Master', ''),
       field('partyName', 'Party name', ''),
-      field('edition', 'System / edition', ''),
       field('cover', 'Cover image', '', { type: 'file', hint: 'PNG, JPEG or WebP · up to 8 MB' }),
     ].join('');
   }
+  const gameSystem = campaignRuleset(campaign);
   return [
-    field('id', 'Campaign ID', entry.id ?? '', {
-      required: true,
-      hint: 'Lowercase letters, numbers and hyphens only.',
-    }),
+    state.advancedMode
+      ? field('id', 'Campaign ID', entry.id ?? '', {
+          hint: 'Stable after creation. Shown for integrations and troubleshooting.',
+        })
+      : '',
     field('startDate', 'Start date', details.startDate ?? new Date().toISOString().slice(0, 10), {
       type: 'date',
     }),
@@ -880,12 +887,12 @@ function campaignForm(campaign) {
     ),
     translationWorkspace(languages),
     section('Game system'),
-    rulesetPicker(campaignRuleset(campaign)),
+    rulesetPicker(gameSystem),
+    customEditionField(details.edition ?? gameSystem.edition ?? '', gameSystem.id),
     palettePicker(entry.palette ?? 'heroic'),
     section('Your table'),
     field('dungeonMaster', 'Game Master', details.dungeonMaster ?? ''),
     field('partyName', 'Party name', details.partyName ?? ''),
-    field('edition', 'System / edition', details.edition ?? ''),
     field('cover', 'Cover image', '', { type: 'file', hint: 'PNG, JPEG or WebP · up to 8 MB' }),
   ].join('');
 }
@@ -897,7 +904,9 @@ function openCampaignEditor(editing = false) {
     html: campaignForm(editing ? state.campaign : null),
     editor: { kind: 'campaign', editing },
   });
-  if (editing) fields.querySelector('[name="id"]').disabled = true;
+  if (editing && fields.querySelector('[name="id"]')) {
+    fields.querySelector('[name="id"]').disabled = true;
+  }
 }
 
 function currentCampaignLocalizedValues() {
@@ -1327,14 +1336,14 @@ async function saveCampaign(form) {
   const defaultLanguage = form.get('defaultLanguage')?.toString().trim() || languages[0];
   const localizedValues = currentCampaignLocalizedValues();
   const data = {
-    id: form.get('id')?.toString() || state.selectedId,
+    id: creating ? form.get('id')?.toString().trim() || undefined : state.selectedId,
     languages,
     defaultLanguage,
     palette: form.get('palette')?.toString() || 'heroic',
     name: localizedValues.name,
     description: localizedValues.description,
     status: localizedValues.status,
-    edition: form.get('edition')?.toString(),
+    edition: form.get('edition')?.toString().trim() || '',
     startDate: form.get('startDate')?.toString(),
     dungeonMaster: form.get('dungeonMaster')?.toString(),
     partyName: form.get('partyName')?.toString(),
@@ -2839,6 +2848,11 @@ fields.addEventListener('change', (event) => {
     );
     refreshCampaignLanguages(languages, event.target.value);
     languagePickerMessage('Default language updated. Required fields changed below.');
+    return;
+  }
+  if (event.target.name === 'gameSystemId') {
+    const customEdition = fields.querySelector('[data-custom-edition]');
+    if (customEdition) customEdition.hidden = event.target.value !== 'generic';
     return;
   }
   const imageField = event.target.closest('[data-ai-image-field]');

@@ -54,6 +54,61 @@ test('creates a complete campaign and reports its counts', async (t) => {
   });
 });
 
+test('generates stable collision-safe campaign IDs from localized names', async (t) => {
+  const root = await fixture(t);
+  const first = await createCampaign(root, {
+    ...campaignInput,
+    id: undefined,
+    languages: ['es'],
+    defaultLanguage: 'es',
+    name: { es: 'Crónicas del Mar' },
+  });
+  const duplicate = await createCampaign(root, {
+    ...campaignInput,
+    id: undefined,
+    languages: ['es'],
+    defaultLanguage: 'es',
+    name: { es: 'Crónicas del Mar' },
+  });
+  const unicode = await createCampaign(root, {
+    ...campaignInput,
+    id: undefined,
+    languages: ['ja'],
+    defaultLanguage: 'ja',
+    name: { ja: '海の年代記' },
+  });
+
+  assert.equal(first.manifestEntry.id, 'cronicas-del-mar');
+  assert.equal(duplicate.manifestEntry.id, 'cronicas-del-mar-2');
+  assert.match(unicode.manifestEntry.id, /^campaign-[a-z0-9]+$/);
+});
+
+test('normalizes known rulesets while preserving custom editions', async (t) => {
+  const root = await fixture(t);
+  const known = await createCampaign(root, {
+    ...campaignInput,
+    id: 'known-system',
+    gameSystem: { id: 'dnd-2024', edition: 'duplicated text' },
+  });
+  const legacy = await createCampaign(root, {
+    ...campaignInput,
+    id: 'legacy-system',
+    edition: 'D&D 5e 2014',
+  });
+  const custom = await createCampaign(root, {
+    ...campaignInput,
+    id: 'custom-system',
+    gameSystem: { id: 'generic', edition: 'Moonlit d12' },
+  });
+
+  assert.equal(known.campaign.gameSystem.edition, '5E fantasy (2024)');
+  assert.equal(known.campaign.edition, '5E fantasy (2024)');
+  assert.equal(legacy.campaign.gameSystem.id, 'dnd-2014');
+  assert.equal(legacy.campaign.edition, '5E fantasy (2014)');
+  assert.equal(custom.campaign.gameSystem.id, 'generic');
+  assert.equal(custom.campaign.edition, 'Moonlit d12');
+});
+
 test('stores curated campaign palettes and rejects unknown themes', async (t) => {
   const root = await fixture(t);
   const campaign = await createCampaign(root, { ...campaignInput, palette: 'gothic' });
