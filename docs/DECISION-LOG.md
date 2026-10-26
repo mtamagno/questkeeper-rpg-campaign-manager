@@ -1173,6 +1173,33 @@ P-03 in [Game Night acceptance journeys](GAME-NIGHT-ACCEPTANCE-JOURNEYS.md).
 **Revisit when:** QuestKeeper gains user accounts, shared player packages or
 device synchronization with an explicit identity and privacy model.
 
+### QK-043 — Node owns npm process launches; shell shims do not
+
+**Date:** 26 October 2026
+
+**Status:** Active
+
+**Decision:** Campaign Manager resolves the active runtime's `npm-cli.js` and
+executes it with that exact Node binary and an argument array. It never spawns
+`npm.cmd` directly and never enables `shell: true`. This contract covers setup,
+preview, builds and direct publishing.
+
+**Why:** Windows command shims can fail with `spawn EINVAL`, especially in
+packaged/private runtimes and paths containing spaces. Shell parsing would hide
+the immediate defect while introducing quoting and injection risks.
+
+**Consequences:** System and private runtime layouts share one resolver;
+unsupported runtimes fail before launch with an actionable setup message.
+Spawn diagnostics may expose the runtime and safe internal command but never
+environment values or secrets. Duplicate preview requests reuse one job and
+shutdown owns the full process tree.
+
+**Source:** [Issue #19](https://github.com/mtamagno/questkeeper-rpg-campaign-manager/issues/19)
+and [Campaign Manager guide](MANAGER-GUIDE.md#local-runtime-and-preview-reliability).
+
+**Revisit when:** Node exposes a stable cross-platform package-manager launch
+API or QuestKeeper replaces npm for distributed runtime jobs.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD

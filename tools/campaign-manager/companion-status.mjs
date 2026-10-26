@@ -1,8 +1,8 @@
 export const COMPANION_URL = 'http://127.0.0.1:4200';
 
-export async function probeCompanion(fetchImpl = globalThis.fetch) {
+export async function probeCompanion(fetchImpl = globalThis.fetch, url = COMPANION_URL) {
   try {
-    const response = await fetchImpl(COMPANION_URL, { signal: AbortSignal.timeout(1_200) });
+    const response = await fetchImpl(url, { signal: AbortSignal.timeout(1_200) });
     if (!response.ok) return { reachable: true, questKeeper: false };
     const html = await response.text();
     return {
@@ -16,24 +16,25 @@ export async function probeCompanion(fetchImpl = globalThis.fetch) {
   }
 }
 
-export function resolveCompanionControl({ dependenciesReady, job, probe }) {
+export function resolveCompanionControl({ dependenciesReady, job, probe, url = COMPANION_URL }) {
+  const port = new URL(url).port || '4200';
   if (!dependenciesReady) {
     return {
       action: 'prepare',
       label: 'Start Companion',
       status: 'Prepare the project first.',
-      url: COMPANION_URL,
+      url,
     };
   }
   if (probe.questKeeper) {
-    return { action: 'open', label: 'Open Companion', status: 'Ready', url: COMPANION_URL };
+    return { action: 'open', label: 'Open Companion', status: 'Ready', url };
   }
   if (probe.reachable) {
     return {
       action: 'retry',
       label: 'Retry',
-      status: 'Port 4200 is used by another application.',
-      url: COMPANION_URL,
+      status: `Port ${port} is used by another application.`,
+      url,
     };
   }
   if (job?.status === 'running' || job?.status === 'stopping') {
@@ -41,7 +42,7 @@ export function resolveCompanionControl({ dependenciesReady, job, probe }) {
       action: 'wait',
       label: 'Starting…',
       status: 'Waiting for the Companion to become ready…',
-      url: COMPANION_URL,
+      url,
     };
   }
   if (job?.status === 'failed') {
@@ -49,8 +50,8 @@ export function resolveCompanionControl({ dependenciesReady, job, probe }) {
       action: 'retry',
       label: 'Retry',
       status: 'Startup failed. Review the preview log and try again.',
-      url: COMPANION_URL,
+      url,
     };
   }
-  return { action: 'start', label: 'Start Companion', status: 'Not started', url: COMPANION_URL };
+  return { action: 'start', label: 'Start Companion', status: 'Not started', url };
 }
