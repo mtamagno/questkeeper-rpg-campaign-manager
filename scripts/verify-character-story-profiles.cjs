@@ -20,6 +20,15 @@ const component = fs.readFileSync(
   path.join(componentRoot, 'character-detail.component.ts'),
   'utf8',
 );
+const npcDetailRoot = path.join(projectRoot, 'src', 'app', 'bestiary', 'pages', 'npc-detail');
+const npcDetailTemplate = fs.readFileSync(
+  path.join(npcDetailRoot, 'npc-detail.component.html'),
+  'utf8',
+);
+const npcDetailComponent = fs.readFileSync(
+  path.join(npcDetailRoot, 'npc-detail.component.ts'),
+  'utf8',
+);
 const relationshipModel = fs.readFileSync(
   path.join(projectRoot, 'src', 'app', 'guild', 'models', 'relationship.model.ts'),
   'utf8',
@@ -43,6 +52,7 @@ let npcToNpcCount = 0;
 let quickFactCount = 0;
 let signatureItemCount = 0;
 let favouriteMomentCount = 0;
+let npcProfileRelationshipCount = 0;
 
 function assert(condition, message) {
   if (!condition) failures.push(message);
@@ -115,6 +125,30 @@ assert(
   !template.includes('href="#') && template.includes('fragment="profile-bonds"'),
   'In-profile references must preserve the active Angular campaign route.',
 );
+assert(
+  npcDetailTemplate.includes('id="npc-profile-relationships"') &&
+    npcDetailTemplate.includes('@for (bond of relationshipCards(); track bond.key)') &&
+    npcDetailTemplate.includes('bond.npcFeelings') &&
+    npcDetailTemplate.includes('bond.otherFeelings') &&
+    npcDetailTemplate.includes('bond.perception'),
+  'NPC profiles need one closable public relationship section with both perspectives.',
+);
+assert(
+  npcDetailTemplate.includes("'npcs', 'relationships'") &&
+    npcDetailTemplate.includes("'relationships',") &&
+    npcDetailTemplate.includes('relationshipCards().length'),
+  'NPC relationship cards need detail links, a full-network route and an honest empty count.',
+);
+assert(
+  npcDetailComponent.includes('getRelationshipsForEntity(npc.id)') &&
+    npcDetailComponent.includes('if (other === undefined) return []') &&
+    npcDetailComponent.includes('PARTY_PERCEPTION_LABELS'),
+  'NPC relationship previews must derive from canonical public records and skip unresolved entities.',
+);
+assert(
+  !npcDetailTemplate.includes('privateProfile') && !npcDetailTemplate.includes('gmNotes'),
+  'NPC relationship profiles must not read protected character or GM data.',
+);
 
 const overviewIndex = template.indexOf('id="profile-overview"');
 const chaptersIndex = template.indexOf('id="personal-chapters"');
@@ -133,7 +167,9 @@ assert(
 
 for (const campaign of campaigns) {
   const campaignRoot = path.join(campaignsRoot, campaign.id);
+  const characterIds = new Set();
   const npcIds = new Set();
+  const minorNpcIds = new Set();
   const sessionIds = new Set();
   const sessionRoot = path.join(campaignRoot, 'data', 'sessions');
   const sessionManifestPath = path.join(sessionRoot, 'manifest.json');
@@ -151,6 +187,7 @@ for (const campaign of campaigns) {
   for (const fileName of manifest) {
     const character = JSON.parse(fs.readFileSync(path.join(characterRoot, fileName), 'utf8'));
     const label = `${campaign.id}/${character.id}`;
+    characterIds.add(character.id);
     characterCount += 1;
     assert(character.publicProfile, `${label} needs a public profile.`);
     for (const field of ['traits', 'ideals', 'bonds', 'flaws', 'knownHistory']) {
@@ -223,6 +260,7 @@ for (const campaign of campaigns) {
     for (const fileName of npcManifest) {
       const npc = JSON.parse(fs.readFileSync(path.join(npcRoot, fileName), 'utf8'));
       npcIds.add(npc.id);
+      if (npc.isMinor === true) minorNpcIds.add(npc.id);
     }
   }
 
@@ -232,7 +270,20 @@ for (const campaign of campaigns) {
     const relationships = JSON.parse(fs.readFileSync(relationshipPath, 'utf8'));
     for (const relationship of relationships) {
       const label = `${campaign.id}/${relationship.sourceId}->${relationship.targetId}`;
+      const knownEntityIds = new Set([...characterIds, ...npcIds]);
       assert(typeof relationship.type === 'string', `${label} needs one relationship type.`);
+      assert(
+        knownEntityIds.has(relationship.sourceId) && knownEntityIds.has(relationship.targetId),
+        `${label} participants must resolve before a public profile can link to them.`,
+      );
+      if (
+        relationshipFile === 'npc-relationships.json' &&
+        !minorNpcIds.has(relationship.sourceId) &&
+        !minorNpcIds.has(relationship.targetId) &&
+        (npcIds.has(relationship.sourceId) || npcIds.has(relationship.targetId))
+      ) {
+        npcProfileRelationshipCount += 1;
+      }
       if (npcIds.has(relationship.sourceId) && npcIds.has(relationship.targetId)) {
         npcToNpcCount += 1;
         assert(
@@ -281,6 +332,10 @@ for (const campaign of campaigns) {
 assert(characterCount > 0, 'At least one campaign character must exercise the story profile.');
 assert(feelingCount > 0, 'At least one relationship must exercise plural directional feelings.');
 assert(npcToNpcCount > 0, 'At least one NPC-to-NPC relationship must exercise party perception.');
+assert(
+  npcProfileRelationshipCount > 0,
+  'At least one public NPC profile must exercise a canonical relationship card.',
+);
 assert(quickFactCount > 0, 'At least one character must exercise quick facts.');
 assert(signatureItemCount > 0, 'At least one character must exercise signature items.');
 assert(favouriteMomentCount > 0, 'At least one character must exercise favourite moments.');
@@ -291,5 +346,5 @@ if (failures.length) {
 }
 
 console.log(
-  `Character story profiles verified across ${campaigns.length} campaign(s), ${characterCount} character(s), ${quickFactCount} quick facts, ${signatureItemCount} signature items, ${favouriteMomentCount} favourite moments, ${feelingCount} relationship feelings and ${npcToNpcCount} NPC-to-NPC bonds.`,
+  `Character and NPC story profiles verified across ${campaigns.length} campaign(s), ${characterCount} character(s), ${quickFactCount} quick facts, ${signatureItemCount} signature items, ${favouriteMomentCount} favourite moments, ${feelingCount} relationship feelings, ${npcToNpcCount} NPC-to-NPC bonds and ${npcProfileRelationshipCount} NPC profile relationship cards.`,
 );

@@ -99,6 +99,197 @@
       </app-accordion>
     </section>
 
+    <!-- Relationships are derived from the canonical public graph, never copied into NPC data. -->
+    <section id="npc-profile-relationships" class="npc-detail__section">
+      <app-accordion
+        [title]="lang() === 'it' ? 'Legami conosciuti' : 'Known relationships'"
+        icon="🔗"
+        [startOpen]="true"
+      >
+        <div class="npc-detail__relationships-heading">
+          <p class="npc-detail__relationships-eyebrow">
+            {{ lang() === 'it' ? 'Il punto di vista del gruppo' : "The party's point of view" }}
+          </p>
+          <p>
+            {{
+              lang() === 'it'
+                ? 'Qui appare soltanto ciò che il gruppo ha osservato, gli è stato riferito o può ragionevolmente dedurre.'
+                : 'Only what the party has observed, been told or can reasonably infer appears here.'
+            }}
+          </p>
+        </div>
+
+        @if (relationshipCards().length > 0) {
+          <ul
+            class="npc-detail__relationship-grid"
+            [attr.aria-label]="
+              lang() === 'it' ? 'Relazioni conosciute del PNG' : 'Known NPC relationships'
+            "
+          >
+            @for (bond of relationshipCards(); track bond.key) {
+              <li class="npc-detail__relationship-card">
+                <header class="npc-detail__relationship-card-header">
+                  <a
+                    class="npc-detail__relationship-person"
+                    [routerLink]="['/', campaignId() ?? '', bond.otherPath, bond.otherId]"
+                  >
+                    <img [src]="bond.otherAvatarUrl" alt="" loading="lazy" decoding="async" />
+                    <strong>{{ bond.otherName }}</strong>
+                  </a>
+                  <span class="npc-detail__relationship-type">{{ bond.typeLabel }}</span>
+                </header>
+
+                <p class="npc-detail__relationship-description">{{ bond.description }}</p>
+
+                @if (bond.perception; as perception) {
+                  <aside class="npc-detail__perception">
+                    <strong>{{ perception.label }}</strong>
+                    <p>{{ perception.basis }}</p>
+                  </aside>
+                }
+
+                <div class="npc-detail__perspectives">
+                  <section class="npc-detail__perspective">
+                    <h3>
+                      {{
+                        lang() === 'it'
+                          ? 'Cosa sembra provare ' + npc.name
+                          : 'What ' + npc.name + ' seems to feel'
+                      }}
+                    </h3>
+                    @if (bond.npcFeelings.length > 0) {
+                      @for (feeling of bond.npcFeelings; track feeling.label) {
+                        <article class="npc-detail__feeling">
+                          <div class="npc-detail__feeling-heading">
+                            <strong>{{ feeling.label }}</strong>
+                            <span
+                              class="npc-detail__feeling-meter"
+                              role="img"
+                              [attr.aria-label]="
+                                (lang() === 'it' ? 'Intensità ' : 'Intensity ') +
+                                feeling.intensity +
+                                (lang() === 'it' ? ' su 5' : ' out of 5')
+                              "
+                            >
+                              @for (step of feelingScale; track step) {
+                                <i [class.is-active]="step <= feeling.intensity"></i>
+                              }
+                            </span>
+                          </div>
+                          <p>{{ feeling.reason }}</p>
+                        </article>
+                      }
+                    } @else {
+                      <p class="npc-detail__perspective-empty">
+                        {{
+                          lang() === 'it'
+                            ? 'Il gruppo non sa ancora cosa provi.'
+                            : 'The party does not yet know how they feel.'
+                        }}
+                      </p>
+                    }
+                  </section>
+
+                  <section class="npc-detail__perspective">
+                    <h3>
+                      {{
+                        bond.otherIsNpc
+                          ? lang() === 'it'
+                            ? 'Cosa sembra provare ' + bond.otherName
+                            : 'What ' + bond.otherName + ' seems to feel'
+                          : lang() === 'it'
+                            ? 'Cosa prova ' + bond.otherName
+                            : 'What ' + bond.otherName + ' feels'
+                      }}
+                    </h3>
+                    @if (bond.otherFeelings.length > 0) {
+                      @for (feeling of bond.otherFeelings; track feeling.label) {
+                        <article class="npc-detail__feeling">
+                          <div class="npc-detail__feeling-heading">
+                            <strong>{{ feeling.label }}</strong>
+                            <span
+                              class="npc-detail__feeling-meter"
+                              role="img"
+                              [attr.aria-label]="
+                                (lang() === 'it' ? 'Intensità ' : 'Intensity ') +
+                                feeling.intensity +
+                                (lang() === 'it' ? ' su 5' : ' out of 5')
+                              "
+                            >
+                              @for (step of feelingScale; track step) {
+                                <i [class.is-active]="step <= feeling.intensity"></i>
+                              }
+                            </span>
+                          </div>
+                          <p>{{ feeling.reason }}</p>
+                        </article>
+                      }
+                    } @else {
+                      <p class="npc-detail__perspective-empty">
+                        {{
+                          lang() === 'it'
+                            ? 'Questo punto di vista non è ancora stato registrato.'
+                            : 'This point of view has not been recorded yet.'
+                        }}
+                      </p>
+                    }
+                  </section>
+                </div>
+
+                <a
+                  class="npc-detail__relationship-link"
+                  [routerLink]="[
+                    '/',
+                    campaignId() ?? '',
+                    'relationships',
+                    bond.sourceId,
+                    bond.targetId,
+                  ]"
+                >
+                  {{ lang() === 'it' ? 'Apri la relazione' : 'Open relationship' }}
+                  @if (bond.sharedMemoryCount > 0) {
+                    <span>
+                      · {{ bond.sharedMemoryCount }}
+                      {{
+                        bond.sharedMemoryCount === 1
+                          ? lang() === 'it'
+                            ? 'memoria'
+                            : 'memory'
+                          : lang() === 'it'
+                            ? 'memorie'
+                            : 'memories'
+                      }}
+                    </span>
+                  }
+                  <span aria-hidden="true">→</span>
+                </a>
+              </li>
+            }
+          </ul>
+        } @else {
+          <div class="npc-detail__relationships-empty empty-state">
+            <span aria-hidden="true">◇</span>
+            <p>
+              {{
+                lang() === 'it'
+                  ? 'Il gruppo non ha ancora registrato alcun legame pubblico per questo PNG.'
+                  : 'The party has not recorded any public relationship for this NPC yet.'
+              }}
+            </p>
+          </div>
+        }
+
+        <a
+          class="npc-detail__network-link"
+          [routerLink]="['/', campaignId() ?? '', 'npcs', 'relationships']"
+        >
+          {{ lang() === 'it' ? 'Apri la rete completa dei PNG' : 'Open the complete NPC network' }}
+          <span>· {{ relationshipCards().length }}</span>
+          <span aria-hidden="true">→</span>
+        </a>
+      </app-accordion>
+    </section>
+
     <!-- Gallery -->
     @if (npc.gallery.length > 0) {
       <section class="npc-detail__section">

@@ -39,6 +39,12 @@ Forms manage names, biographies, public/private details, images, statistics,
 relationships and manifests. Uploaded PNG, JPEG and WebP files are copied into
 the correct campaign folder automatically.
 
+Author a bond once in the relationship editor. Character profiles, NPC dossiers,
+detail pages and the network map all derive from that same record. Do not repeat
+relationship prose inside an NPC biography. For NPC feelings, record only what
+published events let the party observe, hear or infer; AI suggestions follow the
+same rule and remain editable drafts.
+
 When creating or editing a campaign, choose **Heroic**, **Gothic** or
 **Neutral**. The preset updates the Companion's surfaces, accents and focus
 colors while preserving readable status colors. Existing campaigns without a

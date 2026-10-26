@@ -253,6 +253,12 @@ published event. Do not duplicate a perspective to make a bond look mutual.
 person currently experiences it. Update the latter when new notes provide
 evidence, while `sharedEvents` and `evolution` preserve how it changed.
 
+Do not duplicate these fields inside a character or NPC profile. Both profile
+views derive their cards from the relationship files. An NPC dossier can show
+each participant's published perspective, but describes an NPC's inner state as
+the party's current reading rather than objective truth. A participant ID that
+does not resolve to a published character or NPC is never rendered.
+
 NPC-to-NPC relationships are always public party knowledge, not omniscient GM
 truth. Add `partyPerception` with a `certainty` of `observed`, `reported` or
 `inferred`, plus a bilingual `basis` naming the event that supports the party's

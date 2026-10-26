@@ -34,7 +34,8 @@ Every campaign can include:
   features and prepared spells, including links to descriptions where supplied.
 - **Progression:** previous level snapshots and a fantasy-styled PDF export.
 - **Chronicle:** session summaries and longer illustrated prose chapters.
-- **People & bonds:** NPC records and relationship maps for party and world.
+- **People & bonds:** NPC dossiers show the party's current perceived bonds and
+  link to the complete relationship maps for party and world.
 - **Atlas:** maps, discovered locations and campaign artwork.
 - **Personal notebooks:** optional protected character journals with page-like
   navigation rather than an endless feed.
