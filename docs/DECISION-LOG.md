@@ -1402,6 +1402,95 @@ opaque summaries.
 **Revisit when:** A supported ruleset needs structured resources whose identity
 cannot be represented safely by normalized display names.
 
+### QK-052 — Local cross-navigation requires an ephemeral handshake
+
+**Date:** 27 October 2026
+
+**Status:** Active
+
+**Decision:** Campaign Manager opens a local Companion with a one-use,
+60-second loopback handshake. Only that verified session may expose “Open
+Manager”; hosted Companions never show the control. Manager, Companion and all
+local services have separate, explicit stop scopes.
+
+**Why:** A convenient two-way link must not advertise or trust an arbitrary
+local management endpoint, and closing one window must not silently kill a
+different service.
+
+**Consequences:** Cross-links preserve the campaign ID, process trees are
+stopped rather than only parent shells, and shutdown confirmations name exactly
+what remains running.
+
+**Source:** [Issue #28](https://github.com/mtamagno/questkeeper-rpg-campaign-manager/issues/28).
+
+**Revisit when:** Manager and Companion share a signed native-app transport.
+
+### QK-053 — Campaign selection and Campaign Library navigation are distinct
+
+**Date:** 27 October 2026
+
+**Status:** Active
+
+**Decision:** Campaign Manager starts on a neutral, persistent Campaign Library.
+Returning Home clears the workspace mode without deleting the last selected
+campaign, and search state is shared with the sidebar.
+
+**Why:** Automatically opening the first campaign hides the collection model and
+traps multi-campaign users inside an arbitrary workspace.
+
+**Consequences:** Campaign cards own open, edit and backup actions; empty,
+filtered, coverless and multi-campaign states use the same home surface.
+
+**Source:** [Issue #29](https://github.com/mtamagno/questkeeper-rpg-campaign-manager/issues/29).
+
+**Revisit when:** Accounts or shared libraries introduce remote collection
+states.
+
+### QK-054 — Ruleset storage identity and public display identity are separate
+
+**Date:** 27 October 2026
+
+**Status:** Active
+
+**Decision:** Internal ruleset IDs continue to drive terminology, while one
+canonical display resolver supplies localized system and edition names to the
+Manager and Companion. Generic systems show the author's label; unknown data
+falls back to Custom RPG rather than D&D.
+
+**Why:** Storage keys are stable implementation details, not meaningful public
+labels, and a false D&D default misrepresents imported or legacy campaigns.
+
+**Consequences:** Existing campaign files are not rewritten. Selector cards,
+campaign Home and Manager views expose the same readable identity and wrap long
+custom labels safely.
+
+**Source:** [Issue #30](https://github.com/mtamagno/questkeeper-rpg-campaign-manager/issues/30).
+
+**Revisit when:** Ruleset plugins own their own localized product metadata.
+
+### QK-055 — Wide shells expand while reading measures stay bounded
+
+**Date:** 27 October 2026
+
+**Status:** Active
+
+**Decision:** Manager and Companion use centered route shells up to 1920 pixels,
+adaptive card grids and balanced ultrawide gutters. Prose, forms and dialogs
+retain narrower task-specific limits.
+
+**Why:** Fixed desktop shells waste large monitors, while stretching every
+component makes reading and editing worse.
+
+**Consequences:** The release matrix includes 1366, 1920, 2560 and 3440 pixel
+desktop widths; new full-page views inherit the centered shell and choose an
+explicit readable inner width.
+
+**Source:** [Issue #34](https://github.com/mtamagno/questkeeper-rpg-campaign-manager/issues/34)
+and [wide-layout regression matrix](qa/WIDE-LAYOUT-MATRIX.md).
+
+**Revisit when:** Container queries replace the current page-level breakpoint
+contract.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD
