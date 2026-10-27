@@ -17,9 +17,9 @@
       {{ isItalian() ? 'Inventario' : 'Inventory' }}
     </button>
   }
-  @if (hasSpells()) {
+  @if (hasLibrary()) {
     <button type="button" (click)="sectionRequested.emit('spells')">
-      {{ isItalian() ? 'Incantesimi' : 'Spells' }}
+      {{ isItalian() ? 'Libreria' : 'Library' }}
     </button>
   }
 </nav>

@@ -1,0 +1,200 @@
+<section
+  class="rule-library"
+  [id]="'character-sheet-spells-' + characterId()"
+  [style.scroll-margin-top.px]="84"
+>
+  <div class="rule-library__heading">
+    <div>
+      <span class="rule-library__kicker">
+        {{ isItalian() ? 'Libreria del personaggio' : 'Character library' }}
+      </span>
+      <h3>{{ isItalian() ? 'Incantesimi e capacità' : 'Spells & abilities' }}</h3>
+      <p>
+        {{
+          isItalian()
+            ? 'Cerca nel repertorio di questa scheda. Le regole complete compaiono solo quando sono disponibili nel Compendio locale.'
+            : 'Search this sheet’s repertoire. Complete rules appear only when they are available in the local Compendium.'
+        }}
+      </p>
+    </div>
+
+    @if (spellcastingSummary(); as spellcasting) {
+      <dl class="rule-library__casting-stats">
+        <div>
+          <dt>{{ isItalian() ? 'Caratteristica' : 'Ability' }}</dt>
+          <dd>{{ spellcasting.ability }}</dd>
+        </div>
+        <div>
+          <dt>{{ isItalian() ? 'CD salvezza' : 'Save DC' }}</dt>
+          <dd>{{ spellcasting.saveDC }}</dd>
+        </div>
+        <div>
+          <dt>{{ isItalian() ? 'Attacco' : 'Attack' }}</dt>
+          <dd>{{ spellcasting.attackBonus }}</dd>
+        </div>
+      </dl>
+    }
+  </div>
+
+  <div class="rule-library__tools">
+    <label class="rule-library__search">
+      <span class="sr-only">{{
+        isItalian() ? 'Cerca incantesimi e capacità' : 'Search spells and abilities'
+      }}</span>
+      <span aria-hidden="true">⌕</span>
+      <input
+        type="search"
+        [value]="query()"
+        (input)="updateQuery($event)"
+        [placeholder]="
+          isItalian() ? 'Cerca per nome, scuola o livello…' : 'Search by name, school, or level…'
+        "
+      />
+    </label>
+    <div
+      class="rule-library__filters"
+      role="group"
+      [attr.aria-label]="isItalian() ? 'Filtra la libreria' : 'Filter library'"
+    >
+      <button type="button" [attr.aria-pressed]="filter() === 'all'" (click)="setFilter('all')">
+        {{ isItalian() ? 'Tutto' : 'All' }} <span>{{ entries().length }}</span>
+      </button>
+      <button
+        type="button"
+        [attr.aria-pressed]="filter() === 'feature'"
+        (click)="setFilter('feature')"
+      >
+        {{ isItalian() ? 'Capacità' : 'Abilities' }} <span>{{ featureCount() }}</span>
+      </button>
+      <button type="button" [attr.aria-pressed]="filter() === 'spell'" (click)="setFilter('spell')">
+        {{ isItalian() ? 'Incantesimi' : 'Spells' }} <span>{{ spellCount() }}</span>
+      </button>
+    </div>
+  </div>
+
+  @if (sheet().spellcasting?.slots; as slots) {
+    @if (slots.length > 0) {
+      <div class="rule-library__slots" aria-label="Spell slots">
+        <span class="rule-library__slots-label">{{
+          isItalian() ? 'Slot disponibili' : 'Available slots'
+        }}</span>
+        @for (slot of slots; track slot.level) {
+          <div class="rule-library__slot">
+            <span>{{ isItalian() ? 'Liv.' : 'Lvl' }} {{ slot.level }}</span
+            ><strong>{{ slot.total - (slot.used ?? 0) }} / {{ slot.total }}</strong>
+          </div>
+        }
+      </div>
+    }
+  }
+
+  <p class="rule-library__result-count" role="status" aria-live="polite">
+    {{ filteredEntries().length }} {{ isItalian() ? 'risultati nella scheda' : 'sheet results' }}
+  </p>
+
+  @if (filteredEntries().length > 0) {
+    <div class="rule-library__grid">
+      @for (entry of filteredEntries(); track entry.id) {
+        @if (entry.spell; as spell) {
+          @if (spell.categoryId; as categoryId) {
+            @if (spell.key; as spellKey) {
+              <a
+                class="rule-library__card"
+                [routerLink]="['/compendium', categoryId, spellKey]"
+                [attr.aria-label]="
+                  (isItalian() ? 'Apri la descrizione di ' : 'Open description for ') + spell.name
+                "
+              >
+                <ng-container *ngTemplateOutlet="spellCard; context: { $implicit: spell }" />
+              </a>
+            }
+          } @else {
+            <article class="rule-library__card rule-library__card--unlinked">
+              <ng-container *ngTemplateOutlet="spellCard; context: { $implicit: spell }" />
+            </article>
+          }
+        } @else {
+          <article class="rule-library__card rule-library__card--feature">
+            <div class="rule-library__topline">
+              <span>{{ isItalian() ? 'Capacità' : 'Ability' }}</span
+              ><span class="rule-library__provenance">{{ isItalian() ? 'Scheda' : 'Sheet' }}</span>
+            </div>
+            <h5>{{ entry.name }}</h5>
+            <p class="rule-library__disclaimer">
+              {{
+                isItalian()
+                  ? 'Voce registrata nella scheda del personaggio.'
+                  : 'Entry recorded on the character sheet.'
+              }}
+            </p>
+          </article>
+        }
+      }
+    </div>
+  } @else {
+    <div class="rule-library__empty">
+      <span aria-hidden="true">⌕</span
+      ><strong>{{ isItalian() ? 'Nessuna voce trovata' : 'No entries found' }}</strong>
+      <p>
+        {{
+          isItalian()
+            ? 'Prova un termine diverso o cambia filtro.'
+            : 'Try another search term or change the filter.'
+        }}
+      </p>
+    </div>
+  }
+</section>
+
+<ng-template #spellCard let-spell>
+  <div class="rule-library__topline">
+    <span>{{ spell.school ?? (isItalian() ? 'Incantesimo' : 'Spell') }}</span>
+    <span class="rule-library__badges">
+      @if (spell.isConcentration) {
+        <span title="Concentration">C</span>
+      }
+      @if (spell.isRitual) {
+        <span title="Ritual">R</span>
+      }
+    </span>
+  </div>
+  <h5>{{ spell.name }}</h5>
+  <span class="rule-library__provenance">{{
+    spell.key
+      ? isItalian()
+        ? 'Compendio locale'
+        : 'Local compendium'
+      : isItalian()
+        ? 'Scheda'
+        : 'Sheet'
+  }}</span>
+  @if (spell.description) {
+    <p>{{ spell.description }}</p>
+  }
+  <dl class="rule-library__meta">
+    @if (spell.castingTime) {
+      <div>
+        <dt>{{ isItalian() ? 'Lancio' : 'Cast' }}</dt>
+        <dd>{{ spell.castingTime }}</dd>
+      </div>
+    }
+    @if (spell.range) {
+      <div>
+        <dt>{{ isItalian() ? 'Gittata' : 'Range' }}</dt>
+        <dd>{{ spell.range }}</dd>
+      </div>
+    }
+    @if (spell.duration) {
+      <div>
+        <dt>{{ isItalian() ? 'Durata' : 'Duration' }}</dt>
+        <dd>{{ spell.duration }}</dd>
+      </div>
+    }
+  </dl>
+  @if (spell.key) {
+    <span class="rule-library__link"
+      >{{ isItalian() ? 'Leggi la descrizione' : 'Read description' }}
+      <span aria-hidden="true">→</span></span
+    >
+  }
+</ng-template>

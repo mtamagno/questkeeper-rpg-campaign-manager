@@ -15,9 +15,6 @@ import {
   type Signal,
   type WritableSignal,
 } from '@angular/core';
-import { NgTemplateOutlet } from '@angular/common';
-import { RouterLink } from '@angular/router';
-
 import { PasswordService } from '@guild/services/password.service';
 import {
   type CharacterPublicProfile,
@@ -32,10 +29,9 @@ import {
   type SafeSheetAnchor,
 } from '@guild/services/characterReadingPosition.service';
 import { PasswordDialogComponent } from '@guild/components/password-dialog/password-dialog.component';
-import { SPELL_CATEGORIES } from '@arcana/constants/spells.constants';
-import { SPELL_SCHOOLS, isSpellEntry, type SpellEntry } from '@arcana/models/compendium.model';
 import { CharacterSheetHistoryComponent } from '../character-sheet-history/character-sheet-history.component';
 import { CharacterSheetNavigationComponent } from '../character-sheet-navigation/character-sheet-navigation.component';
+import { CharacterRuleLibraryComponent } from '../character-rule-library/character-rule-library.component';
 
 interface AbilityScoreEntry {
   readonly name: string;
@@ -49,33 +45,6 @@ interface CurrencyEntry {
   readonly label: string;
 }
 
-interface CharacterSpellCard {
-  readonly name: string;
-  readonly originalName: string;
-  readonly categoryId?: string;
-  readonly key?: string;
-  readonly level?: number;
-  readonly school?: string;
-  readonly castingTime?: string;
-  readonly range?: string;
-  readonly duration?: string;
-  readonly description?: string;
-  readonly isConcentration: boolean;
-  readonly isRitual: boolean;
-}
-
-interface CharacterSpellGroup {
-  readonly level?: number;
-  readonly label: string;
-  readonly spells: ReadonlyArray<CharacterSpellCard>;
-}
-
-interface SpellcastingSummary {
-  readonly ability: string;
-  readonly saveDC: number;
-  readonly attackBonus: string;
-}
-
 /**
  * Displays a fantasy RPG character sheet behind password protection.
  * Shares unlock state with PrivateProfileComponent via PasswordService.
@@ -84,11 +53,10 @@ interface SpellcastingSummary {
   selector: 'app-character-sheet',
   standalone: true,
   imports: [
-    RouterLink,
-    NgTemplateOutlet,
     PasswordDialogComponent,
     CharacterSheetHistoryComponent,
     CharacterSheetNavigationComponent,
+    CharacterRuleLibraryComponent,
   ],
   templateUrl: './character-sheet.component.html',
   styleUrl: './character-sheet.component.scss',
@@ -260,48 +228,6 @@ export class CharacterSheetComponent {
     return values.filter((entry) => entry.value > 0);
   });
 
-  /** Spellcasting values, using explicit data or deriving them from the chosen ability. */
-  readonly spellcastingSummary: Signal<SpellcastingSummary | undefined> = computed(() => {
-    const data = this.sheet();
-    const config = data.spellcasting;
-    if (config === undefined) return undefined;
-    const score = data.abilityScores[config.ability];
-    const modifier = this.modifierValue(score);
-    return {
-      ability: this.abilityLabel(config.ability),
-      saveDC: config.spellSaveDC ?? 8 + data.proficiencyBonus + modifier,
-      attackBonus: this.formatSignedNumber(
-        config.spellAttackBonus ?? data.proficiencyBonus + modifier,
-      ),
-    };
-  });
-
-  /** Prepared/known spells enriched with data and links from the local compendium. */
-  readonly spellGroups: Signal<ReadonlyArray<CharacterSpellGroup>> = computed(() => {
-    const spellNames = this.sheet().spells ?? [];
-    const cards = spellNames.map((spellName) => this.resolveSpell(spellName));
-    const levels = [...new Set(cards.map((spell) => spell.level))].sort(
-      (a, b) => (a ?? Number.MAX_SAFE_INTEGER) - (b ?? Number.MAX_SAFE_INTEGER),
-    );
-
-    return levels.map((level) => ({
-      level,
-      label:
-        level === undefined
-          ? this.isItalian()
-            ? 'Altri incantesimi'
-            : 'Other spells'
-          : level === 0
-            ? this.isItalian()
-              ? 'Trucchetti'
-              : 'Cantrips'
-            : this.isItalian()
-              ? `Incantesimi di ${level}° livello`
-              : `Level ${level} spells`,
-      spells: cards.filter((spell) => spell.level === level),
-    }));
-  });
-
   /** Opens the password dialog. */
   openDialog(): void {
     this.hasPasswordError.set(false);
@@ -432,67 +358,6 @@ export class CharacterSheetComponent {
 
   private formatSignedNumber(value: number): string {
     return value >= 0 ? `+${value}` : `${value}`;
-  }
-
-  private abilityLabel(ability: keyof CharacterSheetModel['abilityScores']): string {
-    const labels: Record<keyof CharacterSheetModel['abilityScores'], readonly [string, string]> = {
-      strength: ['STR', 'FOR'],
-      dexterity: ['DEX', 'DES'],
-      constitution: ['CON', 'COS'],
-      intelligence: ['INT', 'INT'],
-      wisdom: ['WIS', 'SAG'],
-      charisma: ['CHA', 'CAR'],
-    };
-    return labels[ability][this.isItalian() ? 1 : 0];
-  }
-
-  private resolveSpell(originalName: string): CharacterSpellCard {
-    const normalizedName = this.normalizeSpellName(originalName);
-    for (const category of SPELL_CATEGORIES) {
-      const entry = category.entries.find((candidate) => {
-        if (!isSpellEntry(candidate)) return false;
-        const englishName = this.normalizeSpellName(candidate.en);
-        const italianName = this.normalizeSpellName(candidate.it);
-        return (
-          englishName === normalizedName ||
-          italianName === normalizedName ||
-          englishName.endsWith(normalizedName)
-        );
-      });
-      if (entry !== undefined && isSpellEntry(entry)) {
-        return this.toSpellCard(originalName, category.id, entry);
-      }
-    }
-
-    return {
-      name: originalName,
-      originalName,
-      isConcentration: false,
-      isRitual: false,
-    };
-  }
-
-  private toSpellCard(
-    originalName: string,
-    categoryId: string,
-    spell: SpellEntry,
-  ): CharacterSpellCard {
-    const italian = this.isItalian();
-    const school = SPELL_SCHOOLS[spell.school] ?? { en: spell.school, it: spell.school };
-    return {
-      name: italian ? spell.it : spell.en,
-      originalName,
-      categoryId,
-      key: spell.key,
-      level: spell.level,
-      school: italian ? school.it : school.en,
-      castingTime: italian ? spell.castingTimeIt : spell.castingTimeEn,
-      range: italian ? spell.rangeIt : spell.rangeEn,
-      duration: italian ? spell.durationIt : spell.durationEn,
-      description: italian ? spell.descriptionIt : spell.descriptionEn,
-      isConcentration: spell.isConcentration,
-      isRitual: spell.isRitual,
-    };
   }
 
   private normalizeSpellName(value: string): string {

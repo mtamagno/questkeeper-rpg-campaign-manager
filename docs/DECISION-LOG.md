@@ -1519,6 +1519,32 @@ campaign authoring remain separate from player-owned Companion preferences.
 **Revisit when:** Accounts, cloud sync or native apps introduce preferences
 that must move safely between devices.
 
+### QK-057 — Character rules libraries are derived, not duplicated
+
+**Date:** 27 October 2026
+
+**Status:** Active
+
+**Decision:** Each character's searchable spell and ability library is a
+projection over the selected sheet snapshot and the existing local Compendium.
+The sheet decides membership; an exact catalog match may enrich and link a
+spell, while an unresolved name remains an honest sheet record.
+
+**Why:** A second character-specific rules model would drift from level history,
+obscure provenance and create a route for protected text to enter the public
+template.
+
+**Consequences:** Search and filters never mutate campaign data. Public builds
+remain useful with an empty redistributable catalog. Prepared/favourite state,
+notes, references and future custom packages must extend this projection and
+preserve visible source ownership.
+
+**Source:** [Character rule library contract](CHARACTER-RULE-LIBRARY.md) and
+`scripts/verify-character-rule-library.cjs`.
+
+**Revisit when:** A namespaced custom-compendium platform can resolve abilities
+as well as spells without weakening the sheet-owned membership boundary.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD
