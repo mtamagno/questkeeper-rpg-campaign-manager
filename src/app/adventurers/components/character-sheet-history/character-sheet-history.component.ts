@@ -22,6 +22,15 @@ interface ComparisonRow {
   readonly before: string;
   readonly after: string;
   readonly group: 'identity' | 'core' | 'abilities' | 'collections';
+  readonly state: 'unchanged' | 'increased' | 'decreased' | 'changed';
+  readonly delta?: string;
+}
+
+interface CollectionChange {
+  readonly id: 'skills' | 'features' | 'spells' | 'equipment';
+  readonly label: string;
+  readonly gained: ReadonlyArray<string>;
+  readonly lost: ReadonlyArray<string>;
 }
 
 @Component({
@@ -105,13 +114,20 @@ export class CharacterSheetHistoryComponent {
       beforeValue: string | number,
       afterValue: string | number,
       group: ComparisonRow['group'],
+      formatter: (value: string | number) => string = String,
+      forceChanged = false,
     ): ComparisonRow => ({
       id,
       label,
-      before: String(beforeValue),
-      after: String(afterValue),
+      before: formatter(beforeValue),
+      after: formatter(afterValue),
       group,
+      ...this.changeState(beforeValue, afterValue, forceChanged),
     });
+
+    const collections = this.collectionChangesFor(previous, current);
+    const collection = (id: CollectionChange['id']) =>
+      collections.find((change) => change.id === id)!;
 
     return [
       row('role', italian ? 'Ruolo' : 'Role', previous.classType, current.classType, 'identity'),
@@ -136,9 +152,10 @@ export class CharacterSheetHistoryComponent {
       row(
         'proficiency',
         italian ? 'Bonus competenza' : 'Proficiency bonus',
-        `+${previous.proficiencyBonus}`,
-        `+${current.proficiencyBonus}`,
+        previous.proficiencyBonus,
+        current.proficiencyBonus,
         'core',
+        (value) => `+${value}`,
       ),
       row(
         'strength',
@@ -188,6 +205,8 @@ export class CharacterSheetHistoryComponent {
         previous.skills.length,
         current.skills.length,
         'collections',
+        String,
+        collection('skills').gained.length > 0 || collection('skills').lost.length > 0,
       ),
       row(
         'features',
@@ -195,6 +214,8 @@ export class CharacterSheetHistoryComponent {
         previous.features.length,
         current.features.length,
         'collections',
+        String,
+        collection('features').gained.length > 0 || collection('features').lost.length > 0,
       ),
       row(
         'spells',
@@ -202,6 +223,8 @@ export class CharacterSheetHistoryComponent {
         previous.spells?.length ?? 0,
         current.spells?.length ?? 0,
         'collections',
+        String,
+        collection('spells').gained.length > 0 || collection('spells').lost.length > 0,
       ),
       row(
         'equipment',
@@ -209,8 +232,33 @@ export class CharacterSheetHistoryComponent {
         previous.equipment.length,
         current.equipment.length,
         'collections',
+        String,
+        collection('equipment').gained.length > 0 || collection('equipment').lost.length > 0,
       ),
     ];
+  });
+
+  readonly comparisonCollectionChanges = computed<ReadonlyArray<CollectionChange>>(() => {
+    const { before, after } = this.comparisonSnapshots();
+    if (before === undefined || after === undefined) return [];
+    return this.collectionChangesFor(before.sheet, after.sheet).filter(
+      (change) => change.gained.length > 0 || change.lost.length > 0,
+    );
+  });
+
+  readonly comparisonSummary = computed(() => {
+    const changedValues = this.comparisonRows().filter(
+      (row) => row.group !== 'collections' && row.state !== 'unchanged',
+    ).length;
+    const gained = this.comparisonCollectionChanges().reduce(
+      (total, change) => total + change.gained.length,
+      0,
+    );
+    const lost = this.comparisonCollectionChanges().reduce(
+      (total, change) => total + change.lost.length,
+      0,
+    );
+    return { changedValues, gained, lost, hasChanges: changedValues + gained + lost > 0 };
   });
 
   selectLevel(level: number): void {
@@ -220,8 +268,31 @@ export class CharacterSheetHistoryComponent {
   selectComparison(side: 'before' | 'after', event: Event): void {
     const level = Number((event.target as HTMLSelectElement).value);
     if (!Number.isInteger(level)) return;
-    if (side === 'before') this.comparisonBaseLevel.set(level);
-    else this.comparisonTargetLevel.set(level);
+    if (side === 'before') {
+      this.comparisonBaseLevel.set(level);
+      if ((this.comparisonTargetLevel() ?? level) <= level) {
+        this.comparisonTargetLevel.set(
+          this.snapshots().find((snapshot) => snapshot.sheet.level > level)?.sheet.level,
+        );
+      }
+    } else {
+      this.comparisonTargetLevel.set(level);
+      if ((this.comparisonBaseLevel() ?? level) >= level) {
+        this.comparisonBaseLevel.set(
+          [...this.snapshots()].reverse().find((snapshot) => snapshot.sheet.level < level)?.sheet
+            .level,
+        );
+      }
+    }
+  }
+
+  comparisonDeltaLabel(row: ComparisonRow): string {
+    if (row.state === 'increased')
+      return `${this.isItalian() ? 'Aumentato' : 'Increased'} ${row.delta}`;
+    if (row.state === 'decreased')
+      return `${this.isItalian() ? 'Diminuito' : 'Decreased'} ${row.delta}`;
+    if (row.state === 'changed') return this.isItalian() ? 'Modificato' : 'Changed';
+    return this.isItalian() ? 'Invariato' : 'Unchanged';
   }
 
   comparisonTitle(snapshot: CharacterSheetSnapshot): string {
@@ -318,6 +389,54 @@ export class CharacterSheetHistoryComponent {
     return changes;
   }
 
+  private changeState(
+    previous: string | number,
+    current: string | number,
+    forceChanged = false,
+  ): Pick<ComparisonRow, 'state' | 'delta'> {
+    if (!forceChanged && previous === current) return { state: 'unchanged' };
+    if (typeof previous === 'number' && typeof current === 'number') {
+      const delta = current - previous;
+      if (delta > 0) return { state: 'increased', delta: `+${delta}` };
+      if (delta < 0) return { state: 'decreased', delta: String(delta) };
+    }
+    return { state: 'changed' };
+  }
+
+  private collectionChangesFor(
+    previous: CharacterSheet,
+    current: CharacterSheet,
+  ): ReadonlyArray<CollectionChange> {
+    const italian = this.isItalian();
+    const change = (
+      id: CollectionChange['id'],
+      label: string,
+      before: ReadonlyArray<string>,
+      after: ReadonlyArray<string>,
+    ): CollectionChange => ({
+      id,
+      label,
+      gained: this.newEntries(before, after),
+      lost: this.newEntries(after, before),
+    });
+    return [
+      change('skills', italian ? 'Competenze' : 'Skills', previous.skills, current.skills),
+      change('features', italian ? 'Privilegi' : 'Features', previous.features, current.features),
+      change(
+        'spells',
+        italian ? 'Incantesimi' : 'Spells',
+        previous.spells ?? [],
+        current.spells ?? [],
+      ),
+      change(
+        'equipment',
+        italian ? 'Dotazioni' : 'Equipment',
+        previous.equipment,
+        current.equipment,
+      ),
+    ];
+  }
+
   private addNumericChange(
     changes: EvolutionChange[],
     label: string,
@@ -337,7 +456,18 @@ export class CharacterSheetHistoryComponent {
     previous: ReadonlyArray<string>,
     current: ReadonlyArray<string>,
   ): ReadonlyArray<string> {
-    const existing = new Set(previous.map((entry) => entry.toLocaleLowerCase()));
-    return current.filter((entry) => !existing.has(entry.toLocaleLowerCase()));
+    const normalize = (entry: string): string => entry.trim().toLocaleLowerCase();
+    const existing = new Set(previous.map(normalize));
+    const emitted = new Set<string>();
+
+    return current.filter((entry) => {
+      const normalized = normalize(entry);
+      if (normalized.length === 0 || existing.has(normalized) || emitted.has(normalized)) {
+        return false;
+      }
+
+      emitted.add(normalized);
+      return true;
+    });
   }
 }

@@ -1376,6 +1376,32 @@ and [Data lifecycle](DATA-LIFECYCLE.md).
 **Revisit when:** Native installers gain an operating-system window lifecycle
 or cloud backup changes the recovery surface.
 
+### QK-051 — Character evolution is derived and explicit
+
+**Date:** 27 October 2026
+
+**Status:** Active
+
+**Decision:** QuestKeeper derives level evolution from two immutable character
+sheet snapshots. Numeric changes expose direction and signed delta; spells,
+features, skills and equipment expose their actual gained and lost entries.
+Every state has a textual label, not colour alone.
+
+**Why:** Comparing only totals hides replacements, while storing a second set
+of hand-authored diff data can drift from the historical sheets. Players need
+to understand both mechanical growth and meaningful losses at a glance.
+
+**Consequences:** Entry comparison ignores surrounding whitespace and casing,
+deduplicates repeated values, and keeps equal-count replacements visible.
+Campaigns with one truthful snapshot keep the existing empty state. Future
+manual and AI imports must preserve full collections rather than generating
+opaque summaries.
+
+**Source:** [Side-by-side level history](LEVEL-HISTORY-COMPARISON.md).
+
+**Revisit when:** A supported ruleset needs structured resources whose identity
+cannot be represented safely by normalized display names.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD

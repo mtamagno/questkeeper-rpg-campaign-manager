@@ -84,8 +84,8 @@
       <p>
         {{
           isItalian()
-            ? 'Scegli due schede per leggerle sulla stessa riga, senza perdere il contesto.'
-            : 'Choose two sheets and read matching values on the same row without losing context.'
+            ? 'Scegli due schede: variazioni, guadagni e perdite restano visibili sulla stessa riga.'
+            : 'Choose two sheets: changed values, gains and losses stay visible on the same row.'
         }}
       </p>
     </div>
@@ -98,7 +98,7 @@
             @for (snapshot of snapshots(); track snapshot.sheet.level) {
               <option
                 [value]="snapshot.sheet.level"
-                [disabled]="snapshot.sheet.level === comparisonTargetLevel()"
+                [disabled]="snapshot.sheet.level >= (comparisonTargetLevel() ?? 0)"
                 [selected]="snapshot.sheet.level === comparisonBaseLevel()"
               >
                 {{ comparisonTitle(snapshot) }}
@@ -113,7 +113,7 @@
             @for (snapshot of snapshots(); track snapshot.sheet.level) {
               <option
                 [value]="snapshot.sheet.level"
-                [disabled]="snapshot.sheet.level === comparisonBaseLevel()"
+                [disabled]="snapshot.sheet.level <= (comparisonBaseLevel() ?? 0)"
                 [selected]="snapshot.sheet.level === comparisonTargetLevel()"
               >
                 {{ comparisonTitle(snapshot) }}
@@ -158,15 +158,92 @@
                 <div
                   class="sheet-history__comparison-row"
                   [attr.data-group]="comparison.group"
+                  [attr.data-change]="comparison.state"
                   role="row"
                 >
                   <span role="rowheader">{{ comparison.label }}</span>
                   <span role="cell">{{ comparison.before }}</span>
-                  <span role="cell">{{ comparison.after }}</span>
+                  <span
+                    class="sheet-history__comparison-result"
+                    [class.is-changed]="comparison.state !== 'unchanged'"
+                    role="cell"
+                    [attr.aria-label]="comparison.after + '. ' + comparisonDeltaLabel(comparison)"
+                  >
+                    <span>{{ comparison.after }}</span>
+                    @if (comparison.state !== 'unchanged') {
+                      <small class="sheet-history__delta" [attr.data-change]="comparison.state">
+                        @if (comparison.state === 'increased') {
+                          <span aria-hidden="true">â†‘</span>
+                        } @else if (comparison.state === 'decreased') {
+                          <span aria-hidden="true">â†“</span>
+                        } @else {
+                          <span aria-hidden="true">â—†</span>
+                        }
+                        {{ comparisonDeltaLabel(comparison) }}
+                      </small>
+                    }
+                  </span>
                 </div>
               }
             </div>
           </div>
+
+          @if (comparisonSummary(); as summary) {
+            <div class="sheet-history__evolution-summary" role="status" aria-live="polite">
+              @if (summary.hasChanges) {
+                <strong>{{ isItalian() ? 'Evoluzione rilevata' : 'Evolution detected' }}</strong>
+                <span class="is-changed"
+                  >{{ summary.changedValues }}
+                  {{ isItalian() ? 'valori modificati' : 'changed values' }}</span
+                >
+                <span class="is-gained"
+                  >{{ summary.gained }} {{ isItalian() ? 'acquisiti' : 'gained' }}</span
+                >
+                <span class="is-lost">{{ summary.lost }} {{ isItalian() ? 'persi' : 'lost' }}</span>
+              } @else {
+                <strong>{{
+                  isItalian() ? 'Nessuna variazione registrata' : 'No recorded changes'
+                }}</strong>
+              }
+            </div>
+          }
+
+          @if (comparisonCollectionChanges().length > 0) {
+            <div
+              class="sheet-history__collection-changes"
+              [attr.aria-label]="
+                isItalian()
+                  ? 'Incantesimi, privilegi, competenze e dotazioni cambiati'
+                  : 'Changed spells, features, skills and equipment'
+              "
+            >
+              @for (change of comparisonCollectionChanges(); track change.id) {
+                <article>
+                  <h5>{{ change.label }}</h5>
+                  @if (change.gained.length > 0) {
+                    <div class="sheet-history__change-list is-gained">
+                      <strong>{{ isItalian() ? 'Acquisiti' : 'Gained' }}</strong>
+                      <ul>
+                        @for (entry of change.gained; track $index) {
+                          <li><span aria-hidden="true">+</span>{{ entry }}</li>
+                        }
+                      </ul>
+                    </div>
+                  }
+                  @if (change.lost.length > 0) {
+                    <div class="sheet-history__change-list is-lost">
+                      <strong>{{ isItalian() ? 'Persi' : 'Lost' }}</strong>
+                      <ul>
+                        @for (entry of change.lost; track $index) {
+                          <li><span aria-hidden="true">âˆ’</span>{{ entry }}</li>
+                        }
+                      </ul>
+                    </div>
+                  }
+                </article>
+              }
+            </div>
+          }
         }
       }
     } @else {
