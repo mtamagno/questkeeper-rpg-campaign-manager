@@ -7,7 +7,7 @@
 @use '../../../../styles/mixins' as *;
 
 .campaign-selector {
-  max-width: 1200px;
+  max-width: 1600px;
   margin: 0 auto;
   padding: 0 $spacing-md $spacing-3xl;
 
@@ -627,6 +627,15 @@
     flex: 1;
     flex-direction: column;
     padding: $spacing-lg;
+  }
+
+  &__ruleset {
+    display: block;
+    margin-bottom: $spacing-xs;
+    color: var(--qk-color-text-muted);
+    font-size: $font-size-xs;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
   }
 
   &__card-title {

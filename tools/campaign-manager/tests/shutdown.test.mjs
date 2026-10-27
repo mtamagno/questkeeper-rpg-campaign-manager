@@ -78,6 +78,8 @@ test('authenticated same-origin shutdown stops the local Manager process', async
     body: JSON.stringify({ confirmation: 'quit', scope: 'all' }),
   });
   assert.equal(shutdown.status, 200);
-  assert.equal((await shutdown.json()).closing, true);
+  const result = await shutdown.json();
+  assert.equal(result.closing, true);
+  assert.equal(result.scope, 'all');
   assert.equal(await waitForExit(child), 0);
 });

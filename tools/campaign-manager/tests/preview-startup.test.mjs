@@ -48,7 +48,7 @@ async function post(baseUrl, token, path, body = {}) {
 }
 
 test(
-  'Manager starts, health-checks, deduplicates and stops the Companion preview',
+  'Manager starts, links, health-checks and stops the Companion preview',
   { timeout: 120_000 },
   async (t) => {
     const child = spawn(process.execPath, [join(managerRoot, 'server.mjs')], {
@@ -100,7 +100,44 @@ test(
       await new Promise((resolve) => setTimeout(resolve, 500));
     }
     assert.equal(state?.companion?.action, 'open');
+    assert.equal(state?.companion?.canStop, true);
     assert.equal((await fetch(companionUrl)).ok, true);
+
+    const issued = await post(baseUrl, token, '/api/companion-handshake', {
+      campaignId: 'example-campaign',
+    }).then((response) => response.json());
+    const issuedUrl = new URL(issued.url);
+    assert.equal(issuedUrl.origin, new URL(companionUrl).origin);
+    assert.equal(issuedUrl.pathname, '/example-campaign');
+    const handshakeToken = issuedUrl.searchParams.get('qkHandshake');
+    assert.ok(handshakeToken);
+    const handshakeUrl = `${baseUrl}/api/companion-handshake?token=${handshakeToken}`;
+    const accepted = await fetch(handshakeUrl, {
+      headers: { Origin: new URL(companionUrl).origin },
+    });
+    assert.equal(accepted.status, 200);
+    assert.equal(accepted.headers.get('access-control-allow-origin'), new URL(companionUrl).origin);
+    assert.deepEqual(await accepted.json(), {
+      managerUrl: baseUrl,
+      campaignId: 'example-campaign',
+    });
+    assert.equal(
+      (
+        await fetch(handshakeUrl, {
+          headers: { Origin: new URL(companionUrl).origin },
+        })
+      ).ok,
+      false,
+      'handshakes are one-use',
+    );
+
+    const stopped = await post(baseUrl, token, '/api/actions/preview-stop');
+    assert.equal(stopped.status, 202);
+    const stopDeadline = Date.now() + 10_000;
+    while (Date.now() < stopDeadline && (await fetch(companionUrl).catch(() => null))?.ok) {
+      await new Promise((resolve) => setTimeout(resolve, 200));
+    }
+    assert.equal(await fetch(companionUrl).catch(() => null), null);
 
     const shutdown = await post(baseUrl, token, '/api/shutdown', {
       confirmation: 'quit',

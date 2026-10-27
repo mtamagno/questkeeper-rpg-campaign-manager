@@ -104,10 +104,10 @@
     margin-left: $sidebar-width;
     padding: $spacing-xl $spacing-2xl;
     min-height: 100vh;
-    max-width: $content-max-width;
+    max-width: none;
     min-width: 0;
     width: calc(100% - #{$sidebar-width});
-    margin-right: auto;
+    margin-right: 0;
 
     @include respond-below(lg) {
       margin-left: 0;
@@ -121,9 +121,12 @@
   // Each routed component fades+slides in on mount. Reduced-motion safe
   // via the fade-slide-in-animation mixin.
   &__route-wrapper {
-    display: contents;
+    display: block;
+    width: min(100%, 1920px);
+    margin-inline: auto;
 
     > :not(router-outlet) {
+      display: block;
       @include fade-slide-in-animation(220ms, 0ms);
     }
   }

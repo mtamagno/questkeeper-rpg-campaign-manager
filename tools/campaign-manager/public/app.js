@@ -6,7 +6,9 @@ const editorForm = document.querySelector('#editor-form');
 const fields = document.querySelector('#dialog-fields');
 const dialogError = document.querySelector('#dialog-error');
 const mobileMenu = document.querySelector('#mobile-menu');
+const serviceDialog = document.querySelector('#service-dialog');
 const MY_CHARACTERS_KEY = 'questkeeper-manager-my-characters:v1';
+const initialCampaignId = new URL(window.location.href).searchParams.get('campaign');
 
 function readMyCharacters() {
   try {
@@ -28,6 +30,7 @@ const state = {
   campaign: null,
   selectedId: null,
   tab: 'overview',
+  libraryMode: true,
   projectMode: false,
   scribeMode: false,
   aiMode: false,
@@ -65,11 +68,12 @@ function setMyCharacter(characterId) {
 }
 
 function myCharacterCompanionUrl(baseUrl) {
-  const character = selectedMyCharacter();
-  if (!character || !state.selectedId) return baseUrl;
+  if (!state.selectedId) return baseUrl;
   const url = new URL(baseUrl, window.location.href);
-  const root = url.pathname.replace(/\/+$/, '');
-  url.pathname = `${root}/${encodeURIComponent(state.selectedId)}/party/${encodeURIComponent(character.id)}`;
+  const character = selectedMyCharacter();
+  url.pathname = character
+    ? `/${encodeURIComponent(state.selectedId)}/party/${encodeURIComponent(character.id)}`
+    : `/${encodeURIComponent(state.selectedId)}`;
   return url.toString();
 }
 
@@ -146,9 +150,11 @@ function translate(message) {
   return window.managerI18n?.translate?.(message) ?? message;
 }
 
-async function quitManager() {
+async function quitManager(scope = 'all') {
   const confirmation = translate(
-    'Quit Campaign Manager? Active local jobs and previews started here will stop. Your published Companion remains online.',
+    scope === 'all'
+      ? 'Stop all local QuestKeeper services? Manager, Companion and every service started here will close.'
+      : 'Quit only the Campaign Manager? The local Companion will keep running until you stop it separately.',
   );
   if (!confirm(confirmation)) return;
   const button = document.querySelector('#quit-manager');
@@ -156,11 +162,32 @@ async function quitManager() {
   button.textContent = translate('Stopping local services…');
   const result = await api('/api/shutdown', {
     method: 'POST',
-    body: JSON.stringify({ confirmation: 'quit', scope: 'all' }),
+    body: JSON.stringify({ confirmation: 'quit', scope }),
   });
   document.body.innerHTML = `<main class="shutdown-screen" role="status" aria-live="polite"><div class="shutdown-screen__sigil" aria-hidden="true">✦</div><h1>QuestKeeper is closed</h1><p>The Campaign Manager and the local services it started have stopped safely.</p><p>You can close this browser tab. Your published Companion remains online.</p></main>`;
+  if (scope === 'manager') {
+    document.body.innerHTML = `<main class="shutdown-screen" role="status" aria-live="polite"><div class="shutdown-screen__sigil" aria-hidden="true">&#10022;</div><h1>Campaign Manager is closed</h1><p>The Campaign Manager has stopped. Your local Companion is still available.</p><p>You can close this browser tab. Your published Companion remains online.</p></main>`;
+  }
   window.managerI18n?.translateTree?.();
   document.title = result.message;
+}
+
+async function openLocalCompanion() {
+  const handshake = await api('/api/companion-handshake', {
+    method: 'POST',
+    body: JSON.stringify({ campaignId: state.selectedId }),
+  });
+  window.open(myCharacterCompanionUrl(handshake.url), '_blank', 'noopener');
+}
+
+async function stopCompanion() {
+  if (!confirm(translate('Stop the local Companion? The Campaign Manager will remain open.'))) {
+    return;
+  }
+  await api('/api/actions/preview-stop', { method: 'POST', body: '{}' });
+  serviceDialog.close();
+  toast('The local Companion is stopping.');
+  void refreshJobs();
 }
 
 function setMenuOpen(open) {
@@ -182,9 +209,11 @@ async function loadState({ selectFirst = false, allowFirstRunPrompt = false } = 
     publishing: result.publishing,
     storage: result.storage,
   };
-  if (selectFirst && !state.selectedId && result.campaigns.length) {
-    state.selectedId = result.campaigns[0].id;
+  const requestedCampaign = result.campaigns.find((campaign) => campaign.id === initialCampaignId);
+  if ((selectFirst || requestedCampaign) && !state.selectedId && result.campaigns.length) {
+    state.selectedId = requestedCampaign?.id ?? result.campaigns[0].id;
     state.campaign = await api(`/api/campaigns/${encodeURIComponent(state.selectedId)}`);
+    state.libraryMode = false;
   }
   if (allowFirstRunPrompt && !state.firstRunEvaluated) {
     state.firstRunEvaluated = true;
@@ -202,6 +231,7 @@ async function selectCampaign(id) {
   state.projectMode = false;
   state.scribeMode = false;
   state.aiMode = false;
+  state.libraryMode = false;
   state.campaign = await api(`/api/campaigns/${encodeURIComponent(id)}`);
   state.tab = 'overview';
   setMenuOpen(false);
@@ -210,15 +240,12 @@ async function selectCampaign(id) {
 }
 
 function renderSidebar() {
-  const query = document.querySelector('#campaign-search').value.toLowerCase();
-  const campaigns = state.campaigns.filter((item) =>
-    `${localized(item.name)} ${localized(item.description)}`.toLowerCase().includes(query),
-  );
+  const campaigns = filteredCampaigns();
   campaignList.innerHTML = campaigns.length
     ? campaigns
         .map(
           (item) => `
-          <button class="campaign-link ${item.id === state.selectedId && !state.projectMode ? 'active' : ''}" data-campaign="${escapeHtml(item.id)}">
+          <button class="campaign-link ${item.id === state.selectedId && !state.libraryMode && !state.projectMode && !state.scribeMode && !state.aiMode ? 'active' : ''}" data-campaign="${escapeHtml(item.id)}">
             <span class="campaign-link__sigil">${escapeHtml(localized(item.name).charAt(0).toUpperCase() || '✦')}</span>
             <span><strong>${escapeHtml(localized(item.name, item.defaultLanguage ?? 'en'))}</strong><small>${escapeHtml(localized(item.status, item.defaultLanguage ?? 'en') || 'Campaign')}</small></span>
             <span class="campaign-link__count">${item.counts.characters}</span>
@@ -226,7 +253,61 @@ function renderSidebar() {
         )
         .join('')
     : '<div class="empty">No campaigns found.</div>';
+  document.querySelector('#show-library').classList.toggle('active', state.libraryMode);
   renderAiSetupNavigation();
+}
+
+function filteredCampaigns() {
+  const query = document.querySelector('#campaign-search').value.trim().toLowerCase();
+  return state.campaigns.filter((item) =>
+    `${localized(item.name)} ${localized(item.description)} ${localized(item.status)}`
+      .toLowerCase()
+      .includes(query),
+  );
+}
+
+function rulesetPublicLabel(gameSystem, legacyEdition = '', language = 'en') {
+  const authoredLabel = String(gameSystem?.edition ?? legacyEdition).trim();
+  const legacy = String(legacyEdition).toLowerCase();
+  const inferredId =
+    gameSystem?.id ||
+    (legacy.includes('2024') || legacy.includes('5.5')
+      ? 'dnd-2024'
+      : legacy.includes('d&d') || legacy.includes('dungeons & dragons') || legacy.includes('5e')
+        ? 'dnd-2014'
+        : legacy.includes('pathfinder')
+          ? 'pf2e-remaster'
+          : legacy.includes('cthulhu')
+            ? 'coc7e'
+            : 'generic');
+  const labels = {
+    'dnd-2014': {
+      en: 'Dungeons & Dragons · 5th Edition (2014)',
+      it: 'Dungeons & Dragons · 5a Edizione (2014)',
+    },
+    'dnd-2024': {
+      en: 'Dungeons & Dragons · 5th Edition (2024)',
+      it: 'Dungeons & Dragons · 5a Edizione (2024)',
+    },
+    'pf2e-remaster': {
+      en: 'Pathfinder · Second Edition Remaster',
+      it: 'Pathfinder · Seconda Edizione Remaster',
+    },
+    coc7e: { en: 'Call of Cthulhu · 7th Edition', it: 'Call of Cthulhu · 7a Edizione' },
+  };
+  const known = labels[inferredId];
+  if (known) return known[language] ?? known.en;
+  return authoredLabel || (language === 'it' ? 'GDR personalizzato' : 'Custom RPG');
+}
+
+function showLibrary() {
+  state.libraryMode = true;
+  state.projectMode = false;
+  state.scribeMode = false;
+  state.aiMode = false;
+  setMenuOpen(false);
+  renderSidebar();
+  render();
 }
 
 function renderAiSetupNavigation() {
@@ -258,6 +339,7 @@ function renderCompanionAction() {
   };
   const button = document.querySelector('#open-companion');
   const status = document.querySelector('#companion-state');
+  const stopButton = document.querySelector('#stop-companion');
   button.textContent = control.label;
   if (control.action === 'open' && selectedMyCharacter()) {
     button.textContent = 'Open my character';
@@ -267,6 +349,8 @@ function renderCompanionAction() {
   button.title = control.status;
   status.textContent = control.status;
   status.className = `companion-state companion-state--${control.action}`;
+  stopButton.hidden = control.canStop !== true;
+  document.querySelector('#service-stop-companion').disabled = control.canStop !== true;
 }
 
 function render() {
@@ -281,6 +365,10 @@ function render() {
   }
   if (state.projectMode) {
     renderProject();
+    return;
+  }
+  if (state.libraryMode) {
+    renderLibrary();
     return;
   }
   if (!state.campaign) {
@@ -298,14 +386,48 @@ function render() {
   renderCampaign();
 }
 
-function campaignAsset(path) {
-  if (!path || !state.selectedId) return '';
-  const prefix = `campaigns/${state.selectedId}/`;
+function renderLibrary() {
+  const campaigns = filteredCampaigns();
+  document.querySelector('#page-title').textContent = 'Campaign Library';
+  if (state.campaigns.length === 0) {
+    content.innerHTML = `<div class="welcome"><div class="welcome__inner"><div class="welcome__icon" aria-hidden="true">&#10022;</div><span class="eyebrow">No JSON. No folders to copy.</span><h2>Your next campaign starts here</h2><p>Create a world, gather the party and chronicle each session through friendly forms.</p><div class="welcome__actions"><button class="primary-button" data-action="new-campaign">Create your first campaign</button><button class="secondary-button" data-action="import">Import a backup</button></div></div></div>`;
+    return;
+  }
+  content.innerHTML = `
+    <section class="library" aria-labelledby="library-title">
+      <header class="library__header"><div><span class="eyebrow">Choose your table</span><h2 id="library-title">Your campaign library</h2><p>Open a chronicle or manage it without losing your place in the archive.</p></div><button class="primary-button" data-action="new-campaign">New campaign</button></header>
+      ${
+        campaigns.length
+          ? `<div class="library-grid">${campaigns
+              .map((item) => {
+                const language = item.defaultLanguage ?? item.languages?.[0] ?? 'en';
+                const name = localized(item.name, language) || 'Untitled campaign';
+                const cover = item.thumbnail ? campaignAssetFor(item.id, item.thumbnail) : '';
+                return `<article class="library-card">
+            <div class="library-card__cover">${cover ? `<img src="${escapeHtml(cover)}" alt="" />` : `<span aria-hidden="true">${escapeHtml(name.charAt(0).toUpperCase() || '✦')}</span>`}</div>
+            <div class="library-card__body"><div><span class="status-pill">${escapeHtml(localized(item.status, language) || 'Campaign')}</span><span class="library-card__ruleset">${escapeHtml(rulesetPublicLabel(item.gameSystem, item.details?.edition, language))}</span><h3>${escapeHtml(name)}</h3><p>${escapeHtml(localized(item.description, language) || 'A campaign ready to be chronicled.')}</p></div>
+            <dl class="library-card__metrics"><div><dt>Party</dt><dd>${item.counts.characters}</dd></div><div><dt>NPCs</dt><dd>${item.counts.npcs}</dd></div><div><dt>Sessions</dt><dd>${item.counts.sessions}</dd></div><div><dt>Places</dt><dd>${item.counts.maps}</dd></div></dl>
+            <footer class="library-card__actions"><button class="primary-button" data-library-action="open" data-id="${escapeHtml(item.id)}">Open campaign</button><details class="library-card__menu"><summary aria-label="More actions for ${escapeHtml(name)}">•••</summary><div><button type="button" data-library-action="edit" data-id="${escapeHtml(item.id)}">Edit details</button><button type="button" data-library-action="backup" data-id="${escapeHtml(item.id)}">Download backup</button></div></details></footer></div>
+          </article>`;
+              })
+              .join('')}</div>`
+          : '<div class="library-empty"><strong>No matching campaigns</strong><p>Try another search or create a new adventure.</p></div>'
+      }
+    </section>`;
+}
+
+function campaignAssetFor(campaignId, path) {
+  if (!path || !campaignId) return '';
+  const prefix = `campaigns/${campaignId}/`;
   const relativePath = path.startsWith(prefix) ? path.slice(prefix.length) : path;
-  return `/campaign-assets/${encodeURIComponent(state.selectedId)}/${relativePath
+  return `/campaign-assets/${encodeURIComponent(campaignId)}/${relativePath
     .split('/')
     .map(encodeURIComponent)
     .join('/')}`;
+}
+
+function campaignAsset(path) {
+  return campaignAssetFor(state.selectedId, path);
 }
 
 function renderCampaign() {
@@ -368,7 +490,7 @@ function renderOverview() {
     <div class="overview-grid">
       <section class="project-panel my-character-panel"><span class="eyebrow">Quick return</span><h3>${myCharacter ? escapeHtml(entityName('characters', myCharacter)) : 'Choose my character'}</h3><p>${myCharacter ? 'The Manager will open this profile directly whenever the Companion is ready.' : 'Choose your character once from the Characters tab to make every return immediate.'}</p>${myCharacter ? `<button class="primary-button" data-action="open-my-character">Open my character</button>` : `<button class="secondary-button" data-action="show-characters">Choose from the party</button>`}</section>
       <section class="project-panel"><span class="eyebrow">The story so far</span><h2>${escapeHtml(localized(campaign.name))}</h2><p>${escapeHtml(localized(campaign.storySoFar) || 'Your running campaign recap will appear here.')}</p></section>
-      <section class="project-panel"><h3>Table details</h3><dl class="detail-list"><div><dt>Game Master</dt><dd>${escapeHtml(campaign.dungeonMaster)}</dd></div><div><dt>Party</dt><dd>${escapeHtml(campaign.partyName)}</dd></div><div><dt>System</dt><dd>${escapeHtml(campaign.gameSystem?.edition || campaign.edition)}</dd></div><div><dt>Started</dt><dd>${escapeHtml(campaign.startDate)}</dd></div></dl></section>
+      <section class="project-panel"><h3>Table details</h3><dl class="detail-list"><div><dt>Game Master</dt><dd>${escapeHtml(campaign.dungeonMaster)}</dd></div><div><dt>Party</dt><dd>${escapeHtml(campaign.partyName)}</dd></div><div><dt>System</dt><dd>${escapeHtml(rulesetPublicLabel(campaign.gameSystem, campaign.edition, state.campaign.manifestEntry.defaultLanguage ?? 'en'))}</dd></div><div><dt>Started</dt><dd>${escapeHtml(campaign.startDate)}</dd></div></dl></section>
     </div>`;
 }
 
@@ -2459,7 +2581,7 @@ function renderProject() {
   content.innerHTML = `
     <div class="project-stack">
       <section class="project-panel"><span class="eyebrow">1 · Preparation</span><h2>Prepare the project</h2><p>${state.project.dependenciesReady ? 'Dependencies are installed. You can preview or validate your Companion.' : 'On first use, install everything the project needs. An internet connection is required.'}</p><div class="action-row"><button class="primary-button" data-project-action="install" ${install?.status === 'running' ? 'disabled' : ''}>${state.project.dependenciesReady ? 'Reinstall dependencies' : 'Prepare automatically'}</button><span class="job-status ${install?.status || ''}">${install ? escapeHtml(install.status) : state.project.dependenciesReady ? 'Ready' : 'Not prepared'}</span></div></section>
-      <section class="project-panel"><span class="eyebrow">2 · Preview</span><h2>Open your Companion</h2><p>Launch the local site with the campaign data you just entered.</p><div class="action-row">${companion.action === 'open' ? `<a class="primary-button" href="${escapeHtml(companion.url)}" target="_blank" rel="noreferrer">Open now</a>` : `<button class="primary-button" data-project-action="preview" ${['prepare', 'wait'].includes(companion.action) ? 'disabled' : ''}>${escapeHtml(companion.label)}</button>`}<span class="job-status ${escapeHtml(companion.action)}">${escapeHtml(companion.status)}</span></div></section>
+      <section class="project-panel"><span class="eyebrow">2 · Preview</span><h2>Open your Companion</h2><p>Launch the local site with the campaign data you just entered.</p><div class="action-row">${companion.action === 'open' ? `<button class="primary-button" data-action="open-local-companion">Open now</button>${companion.canStop ? '<button class="secondary-button" data-action="stop-companion">Stop</button>' : ''}` : `<button class="primary-button" data-project-action="preview" ${['prepare', 'wait'].includes(companion.action) ? 'disabled' : ''}>${escapeHtml(companion.label)}</button>`}<span class="job-status ${escapeHtml(companion.action)}">${escapeHtml(companion.status)}</span></div></section>
       <section class="project-panel"><span class="eyebrow">3 · Validation</span><h2>Check before publishing</h2><p>The production build catches invalid data or components before you push to GitHub.</p><div class="action-row"><button class="secondary-button" data-project-action="build" ${!state.project.dependenciesReady || build?.status === 'running' ? 'disabled' : ''}>Check and build site</button><span class="job-status ${build?.status || ''}">${build ? escapeHtml(build.status) : 'Not run'}</span></div></section>
       <section class="project-panel"><span class="eyebrow">4 · Publishing</span><h2>Choose how the archive reaches the realm</h2><p>GitHub Pages remains available through the included workflow. If your hosting provides FTP, configure it once and publish directly from this computer without GitHub Actions.</p><a class="secondary-button" href="https://github.com/mtamagno/questkeeper-rpg-campaign-manager#publish" target="_blank" rel="noreferrer">Open the publishing guide</a></section>
       <section class="project-panel"><span class="eyebrow">Authoring preferences</span><h2>Advanced controls</h2><p>Keep technical identifiers hidden during normal authoring, or reveal them when you need to integrate or troubleshoot campaign data.</p><label class="consent-check"><input type="checkbox" data-advanced-mode ${state.advancedMode ? 'checked' : ''} /> Show advanced identity controls in entity forms</label></section>
@@ -2565,6 +2687,7 @@ async function runProjectAction(kind, view = 'project') {
       url: 'http://127.0.0.1:4200',
     };
   }
+  state.libraryMode = false;
   state.projectMode = view === 'project';
   state.scribeMode = view === 'scribe';
   state.aiMode = false;
@@ -2572,15 +2695,19 @@ async function runProjectAction(kind, view = 'project') {
   void refreshJobs();
 }
 
-async function exportCurrent() {
-  const bundle = await api(`/api/campaigns/${encodeURIComponent(state.selectedId)}/export`);
+async function exportCampaign(campaignId) {
+  const bundle = await api(`/api/campaigns/${encodeURIComponent(campaignId)}/export`);
   const link = document.createElement('a');
   link.href = URL.createObjectURL(
     new Blob([JSON.stringify(bundle, null, 2)], { type: 'application/json' }),
   );
-  link.download = `${state.selectedId}-backup.json`;
+  link.download = `${campaignId}-backup.json`;
   link.click();
   URL.revokeObjectURL(link.href);
+}
+
+async function exportCurrent() {
+  await exportCampaign(state.selectedId);
 }
 
 async function runStorageAction(action, key) {
@@ -2630,8 +2757,12 @@ campaignList.addEventListener('click', (event) => {
   const button = event.target.closest('[data-campaign]');
   if (button) selectCampaign(button.dataset.campaign).catch((error) => toast(error.message, true));
 });
-document.querySelector('#campaign-search').addEventListener('input', renderSidebar);
+document.querySelector('#campaign-search').addEventListener('input', () => {
+  renderSidebar();
+  if (state.libraryMode) renderLibrary();
+});
 document.querySelector('#new-campaign').addEventListener('click', () => openCampaignEditor(false));
+document.querySelector('#show-library').addEventListener('click', showLibrary);
 mobileMenu.addEventListener('click', () =>
   setMenuOpen(!document.body.classList.contains('menu-open')),
 );
@@ -2640,6 +2771,7 @@ document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape' && document.body.classList.contains('menu-open')) setMenuOpen(false);
 });
 document.querySelector('#show-project').addEventListener('click', () => {
+  state.libraryMode = false;
   state.projectMode = true;
   state.scribeMode = false;
   state.aiMode = false;
@@ -2648,6 +2780,7 @@ document.querySelector('#show-project').addEventListener('click', () => {
   render();
 });
 document.querySelector('#show-scribe').addEventListener('click', () => {
+  state.libraryMode = false;
   state.scribeMode = true;
   state.projectMode = false;
   state.aiMode = false;
@@ -2656,6 +2789,7 @@ document.querySelector('#show-scribe').addEventListener('click', () => {
   render();
 });
 document.querySelector('#show-ai-setup').addEventListener('click', () => {
+  state.libraryMode = false;
   state.aiMode = true;
   state.aiConfigureExpanded = state.project.ai?.config?.setupState !== 'unseen';
   state.scribeMode = false;
@@ -2681,7 +2815,7 @@ document.querySelector('#open-companion').addEventListener('click', (event) => {
     return;
   }
   if (action === 'open') {
-    window.open(myCharacterCompanionUrl(state.project.companion.url), '_blank', 'noopener');
+    openLocalCompanion().catch((error) => toast(error.message, true));
     return;
   }
   if (action === 'wait') {
@@ -2691,11 +2825,44 @@ document.querySelector('#open-companion').addEventListener('click', (event) => {
   }
   runProjectAction('preview').catch((error) => toast(error.message, true));
 });
+document.querySelector('#quit-manager').addEventListener('click', () => serviceDialog.showModal());
 document
-  .querySelector('#quit-manager')
-  .addEventListener('click', () => quitManager().catch((error) => toast(error.message, true)));
+  .querySelector('#stop-companion')
+  .addEventListener('click', () => stopCompanion().catch((error) => toast(error.message, true)));
+document
+  .querySelector('#service-dialog-close')
+  .addEventListener('click', () => serviceDialog.close());
+document
+  .querySelector('#service-stop-companion')
+  .addEventListener('click', () => stopCompanion().catch((error) => toast(error.message, true)));
+document
+  .querySelector('#service-quit-manager')
+  .addEventListener('click', () =>
+    quitManager('manager').catch((error) => toast(error.message, true)),
+  );
+document
+  .querySelector('#service-stop-all')
+  .addEventListener('click', () => quitManager('all').catch((error) => toast(error.message, true)));
 
 content.addEventListener('click', async (event) => {
+  const libraryAction = event.target.closest('[data-library-action]');
+  if (libraryAction) {
+    try {
+      const { id } = libraryAction.dataset;
+      if (libraryAction.dataset.libraryAction === 'open') await selectCampaign(id);
+      if (libraryAction.dataset.libraryAction === 'edit') {
+        await selectCampaign(id);
+        openCampaignEditor(true);
+      }
+      if (libraryAction.dataset.libraryAction === 'backup') {
+        await exportCampaign(id);
+        toast('Campaign backup downloaded.');
+      }
+    } catch (error) {
+      toast(error.message, true);
+    }
+    return;
+  }
   const onboarding = event.target.closest('[data-ai-onboarding]');
   if (onboarding) {
     chooseAiSetupPath(onboarding.dataset.aiOnboarding).catch((error) => toast(error.message, true));
@@ -2735,7 +2902,8 @@ content.addEventListener('click', async (event) => {
         });
         state.selectedId = null;
         state.campaign = null;
-        await loadState({ selectFirst: true });
+        await loadState();
+        showLibrary();
         toast('Campaign moved to the local recycle bin.');
       }
       if (action.dataset.action === 'show-sessions') {
@@ -2765,9 +2933,11 @@ content.addEventListener('click', async (event) => {
         if (companion?.action !== 'open') {
           toast('Start the Companion first.', true);
         } else {
-          window.open(myCharacterCompanionUrl(companion.url), '_blank', 'noopener');
+          await openLocalCompanion();
         }
       }
+      if (action.dataset.action === 'open-local-companion') await openLocalCompanion();
+      if (action.dataset.action === 'stop-companion') await stopCompanion();
       if (action.dataset.action === 'add-entity') openEntityEditor(action.dataset.type);
       if (action.dataset.action === 'edit-entity')
         openEntityEditor(
@@ -2980,7 +3150,7 @@ document.querySelector('#dialog-cancel').addEventListener('click', () => {
   dialog.close();
 });
 
-loadState({ selectFirst: true, allowFirstRunPrompt: true }).catch((error) => {
+loadState({ allowFirstRunPrompt: true }).catch((error) => {
   content.innerHTML = `<div class="empty">${escapeHtml(error.message)}</div>`;
   toast(error.message, true);
 });

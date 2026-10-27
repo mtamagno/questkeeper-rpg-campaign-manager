@@ -73,6 +73,28 @@
     text-transform: uppercase;
   }
 
+  &__ruleset {
+    display: inline-flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: $spacing-xs;
+    max-width: min(100%, 42rem);
+    padding: $spacing-xs $spacing-sm;
+    border: $border-width-thin solid rgba($color-parchment-light, 0.28);
+    border-radius: $border-radius-pill;
+    background: rgba($color-bg-deep, 0.48);
+    color: $color-parchment-light;
+    font-size: $font-size-xs;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+
+    span::before {
+      content: '·';
+      margin-right: $spacing-xs;
+      color: var(--qk-color-accent);
+    }
+  }
+
   &__hero-row {
     display: flex;
     align-items: center;

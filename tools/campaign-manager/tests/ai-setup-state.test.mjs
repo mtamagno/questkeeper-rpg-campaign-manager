@@ -62,7 +62,8 @@ test('first-run navigation is explicit, bilingual and never reasserted by backgr
     readFile(join(publicRoot, 'i18n.js'), 'utf8'),
   ]);
   assert.match(app, /allowFirstRunPrompt && !state\.firstRunEvaluated/);
-  assert.match(app, /loadState\(\{ selectFirst: true, allowFirstRunPrompt: true \}\)/);
+  assert.match(app, /loadState\(\{ allowFirstRunPrompt: true \}\)/);
+  assert.match(app, /libraryMode: true/);
   assert.doesNotMatch(app, /if \(!result\.ai\?\.config\?\.setupComplete\) state\.aiMode = true/);
   for (const choice of ['configure', 'manual', 'deferred', 'reset']) {
     assert.match(app, new RegExp(`data-ai-onboarding=["']${choice}["']`));

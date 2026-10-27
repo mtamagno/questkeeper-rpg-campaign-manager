@@ -21,6 +21,11 @@
 
         <div class="local-badge"><span></span> Private on your computer</div>
 
+        <button class="sidebar__home" id="show-library" type="button">
+          <span aria-hidden="true">&#8962;</span>
+          <span><strong>Campaign Library</strong><small>All your adventures</small></span>
+        </button>
+
         <label class="ui-language" for="ui-language">
           <span>Interface</span>
           <select id="ui-language">
@@ -55,6 +60,12 @@
           <button class="secondary-button" id="show-scribe">Discord Session Scribe</button>
           <button class="secondary-button" id="show-project">Preview & publish</button>
         </div>
+        <div class="sidebar__service-actions">
+          <button class="sidebar__quit" id="quit-manager" type="button">
+            <span aria-hidden="true">&#10005;</span>
+            <span>Close QuestKeeper</span>
+          </button>
+        </div>
       </aside>
       <button
         class="menu-backdrop"
@@ -79,8 +90,8 @@
             <h1 id="page-title">Your adventure archive</h1>
           </div>
           <div class="topbar__actions">
-            <button class="secondary-button topbar__quit" id="quit-manager">Quit</button>
             <span class="companion-state" id="companion-state" role="status"></span>
+            <button class="secondary-button" id="stop-companion" hidden>Stop Companion</button>
             <button class="primary-button" id="open-companion">Open Companion</button>
           </div>
         </header>
@@ -112,6 +123,39 @@
           <button class="primary-button" id="dialog-save" type="submit">Save</button>
         </footer>
       </form>
+    </dialog>
+
+    <dialog id="service-dialog" class="dialog service-dialog">
+      <section aria-labelledby="service-dialog-title" aria-describedby="service-dialog-description">
+        <header class="dialog__header">
+          <div>
+            <span class="eyebrow">Local services</span>
+            <h2 id="service-dialog-title">What would you like to close?</h2>
+          </div>
+          <button class="icon-button" id="service-dialog-close" type="button" aria-label="Close">
+            &times;
+          </button>
+        </header>
+        <div class="dialog__body service-dialog__choices">
+          <button class="service-choice" id="service-stop-companion" type="button">
+            <span aria-hidden="true">&#9660;</span>
+            <span
+              ><strong>Stop Companion</strong><small>Keep the Campaign Manager open.</small></span
+            >
+          </button>
+          <button class="service-choice" id="service-quit-manager" type="button">
+            <span aria-hidden="true">&#9671;</span>
+            <span><strong>Quit Manager</strong><small>Leave the Companion running.</small></span>
+          </button>
+          <button class="service-choice service-choice--danger" id="service-stop-all" type="button">
+            <span aria-hidden="true">&#10005;</span>
+            <span
+              ><strong>Stop all local services</strong
+              ><small>Close Manager, Companion and every service started here.</small></span
+            >
+          </button>
+        </div>
+      </section>
     </dialog>
 
     <div id="toast-region" class="toast-region" aria-live="polite"></div>
