@@ -32,7 +32,8 @@
     @if (activeCampaignId(); as campaignId) {
       <a
         class="command-bar__my-character"
-        [routerLink]="myCharacterRoute() ?? ['/', campaignId, 'party']"
+        [routerLink]="myCharacterRoute() ?? ['/', campaignId, 'settings']"
+        [fragment]="myCharacterRoute() ? undefined : 'campaign-settings'"
         [attr.aria-label]="
           myCharacter()
             ? isItalian()

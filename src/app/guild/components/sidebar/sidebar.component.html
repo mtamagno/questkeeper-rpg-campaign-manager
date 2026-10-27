@@ -45,30 +45,6 @@
           <span class="sidebar__section-count">{{ characters().length }}</span>
         </h2>
 
-        @if (myCharacter(); as character) {
-          <a class="sidebar__my-character" [routerLink]="myCharacterRoute()" (click)="close()">
-            <span class="sidebar__my-character-mark" aria-hidden="true">✦</span>
-            <span>
-              <small>{{ isItalian() ? 'Il mio personaggio' : 'My character' }}</small>
-              <strong>{{ character.name }}</strong>
-            </span>
-          </a>
-        } @else if (!isLoading()) {
-          <a
-            class="sidebar__my-character sidebar__my-character--empty"
-            [routerLink]="['/', cId, 'party']"
-            (click)="close()"
-          >
-            <span class="sidebar__my-character-mark" aria-hidden="true">✦</span>
-            <span>
-              <small>{{ isItalian() ? 'Accesso rapido' : 'Quick return' }}</small>
-              <strong>{{
-                isItalian() ? 'Scegli il mio personaggio' : 'Choose my character'
-              }}</strong>
-            </span>
-          </a>
-        }
-
         @if (isLoading()) {
           <app-dice-loader
             [label]="isItalian() ? 'Convocazione avventurieri...' : 'Loading adventurers...'"
@@ -263,8 +239,16 @@
     }
   </nav>
 
-  <!-- Sidebar footer — global utility controls (audio preferences) -->
+  <!-- User-owned preferences live in one durable destination. -->
   <footer class="sidebar__footer">
-    <app-audio-toggle />
+    <a
+      class="sidebar__settings"
+      [routerLink]="activeCampaignId() ? ['/', activeCampaignId(), 'settings'] : ['/settings']"
+      routerLinkActive="sidebar__settings--active"
+      (click)="close()"
+    >
+      <span aria-hidden="true">⚙</span>
+      <span>{{ isItalian() ? 'Impostazioni utente' : 'User settings' }}</span>
+    </a>
   </footer>
 </aside>

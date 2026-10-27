@@ -1,0 +1,168 @@
+<div class="user-settings">
+  <header class="user-settings__hero">
+    <p class="user-settings__eyebrow">
+      {{ isItalian() ? 'Preferenze del dispositivo' : 'Device preferences' }}
+    </p>
+    <h1>{{ isItalian() ? 'Impostazioni utente' : 'User settings' }}</h1>
+    <p>
+      {{
+        isItalian()
+          ? 'Un solo luogo per le tue preferenze globali e per quelle delle singole campagne.'
+          : 'One place for your global preferences and each campaign’s personal settings.'
+      }}
+    </p>
+  </header>
+
+  <nav
+    class="user-settings__scope-nav"
+    [attr.aria-label]="isItalian() ? 'Sezioni delle impostazioni' : 'Settings sections'"
+  >
+    <a href="#global-settings">{{ isItalian() ? 'Globali' : 'Global' }}</a>
+    <a href="#campaign-settings">{{ isItalian() ? 'Campagna' : 'Campaign' }}</a>
+  </nav>
+
+  <section id="global-settings" class="settings-card" aria-labelledby="global-settings-title">
+    <div class="settings-card__heading">
+      <span class="settings-card__icon" aria-hidden="true">◉</span>
+      <div>
+        <p class="settings-card__scope">{{ isItalian() ? 'Globali' : 'Global' }}</p>
+        <h2 id="global-settings-title">
+          {{ isItalian() ? 'Suoni dell’interfaccia' : 'Interface sounds' }}
+        </h2>
+        <p>
+          {{
+            isItalian()
+              ? 'Questa scelta vale per tutte le campagne su questo dispositivo.'
+              : 'This choice applies to every campaign on this device.'
+          }}
+        </p>
+      </div>
+    </div>
+
+    <div class="settings-card__control-row">
+      <div>
+        <label for="sound-muted">{{ isItalian() ? 'Disattiva suoni' : 'Mute sounds' }}</label>
+        <p>
+          {{
+            isItalian()
+              ? 'Silenzia gli effetti senza perdere il volume scelto.'
+              : 'Silence effects without losing your chosen volume.'
+          }}
+        </p>
+      </div>
+      <input
+        id="sound-muted"
+        class="settings-switch"
+        type="checkbox"
+        role="switch"
+        [checked]="audioMuted()"
+        (change)="setMuted($event)"
+      />
+    </div>
+
+    <div class="settings-card__field">
+      <div class="settings-card__label-line">
+        <label for="sound-volume">{{ isItalian() ? 'Volume effetti' : 'Effects volume' }}</label>
+        <output for="sound-volume">{{ volumePercent() }}%</output>
+      </div>
+      <input
+        id="sound-volume"
+        type="range"
+        min="0"
+        max="1"
+        step="0.05"
+        [value]="audioVolume()"
+        [disabled]="audioMuted()"
+        (input)="setVolume($event)"
+        (change)="previewVolume()"
+      />
+    </div>
+  </section>
+
+  <section id="campaign-settings" class="settings-card" aria-labelledby="campaign-settings-title">
+    <div class="settings-card__heading">
+      <span class="settings-card__icon" aria-hidden="true">✦</span>
+      <div>
+        <p class="settings-card__scope">{{ isItalian() ? 'Per campagna' : 'Per campaign' }}</p>
+        <h2 id="campaign-settings-title">
+          {{ isItalian() ? 'Il mio personaggio' : 'My character' }}
+        </h2>
+        <p>
+          @if (activeCampaignName(); as campaignName) {
+            {{
+              isItalian()
+                ? 'Scegli il tuo accesso rapido per ' + campaignName + '.'
+                : 'Choose your quick return for ' + campaignName + '.'
+            }}
+          } @else {
+            {{
+              isItalian()
+                ? 'Apri una campagna per modificarne le preferenze personali.'
+                : 'Open a campaign to change its personal preferences.'
+            }}
+          }
+        </p>
+      </div>
+    </div>
+
+    @if (activeCampaignId()) {
+      <div class="settings-card__field">
+        <label for="my-character">{{
+          isItalian() ? 'Personaggio associato' : 'Assigned character'
+        }}</label>
+        <select
+          id="my-character"
+          [value]="myCharacterId() ?? ''"
+          [disabled]="isLoading()"
+          (change)="selectCharacter($event)"
+        >
+          <option value="">{{ isItalian() ? 'Nessun personaggio' : 'No character' }}</option>
+          @for (character of characters(); track character.id) {
+            <option [value]="character.id">{{ character.name }}</option>
+          }
+        </select>
+        <p class="settings-card__help">
+          {{
+            isItalian()
+              ? 'Vengono salvati soltanto gli identificativi pubblici della campagna e del personaggio.'
+              : 'Only the public campaign and character identifiers are saved.'
+          }}
+        </p>
+      </div>
+
+      @if (myCharacterRecord(); as character) {
+        <div class="settings-card__selection">
+          <span aria-hidden="true">✓</span>
+          <span>
+            <small>{{ isItalian() ? 'Selezione attuale' : 'Current selection' }}</small>
+            <strong>{{ character.name }}</strong>
+          </span>
+          <a [routerLink]="myCharacterRoute()">
+            {{ isItalian() ? 'Apri profilo' : 'Open profile' }}
+          </a>
+        </div>
+      }
+    } @else {
+      <div class="settings-card__campaign-list">
+        @for (campaign of campaignEntries(); track campaign.id) {
+          <a [routerLink]="['/', campaign.id, 'settings']" fragment="campaign-settings">
+            <span aria-hidden="true">⚑</span>
+            <span>{{ campaignName(campaign.id) }}</span>
+            <span aria-hidden="true">→</span>
+          </a>
+        } @empty {
+          <p>{{ isItalian() ? 'Nessuna campagna disponibile.' : 'No campaigns available.' }}</p>
+        }
+      </div>
+    }
+  </section>
+
+  <p class="user-settings__privacy">
+    <span aria-hidden="true">⌂</span>
+    {{
+      isItalian()
+        ? 'Le preferenze restano in questo browser e non modificano i dati della campagna.'
+        : 'Preferences stay in this browser and never modify campaign data.'
+    }}
+  </p>
+</div>

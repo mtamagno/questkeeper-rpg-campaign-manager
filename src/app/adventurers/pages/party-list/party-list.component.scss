@@ -425,7 +425,7 @@
     0 18px 42px rgba(0, 0, 0, 0.34);
 }
 
-.character-card__claim {
+.character-card__identity {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -439,18 +439,7 @@
   color: var(--qk-text-muted, #c7c0b3);
   font: inherit;
   font-size: 0.78rem;
-  cursor: pointer;
-
-  &:hover,
-  &:focus-visible,
-  &--active {
-    border-color: var(--qk-accent, #d6b85c);
-    color: var(--qk-accent-contrast, #fff4c9);
-    background: color-mix(in srgb, var(--qk-accent, #d6b85c) 13%, rgba(8, 9, 15, 0.72));
-  }
-
-  &:focus-visible {
-    outline: 3px solid color-mix(in srgb, var(--qk-accent, #d6b85c) 48%, transparent);
-    outline-offset: 2px;
-  }
+  border-color: var(--qk-accent, #d6b85c);
+  color: var(--qk-accent-contrast, #fff4c9);
+  background: color-mix(in srgb, var(--qk-accent, #d6b85c) 13%, rgba(8, 9, 15, 0.72));
 }

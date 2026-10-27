@@ -15,7 +15,6 @@ import {
 } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
-import { AudioToggleComponent } from '@guild/components/audio-toggle/audio-toggle.component';
 import { DiceLoaderComponent } from '@guild/components/dice-loader/dice-loader.component';
 import { DataService } from '@guild/services/data.service';
 import { CampaignService } from '@guild/services/campaign.service';
@@ -23,7 +22,6 @@ import { type Character } from '@guild/models/character.model';
 import { type Npc } from '@guild/models/npc.model';
 import { LanguageService } from '@guild/services/language.service';
 import { localizeText } from '@guild/models/language.model';
-import { MyCharacterService } from '@guild/services/myCharacter.service';
 
 /** Simple group of NPCs by category for the sidebar. */
 interface NpcCategoryGroup {
@@ -62,7 +60,7 @@ function groupNpcsByCategory(npcs: ReadonlyArray<Npc>): ReadonlyArray<NpcCategor
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, AudioToggleComponent, DiceLoaderComponent],
+  imports: [RouterLink, RouterLinkActive, DiceLoaderComponent],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -71,7 +69,6 @@ export class SidebarComponent {
   private readonly dataService = inject(DataService);
   private readonly campaignService = inject(CampaignService);
   private readonly languageService = inject(LanguageService);
-  private readonly myCharacterService = inject(MyCharacterService);
 
   /** Active campaign ID for building route links. */
   readonly activeCampaignId: Signal<string | undefined> = this.campaignService.activeCampaignId;
@@ -87,10 +84,6 @@ export class SidebarComponent {
 
   /** All player characters for the party section. */
   readonly characters: Signal<ReadonlyArray<Character>> = this.dataService.characters;
-
-  /** Device-local player shortcut; stores only campaign and character IDs. */
-  readonly myCharacter = this.myCharacterService.character;
-  readonly myCharacterRoute = this.myCharacterService.route;
 
   /** All NPCs for the bestiary section. */
   readonly npcs: Signal<ReadonlyArray<Npc>> = this.dataService.npcs;

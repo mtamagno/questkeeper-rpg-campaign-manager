@@ -50,6 +50,7 @@ const ROUTE_LABELS: Readonly<Record<string, { readonly it: string; readonly en: 
   story: { it: 'Cronache', en: 'Chronicles' },
   maps: { it: 'Luoghi', en: 'Places' },
   gallery: { it: 'Galleria', en: 'Gallery' },
+  settings: { it: 'Impostazioni', en: 'Settings' },
 };
 
 function humanizeSegment(segment: string): string {
@@ -165,6 +166,15 @@ export class SiteCommandBarComponent {
     const activeName = this.activeCampaignName();
     const global: Array<NavigationCommand> = [
       {
+        id: 'global-settings',
+        icon: '\u2699',
+        title: it ? 'Impostazioni utente' : 'User settings',
+        detail: it ? 'Preferenze di questo dispositivo' : 'Preferences for this device',
+        url: activeId === undefined ? '/settings' : `/${activeId}/settings`,
+        keywords: 'settings impostazioni preferences preferenze audio character personaggio',
+        scope: 'global',
+      },
+      {
         id: 'global-campaigns',
         icon: '\u2302',
         title: it ? 'Tutte le campagne' : 'All campaigns',
@@ -228,7 +238,7 @@ export class SiteCommandBarComponent {
             : 'Set your quick return once',
         url: this.myCharacter()?.id
           ? `${prefix}/party/${this.myCharacter()!.id}`
-          : `${prefix}/party`,
+          : `${prefix}/settings#campaign-settings`,
         keywords: 'my character mio personaggio profile profilo return torna player giocatore',
         scope: 'current',
       },
