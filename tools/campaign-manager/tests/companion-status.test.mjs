@@ -9,9 +9,16 @@ test('recognizes QuestKeeper readiness instead of trusting the child process alo
     return { ok: true, text: async () => '<html><app-root></app-root></html>' };
   });
   assert.deepEqual(probe, { reachable: true, questKeeper: true });
+  const external = resolveCompanionControl({ dependenciesReady: true, job: undefined, probe });
+  assert.equal(external.action, 'open');
+  assert.equal(external.canStop, false);
   assert.equal(
-    resolveCompanionControl({ dependenciesReady: true, job: undefined, probe }).action,
-    'open',
+    resolveCompanionControl({
+      dependenciesReady: true,
+      job: { status: 'running' },
+      probe,
+    }).canStop,
+    true,
   );
 });
 

@@ -76,6 +76,27 @@
     'Campaign manager': 'Gestore campagne',
     'Your adventure archive': 'Il tuo archivio di avventure',
     'Open Companion': 'Apri Companion',
+    'Stop Companion': 'Arresta Companion',
+    'Close QuestKeeper': 'Chiudi QuestKeeper',
+    'Local services': 'Servizi locali',
+    'What would you like to close?': 'Cosa vuoi chiudere?',
+    'Keep the Campaign Manager open.': 'Mantieni aperto il Gestore campagne.',
+    'Quit Manager': 'Chiudi Gestore',
+    'Leave the Companion running.': 'Lascia il Companion in esecuzione.',
+    'Stop all local services': 'Arresta tutti i servizi locali',
+    'Close Manager, Companion and every service started here.':
+      'Chiudi Gestore, Companion e ogni servizio avviato da qui.',
+    'Stop the local Companion? The Campaign Manager will remain open.':
+      'Arrestare il Companion locale? Il Gestore campagne resterà aperto.',
+    'Stop all local QuestKeeper services? Manager, Companion and every service started here will close.':
+      'Arrestare tutti i servizi locali di QuestKeeper? Gestore, Companion e ogni servizio avviato da qui verranno chiusi.',
+    'Quit only the Campaign Manager? The local Companion will keep running until you stop it separately.':
+      'Chiudere solo il Gestore campagne? Il Companion locale continuerà a funzionare finché non lo arresterai separatamente.',
+    'Closing Manager…': 'Chiusura Gestore…',
+    'Campaign Manager is closed': 'Il Gestore campagne è chiuso',
+    'The Campaign Manager has stopped. Your local Companion is still available.':
+      'Il Gestore campagne è stato chiuso. Il Companion locale è ancora disponibile.',
+    'The local Companion is stopping.': 'Il Companion locale si sta arrestando.',
     'Start Companion': 'Avvia Companion',
     'Starting…': 'Avvio…',
     Retry: 'Riprova',

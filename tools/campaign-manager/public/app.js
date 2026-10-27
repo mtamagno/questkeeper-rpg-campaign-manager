@@ -6,7 +6,9 @@ const editorForm = document.querySelector('#editor-form');
 const fields = document.querySelector('#dialog-fields');
 const dialogError = document.querySelector('#dialog-error');
 const mobileMenu = document.querySelector('#mobile-menu');
+const serviceDialog = document.querySelector('#service-dialog');
 const MY_CHARACTERS_KEY = 'questkeeper-manager-my-characters:v1';
+const initialCampaignId = new URL(window.location.href).searchParams.get('campaign');
 
 function readMyCharacters() {
   try {
@@ -65,11 +67,12 @@ function setMyCharacter(characterId) {
 }
 
 function myCharacterCompanionUrl(baseUrl) {
-  const character = selectedMyCharacter();
-  if (!character || !state.selectedId) return baseUrl;
+  if (!state.selectedId) return baseUrl;
   const url = new URL(baseUrl, window.location.href);
-  const root = url.pathname.replace(/\/+$/, '');
-  url.pathname = `${root}/${encodeURIComponent(state.selectedId)}/party/${encodeURIComponent(character.id)}`;
+  const character = selectedMyCharacter();
+  url.pathname = character
+    ? `/${encodeURIComponent(state.selectedId)}/party/${encodeURIComponent(character.id)}`
+    : `/${encodeURIComponent(state.selectedId)}`;
   return url.toString();
 }
 
@@ -146,9 +149,11 @@ function translate(message) {
   return window.managerI18n?.translate?.(message) ?? message;
 }
 
-async function quitManager() {
+async function quitManager(scope = 'all') {
   const confirmation = translate(
-    'Quit Campaign Manager? Active local jobs and previews started here will stop. Your published Companion remains online.',
+    scope === 'all'
+      ? 'Stop all local QuestKeeper services? Manager, Companion and every service started here will close.'
+      : 'Quit only the Campaign Manager? The local Companion will keep running until you stop it separately.',
   );
   if (!confirm(confirmation)) return;
   const button = document.querySelector('#quit-manager');
@@ -156,11 +161,32 @@ async function quitManager() {
   button.textContent = translate('Stopping local services…');
   const result = await api('/api/shutdown', {
     method: 'POST',
-    body: JSON.stringify({ confirmation: 'quit', scope: 'all' }),
+    body: JSON.stringify({ confirmation: 'quit', scope }),
   });
   document.body.innerHTML = `<main class="shutdown-screen" role="status" aria-live="polite"><div class="shutdown-screen__sigil" aria-hidden="true">✦</div><h1>QuestKeeper is closed</h1><p>The Campaign Manager and the local services it started have stopped safely.</p><p>You can close this browser tab. Your published Companion remains online.</p></main>`;
+  if (scope === 'manager') {
+    document.body.innerHTML = `<main class="shutdown-screen" role="status" aria-live="polite"><div class="shutdown-screen__sigil" aria-hidden="true">&#10022;</div><h1>Campaign Manager is closed</h1><p>The Campaign Manager has stopped. Your local Companion is still available.</p><p>You can close this browser tab. Your published Companion remains online.</p></main>`;
+  }
   window.managerI18n?.translateTree?.();
   document.title = result.message;
+}
+
+async function openLocalCompanion() {
+  const handshake = await api('/api/companion-handshake', {
+    method: 'POST',
+    body: JSON.stringify({ campaignId: state.selectedId }),
+  });
+  window.open(myCharacterCompanionUrl(handshake.url), '_blank', 'noopener');
+}
+
+async function stopCompanion() {
+  if (!confirm(translate('Stop the local Companion? The Campaign Manager will remain open.'))) {
+    return;
+  }
+  await api('/api/actions/preview-stop', { method: 'POST', body: '{}' });
+  serviceDialog.close();
+  toast('The local Companion is stopping.');
+  void refreshJobs();
 }
 
 function setMenuOpen(open) {
@@ -182,8 +208,9 @@ async function loadState({ selectFirst = false, allowFirstRunPrompt = false } = 
     publishing: result.publishing,
     storage: result.storage,
   };
-  if (selectFirst && !state.selectedId && result.campaigns.length) {
-    state.selectedId = result.campaigns[0].id;
+  const requestedCampaign = result.campaigns.find((campaign) => campaign.id === initialCampaignId);
+  if ((selectFirst || requestedCampaign) && !state.selectedId && result.campaigns.length) {
+    state.selectedId = requestedCampaign?.id ?? result.campaigns[0].id;
     state.campaign = await api(`/api/campaigns/${encodeURIComponent(state.selectedId)}`);
   }
   if (allowFirstRunPrompt && !state.firstRunEvaluated) {
@@ -258,6 +285,7 @@ function renderCompanionAction() {
   };
   const button = document.querySelector('#open-companion');
   const status = document.querySelector('#companion-state');
+  const stopButton = document.querySelector('#stop-companion');
   button.textContent = control.label;
   if (control.action === 'open' && selectedMyCharacter()) {
     button.textContent = 'Open my character';
@@ -267,6 +295,8 @@ function renderCompanionAction() {
   button.title = control.status;
   status.textContent = control.status;
   status.className = `companion-state companion-state--${control.action}`;
+  stopButton.hidden = control.canStop !== true;
+  document.querySelector('#service-stop-companion').disabled = control.canStop !== true;
 }
 
 function render() {
@@ -2459,7 +2489,7 @@ function renderProject() {
   content.innerHTML = `
     <div class="project-stack">
       <section class="project-panel"><span class="eyebrow">1 · Preparation</span><h2>Prepare the project</h2><p>${state.project.dependenciesReady ? 'Dependencies are installed. You can preview or validate your Companion.' : 'On first use, install everything the project needs. An internet connection is required.'}</p><div class="action-row"><button class="primary-button" data-project-action="install" ${install?.status === 'running' ? 'disabled' : ''}>${state.project.dependenciesReady ? 'Reinstall dependencies' : 'Prepare automatically'}</button><span class="job-status ${install?.status || ''}">${install ? escapeHtml(install.status) : state.project.dependenciesReady ? 'Ready' : 'Not prepared'}</span></div></section>
-      <section class="project-panel"><span class="eyebrow">2 · Preview</span><h2>Open your Companion</h2><p>Launch the local site with the campaign data you just entered.</p><div class="action-row">${companion.action === 'open' ? `<a class="primary-button" href="${escapeHtml(companion.url)}" target="_blank" rel="noreferrer">Open now</a>` : `<button class="primary-button" data-project-action="preview" ${['prepare', 'wait'].includes(companion.action) ? 'disabled' : ''}>${escapeHtml(companion.label)}</button>`}<span class="job-status ${escapeHtml(companion.action)}">${escapeHtml(companion.status)}</span></div></section>
+      <section class="project-panel"><span class="eyebrow">2 · Preview</span><h2>Open your Companion</h2><p>Launch the local site with the campaign data you just entered.</p><div class="action-row">${companion.action === 'open' ? `<button class="primary-button" data-action="open-local-companion">Open now</button>${companion.canStop ? '<button class="secondary-button" data-action="stop-companion">Stop</button>' : ''}` : `<button class="primary-button" data-project-action="preview" ${['prepare', 'wait'].includes(companion.action) ? 'disabled' : ''}>${escapeHtml(companion.label)}</button>`}<span class="job-status ${escapeHtml(companion.action)}">${escapeHtml(companion.status)}</span></div></section>
       <section class="project-panel"><span class="eyebrow">3 · Validation</span><h2>Check before publishing</h2><p>The production build catches invalid data or components before you push to GitHub.</p><div class="action-row"><button class="secondary-button" data-project-action="build" ${!state.project.dependenciesReady || build?.status === 'running' ? 'disabled' : ''}>Check and build site</button><span class="job-status ${build?.status || ''}">${build ? escapeHtml(build.status) : 'Not run'}</span></div></section>
       <section class="project-panel"><span class="eyebrow">4 · Publishing</span><h2>Choose how the archive reaches the realm</h2><p>GitHub Pages remains available through the included workflow. If your hosting provides FTP, configure it once and publish directly from this computer without GitHub Actions.</p><a class="secondary-button" href="https://github.com/mtamagno/questkeeper-rpg-campaign-manager#publish" target="_blank" rel="noreferrer">Open the publishing guide</a></section>
       <section class="project-panel"><span class="eyebrow">Authoring preferences</span><h2>Advanced controls</h2><p>Keep technical identifiers hidden during normal authoring, or reveal them when you need to integrate or troubleshoot campaign data.</p><label class="consent-check"><input type="checkbox" data-advanced-mode ${state.advancedMode ? 'checked' : ''} /> Show advanced identity controls in entity forms</label></section>
@@ -2681,7 +2711,7 @@ document.querySelector('#open-companion').addEventListener('click', (event) => {
     return;
   }
   if (action === 'open') {
-    window.open(myCharacterCompanionUrl(state.project.companion.url), '_blank', 'noopener');
+    openLocalCompanion().catch((error) => toast(error.message, true));
     return;
   }
   if (action === 'wait') {
@@ -2691,9 +2721,24 @@ document.querySelector('#open-companion').addEventListener('click', (event) => {
   }
   runProjectAction('preview').catch((error) => toast(error.message, true));
 });
+document.querySelector('#quit-manager').addEventListener('click', () => serviceDialog.showModal());
 document
-  .querySelector('#quit-manager')
-  .addEventListener('click', () => quitManager().catch((error) => toast(error.message, true)));
+  .querySelector('#stop-companion')
+  .addEventListener('click', () => stopCompanion().catch((error) => toast(error.message, true)));
+document
+  .querySelector('#service-dialog-close')
+  .addEventListener('click', () => serviceDialog.close());
+document
+  .querySelector('#service-stop-companion')
+  .addEventListener('click', () => stopCompanion().catch((error) => toast(error.message, true)));
+document
+  .querySelector('#service-quit-manager')
+  .addEventListener('click', () =>
+    quitManager('manager').catch((error) => toast(error.message, true)),
+  );
+document
+  .querySelector('#service-stop-all')
+  .addEventListener('click', () => quitManager('all').catch((error) => toast(error.message, true)));
 
 content.addEventListener('click', async (event) => {
   const onboarding = event.target.closest('[data-ai-onboarding]');
@@ -2765,9 +2810,11 @@ content.addEventListener('click', async (event) => {
         if (companion?.action !== 'open') {
           toast('Start the Companion first.', true);
         } else {
-          window.open(myCharacterCompanionUrl(companion.url), '_blank', 'noopener');
+          await openLocalCompanion();
         }
       }
+      if (action.dataset.action === 'open-local-companion') await openLocalCompanion();
+      if (action.dataset.action === 'stop-companion') await stopCompanion();
       if (action.dataset.action === 'add-entity') openEntityEditor(action.dataset.type);
       if (action.dataset.action === 'edit-entity')
         openEntityEditor(

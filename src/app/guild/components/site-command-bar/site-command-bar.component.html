@@ -16,6 +16,19 @@
   </nav>
 
   <div class="command-bar__actions">
+    @if (managerUrl()) {
+      <button
+        class="command-bar__manager"
+        type="button"
+        (click)="openManager()"
+        [attr.aria-label]="
+          isItalian() ? 'Apri il Gestore campagne locale' : 'Open the local Campaign Manager'
+        "
+      >
+        <span aria-hidden="true">&#9881;</span>
+        <span class="command-bar__manager-label">{{ isItalian() ? 'Gestore' : 'Manager' }}</span>
+      </button>
+    }
     @if (activeCampaignId(); as campaignId) {
       <a
         class="command-bar__my-character"

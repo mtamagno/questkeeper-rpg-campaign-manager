@@ -91,6 +91,32 @@ body::before {
   backdrop-filter: blur(18px);
   z-index: 5;
 }
+.sidebar__service-actions {
+  margin-top: auto;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--line);
+}
+.sidebar__quit {
+  width: 100%;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid rgba(210, 125, 119, 0.22);
+  border-radius: 10px;
+  background: transparent;
+  color: #d7aaa5;
+  text-align: left;
+}
+.sidebar__quit:hover,
+.sidebar__quit:focus-visible {
+  outline: 0;
+  border-color: var(--danger);
+  background: rgba(210, 125, 119, 0.14);
+  color: #ffd6d1;
+  box-shadow: 0 0 0 3px rgba(210, 125, 119, 0.08);
+}
 .brand {
   display: flex;
   align-items: center;
@@ -359,10 +385,6 @@ body::before {
 }
 .companion-state--retry {
   color: var(--danger);
-}
-.topbar__quit {
-  color: #ffc8c0;
-  border-color: rgba(255, 125, 108, 0.42);
 }
 .shutdown-screen {
   width: min(680px, calc(100% - 2rem));
@@ -1385,6 +1407,49 @@ code {
 .dialog__body {
   padding: 1.3rem;
   overflow-y: auto;
+}
+.service-dialog {
+  width: min(620px, calc(100vw - 2rem));
+}
+.service-dialog__choices {
+  display: grid;
+  gap: 0.75rem;
+}
+.service-choice {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  gap: 0.85rem;
+  align-items: center;
+  width: 100%;
+  min-height: 64px;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-2);
+  text-align: left;
+}
+.service-choice:hover,
+.service-choice:focus-visible {
+  outline: 0;
+  border-color: var(--gold);
+  background: var(--surface-3);
+  box-shadow: 0 0 0 3px rgba(214, 182, 111, 0.08);
+}
+.service-choice > span:last-child {
+  display: grid;
+  gap: 0.2rem;
+}
+.service-choice small {
+  color: var(--muted);
+}
+.service-choice--danger {
+  border-color: rgba(210, 125, 119, 0.34);
+  color: #ffd0cb;
+}
+.service-choice--danger:hover,
+.service-choice--danger:focus-visible {
+  border-color: var(--danger);
+  background: rgba(210, 125, 119, 0.14);
 }
 .form-grid {
   display: grid;

@@ -22,6 +22,7 @@ import { PwaInstallService } from '@guild/services/pwaInstall.service';
 import { JourneyMemoryService, type JourneyPage } from '@guild/services/journeyMemory.service';
 import { activeElement, restoreFocus, trapTabKey } from '@guild/utils/focusTrap';
 import { MyCharacterService } from '@guild/services/myCharacter.service';
+import { LocalManagerBridgeService } from '@guild/services/localManagerBridge.service';
 
 interface NavigationCommand {
   readonly id: string;
@@ -77,6 +78,7 @@ export class SiteCommandBarComponent {
   private readonly pwaInstall = inject(PwaInstallService);
   private readonly journeyMemory = inject(JourneyMemoryService);
   private readonly myCharacterService = inject(MyCharacterService);
+  private readonly localManager = inject(LocalManagerBridgeService);
   private readonly currentUrl = signal(this.router.url);
   private readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
   private readonly paletteDialog = viewChild<ElementRef<HTMLElement>>('paletteDialog');
@@ -94,6 +96,7 @@ export class SiteCommandBarComponent {
   readonly isCurrentFavorite = this.journeyMemory.isCurrentFavorite;
   readonly myCharacter = this.myCharacterService.character;
   readonly myCharacterRoute = this.myCharacterService.route;
+  readonly managerUrl = this.localManager.managerUrl;
 
   readonly tourActionLabel = computed((): string => {
     const it = this.isItalian();
@@ -415,6 +418,10 @@ export class SiteCommandBarComponent {
 
   async installCompanion(): Promise<void> {
     await this.pwaInstall.install();
+  }
+
+  openManager(): void {
+    this.localManager.open(this.activeCampaignId());
   }
 
   toggleCurrentFavorite(): void {

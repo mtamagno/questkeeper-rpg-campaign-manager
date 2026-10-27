@@ -77,6 +77,7 @@ const TOKEN = randomBytes(24).toString('hex');
 const MAX_BODY_BYTES = 12 * 1024 * 1024;
 const jobs = new Map();
 const children = new Set();
+const companionHandshakes = new Map();
 const hardwarePromise = detectHardware();
 let activeServer;
 let shuttingDown = false;
@@ -97,6 +98,55 @@ function sendJson(response, statusCode, value) {
     'Cache-Control': 'no-store',
   });
   response.end(JSON.stringify(value));
+}
+
+function sendCompanionJson(response, statusCode, value) {
+  response.writeHead(statusCode, {
+    'Content-Type': 'application/json; charset=utf-8',
+    'Cache-Control': 'no-store',
+    'Access-Control-Allow-Origin': new URL(COMPANION_URL).origin,
+    Vary: 'Origin',
+  });
+  response.end(JSON.stringify(value));
+}
+
+function managerUrlFor(request) {
+  const url = new URL(`http://${request.headers.host}`);
+  if (!['127.0.0.1', 'localhost'].includes(url.hostname)) {
+    throw new Error('The local Manager URL is not trusted.');
+  }
+  return url.origin;
+}
+
+function issueCompanionHandshake(request, campaignId) {
+  const token = randomBytes(24).toString('hex');
+  const managerUrl = managerUrlFor(request);
+  companionHandshakes.set(token, {
+    managerUrl,
+    campaignId: typeof campaignId === 'string' ? campaignId : '',
+    expiresAt: Date.now() + 60_000,
+  });
+  const url = new URL(COMPANION_URL);
+  if (campaignId) url.pathname = `/${encodeURIComponent(campaignId)}`;
+  url.searchParams.set('qkManager', managerUrl);
+  url.searchParams.set('qkHandshake', token);
+  return { url: url.toString(), expiresInSeconds: 60 };
+}
+
+function consumeCompanionHandshake(request, url) {
+  if (request.headers.origin !== new URL(COMPANION_URL).origin) {
+    throw new Error('The Companion origin is not trusted.');
+  }
+  const token = url.searchParams.get('token') ?? '';
+  const handshake = companionHandshakes.get(token);
+  companionHandshakes.delete(token);
+  if (!handshake || handshake.expiresAt < Date.now()) {
+    throw new Error('The local Companion handshake is invalid or expired.');
+  }
+  return {
+    managerUrl: handshake.managerUrl,
+    campaignId: handshake.campaignId,
+  };
 }
 
 async function readBody(request) {
@@ -405,6 +455,7 @@ async function startJob(kind) {
     child = spawn(command.command, command.args, {
       cwd: command.cwd,
       windowsHide: true,
+      detached: kind === 'preview',
       env: {
         ...process.env,
         BROWSER: 'none',
@@ -461,6 +512,12 @@ async function stopJob(kind) {
         resolveStop();
       });
     });
+  } else if (kind === 'preview' && job.process.pid) {
+    try {
+      process.kill(-job.process.pid, 'SIGTERM');
+    } catch {
+      job.process.kill('SIGTERM');
+    }
   } else {
     job.process.kill('SIGTERM');
   }
@@ -590,6 +647,10 @@ async function serveCampaignAsset(response, pathname) {
 
 async function routeApi(request, response, url) {
   const parts = url.pathname.split('/').filter(Boolean).map(decodeURIComponent);
+  if (request.method === 'GET' && url.pathname === '/api/companion-handshake') {
+    sendCompanionJson(response, 200, consumeCompanionHandshake(request, url));
+    return;
+  }
   if (request.method === 'GET' && url.pathname === '/api/state') {
     sendJson(response, 200, { ...(await getState(PROJECT_ROOT)), ...(await projectStatus()) });
     return;
@@ -606,6 +667,12 @@ async function routeApi(request, response, url) {
   if (request.method === 'POST' && url.pathname === '/api/storage/open') {
     const body = await readBody(request);
     sendJson(response, 200, { path: openStorageFolder(body.target) });
+    return;
+  }
+
+  if (request.method === 'POST' && url.pathname === '/api/companion-handshake') {
+    const body = await readBody(request);
+    sendJson(response, 201, issueCompanionHandshake(request, body.campaignId));
     return;
   }
   if (request.method === 'POST' && url.pathname === '/api/storage/backup') {
@@ -630,13 +697,18 @@ async function routeApi(request, response, url) {
   if (request.method === 'POST' && url.pathname === '/api/shutdown') {
     const body = await readBody(request);
     if (body.confirmation !== 'quit') throw new Error('Confirm the local shutdown request.');
+    const scope = body.scope === 'manager' ? 'manager' : 'all';
     const runningJobs = [...jobs.values()]
       .filter((job) => ['running', 'stopping'].includes(job.status))
       .map((job) => job.kind);
-    response.once('finish', () => setImmediate(() => void shutdown()));
+    response.once('finish', () =>
+      setImmediate(() => void shutdown({ stopLocalServices: scope === 'all' })),
+    );
     sendJson(response, 200, {
       closing: true,
-      stoppedServices: runningJobs,
+      stoppedServices: scope === 'all' ? runningJobs : [],
+      preservedServices: scope === 'manager' ? runningJobs : [],
+      scope,
       message: 'QuestKeeper is shutting down. You can close this browser tab.',
     });
     return;
@@ -744,8 +816,11 @@ async function routeApi(request, response, url) {
     return;
   }
   if (request.method === 'POST' && parts[1] === 'actions' && parts.length === 3) {
-    const job =
-      parts[2] === 'transcriber-stop' ? await stopJob('transcriber') : await startJob(parts[2]);
+    const stoppedKind = {
+      'transcriber-stop': 'transcriber',
+      'preview-stop': 'preview',
+    }[parts[2]];
+    const job = stoppedKind ? await stopJob(stoppedKind) : await startJob(parts[2]);
     sendJson(response, 202, { job: { ...job, process: undefined } });
     return;
   }
@@ -1077,11 +1152,20 @@ export function startServer({
 const isMain = process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 if (isMain) startServer({ open: process.argv.includes('--open') });
 
-async function shutdown() {
+async function shutdown({ stopLocalServices = true } = {}) {
   if (shuttingDown) return;
   shuttingDown = true;
-  await Promise.all([...jobs.keys()].map((kind) => stopJob(kind)));
-  for (const child of children) child.kill();
+  if (stopLocalServices) {
+    await Promise.all([...jobs.keys()].map((kind) => stopJob(kind)));
+    for (const child of children) child.kill();
+  } else {
+    for (const job of jobs.values()) {
+      if (job.kind !== 'preview' || !job.process) continue;
+      job.process.stdout?.removeAllListeners();
+      job.process.stderr?.removeAllListeners();
+      job.process.unref();
+    }
+  }
   const forcedExit = setTimeout(() => process.exit(0), 1_500);
   forcedExit.unref();
   activeServer?.closeIdleConnections?.();

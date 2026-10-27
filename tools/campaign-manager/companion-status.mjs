@@ -27,7 +27,13 @@ export function resolveCompanionControl({ dependenciesReady, job, probe, url = C
     };
   }
   if (probe.questKeeper) {
-    return { action: 'open', label: 'Open Companion', status: 'Ready', url };
+    return {
+      action: 'open',
+      label: 'Open Companion',
+      status: 'Ready',
+      url,
+      canStop: ['running', 'stopping'].includes(job?.status),
+    };
   }
   if (probe.reachable) {
     return {
@@ -53,5 +59,5 @@ export function resolveCompanionControl({ dependenciesReady, job, probe, url = C
       url,
     };
   }
-  return { action: 'start', label: 'Start Companion', status: 'Not started', url };
+  return { action: 'start', label: 'Start Companion', status: 'Not started', url, canStop: false };
 }
