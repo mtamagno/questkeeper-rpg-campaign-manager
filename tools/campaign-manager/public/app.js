@@ -43,6 +43,7 @@ const state = {
     ai: null,
     languageCatalog: [],
     rulesetProfiles: [],
+    storage: null,
   },
   editor: null,
 };
@@ -179,6 +180,7 @@ async function loadState({ selectFirst = false, allowFirstRunPrompt = false } = 
     languageCatalog: result.languageCatalog ?? [],
     rulesetProfiles: result.rulesetProfiles ?? [],
     publishing: result.publishing,
+    storage: result.storage,
   };
   if (selectFirst && !state.selectedId && result.campaigns.length) {
     state.selectedId = result.campaigns[0].id;
@@ -2437,6 +2439,17 @@ function renderProject() {
   };
   const ftpJob = state.project.jobs['ftp-publish'];
   const publishing = state.project.publishing ?? {};
+  const storage = state.project.storage ?? {};
+  const storageLocations = [
+    ['application', 'Application', 'Replaceable app files'],
+    ['runtime', 'Node runtime', 'Replaceable private runtime'],
+    ['campaigns', 'Campaigns & media', 'Protected user data'],
+    ['configuration', 'Configuration', 'Protected settings & secrets'],
+    ['transcripts', 'Transcripts', 'Protected session notes'],
+    ['backups', 'Backups', 'Protected recovery copies'],
+    ['logs', 'Logs', 'Diagnostic state'],
+    ['cache', 'Cache', 'Replaceable generated files'],
+  ];
   const activeLog =
     [ftpJob, preview, build, install].find((job) => job?.status === 'running') ||
     ftpJob ||
@@ -2450,9 +2463,19 @@ function renderProject() {
       <section class="project-panel"><span class="eyebrow">3 · Validation</span><h2>Check before publishing</h2><p>The production build catches invalid data or components before you push to GitHub.</p><div class="action-row"><button class="secondary-button" data-project-action="build" ${!state.project.dependenciesReady || build?.status === 'running' ? 'disabled' : ''}>Check and build site</button><span class="job-status ${build?.status || ''}">${build ? escapeHtml(build.status) : 'Not run'}</span></div></section>
       <section class="project-panel"><span class="eyebrow">4 · Publishing</span><h2>Choose how the archive reaches the realm</h2><p>GitHub Pages remains available through the included workflow. If your hosting provides FTP, configure it once and publish directly from this computer without GitHub Actions.</p><a class="secondary-button" href="https://github.com/mtamagno/questkeeper-rpg-campaign-manager#publish" target="_blank" rel="noreferrer">Open the publishing guide</a></section>
       <section class="project-panel"><span class="eyebrow">Authoring preferences</span><h2>Advanced controls</h2><p>Keep technical identifiers hidden during normal authoring, or reveal them when you need to integrate or troubleshoot campaign data.</p><label class="consent-check"><input type="checkbox" data-advanced-mode ${state.advancedMode ? 'checked' : ''} /> Show advanced identity controls in entity forms</label></section>
+      <section class="project-panel storage-panel">
+        <div class="storage-panel__heading"><div><span class="eyebrow">Your data · ${escapeHtml(storage.mode ?? 'legacy')}</span><h2>Storage & recovery</h2><p>Protected table memories stay separate from replaceable app and runtime files.</p></div><div class="action-row"><button class="primary-button" type="button" data-storage-action="backup">Back up now</button><button class="secondary-button" type="button" data-storage-action="export">Export all campaigns</button></div></div>
+        <div class="storage-runtime"><strong>Active Node.js</strong><code>${escapeHtml(storage.node?.version ?? '')} · ${escapeHtml(storage.node?.source ?? '')} · ${escapeHtml(storage.node?.executable ?? '')}</code></div>
+        <dl class="storage-list">${storageLocations.map(([key, label, meaning]) => `<div><dt><strong>${label}</strong><span>${meaning}</span></dt><dd><code title="${escapeHtml(storage[key] ?? '')}">${escapeHtml(storage[key] ?? 'Not available')}</code><span class="storage-row__actions"><button class="secondary-button storage-button" type="button" data-storage-action="copy" data-storage-key="${key}">Copy path</button><button class="secondary-button storage-button" type="button" data-storage-action="open" data-storage-key="${key}">Open folder</button></span></dd></div>`).join('')}</dl>
+        <small>Paths never contain or reveal saved API keys, Discord tokens or publishing passwords.</small>
+      </section>
       <form id="publishing-form" class="project-panel publishing-panel"><span class="eyebrow">Direct hosting · FTP / FTPS</span><h2>Publish from Campaign Manager</h2><div class="publishing-grid"><label class="field"><span>Protocol</span><select name="protocol"><option value="ftps" ${publishing.protocol !== 'ftp' ? 'selected' : ''}>FTPS · encrypted (recommended)</option><option value="ftp" ${publishing.protocol === 'ftp' ? 'selected' : ''}>FTP · unencrypted</option></select></label><label class="field"><span>Host</span><input name="host" value="${escapeHtml(publishing.host)}" placeholder="ftp.example.com" /></label><label class="field"><span>Port</span><input name="port" type="number" min="1" value="${publishing.port || 21}" /></label><label class="field"><span>Remote folder</span><input name="remotePath" value="${escapeHtml(publishing.remotePath || '/')}" placeholder="/public_html/questkeeper" /></label><label class="field"><span>Username</span><input name="username" autocomplete="username" value="${escapeHtml(publishing.username)}" /></label><label class="field"><span>Password</span><input name="password" type="password" autocomplete="new-password" placeholder="${publishing.passwordConfigured ? 'Saved locally · leave blank to keep it' : 'Hosting password'}" /></label></div><label class="consent-check"><input name="insecureConsent" type="checkbox" /> I understand that plain FTP sends credentials and files without encryption. This is required only when FTP is selected instead of FTPS.</label><div class="action-row"><button class="secondary-button" type="button" data-publish-action="save">Save destination</button><button class="secondary-button" type="button" data-publish-action="test">Test connection</button><button class="primary-button" type="button" data-publish-action="publish" ${!state.project.dependenciesReady || ftpJob?.status === 'running' ? 'disabled' : ''}>Build & publish now</button><span class="job-status ${ftpJob?.status || ''}">${ftpJob ? escapeHtml(ftpJob.status) : publishing.host ? 'Configured' : 'Not configured'}</span></div><small>Credentials stay in the Git-ignored <code>.campaign-manager/</code> folder and are never returned to the browser.</small></form>
       ${activeLog ? `<pre class="job-log">${escapeHtml(activeLog.logs)}</pre>` : ''}
     </div>`;
+  const credentialNote = content.querySelector('.publishing-panel > small');
+  if (credentialNote)
+    credentialNote.textContent =
+      'Credentials stay in the protected local configuration folder and are never returned to the browser.';
 }
 
 function publishingPayload(form) {
@@ -2558,6 +2581,41 @@ async function exportCurrent() {
   link.download = `${state.selectedId}-backup.json`;
   link.click();
   URL.revokeObjectURL(link.href);
+}
+
+async function runStorageAction(action, key) {
+  const storage = state.project.storage ?? {};
+  if (action === 'copy') {
+    const value = storage[key];
+    if (!value) throw new Error('Storage path is not available.');
+    await navigator.clipboard.writeText(value);
+    toast('Path copied.');
+    return;
+  }
+  if (action === 'open') {
+    await api('/api/storage/open', {
+      method: 'POST',
+      body: JSON.stringify({ target: key }),
+    });
+    toast('Folder opened.');
+    return;
+  }
+  if (action === 'backup') {
+    const result = await api('/api/storage/backup', { method: 'POST', body: '{}' });
+    toast(`Full backup created in ${result.destination}`);
+    return;
+  }
+  if (action === 'export') {
+    const bundle = await api('/api/storage/export');
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(
+      new Blob([JSON.stringify(bundle, null, 2)], { type: 'application/json' }),
+    );
+    link.download = `questkeeper-all-campaigns-${new Date().toISOString().slice(0, 10)}.json`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+    toast('All campaign bundles exported. Use Back up now to include original media.');
+  }
 }
 
 async function importFile(file) {
@@ -2736,6 +2794,11 @@ content.addEventListener('click', async (event) => {
   if (projectAction)
     runProjectAction(projectAction.dataset.projectAction).catch((error) =>
       toast(error.message, true),
+    );
+  const storageAction = event.target.closest('[data-storage-action]');
+  if (storageAction)
+    runStorageAction(storageAction.dataset.storageAction, storageAction.dataset.storageKey).catch(
+      (error) => toast(error.message, true),
     );
   const publishAction = event.target.closest('[data-publish-action]');
   if (publishAction)

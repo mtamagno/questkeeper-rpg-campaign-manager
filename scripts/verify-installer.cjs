@@ -2,7 +2,7 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { execFileSync } = require('node:child_process');
-const { embedRuntimeSelection } = require('./lib/create-sea-entry.cjs');
+const { embedRuntimeSelection, embedStoragePaths } = require('./lib/create-sea-entry.cjs');
 
 const root = path.resolve(__dirname, '..');
 const read = (relativePath) => fs.readFileSync(path.join(root, relativePath), 'utf8');
@@ -32,7 +32,9 @@ const checks = [
       interfaceHtml.includes('launch-manager') &&
       interfaceHtml.includes('runtime-private') &&
       interfaceHtml.includes('runtime-system') &&
-      interfaceHtml.includes('system-runtime'),
+      interfaceHtml.includes('system-runtime') &&
+      interfaceHtml.includes('portable-data') &&
+      interfaceHtml.includes('storage-path'),
   ],
   [
     'a bilingual setup shutdown control',
@@ -40,6 +42,7 @@ const checks = [
       interfaceScript.includes("closeSetup: 'Close setup'") &&
       interfaceScript.includes("closeSetup: 'Chiudi setup'") &&
       interfaceScript.includes("api('shutdown'") &&
+      interfaceScript.includes('window.setTimeout(() => closeSetup(status), 450)') &&
       wizard.includes("requestUrl.pathname === '/api/shutdown'") &&
       wizard.includes('setupServer.close'),
   ],
@@ -89,6 +92,7 @@ const checks = [
       builder.includes('NODE_SEA_BLOB') &&
       builder.includes('createSeaEntry()') &&
       builder.includes('runtime-selection.cjs') &&
+      builder.includes('storage-paths.cjs') &&
       builder.includes('seaEntryPath') &&
       builder.includes('--self-test'),
   ],
@@ -131,6 +135,22 @@ for (const newline of ['\n', '\r\n']) {
   ) {
     failures.push(`SEA entry bundling failed for ${newline === '\n' ? 'LF' : 'CRLF'} input.`);
   }
+}
+
+const storageFixture = [
+  'const {',
+  '  materializeCampaigns,',
+  '  prepareStorage,',
+  '  publicStorageSummary,',
+  '  resolveStoragePaths,',
+  "} = require('../storage-paths.cjs');",
+].join('\n');
+const embeddedStorage = embedStoragePaths(storageFixture, 'module.exports = { ok: true };');
+if (
+  embeddedStorage.includes("require('../storage-paths.cjs')") ||
+  !embeddedStorage.includes('__questkeeperStoragePaths')
+) {
+  failures.push('SEA storage-path bundling failed.');
 }
 
 try {

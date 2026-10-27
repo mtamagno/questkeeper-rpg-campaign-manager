@@ -46,7 +46,7 @@ at any time. Nothing is downloaded until you choose a model; manual authoring
 remains a first-class option. See the complete
 [AI setup guide](../../docs/AI-SETUP.md).
 
-All edits are ordinary files under `src/campaigns/`, so they remain portable
+All edits are ordinary files under the resolved protected campaign root, so they remain portable
 and versionable. The manager itself works before project dependencies are
 installed because it uses only Node.js built-ins.
 
@@ -91,7 +91,7 @@ very large: copy the campaign's `images/` folder separately. Use **Import
 backup** in the sidebar to restore a bundle whose ID is not already present.
 
 Deleting a character, NPC, session or campaign requires confirmation. Files
-are moved to `.campaign-manager/trash/` whenever possible instead of being
+are moved to the resolved state folder's `trash/` directory whenever possible instead of being
 permanently erased. Locations stored in the shared `maps.json` file are removed
 from that file and remain recoverable through Git history or a backup.
 
@@ -105,7 +105,7 @@ main [README](../../README.md#publish) for details.
 If your web host provides FTP access, open **Preview & publish**, configure the
 host, remote folder, username and password, then choose **Build & publish
 now**. FTPS is the secure default; plain FTP requires an explicit warning
-acknowledgement. Credentials stay in the ignored `.campaign-manager/` folder.
+acknowledgement. Credentials stay in the resolved protected configuration folder.
 See the [deployment guide](../../docs/DEPLOYMENT.md) for the complete flow.
 
 ## Troubleshooting

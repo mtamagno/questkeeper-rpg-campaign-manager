@@ -84,6 +84,15 @@
             >Install the locked QuestKeeper tools</span
           ></label
         >
+        <label class="option-with-help"
+          ><input id="portable-data" type="checkbox" /><span
+            ><strong data-copy="portableData">Keep campaign data beside QuestKeeper</strong
+            ><small data-copy="portableDataHint"
+              >Portable mode is useful for a USB drive. Per-user storage is safer for normal
+              updates.</small
+            ></span
+          ></label
+        >
         <label
           ><input id="manager-shortcut" type="checkbox" checked /><span data-copy="managerShortcut"
             >Create a Campaign Manager shortcut</span
@@ -101,6 +110,14 @@
           ></label
         >
       </section>
+
+      <aside class="storage-preview" aria-live="polite">
+        <strong data-copy="storageTitle">Protected campaign storage</strong>
+        <p data-copy="storageBody">
+          Campaigns, media, transcripts and backups are kept separate from replaceable app files.
+        </p>
+        <code id="storage-path"></code>
+      </aside>
 
       <aside class="trust">
         <strong data-copy="trustTitle">A private, verified runtime</strong>

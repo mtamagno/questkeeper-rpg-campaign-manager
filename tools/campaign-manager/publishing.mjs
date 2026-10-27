@@ -1,5 +1,9 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
-import { dirname, join } from 'node:path';
+import { dirname } from 'node:path';
+
+import storagePaths from '../storage-paths.cjs';
+
+const { resolveStoragePaths } = storagePaths;
 
 const DEFAULT_CONFIG = Object.freeze({
   protocol: 'ftps',
@@ -11,7 +15,7 @@ const DEFAULT_CONFIG = Object.freeze({
 });
 
 function configPath(projectRoot) {
-  return join(projectRoot, '.campaign-manager', 'publishing.json');
+  return resolveStoragePaths(projectRoot).publishingConfigFile;
 }
 
 function normalizeHost(value) {

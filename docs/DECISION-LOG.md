@@ -1323,6 +1323,59 @@ snapshots before comparison appears, and duplicate levels fail validation.
 **Revisit when:** A future ruleset requires non-tabular values that cannot keep
 meaningful row correspondence.
 
+### QK-049 — User data outlives the application
+
+**Date:** 26 October 2026
+
+**Status:** Active
+
+**Decision:** Installed releases store campaigns, original media, transcripts,
+settings, secrets and backups in a per-user data contract. Portable mode keeps
+the same separation under `.questkeeper/user-data/`; source checkouts retain a
+legacy mode. A single resolver owns these paths, and builds consume a validated,
+replaceable mirror.
+
+**Why:** Updating the application or its private Node runtime must not risk the
+only copy of a table's history. The same contract must remain testable across
+Windows, macOS and Linux without making Git a prerequisite.
+
+**Consequences:** The 1.1.4 migration copies, validates and atomically adopts
+the new campaign root while preserving the original. Export remains a portable
+content operation; full backup preserves media as well. UI and documentation
+must distinguish protected data from replaceable application files.
+
+**Source:** [Issue #24](https://github.com/mtamagno/questkeeper-rpg-campaign-manager/issues/24)
+and [Data lifecycle](DATA-LIFECYCLE.md).
+
+**Revisit when:** Account synchronization or encrypted operating-system vaults
+change the ownership and recovery model.
+
+### QK-050 — Storage safety is visible and actionable
+
+**Date:** 26 October 2026
+
+**Status:** Active
+
+**Decision:** Campaign Manager exposes the resolved storage roots, active Node
+runtime, safe folder access, complete local backup and all-campaign export in a
+single recovery panel. Successful setup reports what remains running and then
+stops its own loopback process automatically.
+
+**Why:** Separation on disk is not sufficient when a GM cannot tell what an
+update may replace or where recovery copies live. Hidden setup processes also
+undermine trust and interfere with later launches.
+
+**Consequences:** Diagnostic responses include paths and runtime identity but
+never secret values. Backups include media; JSON export deliberately does not.
+Browsers that refuse scripted tab closure keep a bilingual, safe-to-close final
+screen after the local setup service has ended.
+
+**Source:** [Issue #25](https://github.com/mtamagno/questkeeper-rpg-campaign-manager/issues/25)
+and [Data lifecycle](DATA-LIFECYCLE.md).
+
+**Revisit when:** Native installers gain an operating-system window lifecycle
+or cloud backup changes the recovery surface.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD

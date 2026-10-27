@@ -9,6 +9,12 @@ const {
   npmCliCandidates,
   validateRuntimeCandidate,
 } = require('./runtime-selection.cjs');
+const {
+  materializeCampaigns,
+  prepareStorage,
+  publicStorageSummary,
+  resolveStoragePaths,
+} = require('../storage-paths.cjs');
 
 const HOST = '127.0.0.1';
 const PORT = Number.parseInt(process.env.QUESTKEEPER_SETUP_PORT || '0', 10);
@@ -56,6 +62,7 @@ const state = {
   logs: [],
   error: null,
   finishedAt: null,
+  launchedManager: false,
 };
 
 function log(message) {
@@ -136,6 +143,7 @@ function activeRuntimeStatus() {
 }
 
 function setupStatus() {
+  const storage = resolveStoragePaths(root);
   return {
     platform: process.platform,
     architecture: process.arch,
@@ -143,6 +151,11 @@ function setupStatus() {
     runtime: activeRuntimeStatus(),
     systemRuntimes: systemRuntimeCandidates(),
     dependenciesReady: fs.existsSync(path.join(root, 'node_modules', '.package-lock.json')),
+    storage: publicStorageSummary(storage),
+    storageChoices: {
+      user: publicStorageSummary(resolveStoragePaths(root, { mode: 'user' })),
+      portable: publicStorageSummary(resolveStoragePaths(root, { mode: 'portable' })),
+    },
     state,
   };
 }
@@ -325,7 +338,7 @@ function runDetached(command, commandArgs) {
 function launchStatePath(...parts) {
   const stateRoot = process.env.QUESTKEEPER_LAUNCH_STATE_ROOT
     ? path.resolve(process.env.QUESTKEEPER_LAUNCH_STATE_ROOT)
-    : path.join(root, '.questkeeper');
+    : resolveStoragePaths(root).stateRoot;
   return path.join(stateRoot, ...parts);
 }
 
@@ -398,6 +411,7 @@ async function launchCompanion() {
   const angularCli = path.join(root, 'node_modules', '@angular', 'cli', 'bin', 'ng.js');
   if (!fs.existsSync(nodePath)) throw new Error('Run setup before opening QuestKeeper.');
   if (!fs.existsSync(angularCli)) throw new Error('QuestKeeper dependencies are not ready.');
+  await materializeCampaigns(root);
 
   const logPath = appendLaunchLog(`Starting the Companion at ${url}.`);
   const logFile = fs.openSync(logPath, 'a');
@@ -526,9 +540,19 @@ async function install(options) {
   state.phase = 'running';
   state.error = null;
   state.finishedAt = null;
+  state.launchedManager = false;
   state.logs = [];
   try {
     const runtime = await prepareRuntime(options);
+    log('Preparing protected campaign storage…');
+    const storage = await prepareStorage(root, {
+      mode: options.portableData === true ? 'portable' : 'user',
+    });
+    log(
+      storage.migration.migrated
+        ? `Campaigns copied and validated in ${storage.paths.campaignsRoot}. The original remains available for rollback.`
+        : `Campaign storage is ready at ${storage.paths.campaignsRoot}.`,
+    );
     if (options.dependencies !== false) {
       log('Installing QuestKeeper locked dependencies…');
       await runAsync(runtime.nodePath, [runtime.npmCliPath, 'ci'], {
@@ -547,10 +571,13 @@ async function install(options) {
       log('Creating the Companion shortcut…');
       createShortcut('QuestKeeper Companion', 'companion');
     }
+    if (options.launchManager) {
+      await launch('manager');
+      state.launchedManager = true;
+    }
     state.phase = 'complete';
     log('QuestKeeper is ready. Your adventure can begin.');
     state.finishedAt = new Date().toISOString();
-    if (options.launchManager) await launch('manager');
   } catch (error) {
     state.phase = 'failed';
     state.error = error instanceof Error ? error.message : String(error);
@@ -679,6 +706,7 @@ async function main() {
   }
   if (args.has('--launch-manager') || args.has('--launch-companion')) {
     try {
+      await prepareStorage(root);
       await launch(args.has('--launch-manager') ? 'manager' : 'companion');
       return;
     } catch (error) {

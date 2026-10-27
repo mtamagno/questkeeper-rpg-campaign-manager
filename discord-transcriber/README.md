@@ -20,7 +20,8 @@ proper-noun accuracy.
 
 ## Privacy first
 
-- Transcripts stay in `discord-transcriber/transcripts/` on the computer
+- Installed-release transcripts stay in the protected QuestKeeper data root;
+  source checkouts retain `discord-transcriber/transcripts/`
   running the bot.
 - Transcribed text is not posted into Discord channels.
 - Command replies are private/ephemeral.

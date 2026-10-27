@@ -228,6 +228,44 @@ h2 {
   background: #111318;
   cursor: pointer;
 }
+.options .option-with-help {
+  align-items: start;
+}
+.option-with-help > span {
+  display: grid;
+  gap: 4px;
+}
+.option-with-help small {
+  color: #bcb5a9;
+  line-height: 1.45;
+}
+.storage-preview {
+  margin-top: 22px;
+  padding: 17px 20px;
+  border: 1px solid #3d655e;
+  border-radius: 14px;
+  background: rgba(36, 77, 69, 0.22);
+}
+.storage-preview strong {
+  color: #a7ddca;
+}
+.storage-preview p {
+  margin: 5px 0 10px;
+  color: #cbc2b3;
+  line-height: 1.55;
+}
+.storage-preview code {
+  display: block;
+  overflow: hidden;
+  padding: 10px 12px;
+  border: 1px solid rgba(167, 221, 202, 0.22);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.22);
+  color: #d8eee7;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .options input {
   width: 19px;
   height: 19px;

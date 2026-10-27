@@ -55,6 +55,7 @@ shows each optional action before it runs:
 - choose the recommended private Node.js 26 runtime or a compatible detected
   system runtime;
 - prepare the project's locked dependencies;
+- choose recommended per-user storage or an intentionally portable data folder;
 - create separate **QuestKeeper Campaign Manager** and **QuestKeeper
   Companion** desktop launchers;
 - open Campaign Manager when setup finishes.
@@ -77,11 +78,17 @@ Nothing is installed merely by opening the setup: the checklist and **Prepare
 QuestKeeper** button make the selected actions explicit. AI tools and models
 remain a separate, optional Manager decision.
 
-When setup is complete, choose **Close setup / Chiudi setup**. This stops the
-loopback setup service and terminates the setup executable; Campaign Manager or
-Companion instances you deliberately launched remain open. If the browser does
-not allow the setup to close its tab, the page confirms that the local process
-has ended and the tab can be closed manually.
+Setup keeps campaigns, media, transcripts, settings and backups separate from
+the replaceable app and private Node runtime. Existing 1.1.4 campaign data is
+copied, validated and switched atomically; the original remains available for
+rollback. See [Data lifecycle](DATA-LIFECYCLE.md) for platform paths, portable
+mode and recovery behavior.
+
+After a successful run, setup shows the protected campaign location and whether
+Campaign Manager was launched, then stops its loopback service automatically.
+It attempts to close only its own browser tab. When the browser blocks that
+action, the finished page remains visible and explicitly says it is safe to
+close; deliberately launched QuestKeeper apps keep running.
 
 On its first successful run, setup opens Campaign Manager and guides you through
 the first campaign. The Manager normally uses `http://127.0.0.1:4173`; keep its
@@ -138,15 +145,17 @@ Apache/Nginx paths.
 
 ## Updating QuestKeeper
 
-Commit or back up your campaign files before updating. If you cloned with Git:
+Create a full local backup before updating. If you cloned with Git:
 
 ```bash
 git pull
 npm ci
 ```
 
-Then reopen the Manager and run **Check and build site**. Your campaign data is
-stored as ordinary files under `src/campaigns/`.
+Then reopen the Manager and run **Check and build site**. Installed releases
+read protected campaign files from the per-user or portable data root and create
+`src/campaigns/` only as a replaceable build mirror. Source checkouts retain the
+legacy repository layout.
 
 ## Quick troubleshooting
 

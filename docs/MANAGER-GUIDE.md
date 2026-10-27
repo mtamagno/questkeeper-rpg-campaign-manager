@@ -37,7 +37,9 @@ safe-to-close screen before closing the browser tab.
 
 Forms manage names, biographies, public/private details, images, statistics,
 relationships and manifests. Uploaded PNG, JPEG and WebP files are copied into
-the correct campaign folder automatically.
+the protected campaign folder automatically. Installed releases keep that
+folder outside the replaceable application and runtime; see
+[Data lifecycle](DATA-LIFECYCLE.md).
 
 Author a bond once in the relationship editor. Character profiles, NPC dossiers,
 detail pages and the network map all derive from that same record. Do not repeat
@@ -154,6 +156,13 @@ Read the [Discord Scribe guide](../discord-transcriber/README.md) before first u
 
 ## Preview, validate and recover
 
+The **Storage & recovery** panel shows the active Node.js executable and the
+resolved application, runtime, campaign, configuration, transcript, backup,
+log and cache locations. Every path can be copied or opened directly. Use
+**Back up now** for a complete local snapshot including media, or **Export all
+campaigns** for smaller portable JSON bundles without images. No diagnostic
+returns the contents of a saved secret.
+
 ### Local runtime and preview reliability
 
 QuestKeeper launches npm through the selected Node runtime's `npm-cli.js`
@@ -173,6 +182,11 @@ Use **Check and build site** before publishing. Errors identify malformed or
 missing content; automatic backups make edits recoverable. **Launch site** opens
 the real local Companion so you can check mobile layout, links, spoilers and
 image crops before release.
+
+Before every build, QuestKeeper validates protected campaign data and refreshes
+a replaceable static-source mirror. A full backup includes the whole campaign
+tree and original media; a campaign export remains the smaller portable content
+bundle.
 
 Advanced users can inspect the underlying schema in the
 [Content Guide](CONTENT-GUIDE.md), but Manager-generated files remain ordinary,
@@ -197,7 +211,7 @@ credentials or files. See [Deployment](DEPLOYMENT.md) for full instructions.
 - Keep API keys and publishing passwords out of campaign data and Git.
 - Separate player-safe information from GM-only spoilers.
 - Preview the built Companion before every public release.
-- Back up or commit campaign files before major edits and updates.
+- Create a full local backup before major edits and updates.
 
 ---
 
