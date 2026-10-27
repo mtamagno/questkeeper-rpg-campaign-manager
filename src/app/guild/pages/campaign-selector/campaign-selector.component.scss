@@ -629,6 +629,15 @@
     padding: $spacing-lg;
   }
 
+  &__ruleset {
+    display: block;
+    margin-bottom: $spacing-xs;
+    color: var(--qk-color-text-muted);
+    font-size: $font-size-xs;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
   &__card-title {
     font-family: $font-family-heading;
     font-size: $font-size-xl;

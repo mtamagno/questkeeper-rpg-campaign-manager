@@ -17,6 +17,8 @@ export interface CampaignManifestEntry {
   /** Curated visual identity. Missing values retain the legacy heroic theme. */
   readonly palette?: CampaignPalette;
   readonly gameSystem?: CampaignGameSystem;
+  /** Legacy authored label retained for pre-gameSystem manifests. */
+  readonly edition?: string;
   readonly name: BilingualText;
   readonly description: BilingualText;
   readonly thumbnail: string;

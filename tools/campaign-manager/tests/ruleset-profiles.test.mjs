@@ -8,6 +8,7 @@ import {
   inferRulesetId,
   normalizeGameSystem,
   resolveRulesetProfile,
+  rulesetDisplayLabel,
 } from '../ruleset-profiles.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -28,6 +29,42 @@ test('legacy editions infer a profile without destructive migration', () => {
     edition: 'Unknown homebrew',
     customLabels: {},
   });
+});
+
+test('public ruleset labels are canonical, localized and never expose internal IDs', async () => {
+  assert.equal(
+    rulesetDisplayLabel({ id: 'dnd-2024' }, '', 'en'),
+    'Dungeons & Dragons · 5th Edition (2024)',
+  );
+  assert.equal(
+    rulesetDisplayLabel({ id: 'dnd-2024' }, '', 'it'),
+    'Dungeons & Dragons · 5a Edizione (2024)',
+  );
+  assert.equal(rulesetDisplayLabel({ id: 'generic', edition: 'Cairn 2e' }), 'Cairn 2e');
+  assert.equal(rulesetDisplayLabel({ id: 'unknown-internal' }), 'Custom RPG');
+  assert.equal(rulesetDisplayLabel(undefined, 'Unknown homebrew'), 'Unknown homebrew');
+
+  const [selector, homepage, model, manager] = await Promise.all([
+    readFile(
+      join(
+        root,
+        '..',
+        '..',
+        'src/app/guild/pages/campaign-selector/campaign-selector.component.html',
+      ),
+      'utf8',
+    ),
+    readFile(
+      join(root, '..', '..', 'src/app/guild/pages/homepage/homepage.component.html'),
+      'utf8',
+    ),
+    readFile(join(root, '..', '..', 'src/app/guild/models/rulesetProfile.model.ts'), 'utf8'),
+    readFile(join(root, 'public', 'app.js'), 'utf8'),
+  ]);
+  assert.match(selector, /campaignRuleset\(campaign\)/);
+  assert.match(homepage, /rulesetIdentity\(\)/);
+  assert.match(model, /rulesetDisplayIdentity/);
+  assert.match(manager, /rulesetPublicLabel/);
 });
 
 test('only redistributable suggestions carry explicit provenance', () => {

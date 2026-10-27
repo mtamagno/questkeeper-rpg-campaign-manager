@@ -266,6 +266,40 @@ function filteredCampaigns() {
   );
 }
 
+function rulesetPublicLabel(gameSystem, legacyEdition = '', language = 'en') {
+  const authoredLabel = String(gameSystem?.edition ?? legacyEdition).trim();
+  const legacy = String(legacyEdition).toLowerCase();
+  const inferredId =
+    gameSystem?.id ||
+    (legacy.includes('2024') || legacy.includes('5.5')
+      ? 'dnd-2024'
+      : legacy.includes('d&d') || legacy.includes('dungeons & dragons') || legacy.includes('5e')
+        ? 'dnd-2014'
+        : legacy.includes('pathfinder')
+          ? 'pf2e-remaster'
+          : legacy.includes('cthulhu')
+            ? 'coc7e'
+            : 'generic');
+  const labels = {
+    'dnd-2014': {
+      en: 'Dungeons & Dragons · 5th Edition (2014)',
+      it: 'Dungeons & Dragons · 5a Edizione (2014)',
+    },
+    'dnd-2024': {
+      en: 'Dungeons & Dragons · 5th Edition (2024)',
+      it: 'Dungeons & Dragons · 5a Edizione (2024)',
+    },
+    'pf2e-remaster': {
+      en: 'Pathfinder · Second Edition Remaster',
+      it: 'Pathfinder · Seconda Edizione Remaster',
+    },
+    coc7e: { en: 'Call of Cthulhu · 7th Edition', it: 'Call of Cthulhu · 7a Edizione' },
+  };
+  const known = labels[inferredId];
+  if (known) return known[language] ?? known.en;
+  return authoredLabel || (language === 'it' ? 'GDR personalizzato' : 'Custom RPG');
+}
+
 function showLibrary() {
   state.libraryMode = true;
   state.projectMode = false;
@@ -371,7 +405,7 @@ function renderLibrary() {
                 const cover = item.thumbnail ? campaignAssetFor(item.id, item.thumbnail) : '';
                 return `<article class="library-card">
             <div class="library-card__cover">${cover ? `<img src="${escapeHtml(cover)}" alt="" />` : `<span aria-hidden="true">${escapeHtml(name.charAt(0).toUpperCase() || '✦')}</span>`}</div>
-            <div class="library-card__body"><div><span class="status-pill">${escapeHtml(localized(item.status, language) || 'Campaign')}</span><h3>${escapeHtml(name)}</h3><p>${escapeHtml(localized(item.description, language) || 'A campaign ready to be chronicled.')}</p></div>
+            <div class="library-card__body"><div><span class="status-pill">${escapeHtml(localized(item.status, language) || 'Campaign')}</span><span class="library-card__ruleset">${escapeHtml(rulesetPublicLabel(item.gameSystem, item.details?.edition, language))}</span><h3>${escapeHtml(name)}</h3><p>${escapeHtml(localized(item.description, language) || 'A campaign ready to be chronicled.')}</p></div>
             <dl class="library-card__metrics"><div><dt>Party</dt><dd>${item.counts.characters}</dd></div><div><dt>NPCs</dt><dd>${item.counts.npcs}</dd></div><div><dt>Sessions</dt><dd>${item.counts.sessions}</dd></div><div><dt>Places</dt><dd>${item.counts.maps}</dd></div></dl>
             <footer class="library-card__actions"><button class="primary-button" data-library-action="open" data-id="${escapeHtml(item.id)}">Open campaign</button><details class="library-card__menu"><summary aria-label="More actions for ${escapeHtml(name)}">•••</summary><div><button type="button" data-library-action="edit" data-id="${escapeHtml(item.id)}">Edit details</button><button type="button" data-library-action="backup" data-id="${escapeHtml(item.id)}">Download backup</button></div></details></footer></div>
           </article>`;
@@ -456,7 +490,7 @@ function renderOverview() {
     <div class="overview-grid">
       <section class="project-panel my-character-panel"><span class="eyebrow">Quick return</span><h3>${myCharacter ? escapeHtml(entityName('characters', myCharacter)) : 'Choose my character'}</h3><p>${myCharacter ? 'The Manager will open this profile directly whenever the Companion is ready.' : 'Choose your character once from the Characters tab to make every return immediate.'}</p>${myCharacter ? `<button class="primary-button" data-action="open-my-character">Open my character</button>` : `<button class="secondary-button" data-action="show-characters">Choose from the party</button>`}</section>
       <section class="project-panel"><span class="eyebrow">The story so far</span><h2>${escapeHtml(localized(campaign.name))}</h2><p>${escapeHtml(localized(campaign.storySoFar) || 'Your running campaign recap will appear here.')}</p></section>
-      <section class="project-panel"><h3>Table details</h3><dl class="detail-list"><div><dt>Game Master</dt><dd>${escapeHtml(campaign.dungeonMaster)}</dd></div><div><dt>Party</dt><dd>${escapeHtml(campaign.partyName)}</dd></div><div><dt>System</dt><dd>${escapeHtml(campaign.gameSystem?.edition || campaign.edition)}</dd></div><div><dt>Started</dt><dd>${escapeHtml(campaign.startDate)}</dd></div></dl></section>
+      <section class="project-panel"><h3>Table details</h3><dl class="detail-list"><div><dt>Game Master</dt><dd>${escapeHtml(campaign.dungeonMaster)}</dd></div><div><dt>Party</dt><dd>${escapeHtml(campaign.partyName)}</dd></div><div><dt>System</dt><dd>${escapeHtml(rulesetPublicLabel(campaign.gameSystem, campaign.edition, state.campaign.manifestEntry.defaultLanguage ?? 'en'))}</dd></div><div><dt>Started</dt><dd>${escapeHtml(campaign.startDate)}</dd></div></dl></section>
     </div>`;
 }
 

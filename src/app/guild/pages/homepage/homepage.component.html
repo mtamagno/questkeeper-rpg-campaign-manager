@@ -16,6 +16,14 @@
       <span class="homepage__eyebrow">
         {{ lang() === 'it' ? 'Cronache della campagna' : 'Campaign chronicles' }}
       </span>
+      @if (rulesetIdentity(); as ruleset) {
+        <span class="homepage__ruleset" [attr.aria-label]="ruleset.label">
+          <strong>{{ ruleset.system }}</strong>
+          @if (ruleset.edition) {
+            <span>{{ ruleset.edition }}</span>
+          }
+        </span>
+      }
       <div class="homepage__hero-row">
         <h1 class="homepage__title">{{ campaignTitle() }}</h1>
         <app-language-toggle />

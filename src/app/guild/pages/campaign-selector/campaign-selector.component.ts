@@ -30,6 +30,7 @@ import { type CampaignManifestEntry } from '@guild/models/campaignConfig.model';
 import { resolveCampaignPalette, type CampaignPalette } from '@guild/models/campaignPalette.model';
 import { localizeText } from '@guild/models/language.model';
 import { GuidedTourService } from '@guild/services/guidedTour.service';
+import { rulesetDisplayIdentity } from '@guild/models/rulesetProfile.model';
 
 /**
  * Root landing page that lists all available campaigns.
@@ -121,6 +122,11 @@ export class CampaignSelectorComponent {
   /** Resolves legacy manifests to the backward-compatible heroic palette. */
   campaignPalette(campaign: CampaignManifestEntry): CampaignPalette {
     return resolveCampaignPalette(campaign.palette);
+  }
+
+  /** Canonical public label shared with the campaign home and Manager. */
+  campaignRuleset(campaign: CampaignManifestEntry): string {
+    return rulesetDisplayIdentity(campaign.gameSystem, campaign.edition, this.lang()).label;
   }
 
   /** Remembers an orientation path on this device without changing access. */

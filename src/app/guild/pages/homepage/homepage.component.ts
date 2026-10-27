@@ -14,6 +14,10 @@ import { type Character, type CharacterQuote } from '@guild/models/character.mod
 import { LanguageToggleComponent } from '@guild/components/language-toggle/language-toggle.component';
 import { SfxHoverDirective } from '@guild/directives/sfxHover.directive';
 import { localizeText } from '@guild/models/language.model';
+import {
+  rulesetDisplayIdentity,
+  type RulesetDisplayIdentity,
+} from '@guild/models/rulesetProfile.model';
 
 /** Resolved quote with its speaker's name for display. */
 interface DisplayQuote {
@@ -92,6 +96,13 @@ export class HomepageComponent {
       return '';
     }
     return localizeText(campaign.description, this.languageService.currentLanguage());
+  });
+
+  /** Canonical game system and edition, including safe legacy/custom fallbacks. */
+  readonly rulesetIdentity: Signal<RulesetDisplayIdentity | undefined> = computed(() => {
+    const campaign = this.dataService.campaign();
+    if (campaign === undefined) return undefined;
+    return rulesetDisplayIdentity(campaign.gameSystem, campaign.edition, this.lang());
   });
 
   /** A random character quote — picked once on load. */

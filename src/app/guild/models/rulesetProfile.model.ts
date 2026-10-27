@@ -18,6 +18,65 @@ export interface RulesetProfile {
   readonly fields: ReadonlyArray<RulesetIdentityField>;
 }
 
+export interface RulesetDisplayIdentity {
+  readonly system: string;
+  readonly edition?: string;
+  readonly label: string;
+}
+
+const displayIdentities: Readonly<
+  Record<
+    string,
+    { readonly system: string; readonly edition: { readonly en: string; readonly it: string } }
+  >
+> = {
+  'dnd-2014': {
+    system: 'Dungeons & Dragons',
+    edition: { en: '5th Edition (2014)', it: '5a Edizione (2014)' },
+  },
+  'dnd-2024': {
+    system: 'Dungeons & Dragons',
+    edition: { en: '5th Edition (2024)', it: '5a Edizione (2024)' },
+  },
+  'pf2e-remaster': {
+    system: 'Pathfinder',
+    edition: { en: 'Second Edition Remaster', it: 'Seconda Edizione Remaster' },
+  },
+  coc7e: {
+    system: 'Call of Cthulhu',
+    edition: { en: '7th Edition', it: '7a Edizione' },
+  },
+};
+
+export function inferRulesetId(edition = ''): string {
+  const value = edition.toLocaleLowerCase();
+  if (value.includes('2024') || value.includes('5.5')) return 'dnd-2024';
+  if (value.includes('d&d') || value.includes('dungeons & dragons') || value.includes('5e')) {
+    return 'dnd-2014';
+  }
+  if (value.includes('pathfinder')) return 'pf2e-remaster';
+  if (value.includes('cthulhu')) return 'coc7e';
+  return 'generic';
+}
+
+/** Resolves a public name without leaking internal IDs or guessing D&D for unknown legacy data. */
+export function rulesetDisplayIdentity(
+  system?: CampaignGameSystem,
+  legacyEdition = '',
+  language = 'en',
+): RulesetDisplayIdentity {
+  const locale = language === 'it' ? 'it' : 'en';
+  const authoredLabel = String(system?.edition ?? legacyEdition).trim();
+  const requestedId = system?.id || inferRulesetId(legacyEdition);
+  const known = displayIdentities[requestedId];
+  if (known !== undefined) {
+    const edition = known.edition[locale];
+    return { system: known.system, edition, label: `${known.system} · ${edition}` };
+  }
+  const generic = authoredLabel || (locale === 'it' ? 'GDR personalizzato' : 'Custom RPG');
+  return { system: generic, label: generic };
+}
+
 const genericFields: ReadonlyArray<RulesetIdentityField> = [
   {
     key: 'ancestry',

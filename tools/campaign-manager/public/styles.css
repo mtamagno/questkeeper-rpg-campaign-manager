@@ -616,6 +616,14 @@ button:disabled {
   gap: 1rem;
   padding: 1rem;
 }
+.library-card__ruleset {
+  display: block;
+  margin: 0.65rem 0 0.1rem;
+  color: var(--muted);
+  font-size: 0.76rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
 .library-card__metrics {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));

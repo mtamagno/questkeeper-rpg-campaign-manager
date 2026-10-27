@@ -120,6 +120,29 @@ export function normalizeGameSystem(value, edition = '') {
   };
 }
 
+export function rulesetDisplayLabel(value, legacyEdition = '', language = 'en') {
+  const authoredLabel = String(value?.edition ?? legacyEdition).trim();
+  const requestedId = value?.id || inferRulesetId(legacyEdition);
+  const labels = {
+    'dnd-2014': {
+      en: 'Dungeons & Dragons · 5th Edition (2014)',
+      it: 'Dungeons & Dragons · 5a Edizione (2014)',
+    },
+    'dnd-2024': {
+      en: 'Dungeons & Dragons · 5th Edition (2024)',
+      it: 'Dungeons & Dragons · 5a Edizione (2024)',
+    },
+    'pf2e-remaster': {
+      en: 'Pathfinder · Second Edition Remaster',
+      it: 'Pathfinder · Seconda Edizione Remaster',
+    },
+    coc7e: { en: 'Call of Cthulhu · 7th Edition', it: 'Call of Cthulhu · 7a Edizione' },
+  };
+  const known = labels[requestedId];
+  if (known) return known[language] ?? known.en;
+  return authoredLabel || (language === 'it' ? 'GDR personalizzato' : 'Custom RPG');
+}
+
 export function publicRulesetProfiles() {
   return RULESET_PROFILES.map((profile) => structuredClone(profile));
 }
