@@ -42,6 +42,10 @@ A campaign export is portable structured content. A full local backup copies
 the complete campaign tree, including original media, into the protected backup
 root. Keep a second copy on another device for disaster recovery.
 
+Campaign Manager's **Storage & recovery** panel is the authoritative view of
+the active roots and Node runtime. It can open or copy each safe path, create a
+full backup and export every campaign without exposing stored credentials.
+
 ## Safe cleanup
 
 You may recreate the private runtime, `node_modules/`, `dist/`, caches and the

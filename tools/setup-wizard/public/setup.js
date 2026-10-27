@@ -20,6 +20,12 @@ const copy = {
     optionsTitle: 'Choose what to prepare',
     optionsHint: 'You can run this setup again at any time.',
     dependencies: 'Install the locked QuestKeeper tools',
+    portableData: 'Keep campaign data beside QuestKeeper',
+    portableDataHint:
+      'Portable mode is useful for a USB drive. Per-user storage is safer for normal updates.',
+    storageTitle: 'Protected campaign storage',
+    storageBody:
+      'Campaigns, media, transcripts and backups are kept separate from replaceable app files.',
     managerShortcut: 'Create a Campaign Manager shortcut',
     companionShortcut: 'Create a player Companion shortcut',
     launchManager: 'Open Campaign Manager when setup finishes',
@@ -32,6 +38,9 @@ const copy = {
     closeSetup: 'Close setup',
     closing: 'Closing QuestKeeper Setup and its local service…',
     closed: 'Setup is closed. You can close this tab; launched QuestKeeper apps keep running.',
+    closedDetails: 'Protected campaigns: {path}. Campaign Manager: {manager}.',
+    managerRunning: 'launched and still running',
+    managerStopped: 'not launched',
     closedBadge: 'Closed',
     closeFailed: 'Setup could not close cleanly. Try the button again.',
     language: 'Italiano',
@@ -67,6 +76,12 @@ const copy = {
     optionsTitle: 'Scegli cosa preparare',
     optionsHint: 'Potrai eseguire di nuovo questo setup in qualsiasi momento.',
     dependencies: 'Installa gli strumenti QuestKeeper bloccati',
+    portableData: 'Conserva i dati della campagna accanto a QuestKeeper',
+    portableDataHint:
+      'La modalita portabile e utile per una chiavetta USB. Lo spazio utente e piu sicuro per gli aggiornamenti normali.',
+    storageTitle: 'Archivio protetto delle campagne',
+    storageBody:
+      'Campagne, media, trascrizioni e backup restano separati dai file sostituibili dell applicazione.',
     managerShortcut: 'Crea un collegamento al Campaign Manager',
     companionShortcut: 'Crea un collegamento al Companion dei giocatori',
     launchManager: 'Apri Campaign Manager al termine del setup',
@@ -81,6 +96,9 @@ const copy = {
     closed:
       'Il setup è chiuso. Puoi chiudere questa scheda; le app QuestKeeper già avviate restano aperte.',
     closedBadge: 'Chiuso',
+    closedDetails: 'Campagne protette: {path}. Campaign Manager: {manager}.',
+    managerRunning: 'avviato e ancora in esecuzione',
+    managerStopped: 'non avviato',
     closeFailed: 'Non è stato possibile chiudere correttamente il setup. Riprova.',
     language: 'English',
     runtimeReady: 'Node.js {version} {source} in uso su {platform}. Gli strumenti sono pronti.',
@@ -103,6 +121,8 @@ let language =
   (navigator.language.startsWith('it') ? 'it' : 'en');
 let polling;
 let runtimeChoiceInitialized = false;
+let completionHandled = false;
+let lastStatus;
 const $ = (id) => document.getElementById(id);
 const interpolate = (text, values) => text.replace(/\{(\w+)\}/g, (_, key) => values[key] ?? '');
 
@@ -125,6 +145,7 @@ async function api(path, options) {
 }
 
 function render(status) {
+  lastStatus = status;
   const platform = `${status.platform} ${status.architecture}`;
   const ready = status.runtime.ready && status.dependenciesReady;
   const detected = status.systemRuntimes.length > 0;
@@ -135,6 +156,8 @@ function render(status) {
     source: copy[language][status.runtime.source === 'system' ? 'sourceSystem' : 'sourcePrivate'],
   });
   $('status-badge').textContent = copy[language][ready ? 'readyBadge' : 'setupBadge'];
+  $('storage-path').textContent =
+    status.storageChoices[$('portable-data').checked ? 'portable' : 'user'].campaigns;
 
   const previousPath = $('system-runtime').value;
   $('system-runtime').replaceChildren(
@@ -168,8 +191,13 @@ function render(status) {
   $('prepare').disabled = phase === 'running';
   $('close-setup').disabled = phase === 'running';
   if (phase === 'running') $('progress-message').textContent = status.state.message;
-  else if (phase === 'complete') $('progress-message').textContent = copy[language].complete;
-  else if (phase === 'failed') $('progress-message').textContent = copy[language].failed;
+  else if (phase === 'complete') {
+    $('progress-message').textContent = copy[language].complete;
+    if (!completionHandled) {
+      completionHandled = true;
+      window.setTimeout(() => closeSetup(status), 450);
+    }
+  } else if (phase === 'failed') $('progress-message').textContent = copy[language].failed;
 }
 
 document.querySelectorAll('input[name="runtime"]').forEach((input) => {
@@ -208,6 +236,7 @@ $('prepare').addEventListener('click', async () => {
         runtimePreference: $('runtime-system').checked ? 'system' : 'private',
         systemNodePath: $('runtime-system').checked ? $('system-runtime').value : undefined,
         dependencies: $('dependencies').checked,
+        portableData: $('portable-data').checked,
         managerShortcut: $('manager-shortcut').checked,
         companionShortcut: $('companion-shortcut').checked,
         launchManager: $('launch-manager').checked,
@@ -221,7 +250,7 @@ $('prepare').addEventListener('click', async () => {
   }
 });
 
-$('close-setup').addEventListener('click', async () => {
+async function closeSetup(status = lastStatus) {
   if (polling) {
     clearInterval(polling);
     polling = null;
@@ -236,13 +265,29 @@ $('close-setup').addEventListener('click', async () => {
     });
     $('status-badge').textContent = copy[language].closedBadge;
     $('progress').className = 'complete';
-    $('progress-message').textContent = copy[language].closed;
+    $('progress-message').textContent = `${copy[language].closed} ${interpolate(
+      copy[language].closedDetails,
+      {
+        path: status?.storage?.campaigns ?? '',
+        manager:
+          copy[language][status?.state?.launchedManager ? 'managerRunning' : 'managerStopped'],
+      },
+    )}`;
     window.setTimeout(() => window.close(), 100);
   } catch {
     $('close-setup').disabled = false;
     $('prepare').disabled = false;
     $('progress-message').textContent = copy[language].closeFailed;
   }
+}
+
+$('portable-data').addEventListener('change', () => {
+  if (lastStatus) render(lastStatus);
+});
+
+$('close-setup').addEventListener('click', async () => {
+  completionHandled = true;
+  await closeSetup();
 });
 
 translate();

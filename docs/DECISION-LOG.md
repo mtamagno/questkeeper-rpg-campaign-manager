@@ -1350,6 +1350,32 @@ and [Data lifecycle](DATA-LIFECYCLE.md).
 **Revisit when:** Account synchronization or encrypted operating-system vaults
 change the ownership and recovery model.
 
+### QK-050 — Storage safety is visible and actionable
+
+**Date:** 26 October 2026
+
+**Status:** Active
+
+**Decision:** Campaign Manager exposes the resolved storage roots, active Node
+runtime, safe folder access, complete local backup and all-campaign export in a
+single recovery panel. Successful setup reports what remains running and then
+stops its own loopback process automatically.
+
+**Why:** Separation on disk is not sufficient when a GM cannot tell what an
+update may replace or where recovery copies live. Hidden setup processes also
+undermine trust and interfere with later launches.
+
+**Consequences:** Diagnostic responses include paths and runtime identity but
+never secret values. Backups include media; JSON export deliberately does not.
+Browsers that refuse scripted tab closure keep a bilingual, safe-to-close final
+screen after the local setup service has ended.
+
+**Source:** [Issue #25](https://github.com/mtamagno/questkeeper-rpg-campaign-manager/issues/25)
+and [Data lifecycle](DATA-LIFECYCLE.md).
+
+**Revisit when:** Native installers gain an operating-system window lifecycle
+or cloud backup changes the recovery surface.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD

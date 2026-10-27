@@ -62,6 +62,7 @@ const state = {
   logs: [],
   error: null,
   finishedAt: null,
+  launchedManager: false,
 };
 
 function log(message) {
@@ -151,6 +152,10 @@ function setupStatus() {
     systemRuntimes: systemRuntimeCandidates(),
     dependenciesReady: fs.existsSync(path.join(root, 'node_modules', '.package-lock.json')),
     storage: publicStorageSummary(storage),
+    storageChoices: {
+      user: publicStorageSummary(resolveStoragePaths(root, { mode: 'user' })),
+      portable: publicStorageSummary(resolveStoragePaths(root, { mode: 'portable' })),
+    },
     state,
   };
 }
@@ -535,6 +540,7 @@ async function install(options) {
   state.phase = 'running';
   state.error = null;
   state.finishedAt = null;
+  state.launchedManager = false;
   state.logs = [];
   try {
     const runtime = await prepareRuntime(options);
@@ -565,10 +571,13 @@ async function install(options) {
       log('Creating the Companion shortcut…');
       createShortcut('QuestKeeper Companion', 'companion');
     }
+    if (options.launchManager) {
+      await launch('manager');
+      state.launchedManager = true;
+    }
     state.phase = 'complete';
     log('QuestKeeper is ready. Your adventure can begin.');
     state.finishedAt = new Date().toISOString();
-    if (options.launchManager) await launch('manager');
   } catch (error) {
     state.phase = 'failed';
     state.error = error instanceof Error ? error.message : String(error);

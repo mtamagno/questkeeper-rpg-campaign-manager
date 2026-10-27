@@ -84,6 +84,12 @@ copied, validated and switched atomically; the original remains available for
 rollback. See [Data lifecycle](DATA-LIFECYCLE.md) for platform paths, portable
 mode and recovery behavior.
 
+After a successful run, setup shows the protected campaign location and whether
+Campaign Manager was launched, then stops its loopback service automatically.
+It attempts to close only its own browser tab. When the browser blocks that
+action, the finished page remains visible and explicitly says it is safe to
+close; deliberately launched QuestKeeper apps keep running.
+
 On its first successful run, setup opens Campaign Manager and guides you through
 the first campaign. The Manager normally uses `http://127.0.0.1:4173`; keep its
 terminal window open while working.

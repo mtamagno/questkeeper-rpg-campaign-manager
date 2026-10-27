@@ -156,6 +156,13 @@ Read the [Discord Scribe guide](../discord-transcriber/README.md) before first u
 
 ## Preview, validate and recover
 
+The **Storage & recovery** panel shows the active Node.js executable and the
+resolved application, runtime, campaign, configuration, transcript, backup,
+log and cache locations. Every path can be copied or opened directly. Use
+**Back up now** for a complete local snapshot including media, or **Export all
+campaigns** for smaller portable JSON bundles without images. No diagnostic
+returns the contents of a saved secret.
+
 ### Local runtime and preview reliability
 
 QuestKeeper launches npm through the selected Node runtime's `npm-cli.js`

@@ -57,8 +57,13 @@ import { publicRulesetProfiles } from './ruleset-profiles.mjs';
 import { formatSpawnFailure, resolveNpmInvocation } from './runtime-command.mjs';
 import storagePaths from '../storage-paths.cjs';
 
-const { materializeCampaigns, prepareStorage, publicStorageSummary, resolveStoragePaths } =
-  storagePaths;
+const {
+  createCampaignBackup,
+  materializeCampaigns,
+  prepareStorage,
+  publicStorageSummary,
+  resolveStoragePaths,
+} = storagePaths;
 
 const MANAGER_ROOT = dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = resolve(MANAGER_ROOT, '..', '..');
@@ -495,8 +500,44 @@ async function projectStatus() {
       models: { text: TEXT_MODELS, image: IMAGE_MODELS },
     },
     publishing: publicPublishingConfig(publishingConfig),
-    storage: publicStorageSummary(STORAGE_PATHS),
+    storage: {
+      ...publicStorageSummary(STORAGE_PATHS),
+      node: {
+        executable: process.execPath,
+        version: process.version,
+        source: process.execPath.startsWith(STORAGE_PATHS.runtimeRoot) ? 'private' : 'system',
+      },
+    },
   };
+}
+
+function openStorageFolder(target) {
+  const allowed = {
+    application: STORAGE_PATHS.applicationRoot,
+    runtime: STORAGE_PATHS.runtimeRoot,
+    campaigns: STORAGE_PATHS.campaignsRoot,
+    configuration: STORAGE_PATHS.configRoot,
+    transcripts: STORAGE_PATHS.transcriptsRoot,
+    backups: STORAGE_PATHS.backupsRoot,
+    logs: STORAGE_PATHS.logsRoot,
+    cache: STORAGE_PATHS.cacheRoot,
+  };
+  const destination = allowed[target];
+  if (!destination) throw new Error('Unknown storage location.');
+  const command =
+    process.platform === 'win32'
+      ? ['explorer.exe', [destination]]
+      : process.platform === 'darwin'
+        ? ['open', [destination]]
+        : ['xdg-open', [destination]];
+  const child = spawn(command[0], command[1], {
+    detached: true,
+    stdio: 'ignore',
+    windowsHide: true,
+  });
+  child.once('error', () => {});
+  child.unref();
+  return destination;
 }
 
 async function serveStatic(response, pathname) {
@@ -561,6 +602,30 @@ async function routeApi(request, response, url) {
   if (request.method === 'PUT') assertToken(request);
   if (request.method === 'DELETE') assertToken(request);
   if (['POST', 'PUT', 'DELETE'].includes(request.method)) assertSameOrigin(request);
+
+  if (request.method === 'POST' && url.pathname === '/api/storage/open') {
+    const body = await readBody(request);
+    sendJson(response, 200, { path: openStorageFolder(body.target) });
+    return;
+  }
+  if (request.method === 'POST' && url.pathname === '/api/storage/backup') {
+    sendJson(response, 201, await createCampaignBackup(PROJECT_ROOT));
+    return;
+  }
+  if (request.method === 'GET' && url.pathname === '/api/storage/export') {
+    const { campaigns } = await getState(PROJECT_ROOT);
+    const bundles = await Promise.all(
+      campaigns.map((campaign) => exportCampaign(PROJECT_ROOT, campaign.id)),
+    );
+    sendJson(response, 200, {
+      format: 'questkeeper-all-campaigns',
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      campaigns: bundles,
+      note: 'Images are not embedded. Use Back up now for a complete local copy.',
+    });
+    return;
+  }
 
   if (request.method === 'POST' && url.pathname === '/api/shutdown') {
     const body = await readBody(request);

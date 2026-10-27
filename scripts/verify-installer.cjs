@@ -32,7 +32,9 @@ const checks = [
       interfaceHtml.includes('launch-manager') &&
       interfaceHtml.includes('runtime-private') &&
       interfaceHtml.includes('runtime-system') &&
-      interfaceHtml.includes('system-runtime'),
+      interfaceHtml.includes('system-runtime') &&
+      interfaceHtml.includes('portable-data') &&
+      interfaceHtml.includes('storage-path'),
   ],
   [
     'a bilingual setup shutdown control',
@@ -40,6 +42,7 @@ const checks = [
       interfaceScript.includes("closeSetup: 'Close setup'") &&
       interfaceScript.includes("closeSetup: 'Chiudi setup'") &&
       interfaceScript.includes("api('shutdown'") &&
+      interfaceScript.includes('window.setTimeout(() => closeSetup(status), 450)') &&
       wizard.includes("requestUrl.pathname === '/api/shutdown'") &&
       wizard.includes('setupServer.close'),
   ],
