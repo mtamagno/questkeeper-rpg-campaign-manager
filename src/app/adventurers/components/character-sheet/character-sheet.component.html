@@ -83,7 +83,7 @@
           [characterId]="characterId()"
           [isItalian]="isItalian()"
           [hasEquipment]="sheet().equipment.length > 0"
-          [hasSpells]="spellGroups().length > 0"
+          [hasLibrary]="sheet().features.length + (sheet().spells?.length ?? 0) > 0"
           [selectedLevel]="sheet().level"
           [currentLevel]="currentSheet().level"
           (currentRequested)="showCurrentSheet()"
@@ -245,22 +245,6 @@
               </div>
             }
           </section>
-
-          <section class="character-sheet__panel">
-            <div class="character-sheet__section-heading">
-              <div>
-                <span>{{ isItalian() ? 'Talenti' : 'Talents' }}</span>
-                <h3>{{ isItalian() ? 'Privilegi e tratti' : 'Features & traits' }}</h3>
-              </div>
-            </div>
-            @if (sheet().features.length > 0) {
-              <ul class="character-sheet__feature-list">
-                @for (feature of sheet().features; track feature) {
-                  <li><span aria-hidden="true">✦</span>{{ feature }}</li>
-                }
-              </ul>
-            }
-          </section>
         </div>
 
         @if (sheet().equipment.length > 0) {
@@ -286,98 +270,12 @@
           </section>
         }
 
-        @if (spellGroups().length > 0) {
-          <section
-            class="character-sheet__spellbook"
-            [id]="'character-sheet-spells-' + characterId()"
-            [style.scroll-margin-top.px]="84"
-          >
-            <div class="character-sheet__spellbook-heading">
-              <div>
-                <span class="character-sheet__spellbook-kicker">
-                  {{ isItalian() ? 'Repertorio arcano' : 'Arcane repertoire' }}
-                </span>
-                <h3>{{ isItalian() ? 'Incantesimi conosciuti' : 'Known spells' }}</h3>
-                <p>
-                  {{
-                    isItalian()
-                      ? 'Apri una carta per consultare regole, componenti ed effetti completi nel Compendio.'
-                      : 'Open a card to read its complete rules, components, and effects in the Compendium.'
-                  }}
-                </p>
-              </div>
-
-              @if (spellcastingSummary(); as spellcasting) {
-                <dl class="character-sheet__casting-stats">
-                  <div>
-                    <dt>{{ isItalian() ? 'Caratteristica' : 'Ability' }}</dt>
-                    <dd>{{ spellcasting.ability }}</dd>
-                  </div>
-                  <div>
-                    <dt>{{ isItalian() ? 'CD salvezza' : 'Save DC' }}</dt>
-                    <dd>{{ spellcasting.saveDC }}</dd>
-                  </div>
-                  <div>
-                    <dt>{{ isItalian() ? 'Attacco' : 'Attack' }}</dt>
-                    <dd>{{ spellcasting.attackBonus }}</dd>
-                  </div>
-                </dl>
-              }
-            </div>
-
-            @if (sheet().spellcasting?.slots; as slots) {
-              @if (slots.length > 0) {
-                <div class="character-sheet__slots" aria-label="Spell slots">
-                  <span class="character-sheet__slots-label">
-                    {{ isItalian() ? 'Slot disponibili' : 'Available slots' }}
-                  </span>
-                  @for (slot of slots; track slot.level) {
-                    <div class="character-sheet__slot">
-                      <span>{{ isItalian() ? 'Liv.' : 'Lvl' }} {{ slot.level }}</span>
-                      <strong>{{ slot.total - (slot.used ?? 0) }} / {{ slot.total }}</strong>
-                    </div>
-                  }
-                </div>
-              }
-            }
-
-            @for (group of spellGroups(); track group.label) {
-              <div class="character-sheet__spell-level">
-                <div class="character-sheet__spell-level-heading">
-                  <h4>{{ group.label }}</h4>
-                  <span>{{ group.spells.length }}</span>
-                </div>
-                <div class="character-sheet__spell-grid">
-                  @for (spell of group.spells; track spell.originalName) {
-                    @if (spell.categoryId; as categoryId) {
-                      @if (spell.key; as spellKey) {
-                        <a
-                          class="character-sheet__spell-card"
-                          [routerLink]="['/compendium', categoryId, spellKey]"
-                          [attr.aria-label]="
-                            (isItalian() ? 'Apri la descrizione di ' : 'Open description for ') +
-                            spell.name
-                          "
-                        >
-                          <ng-container
-                            *ngTemplateOutlet="spellCard; context: { $implicit: spell }"
-                          />
-                        </a>
-                      }
-                    } @else {
-                      <div
-                        class="character-sheet__spell-card character-sheet__spell-card--unlinked"
-                      >
-                        <ng-container
-                          *ngTemplateOutlet="spellCard; context: { $implicit: spell }"
-                        />
-                      </div>
-                    }
-                  }
-                </div>
-              </div>
-            }
-          </section>
+        @if (sheet().features.length + (sheet().spells?.length ?? 0) > 0) {
+          <app-character-rule-library
+            [sheet]="sheet()"
+            [characterId]="characterId()"
+            [isItalian]="isItalian()"
+          />
         }
       </div>
     }
@@ -397,50 +295,6 @@
     </div>
   }
 </div>
-
-<ng-template #spellCard let-spell>
-  <div class="character-sheet__spell-topline">
-    <span>{{ spell.school ?? (isItalian() ? 'Incantesimo' : 'Spell') }}</span>
-    <span class="character-sheet__spell-badges">
-      @if (spell.isConcentration) {
-        <span title="Concentration">C</span>
-      }
-      @if (spell.isRitual) {
-        <span title="Ritual">R</span>
-      }
-    </span>
-  </div>
-  <h5>{{ spell.name }}</h5>
-  @if (spell.description) {
-    <p>{{ spell.description }}</p>
-  }
-  <dl class="character-sheet__spell-meta">
-    @if (spell.castingTime) {
-      <div>
-        <dt>{{ isItalian() ? 'Lancio' : 'Cast' }}</dt>
-        <dd>{{ spell.castingTime }}</dd>
-      </div>
-    }
-    @if (spell.range) {
-      <div>
-        <dt>{{ isItalian() ? 'Gittata' : 'Range' }}</dt>
-        <dd>{{ spell.range }}</dd>
-      </div>
-    }
-    @if (spell.duration) {
-      <div>
-        <dt>{{ isItalian() ? 'Durata' : 'Duration' }}</dt>
-        <dd>{{ spell.duration }}</dd>
-      </div>
-    }
-  </dl>
-  @if (spell.key) {
-    <span class="character-sheet__spell-link">
-      {{ isItalian() ? 'Leggi la descrizione' : 'Read description' }}
-      <span aria-hidden="true">→</span>
-    </span>
-  }
-</ng-template>
 
 @if (isDialogOpen()) {
   <app-password-dialog

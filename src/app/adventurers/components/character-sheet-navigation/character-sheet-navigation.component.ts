@@ -11,7 +11,7 @@ export class CharacterSheetNavigationComponent {
   readonly characterId = input.required<string>();
   readonly isItalian = input(false);
   readonly hasEquipment = input(false);
-  readonly hasSpells = input(false);
+  readonly hasLibrary = input(false);
   readonly selectedLevel = input.required<number>();
   readonly currentLevel = input.required<number>();
   readonly currentRequested = output<void>();
