@@ -79,24 +79,12 @@
               </p>
             }
 
-            <button
-              class="character-card__claim"
-              type="button"
-              [class.character-card__claim--active]="myCharacterId() === showcase.character.id"
-              [attr.aria-pressed]="myCharacterId() === showcase.character.id"
-              (click)="toggleMyCharacter(showcase.character.id)"
-            >
-              <span aria-hidden="true">✦</span>
-              {{
-                myCharacterId() === showcase.character.id
-                  ? lang() === 'it'
-                    ? 'Il mio personaggio · cambia'
-                    : 'My character · change'
-                  : lang() === 'it'
-                    ? 'Questo è il mio personaggio'
-                    : 'This is my character'
-              }}
-            </button>
+            @if (myCharacterId() === showcase.character.id) {
+              <p class="character-card__identity">
+                <span aria-hidden="true">✦</span>
+                {{ lang() === 'it' ? 'Il mio personaggio' : 'My character' }}
+              </p>
+            }
 
             <!-- Quick stats -->
             @if (showcase.isReady) {

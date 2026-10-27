@@ -125,14 +125,4 @@ export class PartyListComponent {
     const lang = this.languageService.currentLanguage();
     return buildShowcases(characters, lang);
   });
-
-  toggleMyCharacter(characterId: string): void {
-    const campaignId = this.campaignId();
-    if (campaignId === undefined) return;
-    if (this.myCharacterId() === characterId) {
-      this.myCharacter.clear(campaignId);
-      return;
-    }
-    this.myCharacter.select(campaignId, characterId);
-  }
 }

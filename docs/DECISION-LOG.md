@@ -1491,6 +1491,34 @@ and [wide-layout regression matrix](qa/WIDE-LAYOUT-MATRIX.md).
 **Revisit when:** Container queries replace the current page-level breakpoint
 contract.
 
+### QK-056 — User preferences have one home and an explicit scope
+
+**Date:** 27 October 2026
+
+**Status:** Active
+
+**Decision:** Companion user preferences are edited from one User Settings
+destination. Every preference declares whether it is global to the device or
+scoped to one campaign. Navigation shortcuts may reflect a preference, but do
+not become a second editing surface.
+
+**Why:** Audio and My Character controls had accumulated in unrelated sidebar
+and party surfaces. A durable home makes new preferences predictable without
+turning primary navigation into a settings drawer.
+
+**Consequences:** Audio is a global setting; My Character is stored separately
+for each campaign. The sidebar contains one Settings entry, the party page only
+identifies the current character, and an unset quick-return action opens the
+relevant settings section. Future preferences must define scope, persistence,
+privacy, defaults and migration before adding UI. Manager administration and
+campaign authoring remain separate from player-owned Companion preferences.
+
+**Source:** [User Settings contract](USER-SETTINGS.md) and
+`scripts/verify-user-settings.cjs`.
+
+**Revisit when:** Accounts, cloud sync or native apps introduce preferences
+that must move safely between devices.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD

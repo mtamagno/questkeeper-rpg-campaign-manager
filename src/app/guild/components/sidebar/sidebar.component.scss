@@ -87,14 +87,38 @@
     padding: $spacing-sm 0;
   }
 
-  // --- Footer (global utility controls: audio toggle, etc.) ---
+  // --- Footer (single destination for user-owned preferences) ---
   &__footer {
     flex-shrink: 0;
     padding: $spacing-sm $spacing-md;
     border-top: $border-width-thin solid $color-border-subtle;
-    @include flex-row-gap($spacing-sm);
+  }
+
+  &__settings {
+    display: flex;
     align-items: center;
-    justify-content: center;
+    gap: $spacing-sm;
+    width: 100%;
+    min-height: 2.75rem;
+    padding: $spacing-sm $spacing-md;
+    border: $border-width-thin solid transparent;
+    border-radius: $border-radius-md;
+    color: $color-text-secondary;
+    text-decoration: none;
+    @include transition-colors;
+
+    &:hover,
+    &:focus-visible,
+    &--active {
+      border-color: var(--qk-color-accent);
+      background: var(--qk-color-accent-soft);
+      color: var(--qk-color-accent-text);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--qk-color-accent);
+      outline-offset: 2px;
+    }
   }
   // --- Home link ---
   &__home-link {
@@ -167,67 +191,6 @@
     font-family: $font-family-body;
     font-size: $font-size-xs;
     letter-spacing: normal;
-  }
-
-  &__my-character {
-    display: flex;
-    align-items: center;
-    gap: $spacing-sm;
-    margin: 0 $spacing-sm $spacing-sm;
-    padding: $spacing-sm;
-    border: $border-width-thin solid rgba($color-gold, 0.48);
-    border-radius: $border-radius-md;
-    background: linear-gradient(135deg, rgba($color-gold, 0.14), rgba($color-bg-surface, 0.72));
-    color: $color-text-primary;
-    text-decoration: none;
-    @include transition-all($transition-fast);
-
-    &:hover,
-    &:focus-visible {
-      border-color: $color-gold;
-      background-color: $color-bg-surface;
-      transform: translateY(-1px);
-    }
-
-    &:focus-visible {
-      outline: 2px solid $color-gold-light;
-      outline-offset: 2px;
-    }
-
-    small,
-    strong {
-      display: block;
-    }
-
-    small {
-      color: $color-text-muted;
-      font-size: $font-size-xs;
-      letter-spacing: $letter-spacing-wide;
-      text-transform: uppercase;
-    }
-
-    strong {
-      margin-top: 0.15rem;
-      color: $color-gold-light;
-      font-family: $font-family-heading;
-      font-size: $font-size-sm;
-    }
-
-    &--empty {
-      border-style: dashed;
-      background: rgba($color-bg-surface, 0.42);
-    }
-  }
-
-  &__my-character-mark {
-    display: grid;
-    place-items: center;
-    width: 2rem;
-    height: 2rem;
-    flex: 0 0 auto;
-    border-radius: 50%;
-    background: rgba($color-gold, 0.15);
-    color: $color-gold-light;
   }
 
   // --- NPC category toggle ---

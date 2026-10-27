@@ -12,6 +12,13 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'settings',
+    loadComponent: () =>
+      import('./guild/pages/user-settings/user-settings.component').then(
+        (m) => m.UserSettingsComponent,
+      ),
+  },
+  {
     path: ':campaignId',
     canActivate: [spoilerConsentGuard],
     children: [
@@ -20,6 +27,13 @@ export const routes: Routes = [
         pathMatch: 'full',
         loadComponent: () =>
           import('./guild/pages/homepage/homepage.component').then((m) => m.HomepageComponent),
+      },
+      {
+        path: 'settings',
+        loadComponent: () =>
+          import('./guild/pages/user-settings/user-settings.component').then(
+            (m) => m.UserSettingsComponent,
+          ),
       },
       {
         path: 'offline',
