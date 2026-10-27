@@ -30,6 +30,7 @@
 html,
 body {
   min-height: 100%;
+  overflow-x: hidden;
 }
 body {
   margin: 0;
@@ -456,7 +457,8 @@ h3 {
   font-size: 1.08rem;
 }
 .content {
-  max-width: 1500px;
+  width: 100%;
+  max-width: 1920px;
   margin: 0 auto;
   padding: clamp(1.2rem, 4vw, 3.5rem);
 }
@@ -962,7 +964,9 @@ button:disabled {
 .project-stack {
   display: grid;
   gap: 1rem;
-  max-width: 1100px;
+  width: 100%;
+  max-width: 1440px;
+  margin-inline: auto;
 }
 .storage-panel {
   display: grid;
@@ -1049,12 +1053,16 @@ button:disabled {
 .scribe-stack {
   display: grid;
   gap: 1rem;
-  max-width: 1100px;
+  width: 100%;
+  max-width: 1440px;
+  margin-inline: auto;
 }
 .ai-setup {
   display: grid;
   gap: 1rem;
-  max-width: 1180px;
+  width: 100%;
+  max-width: 1560px;
+  margin-inline: auto;
 }
 .ai-hero {
   display: grid;
@@ -1905,6 +1913,30 @@ code {
   from {
     transform: translateY(10px);
     opacity: 0;
+  }
+}
+
+@media (min-width: 1600px) {
+  .content {
+    padding-inline: clamp(3rem, 4vw, 5rem);
+  }
+  .library-grid {
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 1.25rem;
+  }
+  .card-grid {
+    grid-template-columns: repeat(auto-fill, minmax(285px, 1fr));
+  }
+  .project-stack,
+  .scribe-stack,
+  .ai-setup {
+    gap: 1.25rem;
+  }
+}
+
+@media (min-width: 2200px) {
+  .topbar {
+    padding-inline: max(4rem, calc((100vw - 2210px) / 2));
   }
 }
 

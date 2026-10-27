@@ -25,6 +25,8 @@
   background: rgba($color-bg-deep, 0.86);
   box-shadow: $shadow-md;
   backdrop-filter: blur(16px) saturate(120%);
+  width: min(100%, 1920px);
+  margin-inline: auto;
 
   &__breadcrumbs {
     display: flex;
