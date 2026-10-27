@@ -160,6 +160,34 @@ body::before {
   background: #69c185;
   box-shadow: 0 0 12px #69c185;
 }
+.sidebar__home {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 0.7rem;
+  align-items: center;
+  width: 100%;
+  margin: -0.55rem 0 1rem;
+  padding: 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.018);
+  color: var(--ink);
+  text-align: left;
+}
+.sidebar__home > span:last-child {
+  display: grid;
+  gap: 0.12rem;
+}
+.sidebar__home small {
+  color: var(--muted);
+}
+.sidebar__home:hover,
+.sidebar__home:focus-visible,
+.sidebar__home.active {
+  outline: 0;
+  border-color: var(--gold);
+  background: rgba(214, 182, 111, 0.1);
+}
 .ui-language {
   display: grid;
   grid-template-columns: 1fr auto;
@@ -529,6 +557,143 @@ button:disabled {
   gap: 0.7rem;
   margin-top: 1.5rem;
   flex-wrap: wrap;
+}
+.library {
+  display: grid;
+  gap: 1.4rem;
+}
+.library__header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.library__header h2,
+.library-card h3 {
+  margin: 0.25rem 0;
+}
+.library__header p,
+.library-card p,
+.library-empty p {
+  margin: 0;
+  color: var(--muted);
+}
+.library-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr));
+  gap: 1rem;
+}
+.library-card {
+  display: grid;
+  grid-template-rows: minmax(180px, 0.85fr) 1fr;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.18);
+}
+.library-card__cover {
+  display: grid;
+  place-items: center;
+  min-height: 180px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(214, 182, 111, 0.22), transparent 58%), var(--surface-2);
+  color: var(--gold-bright);
+  font:
+    700 3rem Georgia,
+    serif;
+}
+.library-card__cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.library-card__body {
+  display: grid;
+  align-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+}
+.library-card__metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0;
+  padding: 0.7rem 0;
+  border-block: 1px solid var(--line);
+}
+.library-card__metrics div {
+  display: grid;
+  gap: 0.12rem;
+  text-align: center;
+}
+.library-card__metrics dt {
+  color: var(--muted);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+}
+.library-card__metrics dd {
+  margin: 0;
+  color: var(--gold-bright);
+  font:
+    700 1.15rem Georgia,
+    serif;
+}
+.library-card__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+.library-card__actions > .primary-button {
+  flex: 1;
+}
+.library-card__menu {
+  position: relative;
+}
+.library-card__menu summary {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  cursor: pointer;
+  list-style: none;
+}
+.library-card__menu summary::-webkit-details-marker {
+  display: none;
+}
+.library-card__menu[open] > div {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 0.4rem);
+  z-index: 3;
+  display: grid;
+  min-width: 180px;
+  padding: 0.4rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-2);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.34);
+}
+.library-card__menu button {
+  padding: 0.65rem;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+}
+.library-card__menu button:hover,
+.library-card__menu button:focus-visible {
+  background: rgba(214, 182, 111, 0.11);
+}
+.library-empty {
+  padding: 2rem;
+  border: 1px dashed var(--line);
+  border-radius: 14px;
+  text-align: center;
 }
 
 .campaign-hero {
@@ -1795,6 +1960,14 @@ code {
 }
 
 @media (max-width: 620px) {
+  .library__header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .library-card__metrics {
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: 0.7rem;
+  }
   .topbar {
     min-height: 84px;
     padding: 1rem;

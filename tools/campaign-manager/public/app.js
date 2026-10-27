@@ -30,6 +30,7 @@ const state = {
   campaign: null,
   selectedId: null,
   tab: 'overview',
+  libraryMode: true,
   projectMode: false,
   scribeMode: false,
   aiMode: false,
@@ -212,6 +213,7 @@ async function loadState({ selectFirst = false, allowFirstRunPrompt = false } = 
   if ((selectFirst || requestedCampaign) && !state.selectedId && result.campaigns.length) {
     state.selectedId = requestedCampaign?.id ?? result.campaigns[0].id;
     state.campaign = await api(`/api/campaigns/${encodeURIComponent(state.selectedId)}`);
+    state.libraryMode = false;
   }
   if (allowFirstRunPrompt && !state.firstRunEvaluated) {
     state.firstRunEvaluated = true;
@@ -229,6 +231,7 @@ async function selectCampaign(id) {
   state.projectMode = false;
   state.scribeMode = false;
   state.aiMode = false;
+  state.libraryMode = false;
   state.campaign = await api(`/api/campaigns/${encodeURIComponent(id)}`);
   state.tab = 'overview';
   setMenuOpen(false);
@@ -237,15 +240,12 @@ async function selectCampaign(id) {
 }
 
 function renderSidebar() {
-  const query = document.querySelector('#campaign-search').value.toLowerCase();
-  const campaigns = state.campaigns.filter((item) =>
-    `${localized(item.name)} ${localized(item.description)}`.toLowerCase().includes(query),
-  );
+  const campaigns = filteredCampaigns();
   campaignList.innerHTML = campaigns.length
     ? campaigns
         .map(
           (item) => `
-          <button class="campaign-link ${item.id === state.selectedId && !state.projectMode ? 'active' : ''}" data-campaign="${escapeHtml(item.id)}">
+          <button class="campaign-link ${item.id === state.selectedId && !state.libraryMode && !state.projectMode && !state.scribeMode && !state.aiMode ? 'active' : ''}" data-campaign="${escapeHtml(item.id)}">
             <span class="campaign-link__sigil">${escapeHtml(localized(item.name).charAt(0).toUpperCase() || '✦')}</span>
             <span><strong>${escapeHtml(localized(item.name, item.defaultLanguage ?? 'en'))}</strong><small>${escapeHtml(localized(item.status, item.defaultLanguage ?? 'en') || 'Campaign')}</small></span>
             <span class="campaign-link__count">${item.counts.characters}</span>
@@ -253,7 +253,27 @@ function renderSidebar() {
         )
         .join('')
     : '<div class="empty">No campaigns found.</div>';
+  document.querySelector('#show-library').classList.toggle('active', state.libraryMode);
   renderAiSetupNavigation();
+}
+
+function filteredCampaigns() {
+  const query = document.querySelector('#campaign-search').value.trim().toLowerCase();
+  return state.campaigns.filter((item) =>
+    `${localized(item.name)} ${localized(item.description)} ${localized(item.status)}`
+      .toLowerCase()
+      .includes(query),
+  );
+}
+
+function showLibrary() {
+  state.libraryMode = true;
+  state.projectMode = false;
+  state.scribeMode = false;
+  state.aiMode = false;
+  setMenuOpen(false);
+  renderSidebar();
+  render();
 }
 
 function renderAiSetupNavigation() {
@@ -313,6 +333,10 @@ function render() {
     renderProject();
     return;
   }
+  if (state.libraryMode) {
+    renderLibrary();
+    return;
+  }
   if (!state.campaign) {
     document.querySelector('#page-title').textContent = 'Your adventure archive';
     content.innerHTML = `
@@ -328,14 +352,48 @@ function render() {
   renderCampaign();
 }
 
-function campaignAsset(path) {
-  if (!path || !state.selectedId) return '';
-  const prefix = `campaigns/${state.selectedId}/`;
+function renderLibrary() {
+  const campaigns = filteredCampaigns();
+  document.querySelector('#page-title').textContent = 'Campaign Library';
+  if (state.campaigns.length === 0) {
+    content.innerHTML = `<div class="welcome"><div class="welcome__inner"><div class="welcome__icon" aria-hidden="true">&#10022;</div><span class="eyebrow">No JSON. No folders to copy.</span><h2>Your next campaign starts here</h2><p>Create a world, gather the party and chronicle each session through friendly forms.</p><div class="welcome__actions"><button class="primary-button" data-action="new-campaign">Create your first campaign</button><button class="secondary-button" data-action="import">Import a backup</button></div></div></div>`;
+    return;
+  }
+  content.innerHTML = `
+    <section class="library" aria-labelledby="library-title">
+      <header class="library__header"><div><span class="eyebrow">Choose your table</span><h2 id="library-title">Your campaign library</h2><p>Open a chronicle or manage it without losing your place in the archive.</p></div><button class="primary-button" data-action="new-campaign">New campaign</button></header>
+      ${
+        campaigns.length
+          ? `<div class="library-grid">${campaigns
+              .map((item) => {
+                const language = item.defaultLanguage ?? item.languages?.[0] ?? 'en';
+                const name = localized(item.name, language) || 'Untitled campaign';
+                const cover = item.thumbnail ? campaignAssetFor(item.id, item.thumbnail) : '';
+                return `<article class="library-card">
+            <div class="library-card__cover">${cover ? `<img src="${escapeHtml(cover)}" alt="" />` : `<span aria-hidden="true">${escapeHtml(name.charAt(0).toUpperCase() || '✦')}</span>`}</div>
+            <div class="library-card__body"><div><span class="status-pill">${escapeHtml(localized(item.status, language) || 'Campaign')}</span><h3>${escapeHtml(name)}</h3><p>${escapeHtml(localized(item.description, language) || 'A campaign ready to be chronicled.')}</p></div>
+            <dl class="library-card__metrics"><div><dt>Party</dt><dd>${item.counts.characters}</dd></div><div><dt>NPCs</dt><dd>${item.counts.npcs}</dd></div><div><dt>Sessions</dt><dd>${item.counts.sessions}</dd></div><div><dt>Places</dt><dd>${item.counts.maps}</dd></div></dl>
+            <footer class="library-card__actions"><button class="primary-button" data-library-action="open" data-id="${escapeHtml(item.id)}">Open campaign</button><details class="library-card__menu"><summary aria-label="More actions for ${escapeHtml(name)}">•••</summary><div><button type="button" data-library-action="edit" data-id="${escapeHtml(item.id)}">Edit details</button><button type="button" data-library-action="backup" data-id="${escapeHtml(item.id)}">Download backup</button></div></details></footer></div>
+          </article>`;
+              })
+              .join('')}</div>`
+          : '<div class="library-empty"><strong>No matching campaigns</strong><p>Try another search or create a new adventure.</p></div>'
+      }
+    </section>`;
+}
+
+function campaignAssetFor(campaignId, path) {
+  if (!path || !campaignId) return '';
+  const prefix = `campaigns/${campaignId}/`;
   const relativePath = path.startsWith(prefix) ? path.slice(prefix.length) : path;
-  return `/campaign-assets/${encodeURIComponent(state.selectedId)}/${relativePath
+  return `/campaign-assets/${encodeURIComponent(campaignId)}/${relativePath
     .split('/')
     .map(encodeURIComponent)
     .join('/')}`;
+}
+
+function campaignAsset(path) {
+  return campaignAssetFor(state.selectedId, path);
 }
 
 function renderCampaign() {
@@ -2595,6 +2653,7 @@ async function runProjectAction(kind, view = 'project') {
       url: 'http://127.0.0.1:4200',
     };
   }
+  state.libraryMode = false;
   state.projectMode = view === 'project';
   state.scribeMode = view === 'scribe';
   state.aiMode = false;
@@ -2602,15 +2661,19 @@ async function runProjectAction(kind, view = 'project') {
   void refreshJobs();
 }
 
-async function exportCurrent() {
-  const bundle = await api(`/api/campaigns/${encodeURIComponent(state.selectedId)}/export`);
+async function exportCampaign(campaignId) {
+  const bundle = await api(`/api/campaigns/${encodeURIComponent(campaignId)}/export`);
   const link = document.createElement('a');
   link.href = URL.createObjectURL(
     new Blob([JSON.stringify(bundle, null, 2)], { type: 'application/json' }),
   );
-  link.download = `${state.selectedId}-backup.json`;
+  link.download = `${campaignId}-backup.json`;
   link.click();
   URL.revokeObjectURL(link.href);
+}
+
+async function exportCurrent() {
+  await exportCampaign(state.selectedId);
 }
 
 async function runStorageAction(action, key) {
@@ -2660,8 +2723,12 @@ campaignList.addEventListener('click', (event) => {
   const button = event.target.closest('[data-campaign]');
   if (button) selectCampaign(button.dataset.campaign).catch((error) => toast(error.message, true));
 });
-document.querySelector('#campaign-search').addEventListener('input', renderSidebar);
+document.querySelector('#campaign-search').addEventListener('input', () => {
+  renderSidebar();
+  if (state.libraryMode) renderLibrary();
+});
 document.querySelector('#new-campaign').addEventListener('click', () => openCampaignEditor(false));
+document.querySelector('#show-library').addEventListener('click', showLibrary);
 mobileMenu.addEventListener('click', () =>
   setMenuOpen(!document.body.classList.contains('menu-open')),
 );
@@ -2670,6 +2737,7 @@ document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape' && document.body.classList.contains('menu-open')) setMenuOpen(false);
 });
 document.querySelector('#show-project').addEventListener('click', () => {
+  state.libraryMode = false;
   state.projectMode = true;
   state.scribeMode = false;
   state.aiMode = false;
@@ -2678,6 +2746,7 @@ document.querySelector('#show-project').addEventListener('click', () => {
   render();
 });
 document.querySelector('#show-scribe').addEventListener('click', () => {
+  state.libraryMode = false;
   state.scribeMode = true;
   state.projectMode = false;
   state.aiMode = false;
@@ -2686,6 +2755,7 @@ document.querySelector('#show-scribe').addEventListener('click', () => {
   render();
 });
 document.querySelector('#show-ai-setup').addEventListener('click', () => {
+  state.libraryMode = false;
   state.aiMode = true;
   state.aiConfigureExpanded = state.project.ai?.config?.setupState !== 'unseen';
   state.scribeMode = false;
@@ -2741,6 +2811,24 @@ document
   .addEventListener('click', () => quitManager('all').catch((error) => toast(error.message, true)));
 
 content.addEventListener('click', async (event) => {
+  const libraryAction = event.target.closest('[data-library-action]');
+  if (libraryAction) {
+    try {
+      const { id } = libraryAction.dataset;
+      if (libraryAction.dataset.libraryAction === 'open') await selectCampaign(id);
+      if (libraryAction.dataset.libraryAction === 'edit') {
+        await selectCampaign(id);
+        openCampaignEditor(true);
+      }
+      if (libraryAction.dataset.libraryAction === 'backup') {
+        await exportCampaign(id);
+        toast('Campaign backup downloaded.');
+      }
+    } catch (error) {
+      toast(error.message, true);
+    }
+    return;
+  }
   const onboarding = event.target.closest('[data-ai-onboarding]');
   if (onboarding) {
     chooseAiSetupPath(onboarding.dataset.aiOnboarding).catch((error) => toast(error.message, true));
@@ -2780,7 +2868,8 @@ content.addEventListener('click', async (event) => {
         });
         state.selectedId = null;
         state.campaign = null;
-        await loadState({ selectFirst: true });
+        await loadState();
+        showLibrary();
         toast('Campaign moved to the local recycle bin.');
       }
       if (action.dataset.action === 'show-sessions') {
@@ -3027,7 +3116,7 @@ document.querySelector('#dialog-cancel').addEventListener('click', () => {
   dialog.close();
 });
 
-loadState({ selectFirst: true, allowFirstRunPrompt: true }).catch((error) => {
+loadState({ allowFirstRunPrompt: true }).catch((error) => {
   content.innerHTML = `<div class="empty">${escapeHtml(error.message)}</div>`;
   toast(error.message, true);
 });
