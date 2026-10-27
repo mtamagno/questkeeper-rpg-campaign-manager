@@ -221,7 +221,7 @@
         "proficiencyBonus": 2,
         "abilityScores": {
           "strength": 12,
-          "dexterity": 16,
+          "dexterity": 15,
           "constitution": 14,
           "intelligence": 11,
           "wisdom": 13,
@@ -230,8 +230,9 @@
         "savingThrows": ["Dexterity", "Charisma"],
         "skills": ["Acrobatics", "Insight", "Survival"],
         "languages": ["Common", "Courier Cant"],
-        "equipment": ["Weatherproof coat", "Red letter case", "Silver whistle"],
+        "equipment": ["Weatherproof coat", "Red letter case", "Silver whistle", "Worn route token"],
         "features": ["Sure-footed", "Weather Eye"],
+        "spells": ["Guiding Gust"],
         "currency": { "gp": 8, "sp": 9 }
       }
     }
@@ -261,6 +262,7 @@
     "languages": ["Common", "Courier Cant"],
     "equipment": ["Weatherproof coat", "Red letter case", "Silver whistle", "Glass-beacon shard"],
     "features": ["Sure-footed", "Weather Eye", "Tailwind Step"],
+    "spells": ["Guiding Gust", "Roadspark"],
     "currency": { "gp": 11, "sp": 4 }
   },
   "diary": [

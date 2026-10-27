@@ -15,6 +15,15 @@ labels remain readable and keep 44-pixel touch targets. Characters with only
 one recorded sheet receive an honest empty state explaining when comparison
 becomes available.
 
-This task deliberately establishes neutral comparison structure only. Day 10's
-second task owns gained/lost/changed emphasis for spells, abilities, gear and
-statistics.
+The later column now distinguishes increased, decreased and otherwise changed
+values with a signed label as well as colour. A compact live summary announces
+how many values changed and how many collection entries were gained or lost.
+Spells, features, skills and equipment are compared by normalized entry name,
+then presented in responsive gained/lost cards; equal totals therefore cannot
+hide a replacement. Whitespace, casing and duplicate entries do not create
+false progression.
+
+The comparison remains derived from immutable snapshots. QuestKeeper does not
+write diff metadata into campaign data and does not infer missing history.
+Importers and future AI-assisted extraction must preserve complete historical
+collections so the same deterministic comparison remains trustworthy.
