@@ -1545,6 +1545,33 @@ preserve visible source ownership.
 **Revisit when:** A namespaced custom-compendium platform can resolve abilities
 as well as spells without weakening the sheet-owned membership boundary.
 
+### QK-058 — Compendium identity and permission travel with packages
+
+**Date:** 28 October 2026
+
+**Status:** Active
+
+**Decision:** Compendium entries resolve through `namespace:type:id`. Every
+package declares version, owner/source, ruleset/edition, locales, visibility
+and explicit license/redistribution metadata. Local content is private by
+default and may replace another entry only through an explicit qualified
+`overrideOf` reference.
+
+**Why:** Bundled open material and table-owned notes need the same search and
+reference mechanics without allowing load order, an absent license or a
+coincidental ID to imply ownership, publication permission or precedence.
+
+**Consequences:** Ordinary exports omit private and non-redistributable
+packages. Publication uses an allow-list and fails closed. Existing sheet data
+continues to own character membership; packages enrich references rather than
+rewrite sheets. Baseline research and local authoring extend this contract.
+
+**Source:** [Issue #35](https://github.com/mtamagno/questkeeper-rpg-campaign-manager/issues/35)
+and [package contract](COMPENDIUM-PACKAGES.md).
+
+**Revisit when:** A signed package registry or remote marketplace requires
+stronger authenticity and trust metadata.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD
