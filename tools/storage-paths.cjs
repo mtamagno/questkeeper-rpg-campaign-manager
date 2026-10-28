@@ -128,6 +128,10 @@ function resolveStoragePaths(projectRoot, options = {}) {
     selectionFile,
     dataRoot: roots.dataRoot,
     campaignsRoot: mode === 'legacy' ? legacyCampaignsRoot : path.join(roots.dataRoot, 'campaigns'),
+    compendiaRoot:
+      mode === 'legacy'
+        ? path.join(legacyManagerRoot, 'compendia')
+        : path.join(roots.dataRoot, 'compendia'),
     backupsRoot: path.join(roots.dataRoot, 'backups'),
     transcriptsRoot:
       mode === 'legacy' ? legacyTranscriptsRoot : path.join(roots.dataRoot, 'transcripts'),
@@ -335,6 +339,7 @@ async function prepareStorage(projectRoot, options = {}) {
     fsp.mkdir(paths.stateRoot, { recursive: true }),
     fsp.mkdir(paths.cacheRoot, { recursive: true }),
     fsp.mkdir(paths.backupsRoot, { recursive: true }),
+    fsp.mkdir(paths.compendiaRoot, { recursive: true }),
     fsp.mkdir(paths.transcriptsRoot, { recursive: true }),
     fsp.mkdir(paths.logsRoot, { recursive: true }),
     fsp.mkdir(paths.trashRoot, { recursive: true }),
@@ -430,10 +435,20 @@ async function createCampaignBackup(projectRoot, options = {}) {
     recursive: true,
     errorOnExist: true,
   });
+  const includesLocalCompendia = await exists(paths.compendiaRoot);
+  if (includesLocalCompendia) {
+    await fsp.cp(paths.compendiaRoot, path.join(destination, 'compendia'), {
+      recursive: true,
+      errorOnExist: true,
+    });
+  }
   await writeJsonAtomic(path.join(destination, 'backup.json'), {
     version: STORAGE_VERSION,
     createdAt: new Date().toISOString(),
     source: paths.campaignsRoot,
+    includesLocalCompendia,
+    privacy:
+      'Local recovery backup. It may contain private user-owned compendia and is not a sharing export.',
   });
   return { destination, createdAt: stamp };
 }
@@ -444,6 +459,7 @@ function publicStorageSummary(paths) {
     application: paths.applicationRoot,
     runtime: paths.runtimeRoot,
     campaigns: paths.campaignsRoot,
+    compendia: paths.compendiaRoot,
     configuration: paths.configRoot,
     transcripts: paths.transcriptsRoot,
     backups: paths.backupsRoot,

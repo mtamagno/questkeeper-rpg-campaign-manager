@@ -55,6 +55,13 @@ import { probeCompanion, resolveCompanionControl } from './companion-status.mjs'
 import { publicLanguageCatalog } from './language-catalog.mjs';
 import { publicRulesetProfiles } from './ruleset-profiles.mjs';
 import { formatSpawnFailure, resolveNpmInvocation } from './runtime-command.mjs';
+import {
+  exportLocalCompendiumPackage,
+  getLocalCompendiumPackage,
+  listCompendiumPackages,
+  previewCompendiumImport,
+  saveLocalCompendiumPackage,
+} from './compendium-store.mjs';
 import storagePaths from '../storage-paths.cjs';
 
 const {
@@ -573,6 +580,7 @@ function openStorageFolder(target) {
     application: STORAGE_PATHS.applicationRoot,
     runtime: STORAGE_PATHS.runtimeRoot,
     campaigns: STORAGE_PATHS.campaignsRoot,
+    compendia: STORAGE_PATHS.compendiaRoot,
     configuration: STORAGE_PATHS.configRoot,
     transcripts: STORAGE_PATHS.transcriptsRoot,
     backups: STORAGE_PATHS.backupsRoot,
@@ -692,6 +700,55 @@ async function routeApi(request, response, url) {
       note: 'Images are not embedded. Use Back up now for a complete local copy.',
     });
     return;
+  }
+
+  if (request.method === 'GET' && url.pathname === '/api/compendia') {
+    sendJson(response, 200, await listCompendiumPackages(PROJECT_ROOT, url.searchParams.get('q')));
+    return;
+  }
+  if (request.method === 'POST' && url.pathname === '/api/compendia/import-preview') {
+    sendJson(response, 200, await previewCompendiumImport(PROJECT_ROOT, await readBody(request)));
+    return;
+  }
+  if (request.method === 'POST' && url.pathname === '/api/compendia/import') {
+    const input = await readBody(request);
+    sendJson(
+      response,
+      201,
+      await saveLocalCompendiumPackage(PROJECT_ROOT, input.package, {
+        overwriteConfirmed: input.overwriteConfirmed === true,
+      }),
+    );
+    return;
+  }
+  if (parts[1] === 'compendia' && parts.length === 3) {
+    const namespace = parts[2];
+    if (request.method === 'GET' && url.searchParams.get('export') === 'true') {
+      sendJson(
+        response,
+        200,
+        await exportLocalCompendiumPackage(PROJECT_ROOT, namespace, {
+          includePrivate: url.searchParams.get('includePrivate') === 'true',
+        }),
+      );
+      return;
+    }
+    if (request.method === 'GET') {
+      sendJson(response, 200, await getLocalCompendiumPackage(PROJECT_ROOT, namespace));
+      return;
+    }
+    if (request.method === 'PUT') {
+      const input = await readBody(request);
+      sendJson(
+        response,
+        200,
+        await saveLocalCompendiumPackage(PROJECT_ROOT, input.package, {
+          previousNamespace: namespace,
+          overwriteConfirmed: true,
+        }),
+      );
+      return;
+    }
   }
 
   if (request.method === 'POST' && url.pathname === '/api/shutdown') {

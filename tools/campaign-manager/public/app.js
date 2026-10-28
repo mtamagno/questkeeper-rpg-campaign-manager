@@ -34,6 +34,10 @@ const state = {
   projectMode: false,
   scribeMode: false,
   aiMode: false,
+  compendiumMode: false,
+  compendia: { packages: [], entries: [], conflicts: [] },
+  compendiumImport: null,
+  compendiumSearch: '',
   aiConfigureExpanded: false,
   firstRunEvaluated: false,
   advancedMode: localStorage.getItem('questkeeper-manager-advanced') === 'true',
@@ -231,6 +235,7 @@ async function selectCampaign(id) {
   state.projectMode = false;
   state.scribeMode = false;
   state.aiMode = false;
+  state.compendiumMode = false;
   state.libraryMode = false;
   state.campaign = await api(`/api/campaigns/${encodeURIComponent(id)}`);
   state.tab = 'overview';
@@ -245,7 +250,7 @@ function renderSidebar() {
     ? campaigns
         .map(
           (item) => `
-          <button class="campaign-link ${item.id === state.selectedId && !state.libraryMode && !state.projectMode && !state.scribeMode && !state.aiMode ? 'active' : ''}" data-campaign="${escapeHtml(item.id)}">
+          <button class="campaign-link ${item.id === state.selectedId && !state.libraryMode && !state.projectMode && !state.scribeMode && !state.aiMode && !state.compendiumMode ? 'active' : ''}" data-campaign="${escapeHtml(item.id)}">
             <span class="campaign-link__sigil">${escapeHtml(localized(item.name).charAt(0).toUpperCase() || '✦')}</span>
             <span><strong>${escapeHtml(localized(item.name, item.defaultLanguage ?? 'en'))}</strong><small>${escapeHtml(localized(item.status, item.defaultLanguage ?? 'en') || 'Campaign')}</small></span>
             <span class="campaign-link__count">${item.counts.characters}</span>
@@ -254,6 +259,7 @@ function renderSidebar() {
         .join('')
     : '<div class="empty">No campaigns found.</div>';
   document.querySelector('#show-library').classList.toggle('active', state.libraryMode);
+  document.querySelector('#show-compendia').classList.toggle('active', state.compendiumMode);
   renderAiSetupNavigation();
 }
 
@@ -305,6 +311,7 @@ function showLibrary() {
   state.projectMode = false;
   state.scribeMode = false;
   state.aiMode = false;
+  state.compendiumMode = false;
   setMenuOpen(false);
   renderSidebar();
   render();
@@ -357,6 +364,10 @@ function render() {
   renderCompanionAction();
   if (state.aiMode) {
     renderAiSetup();
+    return;
+  }
+  if (state.compendiumMode) {
+    renderCompendia();
     return;
   }
   if (state.scribeMode) {
@@ -414,6 +425,263 @@ function renderLibrary() {
           : '<div class="library-empty"><strong>No matching campaigns</strong><p>Try another search or create a new adventure.</p></div>'
       }
     </section>`;
+}
+
+async function showCompendia() {
+  state.libraryMode = false;
+  state.projectMode = false;
+  state.scribeMode = false;
+  state.aiMode = false;
+  state.compendiumMode = true;
+  setMenuOpen(false);
+  await loadCompendia();
+  renderSidebar();
+  renderCompendia();
+}
+
+async function loadCompendia() {
+  state.compendia = await api(
+    `/api/compendia${state.compendiumSearch ? `?q=${encodeURIComponent(state.compendiumSearch)}` : ''}`,
+  );
+}
+
+function compendiumEntryCard(entry = {}, index = 0, primaryLocale = 'en') {
+  const name = localized(entry.name, primaryLocale);
+  const summary = localized(entry.summary ?? entry.description, primaryLocale);
+  return `<article class="compendium-entry-editor" data-compendium-entry>
+    <div class="compendium-entry-editor__header"><strong>Entry ${index + 1}</strong><button class="quiet-button" type="button" data-compendium-remove-entry>Remove</button></div>
+    <div class="form-grid">
+      ${field('compendiumEntryId', 'Stable entry ID', entry.id ?? '', { required: true, hint: 'Lowercase letters, numbers, dots, underscores and hyphens.' })}
+      ${field('compendiumEntryType', 'Type', entry.type ?? 'rule', { required: true, hint: 'Examples: spell, item, class, ability or rule.' })}
+      ${field('compendiumEntryName', `Name · ${primaryLocale}`, name, { required: true })}
+      ${field('compendiumEntrySummary', `Summary / table notes · ${primaryLocale}`, summary, { type: 'textarea', wide: true })}
+      ${field('compendiumEntryReferences', 'Qualified references', (entry.references ?? []).join('\n'), { type: 'textarea', hint: 'Optional, one per line: namespace:type:id.' })}
+      ${field('compendiumEntryOverride', 'Explicit override target', entry.overrideOf ?? '', { hint: 'Optional advanced reference: namespace:type:id. Never inferred.' })}
+      <details class="field field--wide compendium-localizations"><summary>Other language values</summary><p>Optional JSON objects preserve translations when this package has several locales.</p>${field('compendiumEntryNameJson', 'Localized names', JSON.stringify(entry.name ?? {}, null, 2), { type: 'textarea', wide: true })}${field('compendiumEntrySummaryJson', 'Localized summaries', JSON.stringify(entry.summary ?? entry.description ?? {}, null, 2), { type: 'textarea', wide: true })}</details>
+    </div>
+  </article>`;
+}
+
+function compendiumPackageForm(pkg) {
+  const manifest = pkg?.manifest ?? {};
+  const source = manifest.source ?? {};
+  const license = manifest.license ?? {};
+  const locales = manifest.locales ?? ['en'];
+  const primaryLocale = locales[0] ?? 'en';
+  const suggestedNamespace = `table.${state.selectedId || 'my-table'}`.replace(/[^a-z0-9.-]/g, '-');
+  return [
+    `<section class="compendium-editor-intro field--wide"><strong>Private by default</strong><p>QuestKeeper stores this package in protected user data. Publication and redistribution rights are never inferred from a title, game or source.</p></section>`,
+    section('Package identity'),
+    field('compendiumNamespace', 'Stable namespace', manifest.namespace ?? suggestedNamespace, {
+      required: true,
+      hint: 'Example: table.night-owls. It cannot be renamed after the first save.',
+    }),
+    field('compendiumVersion', 'Version', manifest.version ?? '1.0.0', {
+      required: true,
+      hint: 'Semantic version, for example 1.0.0.',
+    }),
+    field('compendiumOwner', 'Owner / author', manifest.owner ?? '', { required: true }),
+    field('compendiumLocales', 'Languages', locales.join(', '), {
+      required: true,
+      hint: 'BCP-47 language tags separated by commas, for example en, it.',
+    }),
+    section('Source and ruleset'),
+    field('compendiumSourceName', 'Source name', source.name ?? 'Personal table notes', {
+      required: true,
+    }),
+    field('compendiumSourceUrl', 'Source URL or local URI', source.url ?? '', {
+      hint: 'Leave empty for a private questkeeper://local/... URI.',
+    }),
+    field('compendiumRuleset', 'Game system ID', manifest.ruleset?.id ?? 'generic', {
+      required: true,
+    }),
+    field('compendiumEdition', 'System / edition', manifest.ruleset?.edition ?? 'House rules', {
+      required: true,
+    }),
+    section('Sharing permission'),
+    field('compendiumVisibility', 'Package visibility', manifest.visibility ?? 'private', {
+      type: 'select',
+      values: [
+        ['private', 'Private · keep on this device'],
+        ['public', 'Public · eligible only after license review'],
+      ],
+    }),
+    `<label class="consent-check field--wide"><input name="compendiumRedistributable" type="checkbox" ${license.redistributable ? 'checked' : ''} /> I own or have verified permission to redistribute this material. QuestKeeper will not infer this right.</label>`,
+    field('compendiumLicenseId', 'License identifier', license.id ?? 'All-Rights-Reserved', {
+      required: true,
+    }),
+    field('compendiumLicenseUrl', 'License URL or local URI', license.url ?? ''),
+    field(
+      'compendiumAttribution',
+      'Required attribution',
+      license.attribution ?? manifest.owner ?? '',
+      {
+        required: true,
+      },
+    ),
+    field(
+      'compendiumTransformations',
+      'Permitted transformations',
+      (license.permittedTransformations ?? []).join('\n'),
+      { type: 'textarea', hint: 'One per line. Leave empty when no permission was granted.' },
+    ),
+    section('Entries'),
+    `<div class="compendium-entry-heading field--wide"><div><strong>Package entries</strong><small>Namespaced references prevent one package from silently hijacking another.</small></div><button class="secondary-button" type="button" data-compendium-add-entry>Add entry</button></div>`,
+    `<div class="compendium-entry-list field--wide" data-compendium-entries>${(pkg?.entries ?? []).map((entry, index) => compendiumEntryCard(entry, index, primaryLocale)).join('')}</div>`,
+  ].join('');
+}
+
+function openCompendiumEditor(pkg) {
+  openDialog({
+    title: pkg ? 'Edit local compendium' : 'New local compendium',
+    eyebrow: 'Private rules & notes',
+    html: compendiumPackageForm(pkg),
+    editor: { kind: 'compendium', previousNamespace: pkg?.manifest?.namespace, original: pkg },
+  });
+  const namespace = fields.querySelector('[name="compendiumNamespace"]');
+  if (pkg && namespace) namespace.readOnly = true;
+}
+
+function parseLocalizedJson(value, label) {
+  try {
+    const parsed = JSON.parse(value || '{}');
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error();
+    return parsed;
+  } catch {
+    throw new Error(`${label} must be a JSON object keyed by language.`);
+  }
+}
+
+function buildCompendiumPackage(form) {
+  const namespace = form.get('compendiumNamespace').toString().trim();
+  const locales = form
+    .get('compendiumLocales')
+    .toString()
+    .split(',')
+    .map((value) => value.trim())
+    .filter(Boolean);
+  const primaryLocale = locales[0] || 'en';
+  const sourceUrl =
+    form.get('compendiumSourceUrl').toString().trim() || `questkeeper://local/${namespace}`;
+  const licenseUrl = form.get('compendiumLicenseUrl').toString().trim() || sourceUrl;
+  const sourceName = form.get('compendiumSourceName').toString().trim();
+  const entries = [...fields.querySelectorAll('[data-compendium-entry]')].map((card) => {
+    const name = parseLocalizedJson(
+      card.querySelector('[name="compendiumEntryNameJson"]').value,
+      'Localized names',
+    );
+    const summary = parseLocalizedJson(
+      card.querySelector('[name="compendiumEntrySummaryJson"]').value,
+      'Localized summaries',
+    );
+    name[primaryLocale] = card.querySelector('[name="compendiumEntryName"]').value.trim();
+    summary[primaryLocale] = card.querySelector('[name="compendiumEntrySummary"]').value.trim();
+    const overrideOf = card.querySelector('[name="compendiumEntryOverride"]').value.trim();
+    return {
+      id: card.querySelector('[name="compendiumEntryId"]').value.trim(),
+      type: card.querySelector('[name="compendiumEntryType"]').value.trim(),
+      name,
+      summary,
+      references: card
+        .querySelector('[name="compendiumEntryReferences"]')
+        .value.split('\n')
+        .map((value) => value.trim())
+        .filter(Boolean),
+      ...(overrideOf ? { overrideOf } : {}),
+      citations: [{ label: sourceName, url: sourceUrl }],
+    };
+  });
+  return {
+    manifest: {
+      schemaVersion: 1,
+      namespace,
+      version: form.get('compendiumVersion').toString().trim(),
+      kind: 'local',
+      visibility: form.get('compendiumVisibility').toString(),
+      owner: form.get('compendiumOwner').toString().trim(),
+      source: {
+        name: sourceName,
+        url: sourceUrl,
+        upstreamVersion: form.get('compendiumVersion').toString().trim(),
+        reviewedOn: new Date().toISOString().slice(0, 10),
+        updatePolicy: 'Manual review through QuestKeeper Campaign Manager.',
+      },
+      ruleset: {
+        id: form.get('compendiumRuleset').toString().trim(),
+        edition: form.get('compendiumEdition').toString().trim(),
+      },
+      locales,
+      license: {
+        id: form.get('compendiumLicenseId').toString().trim(),
+        url: licenseUrl,
+        attribution: form.get('compendiumAttribution').toString().trim(),
+        redistributable: form.get('compendiumRedistributable') === 'on',
+        permittedTransformations: form
+          .get('compendiumTransformations')
+          .toString()
+          .split('\n')
+          .map((value) => value.trim())
+          .filter(Boolean),
+      },
+    },
+    entries,
+  };
+}
+
+function renderCompendia() {
+  document.querySelector('#page-title').textContent = 'Local compendia';
+  const data = state.compendia ?? { packages: [], entries: [], conflicts: [] };
+  const pending = state.compendiumImport;
+  content.innerHTML = `
+    <div class="compendium-workspace">
+      <section class="project-panel compendium-hero"><div><span class="eyebrow">Private rules & table notes</span><h2>Your local compendia</h2><p>Create or import versioned packages without changing bundled rules. Local material stays on this device and sharing exports exclude it by default.</p></div><div class="action-row"><button class="primary-button" data-compendium-action="new">New package</button><button class="secondary-button" data-compendium-action="choose-import">Preview import</button></div></section>
+      ${pending ? `<section class="project-panel compendium-import-review"><span class="eyebrow">Import preview · nothing written yet</span><h2>${escapeHtml(pending.preview.namespace || 'Invalid package')}</h2><dl class="compendium-preview-metrics"><div><dt>Entries</dt><dd>${pending.preview.entries}</dd></div><div><dt>Version</dt><dd>${escapeHtml(pending.preview.incomingVersion || '—')}</dd></div><div><dt>Conflicts</dt><dd>${pending.preview.conflicts.length}</dd></div><div><dt>Invalid links</dt><dd>${pending.preview.invalidLinks.length}</dd></div></dl>${pending.preview.errors.length ? `<div class="dialog__error"><strong>Validation errors</strong><ul>${pending.preview.errors.map((error) => `<li>${escapeHtml(error)}</li>`).join('')}</ul></div>` : ''}${pending.preview.invalidLinks.length ? `<div class="dialog__error"><strong>References to review</strong><ul>${pending.preview.invalidLinks.map((item) => `<li><code>${escapeHtml(item.entry)}</code> → <code>${escapeHtml(item.reference)}</code> (${escapeHtml(item.reason)})</li>`).join('')}</ul></div>` : ''}${pending.preview.overwriteRequired ? '<label class="consent-check"><input type="checkbox" data-compendium-overwrite /> Replace the installed namespace only after this preview.</label>' : ''}<div class="action-row"><button class="primary-button" data-compendium-action="confirm-import" ${pending.preview.valid ? '' : 'disabled'}>Import reviewed package</button><button class="secondary-button" data-compendium-action="cancel-import">Cancel</button></div></section>` : ''}
+      <section class="project-panel"><div class="compendium-search-heading"><div><span class="eyebrow">Installed packages</span><h2>${data.packages.length} local package${data.packages.length === 1 ? '' : 's'}</h2></div><label class="search compendium-search"><span aria-hidden="true">⌕</span><input data-compendium-search type="search" value="${escapeHtml(state.compendiumSearch)}" placeholder="Search names, types or qualified IDs" /></label></div>${data.packages.length ? `<div class="compendium-package-grid">${data.packages.map((pkg) => `<article class="compendium-package-card"><div><span class="status-pill">${escapeHtml(pkg.visibility)}</span><span class="compendium-package-card__version">v${escapeHtml(pkg.version)}</span><h3>${escapeHtml(pkg.namespace)}</h3><p>${escapeHtml(pkg.source.name)} · ${escapeHtml(pkg.ruleset.edition)}</p></div><dl><div><dt>Entries</dt><dd>${pkg.entries}</dd></div><div><dt>Languages</dt><dd>${pkg.locales.map(escapeHtml).join(', ')}</dd></div><div><dt>License</dt><dd>${escapeHtml(pkg.license)}</dd></div></dl><footer><button class="secondary-button" data-compendium-action="edit" data-namespace="${escapeHtml(pkg.namespace)}">Edit</button><button class="secondary-button" data-compendium-action="export" data-namespace="${escapeHtml(pkg.namespace)}" data-private="${pkg.visibility === 'private'}">Export</button></footer></article>`).join('')}</div>` : '<div class="library-empty"><strong>No local packages yet</strong><p>Create personal rules or preview a package before importing it.</p></div>'}</section>
+      <section class="project-panel"><span class="eyebrow">Resolved search</span><h2>${data.entries.length} matching entr${data.entries.length === 1 ? 'y' : 'ies'}</h2>${
+        data.entries.length
+          ? `<div class="compendium-result-list">${data.entries
+              .slice(0, 100)
+              .map(
+                (entry) =>
+                  `<article><code>${escapeHtml(entry.qualifiedId)}</code><h3>${escapeHtml(localized(entry.name))}</h3><p>${escapeHtml(localized(entry.summary) || entry.type)} · ${escapeHtml(entry.source)}</p></article>`,
+              )
+              .join('')}</div>`
+          : '<p>No matching entries. Search includes bundled and local packages while preserving qualified identity.</p>'
+      }</section>
+    </div>`;
+}
+
+function downloadJson(value, fileName) {
+  const blob = new Blob([`${JSON.stringify(value, null, 2)}\n`], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = fileName;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+async function previewCompendiumFile(file) {
+  const pkg = JSON.parse(await file.text());
+  const preview = await api('/api/compendia/import-preview', {
+    method: 'POST',
+    body: JSON.stringify(pkg),
+  });
+  state.compendiumImport = { package: preview.package, preview };
+  renderCompendia();
+}
+
+async function saveCompendium(form) {
+  const pkg = buildCompendiumPackage(form);
+  const namespace = state.editor.previousNamespace || pkg.manifest.namespace;
+  const path = state.editor.previousNamespace
+    ? `/api/compendia/${encodeURIComponent(namespace)}`
+    : '/api/compendia/import';
+  await api(path, {
+    method: state.editor.previousNamespace ? 'PUT' : 'POST',
+    body: JSON.stringify({ package: pkg, overwriteConfirmed: false }),
+  });
+  await loadCompendia();
 }
 
 function campaignAssetFor(campaignId, path) {
@@ -2531,6 +2799,9 @@ async function saveEditor() {
   if (state.editor.kind === 'campaign') {
     const palette = await saveCampaign(form);
     message = `Saved. The ${palette} palette will appear when the Companion reloads or regains focus.`;
+  } else if (state.editor.kind === 'compendium') {
+    await saveCompendium(form);
+    message = 'Local compendium saved in protected user data.';
   } else {
     const entity = await buildEntity(state.editor.type, form, state.editor.original);
     const base = `/api/campaigns/${encodeURIComponent(state.selectedId)}/${state.editor.type}`;
@@ -2691,6 +2962,7 @@ async function runProjectAction(kind, view = 'project') {
   state.projectMode = view === 'project';
   state.scribeMode = view === 'scribe';
   state.aiMode = false;
+  state.compendiumMode = false;
   renderSidebar();
   void refreshJobs();
 }
@@ -2775,6 +3047,7 @@ document.querySelector('#show-project').addEventListener('click', () => {
   state.projectMode = true;
   state.scribeMode = false;
   state.aiMode = false;
+  state.compendiumMode = false;
   setMenuOpen(false);
   renderSidebar();
   render();
@@ -2784,6 +3057,7 @@ document.querySelector('#show-scribe').addEventListener('click', () => {
   state.scribeMode = true;
   state.projectMode = false;
   state.aiMode = false;
+  state.compendiumMode = false;
   setMenuOpen(false);
   renderSidebar();
   render();
@@ -2794,6 +3068,7 @@ document.querySelector('#show-ai-setup').addEventListener('click', () => {
   state.aiConfigureExpanded = state.project.ai?.config?.setupState !== 'unseen';
   state.scribeMode = false;
   state.projectMode = false;
+  state.compendiumMode = false;
   setMenuOpen(false);
   renderSidebar();
   render();
@@ -2806,10 +3081,19 @@ document.querySelector('#import-file').addEventListener('change', (event) => {
   if (file) importFile(file).catch((error) => toast(error.message, true));
   event.target.value = '';
 });
+document.querySelector('#show-compendia').addEventListener('click', () => {
+  showCompendia().catch((error) => toast(error.message, true));
+});
+document.querySelector('#compendium-import-file').addEventListener('change', (event) => {
+  const [file] = event.target.files;
+  if (file) previewCompendiumFile(file).catch((error) => toast(error.message, true));
+  event.target.value = '';
+});
 document.querySelector('#open-companion').addEventListener('click', (event) => {
   const action = event.currentTarget.dataset.companionAction;
   if (action === 'prepare') {
     state.projectMode = true;
+    state.compendiumMode = false;
     render();
     toast('Prepare the project first.');
     return;
@@ -2820,6 +3104,7 @@ document.querySelector('#open-companion').addEventListener('click', (event) => {
   }
   if (action === 'wait') {
     state.projectMode = true;
+    state.compendiumMode = false;
     render();
     return;
   }
@@ -2845,6 +3130,66 @@ document
   .addEventListener('click', () => quitManager('all').catch((error) => toast(error.message, true)));
 
 content.addEventListener('click', async (event) => {
+  const compendiumAction = event.target.closest('[data-compendium-action]');
+  if (compendiumAction) {
+    try {
+      const action = compendiumAction.dataset.compendiumAction;
+      if (action === 'new') openCompendiumEditor();
+      if (action === 'choose-import') document.querySelector('#compendium-import-file').click();
+      if (action === 'cancel-import') {
+        state.compendiumImport = null;
+        renderCompendia();
+      }
+      if (action === 'confirm-import') {
+        const overwriteConfirmed =
+          content.querySelector('[data-compendium-overwrite]')?.checked === true;
+        if (state.compendiumImport.preview.overwriteRequired && !overwriteConfirmed) {
+          toast('Confirm the reviewed namespace replacement first.', true);
+          return;
+        }
+        await api('/api/compendia/import', {
+          method: 'POST',
+          body: JSON.stringify({
+            package: state.compendiumImport.package,
+            overwriteConfirmed,
+          }),
+        });
+        state.compendiumImport = null;
+        await loadCompendia();
+        renderCompendia();
+        toast('Reviewed compendium package imported.');
+      }
+      if (action === 'edit') {
+        const result = await api(
+          `/api/compendia/${encodeURIComponent(compendiumAction.dataset.namespace)}`,
+        );
+        openCompendiumEditor(result.package);
+      }
+      if (action === 'export') {
+        const isPrivate = compendiumAction.dataset.private === 'true';
+        if (
+          isPrivate &&
+          !confirm(
+            'This export contains private user-owned compendium material. Share it only when you have permission. Continue?',
+          )
+        ) {
+          return;
+        }
+        const namespace = compendiumAction.dataset.namespace;
+        const bundle = await api(
+          `/api/compendia/${encodeURIComponent(namespace)}?export=true&includePrivate=${isPrivate}`,
+        );
+        downloadJson(
+          bundle,
+          `questkeeper-compendium-${namespace}-${bundle.package.manifest.version}.json`,
+        );
+        toast('Compendium package exported with its provenance and permission metadata.');
+      }
+    } catch (error) {
+      toast(error.message, true);
+    }
+    return;
+  }
   const libraryAction = event.target.closest('[data-library-action]');
   if (libraryAction) {
     try {
@@ -2989,6 +3334,18 @@ content.addEventListener('change', (event) => {
   toast(state.advancedMode ? 'Advanced controls enabled.' : 'Advanced controls hidden.');
 });
 
+let compendiumSearchTimer;
+content.addEventListener('input', (event) => {
+  if (!event.target.matches('[data-compendium-search]')) return;
+  state.compendiumSearch = event.target.value;
+  clearTimeout(compendiumSearchTimer);
+  compendiumSearchTimer = setTimeout(() => {
+    loadCompendia()
+      .then(renderCompendia)
+      .catch((error) => toast(error.message, true));
+  }, 180);
+});
+
 content.addEventListener('submit', (event) => {
   if (event.target.id !== 'ai-setup-form') return;
   event.preventDefault();
@@ -2996,6 +3353,22 @@ content.addEventListener('submit', (event) => {
 });
 
 fields.addEventListener('click', (event) => {
+  const addCompendiumEntry = event.target.closest('[data-compendium-add-entry]');
+  if (addCompendiumEntry) {
+    const list = fields.querySelector('[data-compendium-entries]');
+    const index = list.querySelectorAll('[data-compendium-entry]').length;
+    const locale =
+      fields.querySelector('[name="compendiumLocales"]').value.split(',')[0]?.trim() || 'en';
+    list.insertAdjacentHTML('beforeend', compendiumEntryCard({}, index, locale));
+    window.managerI18n?.translateTree?.(list.lastElementChild);
+    list.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+  const removeCompendiumEntry = event.target.closest('[data-compendium-remove-entry]');
+  if (removeCompendiumEntry) {
+    removeCompendiumEntry.closest('[data-compendium-entry]')?.remove();
+    return;
+  }
   const addStoryHighlight = event.target.closest('[data-story-add]');
   if (addStoryHighlight) {
     const kind = addStoryHighlight.dataset.storyAdd;
