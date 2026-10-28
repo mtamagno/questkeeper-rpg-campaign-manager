@@ -35,6 +35,7 @@ interface ResolvedSpell {
 
 export interface CampaignCharacterPdfOptions {
   readonly publicProfile?: CharacterPublicProfile;
+  readonly pronouns?: BilingualText;
   readonly profileImageUrl?: string;
   readonly portraitImageUrl?: string;
   readonly chapterTitle?: BilingualText;
@@ -182,11 +183,18 @@ function drawProfilePage(
   doc.text(characterName, 47, 45);
   doc.setFont('times', 'italic');
   doc.setTextColor(...COLOR.muted);
+  const pronouns = options.pronouns === undefined ? '' : localized(options.pronouns, language);
+  let identityY = 53;
+  if (pronouns.trim()) {
+    doc.setFontSize(8);
+    doc.text(pronouns, 47, 51);
+    identityY = 56;
+  }
   doc.setFontSize(9);
   doc.text(
     `${sheet.race} | ${sheet.classType} | ${language === 'it' ? 'Livello' : 'Level'} ${sheet.level}`,
     47,
-    53,
+    identityY,
   );
 
   const chapterLabel = language === 'it' ? `Capitolo ${sheet.level}` : `Chapter ${sheet.level}`;
@@ -197,12 +205,13 @@ function drawProfilePage(
       : `${chapterLabel} - ${language === 'it' ? chapterTitle.it : chapterTitle.en}`;
   doc.setFontSize(8);
   doc.setTextColor(...COLOR.gold);
-  doc.text(chapterText, 47, 61);
+  const chapterY = identityY + 8;
+  doc.text(chapterText, 47, chapterY);
   if (options.recordedAt !== undefined) {
     doc.setFont('times', 'normal');
     doc.setTextColor(...COLOR.muted);
     doc.setFontSize(7);
-    doc.text(formatRecordedDate(options.recordedAt, language), 47, 65);
+    doc.text(formatRecordedDate(options.recordedAt, language), 47, chapterY + 4);
   }
 
   const portraitX = 132;

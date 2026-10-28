@@ -233,6 +233,8 @@ export interface Character {
   readonly id: string;
   readonly name: string;
   readonly sex: BilingualText;
+  /** Optional self-authored forms of address; never inferred from name, art, voice, or sex/gender. */
+  readonly pronouns?: BilingualText;
   /** Canonical standing height, useful for profiles and proportion guides. */
   readonly heightCm?: number;
   readonly playerName?: string;

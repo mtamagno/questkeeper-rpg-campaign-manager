@@ -1,5 +1,9 @@
 # AI setup and session-draft workflow
 
+> Character imports never infer pronouns from a portrait, name, voice or
+> sex/gender. QuestKeeper copies them into the editable review only when the
+> selected source states them explicitly; otherwise the field stays empty.
+
 > Looking for remote provider support? Read the maintained
 > [AI provider capability, privacy and adapter matrix](AI-PROVIDER-MATRIX.md).
 > It records which roles are supported, model-dependent or deliberately hidden

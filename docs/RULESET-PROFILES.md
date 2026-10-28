@@ -18,6 +18,13 @@ ordered semantic identity fields. Semantic keys such as `ancestry` map to
 existing storage keys such as `sheet.race`; changing a label therefore never
 rewrites character data.
 
+Presentation fields are separate from mechanical identity. Every profile may
+show, rename or hide the existing `sex`/gender field and the optional localized
+`pronouns` field independently. Generic/custom campaigns control both labels;
+leaving one blank hides that editor without deleting the stored value. Pronouns
+are self-authored presentation data and are never derived from sex/gender,
+names, portraits or voices.
+
 Bundled profiles cover 5E fantasy 2014 and 2024, Pathfinder 2e Remaster,
 cosmic-horror investigators and Generic/Custom. Existing campaigns infer a
 profile from `edition` at read time and are not rewritten until the GM saves.

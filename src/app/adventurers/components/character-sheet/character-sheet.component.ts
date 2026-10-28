@@ -22,6 +22,7 @@ import {
   type CharacterSheetSnapshot,
 } from '@guild/models/character.model';
 import { LanguageService } from '@guild/services/language.service';
+import { type BilingualText } from '@guild/models/language.model';
 import { CampaignService } from '@guild/services/campaign.service';
 import {
   CharacterReadingPositionService,
@@ -94,6 +95,9 @@ export class CharacterSheetComponent {
 
   /** Public lore included in the printable character dossier. */
   readonly publicProfile = input<CharacterPublicProfile>();
+
+  /** Optional self-authored pronouns included once in the printable dossier. */
+  readonly pronouns = input<BilingualText>();
 
   /** Character artwork included in the printable character dossier. */
   readonly profileImageUrl = input<string>();
@@ -321,6 +325,7 @@ export class CharacterSheetComponent {
         language,
         {
           publicProfile: this.publicProfile(),
+          pronouns: this.pronouns(),
           profileImageUrl: this.profileImageUrl(),
           portraitImageUrl: this.portraitImageUrl(),
           chapterTitle: this.activeSnapshot()?.title,

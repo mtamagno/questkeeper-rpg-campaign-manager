@@ -162,6 +162,33 @@ test('manages characters, sessions and maps without editing manifests', async (t
   assert.deepEqual(JSON.parse(trash), []);
 });
 
+test('round-trips multilingual pronouns while legacy characters remain unchanged', async (t) => {
+  const root = await fixture(t);
+  await createCampaign(root, {
+    ...campaignInput,
+    id: 'localized-pronouns',
+    languages: ['en', 'it', 'fr'],
+    defaultLanguage: 'en',
+  });
+  await saveEntity(root, 'localized-pronouns', 'characters', {
+    id: 'explicit',
+    name: 'Explicit Source',
+    pronouns: { en: 'they/them', it: 'loro', fr: 'iel' },
+  });
+  await saveEntity(root, 'localized-pronouns', 'characters', {
+    id: 'legacy',
+    name: 'Legacy Record',
+    sex: { en: 'Woman', it: 'Donna' },
+  });
+
+  const campaign = await getCampaign(root, 'localized-pronouns');
+  const explicit = campaign.characters.find((character) => character.id === 'explicit');
+  const legacy = campaign.characters.find((character) => character.id === 'legacy');
+  assert.deepEqual(explicit.pronouns, { en: 'they/them', it: 'loro', fr: 'iel' });
+  assert.equal(Object.hasOwn(legacy, 'pronouns'), false);
+  assert.deepEqual(legacy.sex, { en: 'Woman', it: 'Donna' });
+});
+
 test('enforces one campaign-wide ID namespace under concurrent saves', async (t) => {
   const root = await fixture(t);
   await createCampaign(root, campaignInput);

@@ -94,6 +94,9 @@ Each character JSON contains:
 - diary, session knowledge and quotes;
 - optional standing height in centimetres (`heightCm`), useful for consistent
   party-art proportions;
+- optional localized `pronouns`, kept separate from the legacy localized
+  `sex`/gender value. Record pronouns only when the player or source states
+  them explicitly; omit the field when unknown;
 - optional `loreChapters`, an ordered illustrated chronicle of the character's
   public background. Each chapter has an `id`, localized `title` and `body`, an
   optional localized `period`, and an optional image with localized `alt` and

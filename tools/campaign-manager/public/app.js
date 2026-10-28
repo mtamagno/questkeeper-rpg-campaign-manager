@@ -930,7 +930,10 @@ function currentCampaignValuesForLanguage(language) {
 
 function rulesetProfile(id) {
   const profiles = state.project.rulesetProfiles ?? [];
-  return profiles.find((profile) => profile.id === id) ?? profiles.at(-1) ?? { fields: [] };
+  return (
+    profiles.find((profile) => profile.id === id) ??
+    profiles.at(-1) ?? { fields: [], presentationFields: [] }
+  );
 }
 
 function campaignRuleset(campaign = state.campaign) {
@@ -940,11 +943,13 @@ function campaignRuleset(campaign = state.campaign) {
 function rulesetPicker(value = { id: 'generic', customLabels: {} }) {
   const profiles = state.project.rulesetProfiles ?? [];
   const labels = value.customLabels ?? {};
-  return `${field('gameSystemId', 'Game system', value.id || 'generic', { type: 'select', values: profiles.map((profile) => [profile.id, profile.names?.en || profile.id]), hint: 'Controls terminology and authoring fields without changing stored character values.' })}<details class="field field--wide"><summary>Custom terminology</summary><p>Used by the Generic / custom profile. Leave a label blank to hide that identity field.</p><div class="form-grid">${[
+  return `${field('gameSystemId', 'Game system', value.id || 'generic', { type: 'select', values: profiles.map((profile) => [profile.id, profile.names?.en || profile.id]), hint: 'Controls terminology and authoring fields without changing stored character values.' })}<details class="field field--wide"><summary>Custom terminology</summary><p>Used by the Generic / custom profile. Leave a label blank to hide that identity or presentation field.</p><div class="form-grid">${[
     ['ancestry', 'Origin / ancestry'],
     ['class', 'Role / archetype'],
     ['specialization', 'Specialization'],
     ['background', 'Background'],
+    ['sex', 'Sex / gender'],
+    ['pronouns', 'Pronouns'],
   ]
     .map(([key, fallback]) => field(`rulesetLabel__${key}`, fallback, labels[key] ?? fallback))
     .join('')}</div></details>`;
@@ -958,6 +963,20 @@ function activeIdentityFields() {
   const system = campaignRuleset();
   const profile = rulesetProfile(system.id);
   return (profile.fields ?? [])
+    .map((definition) => ({
+      ...definition,
+      label:
+        profile.id === 'generic' && system.customLabels?.[definition.key] !== undefined
+          ? system.customLabels[definition.key]
+          : definition.labels?.en || definition.key,
+    }))
+    .filter((definition) => definition.label);
+}
+
+function activePresentationFields() {
+  const system = campaignRuleset();
+  const profile = rulesetProfile(system.id);
+  return (profile.presentationFields ?? [])
     .map((definition) => ({
       ...definition,
       label:
@@ -1446,12 +1465,20 @@ function entityForm(type, item = {}) {
     : [];
   if (type === 'characters') {
     const identityFields = activeIdentityFields();
+    const presentationFields = activePresentationFields();
     return [
       ...common,
       entityAiImportPanel(type, languages),
       field('name', 'Name', item.name, { required: true }),
       field('playerName', 'Player', item.playerName),
-      ...localizedFields('sex', 'Gender', item.sex, languages),
+      ...presentationFields.flatMap((definition) =>
+        localizedFields(
+          definition.storageKey,
+          definition.label,
+          item[definition.storageKey],
+          languages,
+        ),
+      ),
       field('heightCm', 'Height (cm)', item.heightCm ?? '', {
         type: 'number',
         min: 1,
@@ -1743,7 +1770,7 @@ async function saveCampaign(form) {
       id: form.get('gameSystemId')?.toString() || 'generic',
       edition: form.get('edition')?.toString() || '',
       customLabels: Object.fromEntries(
-        ['ancestry', 'class', 'specialization', 'background'].map((key) => [
+        ['ancestry', 'class', 'specialization', 'background', 'sex', 'pronouns'].map((key) => [
           key,
           form.get(`rulesetLabel__${key}`)?.toString().trim() ?? '',
         ]),
@@ -2018,7 +2045,14 @@ async function buildEntity(type, form, original = {}) {
     item.id = id;
     item.name = form.get('name').toString();
     item.playerName = form.get('playerName').toString();
-    item.sex = localizedFormValue(form, 'sex', '', languages);
+    for (const definition of activePresentationFields()) {
+      const value = localizedFormValue(form, definition.storageKey, '', languages);
+      if (definition.storageKey === 'pronouns' && !Object.values(value).some(Boolean)) {
+        delete item.pronouns;
+      } else {
+        item[definition.storageKey] = value;
+      }
+    }
     const heightCm = Number(form.get('heightCm'));
     if (heightCm > 0) item.heightCm = heightCm;
     else delete item.heightCm;
@@ -2544,6 +2578,7 @@ async function processEntityImport(type) {
       type === 'characters'
         ? {
             sex: draft.gender,
+            pronouns: draft.pronouns,
             backstory: draft.backstory,
             traits: draft.traits,
             ideals: draft.ideals,
@@ -2647,6 +2682,7 @@ async function processNotebookDraft() {
             id: state.editor.original?.id || form.get('id') || slugify(form.get('name')),
             name: form.get('name'),
             sex: localizedFormValue(form, 'sex', '', campaignLanguages()),
+            pronouns: localizedFormValue(form, 'pronouns', '', campaignLanguages()),
             heightCm: Number(form.get('heightCm')) || undefined,
             publicProfile: {
               backstory: localizedFormValue(form, 'backstory', '', campaignLanguages()),
