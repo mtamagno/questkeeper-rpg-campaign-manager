@@ -1599,6 +1599,32 @@ and [source matrix](COMPENDIUM-SOURCE-MATRIX.md).
 **Revisit when:** An upstream version changes, an official localization is added,
 or a newly reviewed source has a complete redistribution and attribution chain.
 
+### QK-060 — Local compendia remain user-owned and private by default
+
+**Date:** 28 October 2026
+
+**Status:** Active
+
+**Decision:** User-authored compendium packages live in protected data outside
+the replaceable application tree. They are private by default, keep stable
+qualified IDs and enter or leave QuestKeeper only through a validation preview
+with explicit conflict, reference and overwrite decisions.
+
+**Why:** Foundry-like extensibility is useful only if an application update
+cannot erase table material and a convenient export cannot accidentally publish
+content whose license was never reviewed.
+
+**Consequences:** Sharing exports exclude local packages. Recovery backups may
+include them but carry a private-data warning. A local namespace cannot reuse a
+bundled namespace. Manual authoring works without AI; any future extraction is a
+review-only draft and cannot infer redistribution rights.
+
+**Source:** [Issue #37](https://github.com/mtamagno/questkeeper-rpg-campaign-manager/issues/37)
+and [local compendium contract](LOCAL-COMPENDIA.md).
+
+**Revisit when:** Accounts, package signing or remote registries require an
+explicit trust and synchronization model for user-owned packages.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD

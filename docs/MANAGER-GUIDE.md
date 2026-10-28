@@ -16,6 +16,14 @@ and publishing—without asking a GM to hand-edit JSON.
 Open the [interactive Manager demo](https://mtamagno.github.io/questkeeper-rpg-campaign-manager/manager-demo/)
 to explore the workflow safely in a browser.
 
+## Local compendia
+
+Open **Local compendia** from the sidebar to manage personal rules, homebrew and
+table notes without editing JSON folders. New packages are private by default.
+Imports always show counts, conflicts, broken references and overwrite intent
+before writing; exporting private material requires an explicit warning. See
+[Local custom compendia](LOCAL-COMPENDIA.md) for the package and privacy contract.
+
 ## The everyday loop
 
 1. **Choose or create a campaign.** Set its language, premise and visual identity.

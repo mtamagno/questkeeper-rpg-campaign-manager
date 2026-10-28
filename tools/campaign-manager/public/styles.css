@@ -2082,3 +2082,155 @@ code {
     transition: none !important;
   }
 }
+
+.compendium-workspace {
+  display: grid;
+  gap: 1rem;
+}
+
+.compendium-hero,
+.compendium-search-heading,
+.compendium-entry-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.compendium-hero > div:first-child,
+.compendium-search-heading > div:first-child {
+  max-width: 64rem;
+}
+
+.compendium-package-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  gap: 0.9rem;
+  margin-top: 1rem;
+}
+
+.compendium-package-card,
+.compendium-result-list article,
+.compendium-entry-editor {
+  border: 1px solid var(--border);
+  border-radius: 0.85rem;
+  background: color-mix(in srgb, var(--panel) 88%, black);
+}
+
+.compendium-package-card {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.compendium-package-card h3,
+.compendium-result-list h3 {
+  margin: 0.35rem 0;
+  overflow-wrap: anywhere;
+}
+
+.compendium-package-card__version {
+  margin-left: 0.5rem;
+  color: var(--muted);
+}
+
+.compendium-package-card dl,
+.compendium-preview-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.compendium-package-card dl div,
+.compendium-preview-metrics div {
+  min-width: 0;
+  padding: 0.65rem;
+  border-radius: 0.65rem;
+  background: var(--surface);
+}
+
+.compendium-package-card dt,
+.compendium-preview-metrics dt {
+  color: var(--muted);
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.compendium-package-card dd,
+.compendium-preview-metrics dd {
+  margin: 0.25rem 0 0;
+  overflow-wrap: anywhere;
+}
+
+.compendium-package-card footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.compendium-search {
+  width: min(100%, 30rem);
+}
+
+.compendium-result-list,
+.compendium-entry-list {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.compendium-result-list article {
+  padding: 0.9rem 1rem;
+}
+
+.compendium-result-list code {
+  color: var(--accent);
+  overflow-wrap: anywhere;
+}
+
+.compendium-editor-intro {
+  padding: 1rem;
+  border-left: 3px solid var(--accent);
+  background: var(--surface);
+}
+
+.compendium-entry-editor {
+  padding: 1rem;
+}
+
+.compendium-entry-editor__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.compendium-localizations {
+  padding: 0.75rem;
+  border: 1px dashed var(--border);
+  border-radius: 0.65rem;
+}
+
+.compendium-import-review .dialog__error {
+  margin: 1rem 0;
+}
+
+@media (max-width: 760px) {
+  .compendium-hero,
+  .compendium-search-heading,
+  .compendium-entry-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .compendium-search {
+    width: 100%;
+  }
+
+  .compendium-package-card dl,
+  .compendium-preview-metrics {
+    grid-template-columns: 1fr;
+  }
+}
