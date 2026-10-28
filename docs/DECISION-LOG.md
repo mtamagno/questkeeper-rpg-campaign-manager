@@ -1682,3 +1682,29 @@ receive only checked fields after provider/model-specific consent.
 
 **Why:** A long multilingual campaign needs resumable work without silently
 overwriting prose, translating identities or exposing unrelated private canon.
+
+### QK-064 — Personal rule annotations have one private editor
+
+**Date:** 2026-10-28
+
+**Status:** Active
+
+**Decision:** Prepared and favourite state, usage notes and personal rule
+references are edited only in User Settings. The character library displays
+and filters that state without becoming a second settings surface. Preferences
+use stable campaign, character and rule-entry keys in bounded device-local
+storage; personal links are explicitly unverified and restricted to HTTP(S).
+
+**Why:** Table-side annotations should survive level snapshots without changing
+campaign canon, leaking private notes into publication, or scattering competing
+editors across the Companion.
+
+**Consequences:** Campaign JSON, archived sheets and exported public content stay
+unchanged. Other views may consume the state read-only. Any future account sync
+or export needs an explicit privacy and portability decision.
+
+**Source:** [Character rule library](CHARACTER-RULE-LIBRARY.md) and
+[User Settings contract](USER-SETTINGS.md).
+
+**Revisit when:** Account sync, shared table annotations or native apps require
+preferences to leave the current device.

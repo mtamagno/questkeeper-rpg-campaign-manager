@@ -67,15 +67,15 @@ shortcut creation safe for user names and installation paths containing spaces;
 1.1.2 Hearthrest then added explicit clean shutdown of the local setup process.
 Both are corrective release work, not borrowed scope from a later roadmap day.
 
-| Day         | Commit 1                                                                                        | Commit 2                                                                                           |
-| ----------- | ----------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| 08 · 25 Oct | [x] [`feat: redesign profiles around identity bonds and memories`](CHARACTER-STORY-PROFILES.md) | [x] [`feat: add quick facts signature items and favourite moments`](CHARACTER-STORY-HIGHLIGHTS.md) |
-| 09 · 26 Oct | [x] [`feat: add instant return-to-my-character flow`](MY-CHARACTER.md)                          | [x] [`feat: remember private-sheet and journal reading position`](CHARACTER-READING-POSITION.md)   |
-| 10 · 27 Oct | [x] [`feat: build side-by-side level history comparison`](LEVEL-HISTORY-COMPARISON.md)          | [x] [`feat: highlight gained spells abilities gear and stat changes`](LEVEL-HISTORY-COMPARISON.md) |
-| 11 · 28 Oct | [x] [`feat: add searchable spell and ability library per character`](CHARACTER-RULE-LIBRARY.md) | [ ] `feat: add prepared favourites usage notes and external references`                            |
-| 12 · 29 Oct | [ ] `feat: redesign combat resources currency and inventory`                                    | [ ] `feat: add signature equipment and attunement storytelling`                                    |
-| 13 · 30 Oct | [x] `feat: add optional protected character notebooks`                                          | [ ] `feat: connect journal entries to sessions people and places`                                  |
-| 14 · 31 Oct | [ ] `feat: generate complete fantasy character dossiers`                                        | [ ] `feat: add print share and compact game-night PDF variants`                                    |
+| Day         | Commit 1                                                                                        | Commit 2                                                                                             |
+| ----------- | ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| 08 · 25 Oct | [x] [`feat: redesign profiles around identity bonds and memories`](CHARACTER-STORY-PROFILES.md) | [x] [`feat: add quick facts signature items and favourite moments`](CHARACTER-STORY-HIGHLIGHTS.md)   |
+| 09 · 26 Oct | [x] [`feat: add instant return-to-my-character flow`](MY-CHARACTER.md)                          | [x] [`feat: remember private-sheet and journal reading position`](CHARACTER-READING-POSITION.md)     |
+| 10 · 27 Oct | [x] [`feat: build side-by-side level history comparison`](LEVEL-HISTORY-COMPARISON.md)          | [x] [`feat: highlight gained spells abilities gear and stat changes`](LEVEL-HISTORY-COMPARISON.md)   |
+| 11 · 28 Oct | [x] [`feat: add searchable spell and ability library per character`](CHARACTER-RULE-LIBRARY.md) | [x] [`feat: add prepared favourites usage notes and external references`](CHARACTER-RULE-LIBRARY.md) |
+| 12 · 29 Oct | [ ] `feat: redesign combat resources currency and inventory`                                    | [ ] `feat: add signature equipment and attunement storytelling`                                      |
+| 13 · 30 Oct | [x] `feat: add optional protected character notebooks`                                          | [ ] `feat: connect journal entries to sessions people and places`                                    |
+| 14 · 31 Oct | [ ] `feat: generate complete fantasy character dossiers`                                        | [ ] `feat: add print share and compact game-night PDF variants`                                      |
 
 Days 09-12 are also the integrated stabilization window for
 [QuestKeeper 1.1.5 Storyforge](releases/v1.1.5-plan.md). The release plan maps

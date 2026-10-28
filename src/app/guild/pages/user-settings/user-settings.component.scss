@@ -243,6 +243,126 @@
   text-align: center;
 }
 
+.rule-preferences {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--qk-color-border-subtle);
+}
+
+.rule-preferences__heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+
+  h3,
+  p {
+    margin: 0.25rem 0;
+  }
+
+  > a {
+    min-height: 2.75rem;
+    color: var(--qk-color-accent-text);
+    font-weight: 700;
+  }
+}
+
+.rule-preferences__list {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.rule-preferences__entry {
+  padding: 0.75rem;
+  border: 1px solid var(--qk-color-border-subtle);
+  border-radius: 0.75rem;
+  background: var(--qk-color-canvas-deep);
+
+  summary {
+    display: flex;
+    justify-content: space-between;
+    min-height: 2.75rem;
+    cursor: pointer;
+  }
+
+  summary span:first-child,
+  label {
+    display: grid;
+    gap: 0.3rem;
+  }
+
+  small,
+  label span {
+    color: var(--qk-color-text-muted);
+  }
+
+  textarea,
+  input {
+    width: 100%;
+    min-height: 2.75rem;
+    padding: 0.65rem;
+    color: var(--qk-color-text);
+    font: inherit;
+    background: var(--qk-color-canvas);
+    border: 1px solid var(--qk-color-border);
+    border-radius: 0.5rem;
+  }
+
+  textarea {
+    min-height: 6rem;
+    resize: vertical;
+  }
+}
+
+.rule-preferences__toggles,
+.rule-preferences__reference-editor,
+.rule-preferences__saved-reference {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin: 0.75rem 0;
+}
+
+.rule-preferences button {
+  min-height: 2.75rem;
+  padding: 0.55rem 0.8rem;
+  color: var(--qk-color-text);
+  font: inherit;
+  font-weight: 700;
+  background: var(--qk-color-surface);
+  border: 1px solid var(--qk-color-border);
+  border-radius: 0.55rem;
+  cursor: pointer;
+}
+
+.rule-preferences button[aria-pressed='true'] {
+  color: var(--qk-color-on-accent);
+  background: var(--qk-color-accent);
+}
+
+.rule-preferences__reference-editor label {
+  flex: 1 1 14rem;
+}
+
+.rule-preferences__saved-reference {
+  align-items: center;
+  padding: 0.65rem;
+  background: var(--qk-color-accent-soft);
+
+  span {
+    width: 100%;
+    color: var(--qk-color-text-muted);
+    font-size: 0.82rem;
+  }
+
+  a {
+    flex: 1 1 auto;
+    color: var(--qk-color-accent-text);
+    overflow-wrap: anywhere;
+  }
+}
+
 @media (max-width: 38rem) {
   .settings-card__control-row,
   .settings-card__selection {
@@ -252,5 +372,9 @@
 
   .settings-card__selection a {
     width: 100%;
+  }
+
+  .rule-preferences__heading {
+    flex-direction: column;
   }
 }

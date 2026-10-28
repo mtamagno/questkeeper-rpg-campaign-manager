@@ -6,11 +6,12 @@ Settings page is available globally at `/settings` and in campaign context at
 
 ## Scope matrix
 
-| Preference   | Scope        | Current storage                               | Public data only |
-| ------------ | ------------ | --------------------------------------------- | ---------------- |
-| Audio mute   | Device-wide  | Existing audio preference payload             | Yes              |
-| Audio volume | Device-wide  | Existing audio preference payload             | Yes              |
-| My Character | Per campaign | `my-character:v1`, campaign ID → character ID | Yes              |
+| Preference           | Scope                  | Current storage                               | Privacy                                         |
+| -------------------- | ---------------------- | --------------------------------------------- | ----------------------------------------------- |
+| Audio mute           | Device-wide            | Existing audio preference payload             | Public preference                               |
+| Audio volume         | Device-wide            | Existing audio preference payload             | Public preference                               |
+| My Character         | Per campaign           | `my-character:v1`, campaign ID → character ID | Public identifiers only                         |
+| Character rule state | Per campaign/character | `character-rule-preferences:v1`               | Private device notes; never published or synced |
 
 Global settings behave the same in every campaign on the current browser.
 Campaign settings are isolated by stable campaign ID. Opening global Settings
@@ -43,7 +44,9 @@ Before implementing a new field, record:
 
 Persist the smallest safe value. Resolve public records at read time instead
 of copying profiles, journals, character sheets or protected prose into
-preference storage. Never persist passwords, API keys or private notes here.
+preference storage. Never persist passwords, API keys or private campaign
+content here. Personal rule notes are explicit, bounded device-local content;
+they must never be published, exported or synced implicitly.
 
 ## Compatibility
 

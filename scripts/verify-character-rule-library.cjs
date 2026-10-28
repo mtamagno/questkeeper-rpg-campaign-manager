@@ -18,20 +18,37 @@ const sheetTemplate = read(
 const navigation = read(
   'src/app/adventurers/components/character-sheet-navigation/character-sheet-navigation.component.html',
 );
+const preferences = read('src/app/guild/services/characterRulePreferences.service.ts');
 
 assert.match(component, /readonly entries/);
 assert.match(component, /readonly filteredEntries/);
 assert.match(component, /readonly query/);
 assert.match(component, /readonly filter/);
 assert.match(component, /spellCards/);
+assert.match(component, /favouriteCount/);
+assert.match(component, /preparedCount/);
+assert.match(component, /CharacterRulePreferencesService/);
+assert.match(component, /characterRuleEntryId/);
 assert.match(template, /type="search"/);
 assert.match(template, /setFilter\('feature'\)/);
 assert.match(template, /setFilter\('spell'\)/);
 assert.match(template, /Local compendium/);
 assert.match(template, /Entry recorded on the character sheet/);
 assert.match(template, /aria-live="polite"/);
+assert.match(template, /not verified by QuestKeeper/);
+assert.match(template, /rel="noreferrer"/);
+assert.match(template, /Manage in User settings/);
+assert.match(template, /rule-library-settings/);
 assert.match(styles, /&__tools/);
 assert.match(styles, /min-height: 44px/);
+assert.match(styles, /&__annotations/);
+assert.match(styles, /&__settings-link/);
+assert.match(preferences, /character-rule-preferences:v1/);
+assert.match(preferences, /\['https:', 'http:'\]/);
+assert.match(preferences, /MAX_NOTE_LENGTH = 2000/);
+assert.match(preferences, /MAX_ENTRIES = 500/);
+assert.match(preferences, /encodeURIComponent/);
+assert.match(preferences, /campaignId.*characterId.*entryId/s);
 assert.match(navigation, /Library/);
 assert.match(sheetTemplate, /app-character-rule-library/);
 

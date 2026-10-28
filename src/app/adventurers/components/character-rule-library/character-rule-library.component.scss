@@ -265,6 +265,15 @@
       min-height: 160px;
       border-top-color: rgba($color-gold, 0.68);
     }
+    &--prepared {
+      border-left-color: rgba($color-info-light, 0.78);
+      box-shadow:
+        inset 3px 0 rgba($color-info, 0.35),
+        $shadow-sm;
+    }
+    &--favourite {
+      border-right-color: rgba($color-gold-light, 0.78);
+    }
     h5 {
       margin: $spacing-xs 0 $spacing-sm;
       color: $color-parchment-light;
@@ -369,6 +378,57 @@
     text-transform: uppercase;
     border-top: $border-width-thin solid $color-border-subtle;
   }
+
+  &__personal-state {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-xs;
+    margin-top: $spacing-md;
+    padding-top: $spacing-sm;
+    border-top: $border-width-thin solid $color-border-subtle;
+  }
+  &__personal-state span {
+    padding: 2px $spacing-xs;
+    color: $color-gold-light;
+    font-size: $font-size-xs;
+    background: rgba($color-gold, 0.09);
+    border: $border-width-thin solid rgba($color-gold, 0.3);
+    border-radius: $border-radius-pill;
+  }
+  &__annotations {
+    padding: $spacing-sm;
+    margin-top: $spacing-sm;
+    color: $color-text-secondary;
+    background: rgba($color-bg-deep, 0.46);
+    border: $border-width-thin solid $color-border-subtle;
+    border-radius: $border-radius-sm;
+  }
+  &__annotations p {
+    margin: 0 0 $spacing-xs;
+    white-space: pre-wrap;
+  }
+  &__personal-reference {
+    display: grid;
+    gap: $spacing-xs;
+    margin-top: $spacing-sm;
+  }
+  &__personal-reference span {
+    grid-column: 1 / -1;
+    color: $color-text-muted;
+    font-size: $font-size-xs;
+  }
+  &__personal-reference a {
+    color: $color-gold;
+    overflow-wrap: anywhere;
+  }
+  &__settings-link {
+    min-height: 44px;
+    margin-top: $spacing-sm;
+    padding-top: $spacing-sm;
+    color: $color-gold;
+    font-weight: 700;
+    border-top: $border-width-thin solid $color-border-subtle;
+  }
   &__empty {
     position: relative;
     display: grid;
@@ -434,7 +494,7 @@
     }
     &__filters {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
     &__filters button {
       justify-content: center;

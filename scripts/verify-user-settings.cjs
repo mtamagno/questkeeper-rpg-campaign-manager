@@ -19,12 +19,18 @@ assert.match(page, /id="campaign-settings"/);
 assert.match(page, /id="sound-muted"/);
 assert.match(page, /id="sound-volume"/);
 assert.match(page, /id="my-character"/);
+assert.match(page, /id="rule-library-settings"/);
+assert.match(page, /saveRuleReference/);
+assert.match(page, /unverified/);
 assert.match(code, /UserPreferencesService/);
 assert.match(code, /MyCharacterService/);
 assert.match(code, /selectCharacter/);
+assert.match(code, /CharacterRulePreferencesService/);
+assert.match(code, /characterRuleEntryId/);
 assert.doesNotMatch(party, /toggleMyCharacter/);
 assert.match(commands, /global-settings/);
 assert.match(styles, /@media \(max-width: 38rem\)/);
 assert.match(styles, /min-height: 2\.75rem/);
+assert.match(styles, /rule-preferences__reference-editor/);
 
 console.log('Central user settings contract verified: global, campaign-scoped and responsive.');

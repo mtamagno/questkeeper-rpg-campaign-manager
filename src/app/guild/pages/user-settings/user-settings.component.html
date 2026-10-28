@@ -19,6 +19,9 @@
   >
     <a href="#global-settings">{{ isItalian() ? 'Globali' : 'Global' }}</a>
     <a href="#campaign-settings">{{ isItalian() ? 'Campagna' : 'Campaign' }}</a>
+    @if (myCharacterId()) {
+      <a href="#rule-library-settings">{{ isItalian() ? 'Libreria' : 'Library' }}</a>
+    }
   </nav>
 
   <section id="global-settings" class="settings-card" aria-labelledby="global-settings-title">
@@ -124,8 +127,8 @@
         <p class="settings-card__help">
           {{
             isItalian()
-              ? 'Vengono salvati soltanto gli identificativi pubblici della campagna e del personaggio.'
-              : 'Only the public campaign and character identifiers are saved.'
+              ? 'L’associazione salva soltanto gli identificativi pubblici. Le note personali qui sotto restano private su questo dispositivo.'
+              : 'The assignment saves only public identifiers. Personal notes below stay private on this device.'
           }}
         </p>
       </div>
@@ -141,6 +144,138 @@
             {{ isItalian() ? 'Apri profilo' : 'Open profile' }}
           </a>
         </div>
+        <section
+          id="rule-library-settings"
+          class="rule-preferences"
+          aria-labelledby="rule-preferences-title"
+        >
+          <div class="rule-preferences__heading">
+            <div>
+              <p class="settings-card__scope">
+                {{ isItalian() ? 'Per personaggio' : 'Per character' }}
+              </p>
+              <h3 id="rule-preferences-title">
+                {{ isItalian() ? 'Libreria di gioco' : 'Game library' }}
+              </h3>
+              <p>
+                {{
+                  isItalian()
+                    ? 'Gestisci preparazione, preferiti, note e riferimenti di ' +
+                      character.name +
+                      '. Le schede e le regole della campagna non vengono modificate.'
+                    : 'Manage preparation, favourites, notes and references for ' +
+                      character.name +
+                      '. Campaign sheets and rules are never changed.'
+                }}
+              </p>
+            </div>
+            <a
+              [routerLink]="myCharacterRoute()"
+              [fragment]="'character-sheet-spells-' + character.id"
+              >{{ isItalian() ? 'Apri libreria' : 'Open library' }} →</a
+            >
+          </div>
+          <p class="sr-only" role="status" aria-live="polite">{{ ruleReferenceMessage() }}</p>
+          <div class="rule-preferences__list">
+            @for (entry of characterRules(); track entry.id) {
+              <details class="rule-preferences__entry">
+                <summary>
+                  <span
+                    ><small>{{
+                      entry.kind === 'spell'
+                        ? isItalian()
+                          ? 'Incantesimo'
+                          : 'Spell'
+                        : isItalian()
+                          ? 'Capacità'
+                          : 'Ability'
+                    }}</small
+                    ><strong>{{ entry.name }}</strong></span
+                  ><span aria-hidden="true">⌄</span>
+                </summary>
+                <div class="rule-preferences__toggles">
+                  @if (entry.kind === 'spell') {
+                    <button
+                      type="button"
+                      [attr.aria-pressed]="entry.preference.prepared === true"
+                      (click)="toggleRule(entry.id, 'prepared')"
+                    >
+                      ◆ {{ isItalian() ? 'Preparato' : 'Prepared' }}
+                    </button>
+                  }
+                  <button
+                    type="button"
+                    [attr.aria-pressed]="entry.preference.favourite === true"
+                    (click)="toggleRule(entry.id, 'favourite')"
+                  >
+                    ★ {{ isItalian() ? 'Preferito' : 'Favourite' }}
+                  </button>
+                </div>
+                <label
+                  ><span>{{ isItalian() ? 'Nota d’uso' : 'Usage note' }}</span
+                  ><textarea
+                    maxlength="2000"
+                    [value]="entry.preference.note ?? ''"
+                    (change)="saveRuleNote(entry.id, $event)"
+                    [placeholder]="
+                      isItalian()
+                        ? 'Quando usarlo, combinazioni, promemoria…'
+                        : 'When to use it, combinations, reminders…'
+                    "
+                  ></textarea>
+                </label>
+                @if (entry.preference.reference; as reference) {
+                  <div class="rule-preferences__saved-reference">
+                    <span>{{
+                      isItalian()
+                        ? 'Riferimento personale · non verificato'
+                        : 'Personal reference · unverified'
+                    }}</span
+                    ><a [href]="reference.url" target="_blank" rel="noreferrer"
+                      >{{ reference.label }} ↗</a
+                    ><button type="button" (click)="clearRuleReference(entry.id)">
+                      {{ isItalian() ? 'Rimuovi' : 'Remove' }}
+                    </button>
+                  </div>
+                }
+                <div class="rule-preferences__reference-editor">
+                  <label
+                    ><span>{{ isItalian() ? 'Etichetta riferimento' : 'Reference label' }}</span
+                    ><input
+                      #ruleReferenceLabel
+                      maxlength="120"
+                      [value]="entry.preference.reference?.label ?? ''"
+                  /></label>
+                  <label
+                    ><span>URL</span
+                    ><input
+                      #ruleReferenceUrl
+                      type="url"
+                      maxlength="2048"
+                      [value]="entry.preference.reference?.url ?? ''"
+                      placeholder="https://…"
+                  /></label>
+                  <button
+                    type="button"
+                    (click)="
+                      saveRuleReference(entry.id, ruleReferenceLabel.value, ruleReferenceUrl.value)
+                    "
+                  >
+                    {{ isItalian() ? 'Salva' : 'Save' }}
+                  </button>
+                </div>
+              </details>
+            } @empty {
+              <p>
+                {{
+                  isItalian()
+                    ? 'La scheda non contiene ancora capacità o incantesimi.'
+                    : 'The sheet has no abilities or spells yet.'
+                }}
+              </p>
+            }
+          </div>
+        </section>
       }
     } @else {
       <div class="settings-card__campaign-list">
