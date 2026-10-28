@@ -1889,6 +1889,31 @@ code {
   color: var(--warning);
 }
 
+.translation-batch {
+  display: grid;
+  gap: 1rem;
+}
+
+.translation-batch__items {
+  display: grid;
+  gap: 0.75rem;
+  max-height: 58vh;
+  overflow: auto;
+  padding-right: 0.35rem;
+}
+
+.translation-field {
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface-raised) 92%, transparent);
+}
+
+.translation-field p {
+  color: var(--text-muted);
+  white-space: pre-wrap;
+}
+
 .toast-region {
   position: fixed;
   z-index: 30;

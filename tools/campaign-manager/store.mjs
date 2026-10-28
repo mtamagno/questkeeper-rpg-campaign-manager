@@ -406,6 +406,19 @@ export async function saveEntity(projectRoot, campaignId, type, entity, previous
   });
 }
 
+export async function saveRelationshipSet(projectRoot, campaignId, type, entries) {
+  if (!['partyRelationships', 'npcRelationships'].includes(type)) {
+    throw new Error('Unsupported relationship collection.');
+  }
+  if (!Array.isArray(entries)) throw new Error('Relationship collection must be a list.');
+  const fileName =
+    type === 'partyRelationships' ? 'party-relationships.json' : 'npc-relationships.json';
+  return withCampaignWrite(campaignId, async () => {
+    await writeJson(join(dataRoot(projectRoot, campaignId), fileName), entries);
+    return entries;
+  });
+}
+
 function localizedIdentityLabel(value) {
   if (typeof value === 'string') return value;
   return Object.values(value ?? {}).find((entry) => String(entry || '').trim()) ?? '';

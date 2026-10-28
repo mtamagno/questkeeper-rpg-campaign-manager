@@ -35,7 +35,10 @@ test('entity IDs stay optional unless advanced authoring is enabled', async () =
 });
 
 test('translation workspace requires review, consent and overwrite confirmation', async () => {
-  const app = await readFile(join(root, 'public', 'app.js'), 'utf8');
+  const [app, server] = await Promise.all([
+    readFile(join(root, 'public', 'app.js'), 'utf8'),
+    readFile(join(root, 'server.mjs'), 'utf8'),
+  ]);
   for (const contract of [
     'Translation workspace',
     'translationRemoteConsent',
@@ -43,7 +46,14 @@ test('translation workspace requires review, consent and overwrite confirmation'
     'data-apply-translation',
     'The target language already contains text',
     'sourceSnapshot',
+    'data-translation-scope',
+    'data-translation-selected',
+    'data-translation-overwrite',
+    'Recoverable translation draft saved',
   ]) {
     assert.match(app, new RegExp(contract));
   }
+  assert.match(server, /No translation batch was published/);
+  assert.match(server, /would receive exactly/);
+  assert.match(server, /status: 'applied'/);
 });

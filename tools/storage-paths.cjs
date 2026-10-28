@@ -138,6 +138,7 @@ function resolveStoragePaths(projectRoot, options = {}) {
     configRoot: roots.configRoot,
     aiConfigFile: path.join(roots.configRoot, 'ai-config.json'),
     publishingConfigFile: path.join(roots.configRoot, 'publishing.json'),
+    translationDraftsRoot: path.join(roots.stateRoot, 'translation-drafts'),
     scribeEnvFile:
       mode === 'legacy'
         ? path.join(applicationRoot, 'discord-transcriber', '.env')
@@ -464,6 +465,7 @@ function publicStorageSummary(paths) {
     transcripts: paths.transcriptsRoot,
     backups: paths.backupsRoot,
     logs: paths.logsRoot,
+    translationDrafts: paths.translationDraftsRoot,
     cache: paths.cacheRoot,
   };
 }
