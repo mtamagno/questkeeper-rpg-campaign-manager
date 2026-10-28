@@ -14,6 +14,7 @@ import {
   getState,
   importCampaign,
   saveEntity,
+  saveRelationshipSet,
   saveImage,
   updateCampaign,
 } from './store.mjs';
@@ -35,6 +36,7 @@ import {
   generateImagePromptsWithText,
   generateNotebookDraftWithText,
   translateCampaignDraft,
+  translateEntityFields,
   importEntityWithAi,
   processNotesWithText,
   testAiProvider,
@@ -63,6 +65,14 @@ import {
   saveLocalCompendiumPackage,
 } from './compendium-store.mjs';
 import storagePaths from '../storage-paths.cjs';
+import {
+  applyTranslationDraft,
+  buildTranslationPlan,
+  mergeAppliedRecords,
+  readTranslationWorkspace,
+  TRANSLATABLE_ENTITY_TYPES,
+  writeTranslationWorkspace,
+} from './entity-translation.mjs';
 
 const {
   createCampaignBackup,
@@ -296,6 +306,43 @@ function taskEngine(input, config, role) {
       throw new Error(`The selected ${role} model is not in the saved AI model catalog.`);
   }
   return assertEngineCapability(config, { provider, model }, role);
+}
+
+async function persistTranslatedEntities(campaignId, before, after, entityTypes) {
+  const ordinary = {
+    characters: 'characters',
+    npcs: 'npcs',
+    sessions: 'sessions',
+    maps: 'maps',
+  };
+  const relationships = {
+    'party-relationships': 'partyRelationships',
+    'npc-relationships': 'npcRelationships',
+  };
+  const touched = [...new Set(entityTypes)];
+  const write = async (snapshot) => {
+    for (const type of touched) {
+      const property = ordinary[type];
+      if (property) {
+        for (const entity of snapshot[property] ?? []) {
+          await saveEntity(PROJECT_ROOT, campaignId, type, entity, entity.id);
+        }
+      } else if (relationships[type]) {
+        await saveRelationshipSet(
+          PROJECT_ROOT,
+          campaignId,
+          relationships[type],
+          snapshot[relationships[type]] ?? [],
+        );
+      }
+    }
+  };
+  try {
+    await write(after);
+  } catch (error) {
+    await write(before).catch(() => undefined);
+    throw new Error(`No translation batch was published: ${error.message}`);
+  }
 }
 
 async function downloadImageModel(input) {
@@ -888,6 +935,96 @@ async function routeApi(request, response, url) {
 
   const campaignId = parts[2];
   if (
+    request.method === 'GET' &&
+    parts[3] === 'translations' &&
+    parts[4] === 'draft' &&
+    parts.length === 5
+  ) {
+    sendJson(
+      response,
+      200,
+      await readTranslationWorkspace(STORAGE_PATHS.translationDraftsRoot, campaignId),
+    );
+    return;
+  }
+  if (
+    request.method === 'POST' &&
+    parts[3] === 'translations' &&
+    parts[4] === 'plan' &&
+    parts.length === 5
+  ) {
+    const input = await readBody(request);
+    const campaign = await getCampaign(PROJECT_ROOT, campaignId);
+    const workspace = await readTranslationWorkspace(
+      STORAGE_PATHS.translationDraftsRoot,
+      campaignId,
+    );
+    const plan = buildTranslationPlan({
+      campaign,
+      sourceLanguage: input.sourceLanguage,
+      targetLanguage: input.targetLanguage,
+      entityTypes: input.entityTypes?.length ? input.entityTypes : TRANSLATABLE_ENTITY_TYPES,
+      entityIds: input.entityIds,
+      fieldPaths: input.fieldPaths,
+      applied: workspace.applied,
+    });
+    const draft = { ...plan, status: 'planned', createdAt: new Date().toISOString() };
+    const next = { ...workspace, draft };
+    await writeTranslationWorkspace(STORAGE_PATHS.translationDraftsRoot, campaignId, next);
+    sendJson(response, 200, next);
+    return;
+  }
+  if (
+    request.method === 'PUT' &&
+    parts[3] === 'translations' &&
+    parts[4] === 'draft' &&
+    parts.length === 5
+  ) {
+    const input = await readBody(request);
+    const workspace = await readTranslationWorkspace(
+      STORAGE_PATHS.translationDraftsRoot,
+      campaignId,
+    );
+    const draft = input.draft;
+    if (!draft || !['planned', 'draft', 'reviewed'].includes(draft.status)) {
+      throw new Error('Translation draft has an invalid review status.');
+    }
+    const next = { ...workspace, draft, updatedAt: new Date().toISOString() };
+    await writeTranslationWorkspace(STORAGE_PATHS.translationDraftsRoot, campaignId, next);
+    sendJson(response, 200, next);
+    return;
+  }
+  if (
+    request.method === 'POST' &&
+    parts[3] === 'translations' &&
+    parts[4] === 'apply' &&
+    parts.length === 5
+  ) {
+    const input = await readBody(request);
+    const workspace = await readTranslationWorkspace(
+      STORAGE_PATHS.translationDraftsRoot,
+      campaignId,
+    );
+    const before = await getCampaign(PROJECT_ROOT, campaignId);
+    const result = applyTranslationDraft(before, workspace.draft, {
+      overwrite: input.overwrite === true,
+    });
+    const entityTypes = result.report.applied.map((item) => item.key.split(':')[0]);
+    await persistTranslatedEntities(campaignId, before, result.campaign, entityTypes);
+    const next = {
+      ...workspace,
+      applied: mergeAppliedRecords(workspace.applied, result.report),
+      draft: { ...workspace.draft, status: 'applied', completedAt: new Date().toISOString() },
+      lastReport: result.report,
+    };
+    await writeTranslationWorkspace(STORAGE_PATHS.translationDraftsRoot, campaignId, next);
+    sendJson(response, 200, {
+      workspace: next,
+      campaign: await getCampaign(PROJECT_ROOT, campaignId),
+    });
+    return;
+  }
+  if (
     request.method === 'POST' &&
     parts[3] === 'ai' &&
     parts[4] === 'import-entity' &&
@@ -911,6 +1048,53 @@ async function routeApi(request, response, url) {
     sendJson(response, 200, {
       ...result,
       notice: 'Draft only. Review every imported field before saving.',
+    });
+    return;
+  }
+  if (
+    request.method === 'POST' &&
+    parts[3] === 'ai' &&
+    parts[4] === 'translate-entities' &&
+    parts.length === 5
+  ) {
+    const input = await readBody(request);
+    const config = await readAiConfig(PROJECT_ROOT);
+    const engine = taskEngine(input.engine, config, 'prose');
+    const workspace = await readTranslationWorkspace(
+      STORAGE_PATHS.translationDraftsRoot,
+      campaignId,
+    );
+    const draft = input.draft ?? workspace.draft;
+    if (!draft?.items?.length) throw new Error('Create a translation plan first.');
+    const selected = draft.items.filter((item) => item.selected);
+    if (isRemoteProvider(engine.provider) && input.remoteConsent !== true) {
+      throw new Error(
+        `Consent required: ${engine.provider}/${engine.model} would receive exactly ${selected.map((item) => item.key).join(', ')}.`,
+      );
+    }
+    const result = await translateEntityFields({
+      config,
+      fields: selected,
+      sourceLanguage: draft.sourceLanguage,
+      targetLanguage: draft.targetLanguage,
+      selection: engine,
+    });
+    const translations = new Map(result.translations.map((item) => [item.key, item.value]));
+    const translated = {
+      ...draft,
+      status: 'draft',
+      items: draft.items.map((item) => ({
+        ...item,
+        draft: translations.get(item.key) ?? item.draft ?? '',
+      })),
+      engine: result.engine,
+      updatedAt: new Date().toISOString(),
+    };
+    const next = { ...workspace, draft: translated };
+    await writeTranslationWorkspace(STORAGE_PATHS.translationDraftsRoot, campaignId, next);
+    sendJson(response, 200, {
+      ...next,
+      notice: 'Draft only. Review the selected fields before applying the batch.',
     });
     return;
   }

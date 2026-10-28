@@ -38,6 +38,7 @@ const state = {
   compendia: { packages: [], entries: [], conflicts: [] },
   compendiumImport: null,
   compendiumSearch: '',
+  entityTranslations: null,
   aiConfigureExpanded: false,
   firstRunEvaluated: false,
   advancedMode: localStorage.getItem('questkeeper-manager-advanced') === 'true',
@@ -238,6 +239,7 @@ async function selectCampaign(id) {
   state.compendiumMode = false;
   state.libraryMode = false;
   state.campaign = await api(`/api/campaigns/${encodeURIComponent(id)}`);
+  state.entityTranslations = null;
   state.tab = 'overview';
   setMenuOpen(false);
   renderSidebar();
@@ -711,6 +713,7 @@ function renderCampaign() {
     ['npcs', `NPCs · ${data.npcs.length}`],
     ['sessions', `Sessions · ${data.sessions.length}`],
     ['maps', `Locations · ${data.maps.length}`],
+    ['translations', 'Translations'],
   ];
   content.innerHTML = `
     <section class="campaign-hero">
@@ -733,9 +736,126 @@ function renderTab() {
       return renderEntities('sessions', 'Session chronicles', 'Add session');
     case 'maps':
       return renderEntities('maps', 'Locations and maps', 'Add location');
+    case 'translations':
+      return renderEntityTranslations();
     default:
       return renderOverview();
   }
+}
+
+function translationEntityOptions() {
+  const groups = [
+    ['characters', state.campaign?.characters ?? []],
+    ['npcs', state.campaign?.npcs ?? []],
+    ['sessions', state.campaign?.sessions ?? []],
+    ['maps', state.campaign?.maps ?? []],
+  ];
+  return groups.flatMap(([type, items]) =>
+    items.map((item) => ({ type, id: item.id, label: `${type} · ${entityName(type, item)}` })),
+  );
+}
+
+function renderEntityTranslations() {
+  const languages = campaignLanguages();
+  if (languages.length < 2) {
+    return '<section class="project-panel"><h2>Entity translations</h2><p>Add at least two campaign languages before opening a translation batch.</p></section>';
+  }
+  const workspace = state.entityTranslations;
+  const draft = workspace?.draft;
+  const source =
+    draft?.sourceLanguage ?? state.campaign.manifestEntry.defaultLanguage ?? languages[0];
+  const target = draft?.targetLanguage ?? languages.find((language) => language !== source);
+  const entities = translationEntityOptions();
+  const counts = (draft?.items ?? []).reduce(
+    (result, item) => ({ ...result, [item.status]: (result[item.status] ?? 0) + 1 }),
+    {},
+  );
+  return `<section class="section-heading"><div><span class="eyebrow">Reviewed localization</span><h2>Entity translations</h2><p>Scan one field, one entity, one type or a selected batch. Missing and stale fields are selected by default.</p></div></section>
+    <section class="project-panel translation-batch" data-entity-translations>
+      <div class="form-grid">
+        <label class="field"><span>Source language</span><select data-translation-source>${languages.map((language) => `<option value="${escapeHtml(language)}" ${language === source ? 'selected' : ''}>${escapeHtml(languageName(language))}</option>`).join('')}</select></label>
+        <label class="field"><span>Target language</span><select data-translation-target>${languages.map((language) => `<option value="${escapeHtml(language)}" ${language === target ? 'selected' : ''}>${escapeHtml(languageName(language))}</option>`).join('')}</select></label>
+        <label class="field"><span>Scope</span><select data-translation-scope><option value="all">All entity types</option><option value="characters">Characters</option><option value="npcs">NPCs</option><option value="sessions">Sessions</option><option value="maps">Locations</option><option value="party-relationships">Party relationships</option><option value="npc-relationships">NPC relationships</option><option value="entity">One entity</option></select></label>
+        <label class="field"><span>Entity (optional)</span><select data-translation-entity><option value="">Choose after selecting “One entity”</option>${entities.map((item) => `<option value="${escapeHtml(`${item.type}:${item.id}`)}">${escapeHtml(item.label)}</option>`).join('')}</select></label>
+      </div>
+      <div class="action-row"><button class="primary-button" data-translation-action="plan">Scan translatable fields</button></div>
+      ${draft ? `<div class="translation-statuses"><span class="translation-status translation-status--missing">Missing ${counts.missing ?? 0}</span><span class="translation-status translation-status--stale">Stale ${counts.stale ?? 0}</span><span class="translation-status translation-status--current">Current ${counts.current ?? 0}</span><span class="tag">Draft: ${escapeHtml(draft.status)}</span></div>` : '<p>Your recoverable draft will appear here.</p>'}
+      ${
+        draft?.items?.length
+          ? `<div class="translation-batch__items">${draft.items.map((item, index) => `<article class="translation-field"><label class="consent-check"><input type="checkbox" data-translation-selected="${index}" ${item.selected ? 'checked' : ''} /> <strong>${escapeHtml(item.entityType)} / ${escapeHtml(item.entityId)}</strong> · ${escapeHtml(item.path)} <span class="tag">${escapeHtml(item.status)}</span></label><p><strong>${escapeHtml(source)}:</strong> ${escapeHtml(item.source)}</p><label class="field"><span>${escapeHtml(target)} draft</span><textarea data-translation-value="${index}">${escapeHtml(item.draft ?? item.target ?? '')}</textarea></label></article>`).join('')}</div>
+        <div class="ai-engine-grid">${engineSelect('entityTranslationEngine', 'Translation model', 'prose', 'Local engines stay on this computer; remote engines receive only checked fields.')}</div>
+        <label class="consent-check"><input type="checkbox" data-translation-consent /> I consent to sending the checked entity fields to the explicitly selected remote provider/model. Local models do not require cloud consent.</label>
+        <label class="consent-check"><input type="checkbox" data-translation-overwrite /> Allow reviewed drafts to replace non-empty target text.</label>
+        <div class="action-row"><button class="secondary-button" data-translation-action="ai">Create AI drafts</button><button class="secondary-button" data-translation-action="review">Save as reviewed</button><button class="primary-button" data-translation-action="apply" ${draft.status === 'reviewed' ? '' : 'disabled'}>Apply reviewed batch</button></div>`
+          : ''
+      }
+      ${workspace?.lastReport ? `<p class="notice">Completed: ${workspace.lastReport.applied.length} fields applied; ${workspace.lastReport.skipped.length} skipped.</p>` : ''}
+    </section>`;
+}
+
+function collectEntityTranslationDraft(status) {
+  const draft = structuredClone(state.entityTranslations?.draft);
+  if (!draft) return null;
+  for (const [index, item] of draft.items.entries()) {
+    item.selected =
+      content.querySelector(`[data-translation-selected="${index}"]`)?.checked === true;
+    item.draft =
+      content.querySelector(`[data-translation-value="${index}"]`)?.value ?? item.draft ?? '';
+  }
+  draft.status = status ?? draft.status;
+  return draft;
+}
+
+async function runEntityTranslationAction(action) {
+  const base = `/api/campaigns/${encodeURIComponent(state.selectedId)}`;
+  if (action === 'plan') {
+    const scope = content.querySelector('[data-translation-scope]').value;
+    const entityValue = content.querySelector('[data-translation-entity]').value;
+    if (scope === 'entity' && !entityValue) throw new Error('Choose the entity to scan.');
+    const [entityType, entityId] = entityValue.split(':');
+    const entityTypes = scope === 'all' || scope === 'entity' ? undefined : [scope];
+    state.entityTranslations = await api(`${base}/translations/plan`, {
+      method: 'POST',
+      body: JSON.stringify({
+        sourceLanguage: content.querySelector('[data-translation-source]').value,
+        targetLanguage: content.querySelector('[data-translation-target]').value,
+        entityTypes: scope === 'entity' && entityType ? [entityType] : entityTypes,
+        entityIds: scope === 'entity' && entityId ? [entityId] : [],
+      }),
+    });
+    renderCampaign();
+    return;
+  }
+  const reviewed = action === 'review' || action === 'apply';
+  const draft = collectEntityTranslationDraft(reviewed ? 'reviewed' : 'draft');
+  state.entityTranslations = await api(`${base}/translations/draft`, {
+    method: 'PUT',
+    body: JSON.stringify({ draft }),
+  });
+  if (action === 'ai') {
+    const engineValue = content.querySelector('[name="entityTranslationEngine"]')?.value;
+    state.entityTranslations = await api(`${base}/ai/translate-entities`, {
+      method: 'POST',
+      body: JSON.stringify({
+        draft,
+        engine: parseEngineValue(engineValue),
+        remoteConsent: content.querySelector('[data-translation-consent]')?.checked === true,
+      }),
+    });
+  } else if (action === 'apply') {
+    const result = await api(`${base}/translations/apply`, {
+      method: 'POST',
+      body: JSON.stringify({
+        overwrite: content.querySelector('[data-translation-overwrite]')?.checked === true,
+      }),
+    });
+    state.entityTranslations = result.workspace;
+    state.campaign = result.campaign;
+  }
+  renderCampaign();
+  toast(
+    action === 'apply' ? 'Translation batch completed.' : 'Recoverable translation draft saved.',
+  );
 }
 
 function renderOverview() {
@@ -3264,7 +3384,21 @@ content.addEventListener('click', async (event) => {
   const tab = event.target.closest('[data-tab]');
   if (tab) {
     state.tab = tab.dataset.tab;
+    if (state.tab === 'translations' && !state.entityTranslations) {
+      state.entityTranslations = await api(
+        `/api/campaigns/${encodeURIComponent(state.selectedId)}/translations/draft`,
+      );
+    }
     renderCampaign();
+    return;
+  }
+  const translationAction = event.target.closest('[data-translation-action]');
+  if (translationAction) {
+    try {
+      await runEntityTranslationAction(translationAction.dataset.translationAction);
+    } catch (error) {
+      toast(error.message, true);
+    }
     return;
   }
   const action = event.target.closest('[data-action]');

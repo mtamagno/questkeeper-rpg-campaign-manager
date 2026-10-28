@@ -1,5 +1,9 @@
 # Campaign Manager Guide
 
+For multilingual campaigns, see [Reviewed entity translations](ENTITY-TRANSLATIONS.md)
+for recoverable manual and AI-assisted batches across characters, NPCs,
+sessions, locations and relationships.
+
 <table>
   <tr>
     <td width="50%" align="center"><img src="images/companions/brannik-guardian.webp" alt="Brannik the dwarven guardian protects the campaign archive" height="340"></td>

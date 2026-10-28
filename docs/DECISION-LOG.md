@@ -1665,3 +1665,20 @@ a localized free-text form of address.
 **Source:** Link to the authoritative artifact, issue or pull request.
 
 **Revisit when:** Concrete evidence or date that should trigger reconsideration.
+
+### QK-063 — Entity translation is a recoverable reviewed batch
+
+**Date:** 2026-10-28
+
+**Status:** Active
+
+**Source:** [Issue #27](https://github.com/mtamagno/questkeeper-rpg-campaign-manager/issues/27)
+
+**Decision:** Entity localization is planned from stable entity/field keys,
+saved outside campaign content, explicitly reviewed, and applied as one guarded
+batch. Missing/stale fields are the default scope. Existing target prose needs
+overwrite consent; changed source prose invalidates its draft. Remote engines
+receive only checked fields after provider/model-specific consent.
+
+**Why:** A long multilingual campaign needs resumable work without silently
+overwriting prose, translating identities or exposing unrelated private canon.
