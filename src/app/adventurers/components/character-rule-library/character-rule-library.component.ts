@@ -1,13 +1,19 @@
-import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
 import { SPELL_CATEGORIES } from '@arcana/constants/spells.constants';
 import { SPELL_SCHOOLS, isSpellEntry, type SpellEntry } from '@arcana/models/compendium.model';
 import { type CharacterSheet } from '@guild/models/character.model';
+import { CampaignService } from '@guild/services/campaign.service';
+import {
+  CharacterRulePreferencesService,
+  characterRuleEntryId,
+  type CharacterRulePreference,
+} from '@guild/services/characterRulePreferences.service';
 
 type CharacterRuleKind = 'feature' | 'spell';
-type CharacterRuleFilter = 'all' | CharacterRuleKind;
+type CharacterRuleFilter = 'all' | CharacterRuleKind | 'favourite' | 'prepared';
 
 interface CharacterSpellCard {
   readonly name: string;
@@ -30,6 +36,7 @@ interface CharacterRuleLibraryEntry {
   readonly name: string;
   readonly searchText: string;
   readonly spell?: CharacterSpellCard;
+  readonly preference: CharacterRulePreference;
 }
 
 interface SpellcastingSummary {
@@ -47,9 +54,13 @@ interface SpellcastingSummary {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CharacterRuleLibraryComponent {
+  private readonly campaigns = inject(CampaignService);
+  private readonly preferences = inject(CharacterRulePreferencesService);
+
   readonly sheet = input.required<CharacterSheet>();
   readonly characterId = input.required<string>();
   readonly isItalian = input.required<boolean>();
+  readonly campaignId = this.campaigns.activeCampaignId;
 
   readonly query = signal('');
   readonly filter = signal<CharacterRuleFilter>('all');
@@ -59,30 +70,41 @@ export class CharacterRuleLibraryComponent {
   );
 
   readonly entries = computed<ReadonlyArray<CharacterRuleLibraryEntry>>(() => {
-    const features = this.sheet().features.map((name, index) => ({
-      id: `feature-${index}-${this.normalize(name)}`,
-      kind: 'feature' as const,
-      name,
-      searchText: this.normalize(`${name} feature ability trait capacity`),
-    }));
-    const spells = this.spellCards().map((spell, index) => ({
-      id: `spell-${index}-${this.normalize(spell.originalName)}`,
+    const features: ReadonlyArray<CharacterRuleLibraryEntry> = this.sheet().features.map(
+      (name) => ({
+        id: characterRuleEntryId('feature', name),
+        kind: 'feature' as const,
+        name,
+        preference: this.preference(characterRuleEntryId('feature', name)),
+        searchText: '',
+      }),
+    );
+    const spells: ReadonlyArray<CharacterRuleLibraryEntry> = this.spellCards().map((spell) => ({
+      id: characterRuleEntryId('spell', spell.originalName),
       kind: 'spell' as const,
       name: spell.name,
       spell,
+      preference: this.preference(characterRuleEntryId('spell', spell.originalName)),
+      searchText: '',
+    }));
+    return [...features, ...spells].map((entry) => ({
+      ...entry,
       searchText: this.normalize(
         [
-          spell.name,
-          spell.originalName,
-          spell.school,
-          spell.level === undefined ? undefined : `level ${spell.level} livello ${spell.level}`,
-          'spell incantesimo',
+          entry.name,
+          entry.kind === 'feature' ? 'feature ability trait capacity' : 'spell incantesimo',
+          entry.spell?.originalName,
+          entry.spell?.school,
+          entry.spell?.level === undefined
+            ? undefined
+            : `level ${entry.spell.level} livello ${entry.spell.level}`,
+          entry.preference.note,
+          entry.preference.reference?.label,
         ]
           .filter(Boolean)
           .join(' '),
       ),
     }));
-    return [...features, ...spells];
   });
 
   readonly filteredEntries = computed(() => {
@@ -90,7 +112,10 @@ export class CharacterRuleLibraryComponent {
     const filter = this.filter();
     return this.entries().filter(
       (entry) =>
-        (filter === 'all' || entry.kind === filter) &&
+        (filter === 'all' ||
+          entry.kind === filter ||
+          (filter === 'favourite' && entry.preference.favourite === true) ||
+          (filter === 'prepared' && entry.preference.prepared === true)) &&
         (query.length === 0 || entry.searchText.includes(query)),
     );
   });
@@ -100,6 +125,12 @@ export class CharacterRuleLibraryComponent {
   );
   readonly spellCount = computed(
     () => this.entries().filter((entry) => entry.kind === 'spell').length,
+  );
+  readonly favouriteCount = computed(
+    () => this.entries().filter((entry) => entry.preference.favourite).length,
+  );
+  readonly preparedCount = computed(
+    () => this.entries().filter((entry) => entry.preference.prepared).length,
   );
 
   readonly spellcastingSummary = computed<SpellcastingSummary | undefined>(() => {
@@ -122,6 +153,10 @@ export class CharacterRuleLibraryComponent {
 
   updateQuery(event: Event): void {
     this.query.set((event.target as HTMLInputElement).value);
+  }
+
+  private preference(entryId: string): CharacterRulePreference {
+    return this.preferences.get(this.campaigns.activeCampaignId(), this.characterId(), entryId);
   }
 
   private resolveSpell(originalName: string): CharacterSpellCard {

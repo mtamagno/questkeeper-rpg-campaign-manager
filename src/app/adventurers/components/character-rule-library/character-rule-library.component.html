@@ -73,6 +73,20 @@
       <button type="button" [attr.aria-pressed]="filter() === 'spell'" (click)="setFilter('spell')">
         {{ isItalian() ? 'Incantesimi' : 'Spells' }} <span>{{ spellCount() }}</span>
       </button>
+      <button
+        type="button"
+        [attr.aria-pressed]="filter() === 'prepared'"
+        (click)="setFilter('prepared')"
+      >
+        {{ isItalian() ? 'Preparati' : 'Prepared' }} <span>{{ preparedCount() }}</span>
+      </button>
+      <button
+        type="button"
+        [attr.aria-pressed]="filter() === 'favourite'"
+        (click)="setFilter('favourite')"
+      >
+        {{ isItalian() ? 'Preferiti' : 'Favourites' }} <span>{{ favouriteCount() }}</span>
+      </button>
     </div>
   </div>
 
@@ -99,26 +113,30 @@
   @if (filteredEntries().length > 0) {
     <div class="rule-library__grid">
       @for (entry of filteredEntries(); track entry.id) {
-        @if (entry.spell; as spell) {
-          @if (spell.categoryId; as categoryId) {
-            @if (spell.key; as spellKey) {
+        <article
+          class="rule-library__card"
+          [class.rule-library__card--feature]="entry.kind === 'feature'"
+          [class.rule-library__card--unlinked]="entry.spell && !entry.spell.key"
+          [class.rule-library__card--prepared]="entry.preference.prepared"
+          [class.rule-library__card--favourite]="entry.preference.favourite"
+        >
+          @if (entry.spell; as spell) {
+            <ng-container *ngTemplateOutlet="spellCard; context: { $implicit: spell }" />
+            @if (spell.categoryId && spell.key) {
               <a
-                class="rule-library__card"
-                [routerLink]="['/compendium', categoryId, spellKey]"
+                class="rule-library__link"
+                [routerLink]="['/compendium', spell.categoryId, spell.key]"
                 [attr.aria-label]="
-                  (isItalian() ? 'Apri la descrizione di ' : 'Open description for ') + spell.name
+                  (isItalian()
+                    ? 'Apri la descrizione verificata di '
+                    : 'Open verified description for ') + spell.name
                 "
               >
-                <ng-container *ngTemplateOutlet="spellCard; context: { $implicit: spell }" />
+                {{ isItalian() ? 'Descrizione verificata' : 'Verified description' }}
+                <span aria-hidden="true">→</span>
               </a>
             }
           } @else {
-            <article class="rule-library__card rule-library__card--unlinked">
-              <ng-container *ngTemplateOutlet="spellCard; context: { $implicit: spell }" />
-            </article>
-          }
-        } @else {
-          <article class="rule-library__card rule-library__card--feature">
             <div class="rule-library__topline">
               <span>{{ isItalian() ? 'Capacità' : 'Ability' }}</span
               ><span class="rule-library__provenance">{{ isItalian() ? 'Scheda' : 'Sheet' }}</span>
@@ -131,8 +149,51 @@
                   : 'Entry recorded on the character sheet.'
               }}
             </p>
-          </article>
-        }
+          }
+
+          <div
+            class="rule-library__personal-state"
+            [attr.aria-label]="isItalian() ? 'Stato personale' : 'Personal state'"
+          >
+            @if (entry.preference.prepared) {
+              <span>◆ {{ isItalian() ? 'Preparato' : 'Prepared' }}</span>
+            }
+            @if (entry.preference.favourite) {
+              <span>★ {{ isItalian() ? 'Preferito' : 'Favourite' }}</span>
+            }
+          </div>
+          @if (entry.preference.note || entry.preference.reference) {
+            <div class="rule-library__annotations">
+              @if (entry.preference.note) {
+                <p>
+                  <strong>{{ isItalian() ? 'Nota d’uso:' : 'Usage note:' }}</strong>
+                  {{ entry.preference.note }}
+                </p>
+              }
+              @if (entry.preference.reference; as reference) {
+                <div class="rule-library__personal-reference">
+                  <span>{{
+                    isItalian()
+                      ? 'Riferimento personale · non verificato da QuestKeeper'
+                      : 'Personal reference · not verified by QuestKeeper'
+                  }}</span>
+                  <a [href]="reference.url" target="_blank" rel="noreferrer"
+                    >{{ reference.label }} ↗</a
+                  >
+                </div>
+              }
+            </div>
+          }
+          <a
+            class="rule-library__settings-link"
+            [routerLink]="campaignId() ? ['/', campaignId(), 'settings'] : ['/settings']"
+            fragment="rule-library-settings"
+            >{{
+              isItalian() ? 'Gestisci nelle impostazioni utente' : 'Manage in User settings'
+            }}
+            →</a
+          >
+        </article>
       }
     </div>
   } @else {
@@ -195,10 +256,4 @@
       </div>
     }
   </dl>
-  @if (spell.key) {
-    <span class="rule-library__link"
-      >{{ isItalian() ? 'Leggi la descrizione' : 'Read description' }}
-      <span aria-hidden="true">→</span></span
-    >
-  }
 </ng-template>
