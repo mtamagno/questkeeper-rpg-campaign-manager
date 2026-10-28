@@ -1,0 +1,125 @@
+{
+  "sourceId": "wotc-srd-5.2.1",
+  "manifest": {
+    "schemaVersion": 1,
+    "namespace": "questkeeper.srd-5.2.1",
+    "version": "1.0.0",
+    "kind": "bundled",
+    "visibility": "public",
+    "owner": "QuestKeeper contributors",
+    "source": {
+      "name": "System Reference Document 5.2.1",
+      "url": "https://www.dndbeyond.com/srd",
+      "upstreamVersion": "5.2.1",
+      "reviewedOn": "2026-10-28",
+      "updatePolicy": "Pinned; regenerate only after a maintainer reviews the new official version and attribution."
+    },
+    "ruleset": { "id": "dnd-2024", "edition": "SRD 5.2.1" },
+    "locales": ["en", "it"],
+    "license": {
+      "id": "CC-BY-4.0",
+      "url": "https://creativecommons.org/licenses/by/4.0/legalcode",
+      "attribution": "Includes material from SRD 5.2.1 by Wizards of the Coast LLC, licensed CC BY 4.0; source and license links are retained.",
+      "redistributable": true,
+      "permittedTransformations": ["extract", "translate", "summarize", "adapt"]
+    }
+  },
+  "entries": [
+    {
+      "id": "d20-test",
+      "type": "core-rule",
+      "name": { "en": "D20 Test", "it": "Prova con il d20" },
+      "summary": {
+        "en": "The shared resolution family for ability checks, saving throws, and attack rolls.",
+        "it": "La famiglia di risoluzione comune a prove di caratteristica, tiri salvezza e tiri per colpire."
+      },
+      "content": {
+        "en": "Roll a d20, apply the relevant modifiers, and compare the total with the target set by the rule or Game Master.",
+        "it": "Tira un d20, applica i modificatori pertinenti e confronta il totale con il bersaglio stabilito dalla regola o dal Game Master."
+      },
+      "citations": [
+        {
+          "label": "SRD 5.2.1",
+          "url": "https://www.dndbeyond.com/srd",
+          "section": "Playing the Game"
+        }
+      ]
+    },
+    {
+      "id": "ability-check",
+      "type": "core-rule",
+      "name": { "en": "Ability Check", "it": "Prova di caratteristica" },
+      "summary": {
+        "en": "A d20 test used when an attempted action has an uncertain outcome.",
+        "it": "Una prova con il d20 usata quando l'esito di un'azione tentata è incerto."
+      },
+      "content": {
+        "en": "Use the ability and any proficiency that best describe the attempted approach; the result answers whether that approach succeeds.",
+        "it": "Usa la caratteristica e l'eventuale competenza che descrivono meglio l'approccio tentato; il risultato stabilisce se quell'approccio riesce."
+      },
+      "citations": [
+        {
+          "label": "SRD 5.2.1",
+          "url": "https://www.dndbeyond.com/srd",
+          "section": "Playing the Game"
+        }
+      ]
+    },
+    {
+      "id": "saving-throw",
+      "type": "core-rule",
+      "name": { "en": "Saving Throw", "it": "Tiro salvezza" },
+      "summary": {
+        "en": "A reactive d20 test made to resist or reduce an unwanted effect.",
+        "it": "Una prova reattiva con il d20 per resistere o ridurre un effetto indesiderato."
+      },
+      "content": {
+        "en": "The effect identifies the ability, target, and consequence; the roll determines how fully the creature resists it.",
+        "it": "L'effetto indica caratteristica, bersaglio e conseguenza; il tiro determina quanto la creatura riesca a resistergli."
+      },
+      "citations": [
+        {
+          "label": "SRD 5.2.1",
+          "url": "https://www.dndbeyond.com/srd",
+          "section": "Rules Glossary"
+        }
+      ]
+    },
+    {
+      "id": "attack-roll",
+      "type": "core-rule",
+      "name": { "en": "Attack Roll", "it": "Tiro per colpire" },
+      "summary": {
+        "en": "A d20 test that determines whether an attack reaches its target.",
+        "it": "Una prova con il d20 che determina se un attacco raggiunge il bersaglio."
+      },
+      "content": {
+        "en": "Add the attack's relevant ability and proficiency when applicable, then compare the result with the target's defense.",
+        "it": "Aggiungi la caratteristica pertinente dell'attacco e la competenza quando applicabile, poi confronta il risultato con la difesa del bersaglio."
+      },
+      "citations": [
+        {
+          "label": "SRD 5.2.1",
+          "url": "https://www.dndbeyond.com/srd",
+          "section": "Rules Glossary"
+        }
+      ]
+    },
+    {
+      "id": "help-action",
+      "type": "action",
+      "name": { "en": "Help", "it": "Aiutare" },
+      "summary": {
+        "en": "Use your action to make a nearby ally's immediate attempt more likely to succeed.",
+        "it": "Usa la tua azione per rendere più probabile il successo del tentativo immediato di un alleato vicino."
+      },
+      "content": {
+        "en": "Describe concrete assistance that fits the task or attack. The receiving creature gains the benefit defined by the action's current rule.",
+        "it": "Descrivi un aiuto concreto adatto al compito o all'attacco. La creatura che lo riceve ottiene il beneficio definito dalla regola attuale dell'azione."
+      },
+      "citations": [
+        { "label": "SRD 5.2.1", "url": "https://www.dndbeyond.com/srd", "section": "Actions" }
+      ]
+    }
+  ]
+}

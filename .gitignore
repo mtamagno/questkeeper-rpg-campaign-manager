@@ -83,6 +83,8 @@ __pycache__/
 !/scripts/verify-offline-pack.cjs
 !/scripts/verify-command-palette.cjs
 !/scripts/verify-journey-memory.cjs
+!/scripts/import-approved-compendium-sources.mjs
+!/scripts/verify-baseline-compendium.mjs
 !/scripts/verify-user-settings.cjs
 !/scripts/verify-table-moments.cjs
 !/scripts/verify-character-notebooks.cjs

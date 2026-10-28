@@ -24,6 +24,16 @@ export function validateCompendiumPackage(pkg, { forPublication = false } = {}) 
     errors.push('version must use semantic versioning.');
   }
   if (!manifest.owner || !manifest.source?.name) errors.push('owner and source.name are required.');
+  if (
+    !manifest.source?.url ||
+    !manifest.source?.upstreamVersion ||
+    !manifest.source?.reviewedOn ||
+    !manifest.source?.updatePolicy
+  ) {
+    errors.push(
+      'source.url, source.upstreamVersion, source.reviewedOn and source.updatePolicy are required.',
+    );
+  }
   if (!manifest.ruleset?.id || !manifest.ruleset?.edition) {
     errors.push('ruleset.id and ruleset.edition are required.');
   }
@@ -36,6 +46,9 @@ export function validateCompendiumPackage(pkg, { forPublication = false } = {}) 
   }
   if (typeof license?.redistributable !== 'boolean') {
     errors.push('license.redistributable must be explicit.');
+  }
+  if (!Array.isArray(license?.permittedTransformations)) {
+    errors.push('license.permittedTransformations must be explicit.');
   }
   if (!['bundled', 'local'].includes(manifest.kind)) errors.push('kind must be bundled or local.');
   if (!['public', 'private'].includes(manifest.visibility)) {
@@ -64,6 +77,9 @@ export function validateCompendiumPackage(pkg, { forPublication = false } = {}) 
     seen.add(qualified);
     if (!entry?.name || typeof entry.name !== 'object' || Object.keys(entry.name).length === 0) {
       errors.push(`${prefix}.name must contain localized text.`);
+    }
+    if (!Array.isArray(entry?.citations) || entry.citations.length === 0) {
+      errors.push(`${prefix}.citations must identify the reviewed upstream source.`);
     }
     for (const reference of entry?.references ?? []) {
       if (!String(reference).includes(':')) errors.push(`${prefix} has an unqualified reference.`);

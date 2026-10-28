@@ -5,7 +5,13 @@ export interface CompendiumPackageManifest {
   readonly kind: 'bundled' | 'local';
   readonly visibility: 'public' | 'private';
   readonly owner: string;
-  readonly source: { readonly name: string; readonly url: string };
+  readonly source: {
+    readonly name: string;
+    readonly url: string;
+    readonly upstreamVersion: string;
+    readonly reviewedOn: string;
+    readonly updatePolicy: string;
+  };
   readonly ruleset: { readonly id: string; readonly edition: string };
   readonly locales: ReadonlyArray<string>;
   readonly license: {
@@ -13,6 +19,7 @@ export interface CompendiumPackageManifest {
     readonly url: string;
     readonly attribution: string;
     readonly redistributable: boolean;
+    readonly permittedTransformations: ReadonlyArray<string>;
   };
 }
 
@@ -23,6 +30,11 @@ export interface CompendiumPackageEntry {
   readonly summary?: Readonly<Record<string, string>>;
   readonly content?: Readonly<Record<string, string>>;
   readonly references?: ReadonlyArray<string>;
+  readonly citations: ReadonlyArray<{
+    readonly label: string;
+    readonly url: string;
+    readonly section?: string;
+  }>;
   readonly overrideOf?: string;
 }
 

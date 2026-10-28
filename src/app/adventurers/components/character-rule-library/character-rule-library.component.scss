@@ -305,6 +305,16 @@
     border: $border-width-thin solid rgba($color-gold, 0.35);
     border-radius: 50%;
   }
+  &__baseline-link {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-xs;
+    min-height: 44px;
+    margin-top: $spacing-sm;
+    color: $color-gold;
+    font-weight: 700;
+  }
+
   &__provenance {
     align-self: flex-start;
     padding: 2px $spacing-xs;

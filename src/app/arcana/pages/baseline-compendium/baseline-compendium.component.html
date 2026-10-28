@@ -1,0 +1,83 @@
+<main class="baseline" tabindex="-1">
+  <header class="baseline__hero">
+    <span class="baseline__kicker">{{
+      isItalian() ? 'Riferimento verificato' : 'Verified reference'
+    }}</span>
+    <h1>{{ isItalian() ? 'Compendio essenziale' : 'Essential Compendium' }}</h1>
+    <p>
+      {{
+        isItalian()
+          ? 'Una baseline breve e legalmente redistribuibile. Ogni voce mostra fonte, edizione e stato della revisione.'
+          : 'A concise, legally redistributable baseline. Every entry shows its source, edition, and review state.'
+      }}
+    </p>
+    <dl class="baseline__provenance">
+      <div>
+        <dt>{{ isItalian() ? 'Fonte' : 'Source' }}</dt>
+        <dd>{{ manifest.source.name }}</dd>
+      </div>
+      <div>
+        <dt>{{ isItalian() ? 'Edizione' : 'Edition' }}</dt>
+        <dd>{{ manifest.ruleset.edition }}</dd>
+      </div>
+      <div>
+        <dt>{{ isItalian() ? 'Verificato' : 'Reviewed' }}</dt>
+        <dd>{{ manifest.source.reviewedOn }}</dd>
+      </div>
+      <div>
+        <dt>{{ isItalian() ? 'Licenza' : 'License' }}</dt>
+        <dd>{{ manifest.license.id }}</dd>
+      </div>
+    </dl>
+  </header>
+
+  <label class="baseline__search">
+    <span>{{ isItalian() ? 'Cerca nelle regole essenziali' : 'Search essential rules' }}</span>
+    <input
+      type="search"
+      [value]="query()"
+      (input)="updateQuery($event)"
+      [placeholder]="isItalian() ? 'Es. tiro salvezza' : 'E.g. saving throw'"
+    />
+  </label>
+  <p class="baseline__count" role="status" aria-live="polite">
+    {{ entries().length }} {{ isItalian() ? 'voci verificate' : 'reviewed entries' }}
+  </p>
+
+  <section
+    class="baseline__grid"
+    [attr.aria-label]="isItalian() ? 'Regole essenziali' : 'Essential rules'"
+  >
+    @for (entry of entries(); track entry.id) {
+      <article class="baseline__card">
+        <div class="baseline__card-meta">
+          <span>{{ entry.type }}</span
+          ><strong>✓ {{ isItalian() ? 'Fonte verificata' : 'Source reviewed' }}</strong>
+        </div>
+        <h2>{{ entry.name[isItalian() ? 'it' : 'en'] }}</h2>
+        <p class="baseline__summary">{{ entry.summary?.[isItalian() ? 'it' : 'en'] }}</p>
+        <p>{{ entry.content?.[isItalian() ? 'it' : 'en'] }}</p>
+        @for (citation of entry.citations; track citation.url + citation.section) {
+          <a [href]="citation.url" target="_blank" rel="noopener noreferrer"
+            >{{ citation.label }} · {{ citation.section }} ↗</a
+          >
+        }
+      </article>
+    } @empty {
+      <p class="baseline__empty">
+        {{
+          isItalian()
+            ? 'Nessuna voce corrisponde alla ricerca.'
+            : 'No reviewed entry matches this search.'
+        }}
+      </p>
+    }
+  </section>
+
+  <footer class="baseline__license">
+    <p>{{ manifest.license.attribution }}</p>
+    <a [href]="manifest.license.url" target="_blank" rel="noopener noreferrer"
+      >{{ manifest.license.id }} ↗</a
+    >
+  </footer>
+</main>

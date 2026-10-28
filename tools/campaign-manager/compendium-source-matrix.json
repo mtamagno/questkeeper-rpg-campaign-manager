@@ -1,0 +1,32 @@
+{
+  "reviewedOn": "2026-10-28",
+  "sources": [
+    {
+      "id": "wotc-srd-5.2.1",
+      "status": "approved",
+      "publisher": "Wizards of the Coast LLC",
+      "ruleset": "D&D fifth edition revised rules",
+      "edition": "SRD 5.2.1",
+      "sourceUrl": "https://www.dndbeyond.com/srd",
+      "license": "CC-BY-4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/legalcode",
+      "attribution": "Includes material from SRD 5.2.1 by Wizards of the Coast LLC, licensed CC BY 4.0; source and license links are retained.",
+      "transformations": ["extract", "translate", "summarize", "adapt"],
+      "updatePolicy": "Pin the upstream version. Review the official release page, attribution and locale files before regenerating a later version."
+    },
+    {
+      "id": "wotc-core-rulebooks",
+      "status": "excluded",
+      "publisher": "Wizards of the Coast LLC",
+      "reason": "Commercial core-book access does not itself grant redistribution permission; only material inside the licensed SRD is eligible."
+    },
+    {
+      "id": "paizo-orc-candidate",
+      "status": "research-only",
+      "publisher": "Paizo Inc.",
+      "sourceUrl": "https://paizo.com/licenses",
+      "licenseUrl": "https://paizo.com/orclicense",
+      "reason": "ORC eligibility is product- and notice-specific. No Pathfinder text is imported until an exact upstream product declaration and Reserved Material boundary are reviewed."
+    }
+  ]
+}
