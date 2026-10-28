@@ -19,6 +19,13 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'compendium',
+    loadComponent: () =>
+      import('./arcana/pages/baseline-compendium/baseline-compendium.component').then(
+        (m) => m.BaselineCompendiumComponent,
+      ),
+  },
+  {
     path: ':campaignId',
     canActivate: [spoilerConsentGuard],
     children: [

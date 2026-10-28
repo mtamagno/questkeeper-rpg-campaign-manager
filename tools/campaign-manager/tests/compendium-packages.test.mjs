@@ -18,7 +18,13 @@ function fixture(overrides = {}) {
       kind: 'bundled',
       visibility: 'public',
       owner: 'QuestKeeper contributors',
-      source: { name: 'Original demo rules', url: 'https://example.invalid/demo' },
+      source: {
+        name: 'Original demo rules',
+        url: 'https://example.invalid/demo',
+        upstreamVersion: '1',
+        reviewedOn: '2026-10-28',
+        updatePolicy: 'Pinned test fixture.',
+      },
       ruleset: { id: 'generic', edition: '1' },
       locales: ['en'],
       license: {
@@ -26,10 +32,19 @@ function fixture(overrides = {}) {
         url: 'https://creativecommons.org/licenses/by/4.0/',
         attribution: 'QuestKeeper contributors',
         redistributable: true,
+        permittedTransformations: ['summarize'],
       },
       ...overrides,
     },
-    entries: [{ id: 'steady-hand', type: 'ability', name: { en: 'Steady Hand' }, references: [] }],
+    entries: [
+      {
+        id: 'steady-hand',
+        type: 'ability',
+        name: { en: 'Steady Hand' },
+        references: [],
+        citations: [{ label: 'Fixture', url: 'https://example.invalid/demo' }],
+      },
+    ],
   };
 }
 
@@ -52,6 +67,7 @@ test('qualified IDs and explicit local overrides avoid namespace hijacking', () 
       type: 'ability',
       overrideOf: 'questkeeper.demo:ability:steady-hand',
       name: { en: 'Steady Hand (table notes)' },
+      citations: [{ label: 'Table notes', url: 'https://example.invalid/table' }],
     },
   ];
   const result = resolveCompendiumPackages([local, bundled]);
@@ -76,6 +92,7 @@ test('ordinary exports omit private and non-redistributable packages', () => {
       url: 'https://example.invalid',
       attribution: 'Vendor',
       redistributable: false,
+      permittedTransformations: [],
     },
   });
   assert.deepEqual(

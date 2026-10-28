@@ -1572,6 +1572,33 @@ and [package contract](COMPENDIUM-PACKAGES.md).
 **Revisit when:** A signed package registry or remote marketplace requires
 stronger authenticity and trust metadata.
 
+### QK-059 — Redistributable sources are pinned and fail closed
+
+**Date:** 28 October 2026
+
+**Status:** Active
+
+**Decision:** QuestKeeper bundles a rules reference only when its exact upstream
+version, official source URL, license, permitted transformations, review date and
+update policy are recorded in the source matrix. Importers reject unapproved or
+changed sources instead of silently falling back to a similar edition.
+
+**Why:** A familiar game name or an open-license family does not prove that a
+specific document, translation or edition is redistributable. Version drift can
+also change both rules and attribution requirements without changing a friendly
+product label.
+
+**Consequences:** The initial baseline is pinned to the officially published SRD
+5.2.1 under CC BY 4.0. Commercial rulebooks are excluded. ORC candidates remain
+research-only until the exact product notice and Reserved Material boundaries
+are reviewed. Every published entry keeps a visible citation and attribution.
+
+**Source:** [Issue #36](https://github.com/mtamagno/questkeeper-rpg-campaign-manager/issues/36)
+and [source matrix](COMPENDIUM-SOURCE-MATRIX.md).
+
+**Revisit when:** An upstream version changes, an official localization is added,
+or a newly reviewed source has a complete redistribution and attribution chain.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD

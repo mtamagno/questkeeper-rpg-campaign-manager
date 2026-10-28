@@ -16,6 +16,10 @@
             : 'Search this sheet’s repertoire. Complete rules appear only when they are available in the local Compendium.'
         }}
       </p>
+      <a class="rule-library__baseline-link" [routerLink]="['/compendium']">
+        {{ isItalian() ? 'Apri il compendio verificato' : 'Open verified compendium' }}
+        <span aria-hidden="true">→</span>
+      </a>
     </div>
 
     @if (spellcastingSummary(); as spellcasting) {
