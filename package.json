@@ -17,6 +17,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:manager": "node --test tools/campaign-manager/tests/*.test.mjs",
+    "test:compendium-packages": "node --test tools/campaign-manager/tests/compendium-packages.test.mjs",
     "test:storage": "node --test tools/campaign-manager/tests/storage-paths.test.mjs",
     "test:entity-ids": "npm run prepare:campaigns && node tools/campaign-manager/verify-entity-ids.mjs",
     "test:transcriber": "cd discord-transcriber && python -m unittest discover -s tests",
