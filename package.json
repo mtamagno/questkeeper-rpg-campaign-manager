@@ -41,6 +41,7 @@
     "test:table-moments": "node scripts/verify-table-moments.cjs",
     "test:notebooks": "node scripts/verify-character-notebooks.cjs",
     "test:character-profiles": "node scripts/verify-character-story-profiles.cjs",
+    "test:character-pronouns": "node scripts/verify-character-pronouns.cjs",
     "test:character-rules": "node scripts/verify-character-rule-library.cjs",
     "test:accessibility": "node scripts/verify-accessibility.cjs",
     "test:performance": "node scripts/verify-performance-budgets.cjs",

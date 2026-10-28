@@ -166,6 +166,23 @@
     margin: 0;
   }
 
+  &__pronouns {
+    align-self: flex-start;
+    margin: 0;
+    padding: $spacing-2xs $spacing-sm;
+    border: $border-width-thin solid $color-border-default;
+    border-radius: $border-radius-pill;
+    background: rgba($color-bg-void, 0.24);
+    color: $color-parchment-light;
+    font-family: $font-family-heading;
+    font-size: $font-size-xs;
+    letter-spacing: $letter-spacing-wide;
+
+    @include respond-below(md) {
+      align-self: center;
+    }
+  }
+
   &__player {
     font-size: $font-size-sm;
     color: $color-text-muted;

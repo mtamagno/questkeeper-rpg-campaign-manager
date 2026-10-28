@@ -19,6 +19,9 @@ test('ruleset profiles expose materially different terminology', () => {
   assert.equal(resolveRulesetProfile('pf2e-remaster').fields[0].labels.en, 'Ancestry');
   assert.equal(resolveRulesetProfile('coc7e').fields[0].labels.en, 'Occupation');
   assert.equal(resolveRulesetProfile('generic').fields[1].labels.en, 'Role / archetype');
+  assert.equal(resolveRulesetProfile('dnd-2024').presentationFields[0].labels.en, 'Gender');
+  assert.equal(resolveRulesetProfile('coc7e').presentationFields[0].labels.en, 'Sex');
+  assert.equal(resolveRulesetProfile('generic').presentationFields[1].labels.it, 'Pronomi');
 });
 
 test('legacy editions infer a profile without destructive migration', () => {
@@ -88,5 +91,8 @@ test('ruleset identity controls preserve known, custom and imported values', asy
   assert.match(app, /list="\$\{listId\}"/);
   assert.match(app, /Custom or imported value · preserved exactly/);
   assert.match(app, /definition\.storageKey/);
+  assert.match(app, /activePresentationFields/);
+  assert.match(app, /\['sex', 'Sex \/ gender'\]/);
+  assert.match(app, /\['pronouns', 'Pronouns'\]/);
   assert.match(styles, /\.ruleset-combobox__state\.is-custom/);
 });

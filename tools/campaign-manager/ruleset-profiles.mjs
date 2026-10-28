@@ -11,11 +11,17 @@ const field = (key, storageKey, en, it, options = []) => ({
   options,
 });
 
+const presentationField = (key, en, it) => ({ key, storageKey: key, labels: { en, it } });
+
 export const RULESET_PROFILES = Object.freeze([
   {
     id: 'dnd-2014',
     names: { en: '5E fantasy (2014)', it: 'Fantasy 5E (2014)' },
     characterTerms: { en: 'Character', it: 'Personaggio' },
+    presentationFields: [
+      presentationField('sex', 'Gender', 'Genere'),
+      presentationField('pronouns', 'Pronouns', 'Pronomi'),
+    ],
     fields: [
       field('ancestry', 'race', 'Race', 'Razza'),
       field('class', 'classType', 'Class', 'Classe'),
@@ -27,6 +33,10 @@ export const RULESET_PROFILES = Object.freeze([
     id: 'dnd-2024',
     names: { en: '5E fantasy (2024)', it: 'Fantasy 5E (2024)' },
     characterTerms: { en: 'Character', it: 'Personaggio' },
+    presentationFields: [
+      presentationField('sex', 'Gender', 'Genere'),
+      presentationField('pronouns', 'Pronouns', 'Pronomi'),
+    ],
     fields: [
       field('ancestry', 'race', 'Species', 'Specie', [
         { value: 'Dwarf', provenance: OPEN_SRD_52 },
@@ -66,6 +76,10 @@ export const RULESET_PROFILES = Object.freeze([
     id: 'pf2e-remaster',
     names: { en: 'Pathfinder 2e Remaster', it: 'Pathfinder 2e Remaster' },
     characterTerms: { en: 'Adventurer', it: 'Avventuriero' },
+    presentationFields: [
+      presentationField('sex', 'Gender', 'Genere'),
+      presentationField('pronouns', 'Pronouns', 'Pronomi'),
+    ],
     fields: [
       field('ancestry', 'race', 'Ancestry', 'Ascendenza'),
       field('specialization', 'subclass', 'Heritage / archetype', 'Retaggio / archetipo'),
@@ -77,12 +91,20 @@ export const RULESET_PROFILES = Object.freeze([
     id: 'coc7e',
     names: { en: 'Cosmic horror investigators (7e)', it: 'Investigatori horror cosmico (7a)' },
     characterTerms: { en: 'Investigator', it: 'Investigatore' },
+    presentationFields: [
+      presentationField('sex', 'Sex', 'Sesso'),
+      presentationField('pronouns', 'Pronouns', 'Pronomi'),
+    ],
     fields: [field('class', 'classType', 'Occupation', 'Occupazione')],
   },
   {
     id: 'generic',
     names: { en: 'Generic / custom RPG', it: 'GDR generico / personalizzato' },
     characterTerms: { en: 'Character', it: 'Personaggio' },
+    presentationFields: [
+      presentationField('sex', 'Sex / gender', 'Sesso / genere'),
+      presentationField('pronouns', 'Pronouns', 'Pronomi'),
+    ],
     fields: [
       field('ancestry', 'race', 'Origin / ancestry', 'Origine / ascendenza'),
       field('class', 'classType', 'Role / archetype', 'Ruolo / archetipo'),

@@ -1625,6 +1625,31 @@ and [local compendium contract](LOCAL-COMPENDIA.md).
 **Revisit when:** Accounts, package signing or remote registries require an
 explicit trust and synchronization model for user-owned packages.
 
+### QK-061 — Pronouns are explicit presentation data
+
+**Date:** 28 October 2026
+
+**Status:** Active
+
+**Decision:** Characters may store optional localized pronouns independently
+from the existing sex/gender value. Ruleset profiles own the label and
+visibility of both fields, while imports copy pronouns only from an explicit
+source statement.
+
+**Why:** A portrait, name, voice or sex/gender value does not establish how a
+person wants to be addressed. Combining the fields also prevents rulesets from
+keeping their own sheet terminology.
+
+**Consequences:** Blank pronouns create no Companion or PDF placeholder. The
+Manager preserves hidden legacy fields, custom rulesets may rename or hide each
+presentation field, and AI review prompts prohibit inference. Existing
+campaigns require no migration.
+
+**Source:** [Issue #26](https://github.com/mtamagno/questkeeper-rpg-campaign-manager/issues/26).
+
+**Revisit when:** A campaign requires structured grammatical agreement beyond
+a localized free-text form of address.
+
 ### QK-XXX — Short decision title
 
 **Date:** YYYY-MM-DD

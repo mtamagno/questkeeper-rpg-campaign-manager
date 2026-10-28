@@ -8,6 +8,7 @@ import {
   normalizeProviderModels,
 } from '../ai-providers.mjs';
 import {
+  buildEntityImportPrompt,
   buildImagePromptPlan,
   buildNotebookPromptPlan,
   buildNotesPrompt,
@@ -198,6 +199,7 @@ test('character imports require reviewable identity, rules and source-warning fi
   assert.equal(ENTITY_IMPORT_SCHEMA.additionalProperties, false);
   for (const field of [
     'name',
+    'pronouns',
     'heightCm',
     'classType',
     'race',
@@ -211,6 +213,14 @@ test('character imports require reviewable identity, rules and source-warning fi
     assert.ok(ENTITY_IMPORT_SCHEMA.required.includes(field), `${field} must be reviewed`);
   }
   assert.deepEqual(ENTITY_IMPORT_SCHEMA.properties.allegiance.enum, ['ally', 'neutral', 'enemy']);
+  const prompt = buildEntityImportPrompt({
+    campaign: { campaign: { name: { en: 'Test' } }, characters: [], npcs: [] },
+    entityType: 'characters',
+    language: 'English',
+    sourceUrl: 'https://example.com/print-view',
+  });
+  assert.match(prompt, /Never infer pronouns from a portrait, name, voice, or sex\/gender/);
+  assert.match(prompt, /only when the source states them explicitly/);
 });
 
 const minimalCampaign = {

@@ -1,9 +1,10 @@
 export type RulesetIdentityKey = 'ancestry' | 'class' | 'specialization' | 'background';
+export type RulesetPresentationKey = 'sex' | 'pronouns';
 
 export interface CampaignGameSystem {
   readonly id: string;
   readonly edition?: string;
-  readonly customLabels?: Partial<Record<RulesetIdentityKey, string>>;
+  readonly customLabels?: Partial<Record<RulesetIdentityKey | RulesetPresentationKey, string>>;
 }
 
 export interface RulesetIdentityField {
@@ -12,10 +13,17 @@ export interface RulesetIdentityField {
   readonly labels: { readonly en: string; readonly it: string };
 }
 
+export interface RulesetPresentationField {
+  readonly key: RulesetPresentationKey;
+  readonly storageKey: RulesetPresentationKey;
+  readonly labels: { readonly en: string; readonly it: string };
+}
+
 export interface RulesetProfile {
   readonly id: string;
   readonly characterTerms: { readonly en: string; readonly it: string };
   readonly fields: ReadonlyArray<RulesetIdentityField>;
+  readonly presentationFields: ReadonlyArray<RulesetPresentationField>;
 }
 
 export interface RulesetDisplayIdentity {
@@ -96,10 +104,27 @@ const genericFields: ReadonlyArray<RulesetIdentityField> = [
   { key: 'background', storageKey: 'background', labels: { en: 'Background', it: 'Background' } },
 ];
 
+const genericPresentationFields: ReadonlyArray<RulesetPresentationField> = [
+  {
+    key: 'sex',
+    storageKey: 'sex',
+    labels: { en: 'Sex / gender', it: 'Sesso / genere' },
+  },
+  {
+    key: 'pronouns',
+    storageKey: 'pronouns',
+    labels: { en: 'Pronouns', it: 'Pronomi' },
+  },
+];
+
 const profiles: ReadonlyArray<RulesetProfile> = [
   {
     id: 'dnd-2014',
     characterTerms: { en: 'Character', it: 'Personaggio' },
+    presentationFields: [
+      { ...genericPresentationFields[0], labels: { en: 'Gender', it: 'Genere' } },
+      genericPresentationFields[1],
+    ],
     fields: [
       { key: 'ancestry', storageKey: 'race', labels: { en: 'Race', it: 'Razza' } },
       { key: 'class', storageKey: 'classType', labels: { en: 'Class', it: 'Classe' } },
@@ -114,6 +139,10 @@ const profiles: ReadonlyArray<RulesetProfile> = [
   {
     id: 'dnd-2024',
     characterTerms: { en: 'Character', it: 'Personaggio' },
+    presentationFields: [
+      { ...genericPresentationFields[0], labels: { en: 'Gender', it: 'Genere' } },
+      genericPresentationFields[1],
+    ],
     fields: [
       { key: 'ancestry', storageKey: 'race', labels: { en: 'Species', it: 'Specie' } },
       { key: 'class', storageKey: 'classType', labels: { en: 'Class', it: 'Classe' } },
@@ -128,6 +157,10 @@ const profiles: ReadonlyArray<RulesetProfile> = [
   {
     id: 'pf2e-remaster',
     characterTerms: { en: 'Adventurer', it: 'Avventuriero' },
+    presentationFields: [
+      { ...genericPresentationFields[0], labels: { en: 'Gender', it: 'Genere' } },
+      genericPresentationFields[1],
+    ],
     fields: [
       { key: 'ancestry', storageKey: 'race', labels: { en: 'Ancestry', it: 'Ascendenza' } },
       {
@@ -142,11 +175,20 @@ const profiles: ReadonlyArray<RulesetProfile> = [
   {
     id: 'coc7e',
     characterTerms: { en: 'Investigator', it: 'Investigatore' },
+    presentationFields: [
+      { ...genericPresentationFields[0], labels: { en: 'Sex', it: 'Sesso' } },
+      genericPresentationFields[1],
+    ],
     fields: [
       { key: 'class', storageKey: 'classType', labels: { en: 'Occupation', it: 'Occupazione' } },
     ],
   },
-  { id: 'generic', characterTerms: { en: 'Character', it: 'Personaggio' }, fields: genericFields },
+  {
+    id: 'generic',
+    characterTerms: { en: 'Character', it: 'Personaggio' },
+    fields: genericFields,
+    presentationFields: genericPresentationFields,
+  },
 ];
 
 export function resolveRulesetProfile(system?: CampaignGameSystem): RulesetProfile {
@@ -155,6 +197,12 @@ export function resolveRulesetProfile(system?: CampaignGameSystem): RulesetProfi
   return {
     ...base,
     fields: base.fields
+      .map((field) => {
+        const label = system.customLabels?.[field.key];
+        return label === undefined ? field : { ...field, labels: { en: label, it: label } };
+      })
+      .filter((field) => field.labels.en.length > 0),
+    presentationFields: base.presentationFields
       .map((field) => {
         const label = system.customLabels?.[field.key];
         return label === undefined ? field : { ...field, labels: { en: label, it: label } };

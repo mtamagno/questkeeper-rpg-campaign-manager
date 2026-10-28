@@ -28,6 +28,14 @@
         </div>
         <div class="character-detail__header-info">
           <h1 class="character-detail__name">{{ char.name }}</h1>
+          @if (char.pronouns && isRecorded(char.pronouns)) {
+            <p
+              class="character-detail__pronouns"
+              [attr.aria-label]="lang() === 'it' ? 'Pronomi' : 'Pronouns'"
+            >
+              {{ char.pronouns | bilingual }}
+            </p>
+          }
           <p class="character-detail__meta">
             {{ char.sheet.race }} · {{ char.sheet.classType }}
             @if (char.sheet.subclass) {
@@ -438,6 +446,7 @@
           [sheet]="char.sheet"
           [sheetHistory]="char.sheetHistory ?? []"
           [publicProfile]="char.publicProfile"
+          [pronouns]="char.pronouns"
           [profileImageUrl]="displayProfileUrl() ?? char.profileImageUrl"
           [portraitImageUrl]="displayPortraitUrl() ?? char.portraitImageUrl"
           [password]="char.password ?? defaultCharacterPassword"

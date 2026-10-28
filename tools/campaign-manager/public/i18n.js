@@ -351,6 +351,12 @@
     'Private notes': 'Note private',
     Backstory: 'Storia personale',
     Gender: 'Genere',
+    Sex: 'Sesso',
+    'Sex / gender': 'Sesso / genere',
+    Pronouns: 'Pronomi',
+    'Custom terminology': 'Terminologia personalizzata',
+    'Used by the Generic / custom profile. Leave a label blank to hide that identity or presentation field.':
+      'Usata dal profilo generico / personalizzato. Lascia vuota unâ€™etichetta per nascondere quel campo identitario o di presentazione.',
     'Personality traits': 'Tratti della personalità',
     Ideals: 'Ideali',
     Bonds: 'Legami',
