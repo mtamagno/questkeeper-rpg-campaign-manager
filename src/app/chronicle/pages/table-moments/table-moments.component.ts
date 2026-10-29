@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, inject, type Signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  signal,
+  type Signal,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { BilingualTextPipe } from '@guild/components/bilingual-text/bilingual-text.pipe';
@@ -54,6 +61,7 @@ export class TableMomentsComponent {
   readonly groups: Signal<ReadonlyArray<TableMomentGroup>> = computed(() =>
     selectTableMomentGroups(this.data.sortedSessions()),
   );
+  readonly activeMomentIndexes = signal<Readonly<Record<string, number>>>({});
 
   readonly subtitle: BilingualText = {
     en: 'The jokes, comments, and little disasters that happened around the story—not inside it.',
@@ -63,5 +71,56 @@ export class TableMomentsComponent {
   sessionLabel(group: TableMomentGroup): string {
     if (group.sessionNumber === 0) return this.lang() === 'it' ? 'Sessione Zero' : 'Session Zero';
     return `${this.lang() === 'it' ? 'Sessione' : 'Session'} ${group.sessionNumber}`;
+  }
+
+  activeMomentIndex(group: TableMomentGroup): number {
+    const lastIndex = Math.max(group.moments.length - 1, 0);
+    return Math.min(this.activeMomentIndexes()[group.sessionId] ?? 0, lastIndex);
+  }
+
+  activeMoment(group: TableMomentGroup): TableMoment | undefined {
+    return group.moments[this.activeMomentIndex(group)];
+  }
+
+  selectMoment(group: TableMomentGroup, index: number): void {
+    if (group.moments.length === 0) return;
+    const safeIndex =
+      ((index % group.moments.length) + group.moments.length) % group.moments.length;
+    this.activeMomentIndexes.update((indexes) => ({
+      ...indexes,
+      [group.sessionId]: safeIndex,
+    }));
+  }
+
+  previousMoment(group: TableMomentGroup): void {
+    this.selectMoment(group, this.activeMomentIndex(group) - 1);
+  }
+
+  nextMoment(group: TableMomentGroup): void {
+    this.selectMoment(group, this.activeMomentIndex(group) + 1);
+  }
+
+  onCarouselKeydown(event: KeyboardEvent, group: TableMomentGroup): void {
+    if (event.key === 'ArrowLeft') {
+      event.preventDefault();
+      this.previousMoment(group);
+    } else if (event.key === 'ArrowRight') {
+      event.preventDefault();
+      this.nextMoment(group);
+    }
+  }
+
+  carouselLabel(group: TableMomentGroup): string {
+    const position = `${this.activeMomentIndex(group) + 1} / ${group.moments.length}`;
+    return this.lang() === 'it'
+      ? `Momenti al tavolo della ${this.sessionLabel(group)}, ${position}`
+      : `Around-the-table moments from ${this.sessionLabel(group)}, ${position}`;
+  }
+
+  momentButtonLabel(group: TableMomentGroup, index: number): string {
+    const number = index + 1;
+    return this.lang() === 'it'
+      ? `Mostra il momento ${number} della ${this.sessionLabel(group)}`
+      : `Show moment ${number} from ${this.sessionLabel(group)}`;
   }
 }

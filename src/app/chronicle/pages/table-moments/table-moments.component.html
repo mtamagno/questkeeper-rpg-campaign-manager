@@ -63,19 +63,70 @@
               }
             </header>
 
-            <ul class="table-moments__quotes">
-              @for (moment of group.moments; track moment.id) {
-                <li class="table-moments__quote-card">
-                  <figure>
-                    <blockquote>“{{ moment.quote | bilingual }}”</blockquote>
-                    <figcaption>— {{ moment.speaker }}</figcaption>
-                  </figure>
-                  @if (moment.context; as context) {
-                    <p class="table-moments__context">{{ context | bilingual }}</p>
+            <section
+              class="table-moments__carousel"
+              role="region"
+              aria-roledescription="carousel"
+              [attr.aria-label]="carouselLabel(group)"
+              tabindex="0"
+              (keydown)="onCarouselKeydown($event, group)"
+            >
+              <button
+                class="table-moments__arrow table-moments__arrow--previous"
+                type="button"
+                [disabled]="group.moments.length < 2"
+                [attr.aria-label]="lang() === 'it' ? 'Momento precedente' : 'Previous moment'"
+                (click)="previousMoment(group)"
+              >
+                <span aria-hidden="true">←</span>
+              </button>
+
+              <div class="table-moments__slide" aria-live="polite" aria-atomic="true">
+                @if (activeMoment(group); as moment) {
+                  <article class="table-moments__quote-card">
+                    <span class="table-moments__quote-mark" aria-hidden="true">“</span>
+                    <figure>
+                      <blockquote>{{ moment.quote | bilingual }}</blockquote>
+                      <figcaption>— {{ moment.speaker }}</figcaption>
+                    </figure>
+                    @if (moment.context; as context) {
+                      <p class="table-moments__context">{{ context | bilingual }}</p>
+                    }
+                  </article>
+                }
+              </div>
+
+              <button
+                class="table-moments__arrow table-moments__arrow--next"
+                type="button"
+                [disabled]="group.moments.length < 2"
+                [attr.aria-label]="lang() === 'it' ? 'Momento successivo' : 'Next moment'"
+                (click)="nextMoment(group)"
+              >
+                <span aria-hidden="true">→</span>
+              </button>
+
+              <nav
+                class="table-moments__pagination"
+                [attr.aria-label]="lang() === 'it' ? 'Scegli un momento' : 'Choose a moment'"
+              >
+                <span class="table-moments__counter" aria-hidden="true">
+                  {{ activeMomentIndex(group) + 1 }} / {{ group.moments.length }}
+                </span>
+                <span class="table-moments__dots">
+                  @for (moment of group.moments; track moment.id; let index = $index) {
+                    <button
+                      type="button"
+                      class="table-moments__dot"
+                      [class.table-moments__dot--active]="activeMomentIndex(group) === index"
+                      [attr.aria-label]="momentButtonLabel(group, index)"
+                      [attr.aria-current]="activeMomentIndex(group) === index ? 'true' : null"
+                      (click)="selectMoment(group, index)"
+                    ></button>
                   }
-                </li>
-              }
-            </ul>
+                </span>
+              </nav>
+            </section>
 
             @if (campaignId(); as cId) {
               <a

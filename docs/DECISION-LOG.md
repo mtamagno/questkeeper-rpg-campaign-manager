@@ -1708,3 +1708,30 @@ or export needs an explicit privacy and portability decision.
 
 **Revisit when:** Account sync, shared table annotations or native apps require
 preferences to leave the current device.
+
+### QK-065 — Table memories scale by session, not by page length
+
+**Date:** 2026-10-29
+
+**Status:** Active
+
+**Decision:** Around the Table groups approved out-of-character memories by
+session and presents one quote card at a time in an independent accessible
+carousel. Every carousel supports labelled previous/next controls, direct
+position indicators and left/right arrow keys. Its surfaces use semantic
+campaign tokens instead of a fixed parchment treatment.
+
+**Why:** A stacked quote grid becomes visually noisy as a campaign grows, and
+fixed light surfaces can make inherited campaign text colours unreadable.
+Session-scoped carousels preserve chronology, reduce page length and keep one
+memory legible without mixing it into canon.
+
+**Consequences:** New sessions may add any reasonable number of approved table
+moments without expanding the page into an unbroken wall of cards. Future
+themes must preserve semantic contrast, and future carousel changes must keep
+mouse, touch, keyboard and assistive-technology controls equivalent.
+
+**Source:** [Around the Table memories](TABLE-MOMENTS.md).
+
+**Revisit when:** User testing shows that comparing multiple quotes at once is
+more valuable than the current compact reading flow.

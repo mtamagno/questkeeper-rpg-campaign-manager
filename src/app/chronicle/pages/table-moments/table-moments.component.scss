@@ -8,7 +8,7 @@
 .table-moments {
   @include flex-column;
   gap: $spacing-xl;
-  width: min(100%, 900px);
+  width: min(100%, 1040px);
   margin: 0 auto;
   animation: fade-in-up $transition-base;
 
@@ -26,7 +26,7 @@
 
   &__title {
     margin: 0;
-    color: $color-gold-light;
+    color: var(--qk-color-accent-text);
     font-family: $font-family-heading;
     font-size: $font-size-3xl;
     letter-spacing: $letter-spacing-wide;
@@ -36,7 +36,7 @@
   &__subtitle {
     max-width: 680px;
     margin: $spacing-xs auto 0;
-    color: $color-text-secondary;
+    color: var(--qk-color-text-secondary);
     font-size: $font-size-md;
     font-style: italic;
     line-height: $line-height-relaxed;
@@ -52,10 +52,10 @@
     gap: $spacing-sm;
     align-items: flex-start;
     padding: $spacing-md $spacing-lg;
-    border: $border-width-thin solid rgba($color-gold, 0.35);
+    border: $border-width-thin solid var(--qk-color-border);
     border-radius: $border-radius-md;
-    background: rgba($color-gold, 0.06);
-    color: $color-text-secondary;
+    background: var(--qk-color-accent-soft);
+    color: var(--qk-color-text);
 
     p {
       margin: 0;
@@ -63,21 +63,23 @@
     }
   }
 
-  &__sessions,
-  &__quotes {
+  &__sessions {
+    @include flex-column;
+    gap: $spacing-xl;
     list-style: none;
     padding: 0;
     margin: 0;
   }
 
-  &__sessions {
-    @include flex-column;
-    gap: $spacing-xl;
-  }
-
   &__session {
-    @include surface-parchment;
     padding: $spacing-xl;
+    overflow: hidden;
+    border: $border-width-thin solid var(--qk-color-border);
+    border-radius: $border-radius-lg;
+    background:
+      radial-gradient(circle at 50% 0%, var(--qk-color-accent-soft), transparent 52%),
+      var(--qk-color-surface);
+    box-shadow: var(--qk-shadow-md);
   }
 
   &__session-header {
@@ -86,17 +88,17 @@
     justify-content: space-between;
     gap: $spacing-md;
     padding-bottom: $spacing-md;
-    border-bottom: $border-width-thin solid rgba($color-leather, 0.35);
+    border-bottom: $border-width-thin solid var(--qk-color-border-subtle);
 
     h2 {
       margin: $spacing-2xs 0 0;
-      color: $color-text-inverse;
+      color: var(--qk-color-text);
       font-family: $font-family-heading;
       font-size: $font-size-xl;
     }
 
     time {
-      color: $color-text-muted;
+      color: var(--qk-color-text-secondary);
       font-size: $font-size-sm;
       white-space: nowrap;
     }
@@ -104,7 +106,7 @@
 
   &__session-kicker {
     margin: 0;
-    color: $color-gold;
+    color: var(--qk-color-accent-text);
     font-family: $font-family-heading;
     font-size: $font-size-xs;
     font-weight: $font-weight-semibold;
@@ -112,53 +114,191 @@
     text-transform: uppercase;
   }
 
-  &__quotes {
+  &__carousel {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+      'previous slide next'
+      '. pagination .';
+    grid-template-columns: 48px minmax(0, 1fr) 48px;
     gap: $spacing-md;
+    align-items: center;
     margin-top: $spacing-lg;
+    outline: none;
+
+    &:focus-visible .table-moments__slide {
+      outline: $border-width-default solid var(--qk-color-accent);
+      outline-offset: $spacing-2xs;
+    }
+  }
+
+  &__slide {
+    grid-area: slide;
+    min-width: 0;
   }
 
   &__quote-card {
-    padding: $spacing-lg;
-    border: $border-width-thin solid rgba($color-leather, 0.3);
-    border-radius: $border-radius-md;
-    background: rgba(255, 255, 255, 0.035);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 260px;
+    padding: clamp($spacing-lg, 5vw, $spacing-2xl);
+    overflow: hidden;
+    border: $border-width-thin solid var(--qk-color-border-strong);
+    border-radius: $border-radius-lg;
+    background: linear-gradient(
+      145deg,
+      var(--qk-color-surface-raised),
+      var(--qk-color-canvas-deep)
+    );
+    box-shadow: inset 0 0 36px rgba(0, 0, 0, 0.2);
 
     figure {
+      position: relative;
+      z-index: 1;
       margin: 0;
     }
 
     blockquote {
-      margin: 0;
-      color: $color-text-primary;
+      max-width: 760px;
+      margin: 0 auto;
+      color: var(--qk-color-text);
       font-family: $font-family-heading;
-      font-size: $font-size-md;
+      font-size: clamp($font-size-lg, 3vw, $font-size-2xl);
       font-style: italic;
       line-height: $line-height-relaxed;
+      text-align: center;
+      text-wrap: balance;
     }
 
     figcaption {
-      margin-top: $spacing-sm;
-      color: $color-gold;
+      margin-top: $spacing-lg;
+      color: var(--qk-color-accent-text);
       font-size: $font-size-sm;
       font-weight: $font-weight-semibold;
+      letter-spacing: $letter-spacing-wide;
+      text-align: center;
+      text-transform: uppercase;
     }
   }
 
+  &__quote-mark {
+    position: absolute;
+    top: -$spacing-lg;
+    left: $spacing-md;
+    color: var(--qk-color-accent-soft);
+    font-family: Georgia, serif;
+    font-size: 11rem;
+    line-height: 1;
+    pointer-events: none;
+  }
+
   &__context {
-    margin: $spacing-md 0 0;
-    padding-top: $spacing-sm;
-    border-top: $border-width-thin dashed rgba($color-leather, 0.25);
-    color: $color-text-secondary;
+    position: relative;
+    z-index: 1;
+    max-width: 680px;
+    margin: $spacing-lg auto 0;
+    padding-top: $spacing-md;
+    border-top: $border-width-thin dashed var(--qk-color-border);
+    color: var(--qk-color-text-secondary);
     font-size: $font-size-sm;
-    line-height: $line-height-base;
+    line-height: $line-height-relaxed;
+    text-align: center;
+  }
+
+  &__arrow {
+    display: inline-grid;
+    place-items: center;
+    width: 48px;
+    min-height: 48px;
+    padding: 0;
+    border: $border-width-thin solid var(--qk-color-border);
+    border-radius: 50%;
+    color: var(--qk-color-accent-text);
+    background: var(--qk-color-canvas-deep);
+    font-size: $font-size-xl;
+    cursor: pointer;
+    transition:
+      color $transition-fast,
+      border-color $transition-fast,
+      background $transition-fast,
+      transform $transition-fast;
+
+    &--previous {
+      grid-area: previous;
+    }
+
+    &--next {
+      grid-area: next;
+    }
+
+    &:hover:not(:disabled),
+    &:focus-visible {
+      border-color: var(--qk-color-accent-strong);
+      color: var(--qk-color-text);
+      background: var(--qk-color-accent-soft);
+      transform: scale(1.05);
+    }
+
+    &:focus-visible {
+      outline: $border-width-default solid var(--qk-color-accent);
+      outline-offset: $spacing-2xs;
+    }
+
+    &:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+  }
+
+  &__pagination {
+    grid-area: pagination;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $spacing-md;
+    min-height: 44px;
+  }
+
+  &__counter {
+    min-width: 4ch;
+    color: var(--qk-color-text-secondary);
+    font-size: $font-size-xs;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__dots {
+    display: flex;
+    gap: $spacing-xs;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  &__dot {
+    width: 12px;
+    height: 12px;
+    padding: 0;
+    border: $border-width-thin solid var(--qk-color-border-strong);
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+
+    &--active {
+      border-color: var(--qk-color-accent);
+      background: var(--qk-color-accent);
+      box-shadow: 0 0 10px var(--qk-color-accent-soft);
+    }
+
+    &:focus-visible {
+      outline: $border-width-default solid var(--qk-color-accent);
+      outline-offset: $spacing-2xs;
+    }
   }
 
   &__story-link {
     display: inline-block;
     margin-top: $spacing-lg;
-    color: $color-gold;
+    color: var(--qk-color-accent-text);
     font-family: $font-family-heading;
     font-size: $font-size-sm;
     font-weight: $font-weight-semibold;
@@ -166,12 +306,12 @@
 
     &:hover,
     &:focus-visible {
-      color: $color-gold-light;
+      color: var(--qk-color-text);
       text-decoration: underline;
     }
 
     &:focus-visible {
-      outline: $border-width-default solid $color-gold;
+      outline: $border-width-default solid var(--qk-color-accent);
       outline-offset: $spacing-2xs;
     }
   }
@@ -183,10 +323,6 @@
 
 @include respond-below(md) {
   .table-moments {
-    &__quotes {
-      grid-template-columns: 1fr;
-    }
-
     &__session {
       padding: $spacing-lg;
     }
@@ -194,5 +330,27 @@
     &__session-header {
       flex-direction: column;
     }
+
+    &__carousel {
+      grid-template-areas:
+        'slide slide'
+        'previous next'
+        'pagination pagination';
+      grid-template-columns: 1fr 1fr;
+    }
+
+    &__arrow {
+      justify-self: center;
+    }
+
+    &__quote-card {
+      min-height: 230px;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .table-moments__arrow {
+    transition: none;
   }
 }

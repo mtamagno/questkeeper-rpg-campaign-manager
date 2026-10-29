@@ -6,7 +6,15 @@
 `Session.tableMoments` stores memorable out-of-character jokes and comments
 without mixing them into campaign canon. The dedicated page groups them by
 session, shows the newest session first, and links back to the corresponding
-story chapter.
+story chapter. Each session owns an independent carousel that reveals one
+quote card at a time, preventing a long campaign from becoming an unbroken
+wall of text.
+
+Readers can move with the previous and next buttons, choose a quote from the
+position indicators, or use the left and right arrow keys while the carousel
+has focus. The active card is announced to assistive technology. Cards and
+controls use semantic campaign tokens rather than parchment-specific colours,
+so every selectable palette retains readable foreground/background contrast.
 
 Each entry contains:
 
@@ -30,4 +38,5 @@ Each entry contains:
   state instead of inventing material.
 
 Run `npm run test:table-moments` to protect the model, route, navigation,
-canon boundary, accessible quotation markup, and responsive layout.
+canon boundary, carousel keyboard behavior, semantic contrast, accessible
+quotation markup, and responsive layout.

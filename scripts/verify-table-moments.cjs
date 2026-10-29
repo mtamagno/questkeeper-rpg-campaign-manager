@@ -54,6 +54,10 @@ for (const contract of [
   '.reverse()',
   'session.tableMoments?.length',
   'track moment.id',
+  'activeMomentIndexes',
+  'previousMoment',
+  'nextMoment',
+  'onCarouselKeydown',
 ]) {
   assert(
     page.ts.includes(contract) || page.html.includes(contract),
@@ -65,6 +69,10 @@ for (const contract of [
   '<blockquote>',
   '<figcaption>',
   '<time [attr.datetime]',
+  'aria-roledescription="carousel"',
+  'aria-live="polite"',
+  'table-moments__pagination',
+  'aria-current',
   'non fanno parte del canone',
   'not campaign canon',
   'empty-state',
@@ -72,10 +80,30 @@ for (const contract of [
   assert(page.html.includes(contract), `missing semantic or editorial UI: ${contract}`);
 }
 
-assert(/repeat\(2, minmax\(0, 1fr\)\)/.test(page.scss), 'desktop quote grid is missing');
 assert(
-  /respond-below\(md\)[\s\S]*?grid-template-columns:\s*1fr/.test(page.scss),
-  'mobile quote stack is missing',
+  /grid-template-areas:[\s\S]*?'previous slide next'/.test(page.scss),
+  'desktop carousel layout is missing',
+);
+assert(
+  /respond-below\(md\)[\s\S]*?'slide slide'[\s\S]*?'previous next'/.test(page.scss),
+  'mobile carousel layout is missing',
+);
+assert(
+  page.scss.includes('min-height: 48px') && page.scss.includes('min-height: 44px'),
+  'carousel controls do not preserve accessible touch targets',
+);
+for (const token of [
+  '--qk-color-surface',
+  '--qk-color-canvas-deep',
+  '--qk-color-text',
+  '--qk-color-text-secondary',
+  '--qk-color-accent',
+]) {
+  assert(page.scss.includes(token), `missing semantic contrast token: ${token}`);
+}
+assert(
+  !page.scss.includes('@include surface-parchment'),
+  'the quote carousel must not inherit the low-contrast parchment surface',
 );
 assert(guide.includes('never turn an AI paraphrase into'), 'quotation provenance rule is missing');
 assert(
@@ -101,5 +129,5 @@ if (fs.existsSync(demoPath)) {
 }
 
 console.log(
-  'Table moments verified: separate canon boundary, accessible quotes, navigation and responsive grouping.',
+  'Table moments verified: separate canon boundary, accessible per-session carousels, keyboard navigation and semantic contrast.',
 );
