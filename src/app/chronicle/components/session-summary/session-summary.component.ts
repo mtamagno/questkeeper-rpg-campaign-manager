@@ -6,6 +6,7 @@
 import {
   Component,
   ChangeDetectionStrategy,
+  computed,
   inject,
   input,
   type InputSignal,
@@ -17,6 +18,8 @@ import { RouterLink } from '@angular/router';
 import { type Session } from '@guild/models/session.model';
 import { BilingualTextPipe } from '@guild/components/bilingual-text/bilingual-text.pipe';
 import { CampaignService } from '@guild/services/campaign.service';
+import { DataService } from '@guild/services/data.service';
+import { resolveNarrativeMood } from '@guild/models/narrativeMood.model';
 
 /**
  * Displays a single session summary card with number, date, title,
@@ -32,10 +35,26 @@ import { CampaignService } from '@guild/services/campaign.service';
 })
 export class SessionSummaryComponent {
   private readonly campaignService = inject(CampaignService);
+  private readonly dataService = inject(DataService);
 
   /** Active campaign ID for building route links. */
   readonly campaignId: Signal<string | undefined> = this.campaignService.activeCampaignId;
 
   /** The session data to display. */
   readonly session: InputSignal<Session> = input.required<Session>();
+  readonly mood = computed(() =>
+    resolveNarrativeMood(
+      this.dataService.campaign(),
+      this.dataService.sortedSessions(),
+      this.session(),
+    ),
+  );
+  readonly summaryMood = computed(() =>
+    resolveNarrativeMood(
+      this.dataService.campaign(),
+      this.dataService.sortedSessions(),
+      this.session(),
+      'summary',
+    ),
+  );
 }

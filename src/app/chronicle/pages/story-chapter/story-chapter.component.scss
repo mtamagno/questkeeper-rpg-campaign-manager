@@ -13,6 +13,12 @@
   max-width: 720px;
   margin: 0 auto;
   padding: $spacing-2xl $spacing-lg;
+  color: var(--narrative-text, $color-text-primary);
+
+  &[data-narrative-mood] {
+    border-radius: $border-radius-md;
+    background: var(--narrative-background);
+  }
 
   // --- 📌 Header: chapter label, title, ornament ---
   &__header {
@@ -52,6 +58,13 @@
   // --- 📖 Prose body — book-style typography ---
   &__body {
     margin-bottom: $spacing-2xl;
+
+    &[data-narrative-mood] {
+      padding: $spacing-lg;
+      border: $border-width-thin solid var(--narrative-border);
+      border-radius: $border-radius-md;
+      background: var(--narrative-surface);
+    }
   }
 
   &__prose {
@@ -59,7 +72,7 @@
     font-size: $font-size-md;
     font-weight: $font-weight-normal;
     line-height: $line-height-relaxed;
-    color: $color-text-primary;
+    color: var(--narrative-text, $color-text-primary);
     text-align: justify;
 
     // Paragraph spacing — book style with text indent

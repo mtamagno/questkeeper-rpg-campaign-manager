@@ -2,6 +2,9 @@
   "id": "session-2",
   "sessionNumber": 2,
   "date": "2026-01-08",
+  "blockMoods": {
+    "summary": "light"
+  },
   "title": { "en": "The Shadow of the Beacon", "it": "L'ombra del Faro" },
   "summary": {
     "en": "A trail of reversed road signs leads the Wayfarers to a beacon that shines without warmth.",

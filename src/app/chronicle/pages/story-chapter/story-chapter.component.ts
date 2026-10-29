@@ -18,6 +18,7 @@ import { DiceLoaderComponent } from '@guild/components/dice-loader/dice-loader.c
 import { BilingualTextPipe } from '@guild/components/bilingual-text/bilingual-text.pipe';
 import { type Session, type SessionImage } from '@guild/models/session.model';
 import { localizeText } from '@guild/models/language.model';
+import { resolveNarrativeMood } from '@guild/models/narrativeMood.model';
 
 /** Regex to split prose HTML at &lt;hr&gt; scene breaks. */
 const PROSE_SECTION_SEPARATOR = /<hr\s*\/?>/gi;
@@ -99,6 +100,23 @@ export class StoryChapterComponent {
 
   /** Whether data is still loading. */
   readonly isLoading: Signal<boolean> = this.dataService.isLoading;
+
+  readonly chapterMood = computed(() =>
+    resolveNarrativeMood(
+      this.dataService.campaign(),
+      this.dataService.sortedSessions(),
+      this.session(),
+    ),
+  );
+
+  readonly proseMood = computed(() =>
+    resolveNarrativeMood(
+      this.dataService.campaign(),
+      this.dataService.sortedSessions(),
+      this.session(),
+      'prose',
+    ),
+  );
 
   /** Chapter number derived from session number. */
   readonly chapterLabel: Signal<string> = computed(() => {

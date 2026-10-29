@@ -15,6 +15,8 @@
   padding: $spacing-lg $spacing-xl;
   @include flex-column;
   gap: $spacing-sm;
+  background: var(--narrative-surface, $color-parchment);
+  border-color: var(--narrative-border, $color-border-subtle);
 
   // --- Header row ---
   &__header {
@@ -44,7 +46,7 @@
     font-family: $font-family-heading;
     font-size: $font-size-lg;
     font-weight: $font-weight-bold;
-    color: $color-text-inverse;
+    color: var(--narrative-text, $color-text-inverse);
     margin: 0;
   }
 
@@ -58,10 +60,16 @@
   // --- Summary text ---
   &__text {
     font-size: $font-size-base;
-    color: $color-text-inverse;
+    color: var(--narrative-text, $color-text-inverse);
     line-height: $line-height-relaxed;
     margin: $spacing-xs 0 0;
     opacity: 0.85;
+
+    &[data-narrative-mood] {
+      padding: $spacing-sm;
+      border-radius: $border-radius-sm;
+      background: var(--narrative-background);
+    }
   }
 
   // --- Story link ---

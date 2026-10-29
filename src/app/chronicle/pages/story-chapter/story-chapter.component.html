@@ -4,7 +4,10 @@
     <app-dice-loader label="The chronicler prepares the manuscript..." [playSound]="false" />
   </div>
 } @else if (session(); as session) {
-  <article class="story-chapter">
+  <article
+    class="story-chapter"
+    [attr.data-narrative-mood]="chapterMood() === 'default' ? null : chapterMood()"
+  >
     <header class="story-chapter__header">
       <app-language-toggle />
       <p class="story-chapter__chapter-label">Chapter {{ chapterLabel() }}</p>
@@ -13,7 +16,10 @@
     </header>
 
     @if (proseChunks().length > 0) {
-      <section class="story-chapter__body">
+      <section
+        class="story-chapter__body"
+        [attr.data-narrative-mood]="proseMood() === 'default' ? null : proseMood()"
+      >
         @for (chunk of proseChunks(); track $index) {
           <div
             class="story-chapter__prose"

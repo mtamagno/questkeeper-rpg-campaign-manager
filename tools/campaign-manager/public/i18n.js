@@ -211,6 +211,37 @@
     'Companion appearance': 'Aspetto del Companion',
     'Styles the published player Companion, not this Manager.':
       'Modifica il Companion pubblicato per i giocatori, non questo Gestore.',
+    'Narrative presentation': 'Presentazione narrativa',
+    'Narrative mood': 'Atmosfera narrativa',
+    'Presentation only. It never changes canon or reads hidden notes.':
+      'Cambia solo la presentazione. Non modifica il canone e non legge appunti nascosti.',
+    'Campaign default': 'Atmosfera predefinita della campagna',
+    'Default Â· inherit': 'Predefinita Â· eredita',
+    'Light Â· open and warm': 'Chiara Â· aperta e calda',
+    'Dark Â· tense and intimate': 'Scura Â· tesa e raccolta',
+    'Published phase': 'Fase pubblicata',
+    'Stable phase ID': 'ID stabile della fase',
+    'Editor label': 'Etichetta editoriale',
+    'Starts at published session ID': 'Inizia dalla sessione pubblicata con ID',
+    'The phase activates only when this public session exists.':
+      'La fase si attiva soltanto quando esiste questa sessione pubblica.',
+    'Phase mood': 'Atmosfera della fase',
+    'Add published phase': 'Aggiungi fase pubblicata',
+    'Remove phase': 'Rimuovi fase',
+    'Chapter mood': 'Atmosfera del capitolo',
+    'Inherits the campaign or published phase when left on Default.':
+      'Se resta Predefinita eredita dalla campagna o dalla fase pubblicata.',
+    'Summary block mood': 'Atmosfera del riepilogo',
+    'Optional override for the session summary only.':
+      'Sostituzione facoltativa limitata al riepilogo della sessione.',
+    'Story-so-far mood': 'Atmosfera della storia fin qui',
+    'Optional override for this recap entry only.':
+      'Sostituzione facoltativa limitata a questa voce del riepilogo.',
+    'Chronicle prose mood': 'Atmosfera della prosa',
+    'Optional override for the long-form chronicle only.':
+      'Sostituzione facoltativa limitata alla cronaca estesa.',
+    'AI may suggest a mood while drafting, but it never applies one silently. Only these reviewed controls change presentation.':
+      "L'AI puÃ² suggerire un'atmosfera durante la bozza, ma non la applica mai senza conferma. Solo questi controlli revisionati cambiano la presentazione.",
     Heroic: 'Eroica',
     Gothic: 'Gotica',
     Neutral: 'Neutrale',
