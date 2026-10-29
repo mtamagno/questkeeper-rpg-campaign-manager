@@ -3,6 +3,8 @@
 // Curated presets set visual identity; semantic components remain unchanged.
 // ============================================
 
+@use 'variables' as *;
+
 [data-qk-palette='neutral'] {
   color-scheme: dark;
   --campaign-canvas: #101318;
@@ -66,6 +68,33 @@
   --campaign-glow: rgba(192, 97, 115, 0.22);
 }
 
+[data-qk-palette='custom'] {
+  color-scheme: dark;
+  // Safe defaults are replaced by validated inline semantic roles. If the
+  // author draft is legacy or invalid, runtime resolution selects Heroic and
+  // this selector is never activated.
+  --campaign-canvas: #0a0a0f;
+  --campaign-canvas-deep: var(--campaign-canvas);
+  --campaign-surface: #222233;
+  --campaign-surface-raised: var(--campaign-surface);
+  --campaign-overlay: color-mix(in srgb, var(--campaign-canvas) 93%, transparent);
+  --campaign-text: #f0eadb;
+  --campaign-text-secondary: var(--campaign-text);
+  --campaign-text-muted: var(--campaign-text);
+  --campaign-border-subtle: var(--campaign-border);
+  --campaign-border: #6e6e8b;
+  --campaign-border-strong: var(--campaign-border);
+  --campaign-accent: #f4d96d;
+  --campaign-accent-strong: var(--campaign-accent);
+  --campaign-accent-light: var(--campaign-accent);
+  --campaign-on-accent: #0a0a0f;
+  --campaign-focus: var(--campaign-accent);
+  --campaign-glow: color-mix(in srgb, var(--campaign-accent) 20%, transparent);
+  --campaign-success: #73d69e;
+  --campaign-warning: #f2c96d;
+  --campaign-danger: #f08a8a;
+}
+
 // Resolve the campaign tier into the shared semantic contract on the same
 // element. This keeps nested cards and future embedded previews self-contained.
 [data-qk-palette] {
@@ -86,4 +115,7 @@
   --qk-color-accent-soft: var(--campaign-glow);
   --qk-color-on-accent: var(--campaign-on-accent);
   --qk-color-focus: var(--campaign-focus);
+  --qk-color-success: var(--campaign-success, #{$color-success-light});
+  --qk-color-warning: var(--campaign-warning, #{$color-warning-light});
+  --qk-color-danger: var(--campaign-danger, #{$color-danger-light});
 }

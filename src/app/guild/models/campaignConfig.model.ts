@@ -4,7 +4,10 @@
  */
 
 import { type BilingualText } from '@guild/models/language.model';
-import { type CampaignPalette } from '@guild/models/campaignPalette.model';
+import {
+  type CampaignCustomPalette,
+  type CampaignPalette,
+} from '@guild/models/campaignPalette.model';
 import { type CampaignGameSystem } from '@guild/models/rulesetProfile.model';
 
 /** A single campaign listed in the global campaigns manifest. */
@@ -16,6 +19,8 @@ export interface CampaignManifestEntry {
   readonly defaultLanguage?: string;
   /** Curated visual identity. Missing values retain the legacy heroic theme. */
   readonly palette?: CampaignPalette;
+  /** Versioned semantic role overrides. Preserved even when invalid so authors can repair drafts. */
+  readonly customPalette?: CampaignCustomPalette;
   readonly gameSystem?: CampaignGameSystem;
   /** Legacy authored label retained for pre-gameSystem manifests. */
   readonly edition?: string;

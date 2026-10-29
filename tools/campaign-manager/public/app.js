@@ -945,20 +945,174 @@ function section(label) {
   return `<div class="form-section">${escapeHtml(label)}</div>`;
 }
 
-function palettePicker(value = 'heroic') {
+const PALETTE_ROLE_LABELS = {
+  background: 'Background',
+  surface: 'Surface',
+  text: 'Text',
+  accent: 'Accent and focus',
+  border: 'Borders',
+  success: 'Success',
+  warning: 'Warning',
+  danger: 'Danger',
+};
+
+const PALETTE_PRESETS = {
+  heroic: {
+    background: '#0A0A0F',
+    surface: '#222233',
+    text: '#F0EADB',
+    accent: '#F4D96D',
+    border: '#6E6E8B',
+    success: '#73D69E',
+    warning: '#F2C96D',
+    danger: '#F08A8A',
+  },
+  gothic: {
+    background: '#0D0B0E',
+    surface: '#211A22',
+    text: '#F0E7E1',
+    accent: '#E7A0AD',
+    border: '#8D5A68',
+    success: '#79D29C',
+    warning: '#EFC36A',
+    danger: '#F08C99',
+  },
+  neutral: {
+    background: '#101318',
+    surface: '#1D242D',
+    text: '#F0EDE6',
+    accent: '#C6D9E7',
+    border: '#78899A',
+    success: '#75D4A0',
+    warning: '#EBC66F',
+    danger: '#EC9191',
+  },
+};
+
+const PALETTE_CONTRAST_PAIRS = [
+  ['text', 'background', 4.5],
+  ['text', 'surface', 4.5],
+  ['accent', 'background', 4.5],
+  ['accent', 'surface', 4.5],
+  ['border', 'background', 3],
+  ['border', 'surface', 3],
+  ['success', 'background', 4.5],
+  ['warning', 'background', 4.5],
+  ['danger', 'background', 4.5],
+];
+
+function paletteLuminance(color) {
+  const channels = [1, 3, 5].map((index) => {
+    const value = Number.parseInt(color.slice(index, index + 2), 16) / 255;
+    return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+  });
+  return channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722;
+}
+
+function paletteContrast(first, second) {
+  const light = Math.max(paletteLuminance(first), paletteLuminance(second));
+  const dark = Math.min(paletteLuminance(first), paletteLuminance(second));
+  return (light + 0.05) / (dark + 0.05);
+}
+
+function paletteDraftFromFields() {
+  const studio = fields.querySelector('[data-palette-studio]');
+  if (!studio) return null;
+  return {
+    version: 1,
+    name: studio.querySelector('[name="customPaletteName"]')?.value.trim() || 'Custom palette',
+    base: studio.querySelector('[name="customPaletteBase"]')?.value || 'heroic',
+    roles: Object.fromEntries(
+      Object.keys(PALETTE_ROLE_LABELS).map((role) => [
+        role,
+        studio.querySelector(`[name="paletteRole__${role}"]`)?.value.toUpperCase(),
+      ]),
+    ),
+  };
+}
+
+function paletteContrastReport(roles) {
+  return PALETTE_CONTRAST_PAIRS.map(([foreground, background, minimum]) => {
+    const ratio = paletteContrast(roles[foreground], roles[background]);
+    return { foreground, background, minimum, ratio, passes: ratio >= minimum };
+  });
+}
+
+function customPaletteStudio(customPalette, selectedPalette) {
+  const base = ['heroic', 'gothic', 'neutral'].includes(customPalette?.base)
+    ? customPalette.base
+    : ['heroic', 'gothic', 'neutral'].includes(selectedPalette)
+      ? selectedPalette
+      : 'heroic';
+  const roles = { ...PALETTE_PRESETS[base], ...(customPalette?.roles ?? {}) };
+  return `<section class="palette-studio" data-palette-studio ${selectedPalette === 'custom' ? '' : 'hidden'}>
+    <header><div><strong>Custom Companion palette</strong><small>Semantic roles keep every screen consistent.</small></div><div class="palette-studio__preset-actions">${Object.keys(
+      PALETTE_PRESETS,
+    )
+      .map(
+        (id) =>
+          `<button type="button" class="secondary-button" data-palette-duplicate="${id}">Duplicate ${id}</button>`,
+      )
+      .join('')}</div></header>
+    <input type="hidden" name="customPaletteBase" value="${escapeHtml(base)}" />
+    ${field('customPaletteName', 'Palette name', customPalette?.name || 'Custom palette', { wide: true })}
+    <div class="palette-studio__roles">${Object.entries(PALETTE_ROLE_LABELS)
+      .map(
+        ([role, label]) =>
+          `<label class="palette-role"><span>${escapeHtml(label)}</span><span class="palette-role__controls"><input type="color" name="paletteRole__${role}" value="${escapeHtml(roles[role])}" /><output data-palette-value="${role}">${escapeHtml(roles[role])}</output><button type="button" class="icon-button" data-palette-reset="${role}" aria-label="Reset ${escapeHtml(label)}">↺</button></span></label>`,
+      )
+      .join('')}</div>
+    <div class="palette-preview" data-palette-preview>
+      <nav><strong>QuestKeeper</strong><a href="#" onclick="return false">Chronicle</a><a href="#" onclick="return false">Characters</a></nav>
+      <article><span class="eyebrow">Representative Companion preview</span><h3>A card, a choice and a secret</h3><p>Body text and supporting information remain readable on campaign surfaces.</p><div><button type="button">Primary action</button><button type="button" class="preview-secondary">Secondary</button></div><aside tabindex="0"><strong>Protected content</strong><span>Focus and dialog boundaries stay visible.</span></aside><div class="palette-preview__states"><span data-state="success">Success</span><span data-state="warning">Warning</span><span data-state="danger">Danger</span></div></article>
+    </div>
+    <div class="palette-contrast" data-palette-contrast role="status" aria-live="polite"></div>
+    <div class="action-row"><button type="button" class="secondary-button" data-palette-export>Export palette</button><button type="button" class="secondary-button" data-palette-import>Import palette</button><input type="file" accept="application/json,.json" data-palette-import-file hidden /></div>
+  </section>`;
+}
+
+function palettePicker(value = 'heroic', customPalette) {
   const choices = [
     ['heroic', 'Heroic', 'Gold and midnight'],
     ['gothic', 'Gothic', 'Burgundy and fog'],
     ['neutral', 'Neutral', 'Slate and silver'],
+    ['custom', 'Custom', 'Your accessible semantic roles'],
   ];
-  return `<fieldset class="field field--wide palette-picker"><legend>Campaign palette</legend><div class="palette-picker__grid">${choices
+  return `<fieldset class="field field--wide palette-picker"><legend>Companion appearance</legend><p>Styles the published player Companion, not this Manager.</p><div class="palette-picker__grid">${choices
     .map(
       ([id, name, description]) =>
         `<label class="palette-choice palette-choice--${id}"><input type="radio" name="palette" value="${id}" ${id === value ? 'checked' : ''} /><span class="palette-choice__swatch" aria-hidden="true"><i></i><i></i><i></i></span><span><strong>${name}</strong><small>${description}</small></span></label>`,
     )
     .join(
       '',
-    )}</div><small>Previewed here and applied when the Companion tab reloads or regains focus.</small></fieldset>`;
+    )}</div><small>Previewed here and applied when the Companion tab reloads or regains focus.</small>${customPaletteStudio(customPalette, value)}</fieldset>`;
+}
+
+function refreshPaletteStudio() {
+  const studio = fields.querySelector('[data-palette-studio]');
+  if (!studio) return;
+  const selected = fields.querySelector('[name="palette"]:checked')?.value ?? 'heroic';
+  studio.hidden = selected !== 'custom';
+  const save = document.querySelector('#dialog-save');
+  if (selected !== 'custom') {
+    save.disabled = false;
+    return;
+  }
+  const draft = paletteDraftFromFields();
+  const preview = studio.querySelector('[data-palette-preview]');
+  for (const [role, color] of Object.entries(draft.roles)) {
+    preview.style.setProperty(`--preview-${role}`, color);
+    studio.querySelector(`[data-palette-value="${role}"]`).textContent = color;
+  }
+  const report = paletteContrastReport(draft.roles);
+  const failures = report.filter((entry) => !entry.passes);
+  studio.querySelector('[data-palette-contrast]').innerHTML = report
+    .map(
+      (entry) =>
+        `<span class="palette-contrast__item ${entry.passes ? 'pass' : 'fail'}"><strong>${entry.passes ? 'Pass' : 'Fix'}</strong> ${escapeHtml(PALETTE_ROLE_LABELS[entry.foreground])} / ${escapeHtml(PALETTE_ROLE_LABELS[entry.background])}: ${entry.ratio.toFixed(2)}:1 (min ${entry.minimum.toFixed(1)}:1)</span>`,
+    )
+    .join('');
+  save.disabled = failures.length > 0;
 }
 
 function normalizeLanguageCodes(value) {
@@ -1420,7 +1574,7 @@ function campaignForm(campaign) {
     section('Game system'),
     rulesetPicker(gameSystem),
     customEditionField(details.edition ?? gameSystem.edition ?? '', gameSystem.id),
-    palettePicker(entry.palette ?? 'heroic'),
+    palettePicker(entry.palette ?? 'heroic', entry.customPalette),
     section('Your table'),
     field('dungeonMaster', 'Game Master', details.dungeonMaster ?? ''),
     field('partyName', 'Party name', details.partyName ?? ''),
@@ -1438,6 +1592,7 @@ function openCampaignEditor(editing = false) {
   if (editing && fields.querySelector('[name="id"]')) {
     fields.querySelector('[name="id"]').disabled = true;
   }
+  refreshPaletteStudio();
 }
 
 function currentCampaignLocalizedValues() {
@@ -1897,6 +2052,7 @@ async function saveCampaign(form) {
       ),
     },
   };
+  if (data.palette === 'custom') data.customPalette = paletteDraftFromFields();
   if (creating) {
     const created = await api('/api/campaigns', { method: 'POST', body: JSON.stringify(data) });
     state.selectedId = created.manifestEntry.id;
@@ -3523,6 +3679,35 @@ content.addEventListener('submit', (event) => {
 });
 
 fields.addEventListener('click', (event) => {
+  const duplicatePalette = event.target.closest('[data-palette-duplicate]');
+  if (duplicatePalette) {
+    const base = duplicatePalette.dataset.paletteDuplicate;
+    const preset = PALETTE_PRESETS[base];
+    fields.querySelector('[name="palette"][value="custom"]').checked = true;
+    fields.querySelector('[name="customPaletteBase"]').value = base;
+    for (const [role, color] of Object.entries(preset)) {
+      fields.querySelector(`[name="paletteRole__${role}"]`).value = color;
+    }
+    refreshPaletteStudio();
+    return;
+  }
+  const resetPaletteRole = event.target.closest('[data-palette-reset]');
+  if (resetPaletteRole) {
+    const role = resetPaletteRole.dataset.paletteReset;
+    const base = fields.querySelector('[name="customPaletteBase"]')?.value || 'heroic';
+    fields.querySelector(`[name="paletteRole__${role}"]`).value = PALETTE_PRESETS[base][role];
+    refreshPaletteStudio();
+    return;
+  }
+  if (event.target.closest('[data-palette-export]')) {
+    downloadJson(paletteDraftFromFields(), 'questkeeper-companion-palette.json');
+    toast('Custom Companion palette exported.');
+    return;
+  }
+  if (event.target.closest('[data-palette-import]')) {
+    fields.querySelector('[data-palette-import-file]')?.click();
+    return;
+  }
   const addCompendiumEntry = event.target.closest('[data-compendium-add-entry]');
   if (addCompendiumEntry) {
     const list = fields.querySelector('[data-compendium-entries]');
@@ -3611,6 +3796,45 @@ fields.addEventListener('click', (event) => {
 });
 
 fields.addEventListener('change', (event) => {
+  if (event.target.name === 'palette') {
+    refreshPaletteStudio();
+    return;
+  }
+  if (event.target.matches('[name^="paletteRole__"]')) {
+    refreshPaletteStudio();
+    return;
+  }
+  if (event.target.matches('[data-palette-import-file]')) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    file
+      .text()
+      .then((text) => {
+        const palette = JSON.parse(text);
+        if (palette?.version !== 1 || !palette.roles) {
+          throw new Error('This is not a supported QuestKeeper palette file.');
+        }
+        const base = ['heroic', 'gothic', 'neutral'].includes(palette.base)
+          ? palette.base
+          : 'heroic';
+        fields.querySelector('[name="palette"][value="custom"]').checked = true;
+        fields.querySelector('[name="customPaletteBase"]').value = base;
+        fields.querySelector('[name="customPaletteName"]').value = String(
+          palette.name || 'Imported palette',
+        ).slice(0, 80);
+        for (const role of Object.keys(PALETTE_ROLE_LABELS)) {
+          const color = String(palette.roles[role] || '').toUpperCase();
+          if (!/^#[0-9A-F]{6}$/.test(color)) {
+            throw new Error(`Imported ${role} colour is missing or invalid.`);
+          }
+          fields.querySelector(`[name="paletteRole__${role}"]`).value = color;
+        }
+        refreshPaletteStudio();
+        toast('Palette imported as an editable draft. Review contrast before saving.');
+      })
+      .catch((error) => showDialogError(error.message));
+    return;
+  }
   if (event.target.matches('[data-notebook-toggle]')) {
     const body = event.target
       .closest('[data-notebook-editor]')
@@ -3659,6 +3883,10 @@ fields.addEventListener('keydown', (event) => {
     event.preventDefault();
     addCampaignLanguage(true);
   }
+});
+
+fields.addEventListener('input', (event) => {
+  if (event.target.matches('[name^="paletteRole__"]')) refreshPaletteStudio();
 });
 
 editorForm.addEventListener('submit', (event) => {

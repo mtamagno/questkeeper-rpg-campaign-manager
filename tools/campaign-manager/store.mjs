@@ -9,13 +9,14 @@ import {
 } from './entity-identity.mjs';
 import { normalizeCampaignLanguages, normalizeLanguageTag } from './language-catalog.mjs';
 import { normalizeGameSystem } from './ruleset-profiles.mjs';
+import { CAMPAIGN_PALETTE_IDS, normalizeCustomPalette } from './campaign-palettes.mjs';
 import storagePaths from '../storage-paths.cjs';
 
 const { resolveStoragePaths } = storagePaths;
 
 const ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const ENTITY_TYPE_SET = new Set(ENTITY_TYPES);
-const CAMPAIGN_PALETTES = new Set(['heroic', 'gothic', 'neutral']);
+const CAMPAIGN_PALETTES = new Set(CAMPAIGN_PALETTE_IDS);
 const campaignWriteLocks = new Map();
 
 function nowStamp() {
@@ -59,7 +60,7 @@ function defaultCampaignLanguage(value, languages) {
 function normalizeCampaignPalette(value, fallback = 'heroic') {
   const palette = value ?? fallback;
   if (!CAMPAIGN_PALETTES.has(palette)) {
-    throw new Error('Campaign palette must be heroic, gothic or neutral.');
+    throw new Error('Campaign palette must be heroic, gothic, neutral or custom.');
   }
   return palette;
 }
@@ -250,6 +251,9 @@ export async function createCampaign(projectRoot, input) {
     languages,
     defaultLanguage,
     palette: normalizeCampaignPalette(input.palette),
+    ...(input.palette === 'custom'
+      ? { customPalette: normalizeCustomPalette(input.customPalette) }
+      : {}),
     name: input.name,
     description: input.description ?? { [defaultLanguage]: '' },
     thumbnail: '',
@@ -298,11 +302,20 @@ export async function updateCampaign(projectRoot, campaignId, input) {
   const defaultLanguage = defaultCampaignLanguage(requestedDefault, languages);
   const nextName = input.name ?? current.manifestEntry.name;
   assertDefaultLocalizedValue(nextName, defaultLanguage, 'Campaign name');
+  const nextPalette = normalizeCampaignPalette(input.palette ?? current.manifestEntry.palette);
+  const suppliedCustomPalette = Object.hasOwn(input, 'customPalette');
+  const nextCustomPalette = suppliedCustomPalette
+    ? normalizeCustomPalette(input.customPalette)
+    : current.manifestEntry.customPalette;
+  if (nextPalette === 'custom' && !nextCustomPalette) {
+    throw new Error('Custom palette data is required. Duplicate a preset to begin.');
+  }
   const nextEntry = {
     ...current.manifestEntry,
     languages,
     defaultLanguage,
-    palette: normalizeCampaignPalette(input.palette ?? current.manifestEntry.palette),
+    palette: nextPalette,
+    ...(nextCustomPalette ? { customPalette: nextCustomPalette } : {}),
     name: nextName,
     description: input.description ?? current.manifestEntry.description,
     status: input.status ?? current.manifestEntry.status,
