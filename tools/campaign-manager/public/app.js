@@ -7,8 +7,55 @@ const fields = document.querySelector('#dialog-fields');
 const dialogError = document.querySelector('#dialog-error');
 const mobileMenu = document.querySelector('#mobile-menu');
 const serviceDialog = document.querySelector('#service-dialog');
+const managerSettingsDialog = document.querySelector('#manager-settings-dialog');
 const MY_CHARACTERS_KEY = 'questkeeper-manager-my-characters:v1';
+const MANAGER_THEME_KEY = 'questkeeper-manager-theme:v1';
+const MANAGER_THEMES = ['system', 'light', 'dark', 'contrast'];
+const managerThemeMedia = window.matchMedia('(prefers-color-scheme: light)');
 const initialCampaignId = new URL(window.location.href).searchParams.get('campaign');
+
+function managerThemePreference() {
+  const value = document.documentElement.dataset.managerThemePreference;
+  return MANAGER_THEMES.includes(value) ? value : 'system';
+}
+
+function resolvedManagerTheme(preference) {
+  return preference === 'system' ? (managerThemeMedia.matches ? 'light' : 'dark') : preference;
+}
+
+function syncManagerThemeUi() {
+  const preference = managerThemePreference();
+  const radio = document.querySelector(`[name="managerTheme"][value="${preference}"]`);
+  if (radio) radio.checked = true;
+  const labels = {
+    system: 'System',
+    light: 'Light',
+    dark: 'Dark',
+    contrast: 'High contrast',
+  };
+  const summary = document.querySelector('#manager-theme-summary');
+  if (summary) {
+    summary.textContent = `Appearance · ${labels[preference]}`;
+    window.managerI18n?.translateTree?.(summary);
+  }
+}
+
+function setManagerTheme(preference, persist = true) {
+  const next = MANAGER_THEMES.includes(preference) ? preference : 'system';
+  document.documentElement.dataset.managerThemePreference = next;
+  document.documentElement.dataset.managerTheme = resolvedManagerTheme(next);
+  if (persist) {
+    try {
+      if (next === 'system') localStorage.removeItem(MANAGER_THEME_KEY);
+      else localStorage.setItem(MANAGER_THEME_KEY, next);
+    } catch {}
+  }
+  syncManagerThemeUi();
+}
+
+managerThemeMedia.addEventListener('change', () => {
+  if (managerThemePreference() === 'system') setManagerTheme('system', false);
+});
 
 function readMyCharacters() {
   try {
@@ -3920,6 +3967,26 @@ document.querySelector('#dialog-cancel').addEventListener('click', () => {
   clearDialogError();
   dialog.close();
 });
+
+document.querySelector('#show-manager-settings').addEventListener('click', () => {
+  syncManagerThemeUi();
+  managerSettingsDialog.showModal();
+});
+document.querySelector('#manager-settings-close').addEventListener('click', () => {
+  managerSettingsDialog.close();
+});
+document.querySelector('#manager-settings-done').addEventListener('click', () => {
+  managerSettingsDialog.close();
+});
+document.querySelector('#manager-theme-reset').addEventListener('click', () => {
+  setManagerTheme('system');
+  toast('Manager appearance now follows this device.');
+});
+managerSettingsDialog.addEventListener('change', (event) => {
+  if (event.target.name !== 'managerTheme') return;
+  setManagerTheme(event.target.value);
+});
+syncManagerThemeUi();
 
 loadState({ allowFirstRunPrompt: true }).catch((error) => {
   content.innerHTML = `<div class="empty">${escapeHtml(error.message)}</div>`;

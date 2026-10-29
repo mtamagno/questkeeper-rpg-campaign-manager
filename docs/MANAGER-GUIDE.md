@@ -59,10 +59,21 @@ relationship prose inside an NPC biography. For NPC feelings, record only what
 published events let the party observe, hear or infer; AI suggestions follow the
 same rule and remain editable drafts.
 
-When creating or editing a campaign, choose **Heroic**, **Gothic** or
-**Neutral**. The preset updates the Companion's surfaces, accents and focus
-colors while preserving readable status colors. Existing campaigns without a
-selection keep the Heroic appearance, and the choice can be changed later.
+When creating or editing a campaign, **Companion appearance** controls the
+published player-facing site. Choose Heroic, Gothic, Neutral or an accessible
+custom semantic palette. This is campaign data and therefore travels with a
+backup or export.
+
+Open **Manager settings** for the separate authoring-app appearance. System,
+Light, Dark and High contrast are local browser preferences: they never enter a
+campaign export or alter what players see. **Reset to system** follows the
+device again, and the preference is applied before the first painted frame to
+avoid a bright/dark startup flash.
+
+In italiano: **Aspetto del Companion** modifica il sito pubblicato ed è salvato
+nella campagna. **Impostazioni del Gestore → Aspetto del Gestore** modifica
+soltanto questa app e questo browser. **Ripristina sistema** torna a seguire il
+tema del dispositivo; la preferenza del Gestore non viene mai esportata.
 
 For faster character and NPC entry, choose an assisted import source:
 
