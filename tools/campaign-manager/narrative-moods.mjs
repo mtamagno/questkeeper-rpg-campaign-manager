@@ -79,9 +79,10 @@ export function normalizeSessionNarrativeMood(entity) {
 
 export function resolveNarrativeMood(campaign, sessions, session, block) {
   let resolved = campaign?.narrativeMood?.default ?? 'default';
-  if (!session) return resolved;
   const ordered = [...sessions].sort((a, b) => a.sessionNumber - b.sessionNumber);
-  const targetIndex = ordered.findIndex(({ id }) => id === session.id);
+  const targetSession = session ?? ordered.at(-1);
+  if (!targetSession) return resolved;
+  const targetIndex = ordered.findIndex(({ id }) => id === targetSession.id);
   if (targetIndex >= 0) {
     for (const phase of campaign?.narrativeMood?.phases ?? []) {
       const milestoneIndex = ordered.findIndex(({ id }) => id === phase.startsAtSessionId);
@@ -90,8 +91,8 @@ export function resolveNarrativeMood(campaign, sessions, session, block) {
       }
     }
   }
-  if (session.mood && session.mood !== 'default') resolved = session.mood;
-  if (block && session.blockMoods?.[block] && session.blockMoods[block] !== 'default') {
+  if (session?.mood && session.mood !== 'default') resolved = session.mood;
+  if (block && session?.blockMoods?.[block] && session.blockMoods[block] !== 'default') {
     resolved = session.blockMoods[block];
   }
   return resolved;

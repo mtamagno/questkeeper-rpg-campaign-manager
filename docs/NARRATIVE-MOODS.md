@@ -13,6 +13,8 @@ Mood is resolved in this order:
 
 `default` means “inherit”. Existing campaigns without mood data keep their previous rendering.
 
+Campaign-wide narrative surfaces use the phase reached by the latest published session. A session-only override never leaks back into that wider campaign state.
+
 Campaign phases use an explicit `startsAtSessionId`. A phase activates only when that public session exists, so private notes, unpublished drafts and inferred spoilers can never switch the player-facing mood.
 
 ```json
