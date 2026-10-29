@@ -992,6 +992,100 @@ function section(label) {
   return `<div class="form-section">${escapeHtml(label)}</div>`;
 }
 
+const INVENTORY_CATEGORIES = new Set([
+  'weapon',
+  'armor',
+  'consumable',
+  'tool',
+  'quest',
+  'gear',
+  'other',
+]);
+const RESOURCE_RECOVERY = new Set(['short-rest', 'long-rest', 'dawn', 'manual']);
+
+function stableLineId(prefix, name, index) {
+  const slug = String(name || '')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 48);
+  return `${prefix}-${slug || 'entry'}-${index + 1}`;
+}
+
+function inventoryEditorValue(sheet = {}) {
+  const entries = sheet.inventory?.length
+    ? sheet.inventory
+    : (sheet.equipment ?? []).map((name) => ({ name }));
+  return entries
+    .map((item) =>
+      [
+        item.name,
+        item.quantity ?? 1,
+        item.category ?? 'gear',
+        item.equipped ? 'yes' : 'no',
+        item.note ?? '',
+      ].join(' | '),
+    )
+    .join('\n');
+}
+
+function resourceEditorValue(resources = []) {
+  return resources
+    .map((resource) =>
+      [
+        resource.name,
+        `${resource.current ?? 0}/${resource.maximum ?? 0}`,
+        resource.recovery ?? 'manual',
+        resource.note ?? '',
+      ].join(' | '),
+    )
+    .join('\n');
+}
+
+function parseInventory(value, previous = []) {
+  const previousByName = new Map(previous.map((item) => [item.name.trim().toLowerCase(), item]));
+  return String(value || '')
+    .split('\n')
+    .map((line) => line.split('|').map((part) => part.trim()))
+    .filter(([name]) => name)
+    .map(([name, quantity, category, equipped, note], index) => {
+      const old = previousByName.get(name.toLowerCase());
+      const parsedQuantity = Number.parseInt(quantity, 10);
+      return {
+        id: old?.id || stableLineId('item', name, index),
+        name,
+        quantity: Number.isFinite(parsedQuantity) ? Math.max(1, parsedQuantity) : 1,
+        category: INVENTORY_CATEGORIES.has(category) ? category : 'gear',
+        equipped: /^(yes|true|1|equipped)$/i.test(equipped),
+        ...(note ? { note } : {}),
+      };
+    });
+}
+
+function parseResources(value, previous = []) {
+  const previousByName = new Map(previous.map((item) => [item.name.trim().toLowerCase(), item]));
+  return String(value || '')
+    .split('\n')
+    .map((line) => line.split('|').map((part) => part.trim()))
+    .filter(([name]) => name)
+    .map(([name, amount, recovery, note], index) => {
+      const [rawCurrent, rawMaximum] = String(amount || '').split('/');
+      const maximum = Math.max(0, Number.parseInt(rawMaximum, 10) || 0);
+      const current = Math.min(maximum, Math.max(0, Number.parseInt(rawCurrent, 10) || 0));
+      const old = previousByName.get(name.toLowerCase());
+      return {
+        id: old?.id || stableLineId('resource', name, index),
+        name,
+        current,
+        maximum,
+        recovery: RESOURCE_RECOVERY.has(recovery) ? recovery : 'manual',
+        ...(note ? { note } : {}),
+      };
+    });
+}
+
 const MOOD_OPTIONS = [
   ['default', 'Default · inherit'],
   ['light', 'Light · open and warm'],
@@ -1890,10 +1984,21 @@ function entityForm(type, item = {}) {
         type: 'textarea',
         hint: 'One per line.',
       }),
-      field('equipment', 'Equipment', (item.sheet?.equipment ?? []).join('\n'), {
+      field('inventory', 'Inventory', inventoryEditorValue(item.sheet), {
         type: 'textarea',
-        hint: 'One item per line.',
+        wide: true,
+        hint: 'One per line: name | quantity | weapon/armor/consumable/tool/quest/gear/other | yes/no equipped | optional note.',
       }),
+      field(
+        'combatResources',
+        'Combat resources',
+        resourceEditorValue(item.sheet?.combatResources),
+        {
+          type: 'textarea',
+          wide: true,
+          hint: 'One per line: name | current/maximum | short-rest/long-rest/dawn/manual | optional note.',
+        },
+      ),
       field('features', 'Features and traits', (item.sheet?.features ?? []).join('\n'), {
         type: 'textarea',
         hint: 'One per line.',
@@ -2484,6 +2589,14 @@ async function buildEntity(type, form, original = {}) {
     const notebook = await buildNotebook(item.notebook);
     if (notebook) item.notebook = notebook;
     else delete item.notebook;
+    const inventory = parseInventory(
+      form.get('inventory')?.toString(),
+      item.sheet?.inventory ?? [],
+    );
+    const combatResources = parseResources(
+      form.get('combatResources')?.toString(),
+      item.sheet?.combatResources ?? [],
+    );
     item.sheet = {
       ...item.sheet,
       level: Number(form.get('level')) || 1,
@@ -2505,7 +2618,7 @@ async function buildEntity(type, form, original = {}) {
         ),
       ),
       ...Object.fromEntries(
-        ['savingThrows', 'skills', 'languages', 'equipment', 'features'].map((key) => [
+        ['savingThrows', 'skills', 'languages', 'features'].map((key) => [
           key,
           form
             .get(key)
@@ -2515,7 +2628,12 @@ async function buildEntity(type, form, original = {}) {
             .filter(Boolean),
         ]),
       ),
+      equipment: inventory.map((entry) => entry.name),
+      ...(inventory.length ? { inventory } : {}),
+      ...(combatResources.length ? { combatResources } : {}),
     };
+    if (!inventory.length) delete item.sheet.inventory;
+    if (!combatResources.length) delete item.sheet.combatResources;
     return item;
   }
   if (type === 'npcs') {
@@ -3041,8 +3159,16 @@ async function processEntityImport(type) {
       }
       for (const [ability, value] of Object.entries(draft.abilityScores ?? {}))
         setFormValue(`ability__${ability}`, value || 10);
-      for (const key of ['savingThrows', 'skills', 'languages', 'equipment', 'features'])
+      for (const key of ['savingThrows', 'skills', 'languages', 'features'])
         setFormValue(key, (draft[key] ?? []).join('\n'));
+      setFormValue(
+        'inventory',
+        inventoryEditorValue({
+          inventory: draft.inventory,
+          equipment: draft.equipment,
+        }),
+      );
+      setFormValue('combatResources', resourceEditorValue(draft.combatResources));
     }
     const review = fields.querySelector('[data-ai-entity-review]');
     review.hidden = false;

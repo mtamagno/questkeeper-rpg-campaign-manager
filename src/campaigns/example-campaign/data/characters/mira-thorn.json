@@ -261,6 +261,54 @@
     "skills": ["Acrobatics", "Insight", "Survival"],
     "languages": ["Common", "Courier Cant"],
     "equipment": ["Weatherproof coat", "Red letter case", "Silver whistle", "Glass-beacon shard"],
+    "inventory": [
+      {
+        "id": "weatherproof-coat",
+        "name": "Weatherproof coat",
+        "quantity": 1,
+        "category": "armor",
+        "equipped": true,
+        "note": "Waxed canvas, repaired along the left shoulder."
+      },
+      {
+        "id": "red-letter-case",
+        "name": "Red letter case",
+        "quantity": 1,
+        "category": "quest",
+        "equipped": true
+      },
+      {
+        "id": "silver-whistle",
+        "name": "Silver whistle",
+        "quantity": 1,
+        "category": "tool",
+        "equipped": true
+      },
+      {
+        "id": "glass-beacon-shard",
+        "name": "Glass-beacon shard",
+        "quantity": 1,
+        "category": "quest",
+        "equipped": false
+      }
+    ],
+    "combatResources": [
+      {
+        "id": "tailwind-step",
+        "name": "Tailwind Step",
+        "current": 1,
+        "maximum": 2,
+        "recovery": "short-rest",
+        "note": "One burst remains before Mira needs to catch her breath."
+      },
+      {
+        "id": "courier-focus",
+        "name": "Courier Focus",
+        "current": 3,
+        "maximum": 3,
+        "recovery": "long-rest"
+      }
+    ],
     "features": ["Sure-footed", "Weather Eye", "Tailwind Step"],
     "spells": ["Guiding Gust", "Roadspark"],
     "currency": { "gp": 11, "sp": 4 }

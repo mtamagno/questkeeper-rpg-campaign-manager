@@ -13,6 +13,7 @@ import {
   type CharacterSheet,
 } from '@guild/models/character.model';
 import { type BilingualText } from '@guild/models/language.model';
+import { inventoryViews } from '../utils/characterSheetPresentation';
 import { SPELL_CATEGORIES } from '@arcana/constants/spells.constants';
 import { SPELL_SCHOOLS, isSpellEntry, type SpellEntry } from '@arcana/models/compendium.model';
 
@@ -720,8 +721,11 @@ function drawFeatureAndInventoryColumns(
 
   sectionTitle(doc, language === 'it' ? 'Inventario' : 'Inventory', y, rightX, columnWidth);
   const inventoryRows: string[][] = [];
-  for (let index = 0; index < sheet.equipment.length; index += 2) {
-    inventoryRows.push([sheet.equipment[index] ?? '', sheet.equipment[index + 1] ?? '']);
+  const inventory = inventoryViews(sheet).map(
+    (item) => `${item.name}${item.quantity > 1 ? ` ×${item.quantity}` : ''}`,
+  );
+  for (let index = 0; index < inventory.length; index += 2) {
+    inventoryRows.push([inventory[index] ?? '', inventory[index + 1] ?? '']);
   }
   autoTable(doc, {
     startY: y + 4,

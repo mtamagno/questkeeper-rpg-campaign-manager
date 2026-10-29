@@ -153,6 +153,33 @@ export interface CharacterCurrency {
   readonly pp?: number;
 }
 
+/** When a table-side resource normally becomes available again. */
+export type CharacterResourceRecovery = 'short-rest' | 'long-rest' | 'dawn' | 'manual';
+
+/** A finite class, ancestry, item or encounter resource visible at a glance. */
+export interface CharacterCombatResource {
+  readonly id: string;
+  readonly name: string;
+  readonly current: number;
+  readonly maximum: number;
+  readonly recovery?: CharacterResourceRecovery;
+  readonly note?: string;
+}
+
+/** Broad inventory grouping used for scanning, not rules automation. */
+export type CharacterInventoryCategory =
+  'weapon' | 'armor' | 'consumable' | 'tool' | 'quest' | 'gear' | 'other';
+
+/** A structured carried item. Legacy `equipment` strings remain fully supported. */
+export interface CharacterInventoryItem {
+  readonly id: string;
+  readonly name: string;
+  readonly quantity?: number;
+  readonly category?: CharacterInventoryCategory;
+  readonly equipped?: boolean;
+  readonly note?: string;
+}
+
 /** A pool of spell slots for one spell level. */
 export interface CharacterSpellSlots {
   readonly level: number;
@@ -187,7 +214,12 @@ export interface CharacterSheet {
   readonly savingThrows: ReadonlyArray<string>;
   readonly skills: ReadonlyArray<string>;
   readonly languages: ReadonlyArray<string>;
+  /** Legacy inventory source retained for old campaigns and level-history comparison. */
   readonly equipment: ReadonlyArray<string>;
+  /** Optional structured inventory used by the fast table view. */
+  readonly inventory?: ReadonlyArray<CharacterInventoryItem>;
+  /** Optional finite pools shown beside the combat essentials. */
+  readonly combatResources?: ReadonlyArray<CharacterCombatResource>;
   readonly features: ReadonlyArray<string>;
   readonly spells?: ReadonlyArray<string>;
   readonly currency?: CharacterCurrency;

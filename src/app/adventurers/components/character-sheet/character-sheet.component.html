@@ -82,7 +82,7 @@
         <app-character-sheet-navigation
           [characterId]="characterId()"
           [isItalian]="isItalian()"
-          [hasEquipment]="sheet().equipment.length > 0"
+          [hasEquipment]="inventoryItems().length > 0"
           [hasLibrary]="sheet().features.length + (sheet().spells?.length ?? 0) > 0"
           [selectedLevel]="sheet().level"
           [currentLevel]="currentSheet().level"
@@ -179,6 +179,40 @@
           }
         </section>
 
+        @if (combatResources().length > 0) {
+          <section class="character-sheet__resources" aria-labelledby="combat-resources-title">
+            <div class="character-sheet__resource-heading">
+              <div>
+                <span>{{ isItalian() ? 'Pronte al tavolo' : 'Table ready' }}</span>
+                <h3 id="combat-resources-title">
+                  {{ isItalian() ? 'Risorse da combattimento' : 'Combat resources' }}
+                </h3>
+              </div>
+              <small>{{ isItalian() ? 'Disponibili / massimo' : 'Available / maximum' }}</small>
+            </div>
+            <div class="character-sheet__resource-grid">
+              @for (resource of combatResources(); track resource.id) {
+                <article class="character-sheet__resource">
+                  <div class="character-sheet__resource-copy">
+                    <strong>{{ resource.name }}</strong>
+                    <span>{{ resourceRecoveryLabel(resource) }}</span>
+                  </div>
+                  <div class="character-sheet__resource-value">
+                    <strong>{{ resource.current }}</strong
+                    ><span>/{{ resource.maximum }}</span>
+                  </div>
+                  <span class="character-sheet__resource-track" aria-hidden="true">
+                    <i [style.width]="resourceFill(resource)"></i>
+                  </span>
+                  @if (resource.note) {
+                    <p>{{ resource.note }}</p>
+                  }
+                </article>
+              }
+            </div>
+          </section>
+        }
+
         <section
           class="character-sheet__panel character-sheet__abilities"
           [id]="'character-sheet-abilities-' + characterId()"
@@ -247,7 +281,7 @@
           </section>
         </div>
 
-        @if (sheet().equipment.length > 0) {
+        @if (inventoryItems().length > 0) {
           <section
             class="character-sheet__panel character-sheet__inventory"
             [id]="'character-sheet-inventory-' + characterId()"
@@ -259,14 +293,36 @@
                 <h3>{{ isItalian() ? 'Inventario' : 'Inventory' }}</h3>
               </div>
               <span class="character-sheet__count">
-                {{ sheet().equipment.length }} {{ isItalian() ? 'voci' : 'items' }}
+                {{ inventoryItems().length }} {{ isItalian() ? 'voci' : 'items' }}
               </span>
             </div>
-            <ul class="character-sheet__inventory-grid">
-              @for (item of sheet().equipment; track item) {
-                <li><span aria-hidden="true">◆</span>{{ item }}</li>
+            <div class="character-sheet__inventory-grid">
+              @for (item of inventoryItems(); track item.id) {
+                <article
+                  class="character-sheet__inventory-card"
+                  [class.character-sheet__inventory-card--equipped]="item.equipped"
+                >
+                  <div class="character-sheet__inventory-title">
+                    <span class="character-sheet__inventory-mark" aria-hidden="true">◆</span>
+                    <strong>{{ item.name }}</strong>
+                    @if (item.quantity > 1) {
+                      <span class="character-sheet__quantity">×{{ item.quantity }}</span>
+                    }
+                  </div>
+                  <div class="character-sheet__inventory-meta">
+                    <span>{{ inventoryCategoryLabel(item.category) }}</span>
+                    @if (item.equipped) {
+                      <span class="character-sheet__equipped">
+                        {{ isItalian() ? 'Equipaggiato' : 'Equipped' }}
+                      </span>
+                    }
+                  </div>
+                  @if (item.note) {
+                    <p>{{ item.note }}</p>
+                  }
+                </article>
               }
-            </ul>
+            </div>
           </section>
         }
 

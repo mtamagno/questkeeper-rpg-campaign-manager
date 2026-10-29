@@ -207,6 +207,8 @@ test('character imports require reviewable identity, rules and source-warning fi
     'skills',
     'languages',
     'equipment',
+    'inventory',
+    'combatResources',
     'features',
     'reviewNotes',
   ]) {

@@ -222,6 +222,42 @@ export const ENTITY_IMPORT_SCHEMA = Object.freeze({
     skills: { type: 'array', items: { type: 'string' } },
     languages: { type: 'array', items: { type: 'string' } },
     equipment: { type: 'array', items: { type: 'string' } },
+    inventory: {
+      type: 'array',
+      items: {
+        type: 'object',
+        additionalProperties: false,
+        properties: {
+          name: { type: 'string' },
+          quantity: { type: 'integer' },
+          category: {
+            type: 'string',
+            enum: ['weapon', 'armor', 'consumable', 'tool', 'quest', 'gear', 'other'],
+          },
+          equipped: { type: 'boolean' },
+          note: { type: 'string' },
+        },
+        required: ['name', 'quantity', 'category', 'equipped', 'note'],
+      },
+    },
+    combatResources: {
+      type: 'array',
+      items: {
+        type: 'object',
+        additionalProperties: false,
+        properties: {
+          name: { type: 'string' },
+          current: { type: 'integer' },
+          maximum: { type: 'integer' },
+          recovery: {
+            type: 'string',
+            enum: ['short-rest', 'long-rest', 'dawn', 'manual'],
+          },
+          note: { type: 'string' },
+        },
+        required: ['name', 'current', 'maximum', 'recovery', 'note'],
+      },
+    },
     features: { type: 'array', items: { type: 'string' } },
     reviewNotes: { type: 'array', items: { type: 'string' } },
   },
@@ -263,6 +299,8 @@ export const ENTITY_IMPORT_SCHEMA = Object.freeze({
     'skills',
     'languages',
     'equipment',
+    'inventory',
+    'combatResources',
     'features',
     'reviewNotes',
   ],
