@@ -1002,6 +1002,7 @@ const INVENTORY_CATEGORIES = new Set([
   'other',
 ]);
 const RESOURCE_RECOVERY = new Set(['short-rest', 'long-rest', 'dawn', 'manual']);
+const ATTUNEMENT_STATES = new Set(['not-required', 'required', 'attuned']);
 
 function stableLineId(prefix, name, index) {
   const slug = String(name || '')
@@ -1025,6 +1026,8 @@ function inventoryEditorValue(sheet = {}) {
         item.quantity ?? 1,
         item.category ?? 'gear',
         item.equipped ? 'yes' : 'no',
+        item.attunement ?? 'not-required',
+        item.signatureItemId ?? '',
         item.note ?? '',
       ].join(' | '),
     )
@@ -1050,7 +1053,7 @@ function parseInventory(value, previous = []) {
     .split('\n')
     .map((line) => line.split('|').map((part) => part.trim()))
     .filter(([name]) => name)
-    .map(([name, quantity, category, equipped, note], index) => {
+    .map(([name, quantity, category, equipped, attunement, signatureItemId, note], index) => {
       const old = previousByName.get(name.toLowerCase());
       const parsedQuantity = Number.parseInt(quantity, 10);
       return {
@@ -1059,6 +1062,8 @@ function parseInventory(value, previous = []) {
         quantity: Number.isFinite(parsedQuantity) ? Math.max(1, parsedQuantity) : 1,
         category: INVENTORY_CATEGORIES.has(category) ? category : 'gear',
         equipped: /^(yes|true|1|equipped)$/i.test(equipped),
+        attunement: ATTUNEMENT_STATES.has(attunement) ? attunement : 'not-required',
+        ...(signatureItemId ? { signatureItemId } : {}),
         ...(note ? { note } : {}),
       };
     });
@@ -1987,7 +1992,7 @@ function entityForm(type, item = {}) {
       field('inventory', 'Inventory', inventoryEditorValue(item.sheet), {
         type: 'textarea',
         wide: true,
-        hint: 'One per line: name | quantity | weapon/armor/consumable/tool/quest/gear/other | yes/no equipped | optional note.',
+        hint: 'One per line: name | quantity | category | yes/no equipped | not-required/required/attuned | optional signature-item ID | optional note.',
       }),
       field(
         'combatResources',
@@ -2593,6 +2598,17 @@ async function buildEntity(type, form, original = {}) {
       form.get('inventory')?.toString(),
       item.sheet?.inventory ?? [],
     );
+    const signatureItemIds = new Set(
+      (item.publicProfile.signatureItems ?? []).map((signatureItem) => signatureItem.id),
+    );
+    const unknownSignatureLink = inventory.find(
+      (entry) => entry.signatureItemId && !signatureItemIds.has(entry.signatureItemId),
+    );
+    if (unknownSignatureLink) {
+      throw new Error(
+        `Inventory item “${unknownSignatureLink.name}” links to an unknown signature-item ID. Choose an ID from Story highlights or leave it blank.`,
+      );
+    }
     const combatResources = parseResources(
       form.get('combatResources')?.toString(),
       item.sheet?.combatResources ?? [],

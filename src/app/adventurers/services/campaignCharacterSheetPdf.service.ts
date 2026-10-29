@@ -721,9 +721,20 @@ function drawFeatureAndInventoryColumns(
 
   sectionTitle(doc, language === 'it' ? 'Inventario' : 'Inventory', y, rightX, columnWidth);
   const inventoryRows: string[][] = [];
-  const inventory = inventoryViews(sheet).map(
-    (item) => `${item.name}${item.quantity > 1 ? ` ×${item.quantity}` : ''}`,
-  );
+  const inventory = inventoryViews(sheet).map((item) => {
+    const quantity = item.quantity > 1 ? ` ×${item.quantity}` : '';
+    const attunement =
+      item.attunement === 'attuned'
+        ? language === 'it'
+          ? ' · in sintonia'
+          : ' · attuned'
+        : item.attunement === 'required'
+          ? language === 'it'
+            ? ' · sintonia richiesta'
+            : ' · attunement required'
+          : '';
+    return `${item.name}${quantity}${attunement}`;
+  });
   for (let index = 0; index < inventory.length; index += 2) {
     inventoryRows.push([inventory[index] ?? '', inventory[index + 1] ?? '']);
   }

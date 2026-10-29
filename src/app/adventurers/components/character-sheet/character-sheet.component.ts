@@ -19,7 +19,9 @@ import { PasswordService } from '@guild/services/password.service';
 import {
   type CharacterPublicProfile,
   type CharacterCombatResource,
+  type CharacterAttunementState,
   type CharacterInventoryCategory,
+  type CharacterSignatureItem,
   type CharacterSheet as CharacterSheetModel,
   type CharacterSheetSnapshot,
 } from '@guild/models/character.model';
@@ -51,6 +53,10 @@ interface CurrencyEntry {
   readonly code: string;
   readonly value: number;
   readonly label: string;
+}
+
+interface InventoryStoryView extends CharacterInventoryView {
+  readonly signatureItem?: CharacterSignatureItem;
 }
 
 /**
@@ -240,8 +246,18 @@ export class CharacterSheetComponent {
   });
 
   /** Structured inventory with transparent support for legacy string-only sheets. */
-  readonly inventoryItems: Signal<ReadonlyArray<CharacterInventoryView>> = computed(() =>
-    inventoryViews(this.sheet()),
+  readonly inventoryItems: Signal<ReadonlyArray<InventoryStoryView>> = computed(() => {
+    const signatureItems = new Map(
+      (this.publicProfile()?.signatureItems ?? []).map((item) => [item.id, item]),
+    );
+    return inventoryViews(this.sheet()).map((item) => ({
+      ...item,
+      signatureItem: item.signatureItemId ? signatureItems.get(item.signatureItemId) : undefined,
+    }));
+  });
+
+  readonly attunedItemCount = computed(
+    () => this.inventoryItems().filter((item) => item.attunement === 'attuned').length,
   );
 
   /** Finite resources, defensively clamped for a trustworthy table view. */
@@ -260,6 +276,19 @@ export class CharacterSheetComponent {
       other: ['Altro', 'Other'],
     };
     return labels[category][this.isItalian() ? 0 : 1];
+  }
+
+  attunementLabel(state: CharacterAttunementState): string {
+    const labels: Readonly<Record<CharacterAttunementState, readonly [string, string]>> = {
+      'not-required': ['Nessuna sintonia', 'No attunement'],
+      required: ['Richiede sintonia', 'Requires attunement'],
+      attuned: ['In sintonia', 'Attuned'],
+    };
+    return labels[state][this.isItalian() ? 0 : 1];
+  }
+
+  storyText(value: BilingualText): string {
+    return this.isItalian() ? value.it || value.en : value.en || value.it;
   }
 
   resourceRecoveryLabel(resource: CharacterCombatResource): string {

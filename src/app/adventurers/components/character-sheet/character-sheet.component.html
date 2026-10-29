@@ -294,6 +294,9 @@
               </div>
               <span class="character-sheet__count">
                 {{ inventoryItems().length }} {{ isItalian() ? 'voci' : 'items' }}
+                @if (attunedItemCount() > 0) {
+                  · {{ attunedItemCount() }} {{ isItalian() ? 'in sintonia' : 'attuned' }}
+                }
               </span>
             </div>
             <div class="character-sheet__inventory-grid">
@@ -316,9 +319,28 @@
                         {{ isItalian() ? 'Equipaggiato' : 'Equipped' }}
                       </span>
                     }
+                    @if (item.attunement; as attunement) {
+                      <span
+                        class="character-sheet__attunement"
+                        [class.character-sheet__attunement--active]="attunement === 'attuned'"
+                      >
+                        {{ attunementLabel(attunement) }}
+                      </span>
+                    }
                   </div>
                   @if (item.note) {
                     <p>{{ item.note }}</p>
+                  }
+                  @if (item.signatureItem; as signatureItem) {
+                    <aside class="character-sheet__item-story">
+                      <span>{{ isItalian() ? 'Oggetto significativo' : 'Signature item' }}</span>
+                      <strong>{{ storyText(signatureItem.name) }}</strong>
+                      <p>{{ storyText(signatureItem.description) }}</p>
+                      <a href="#profile-highlights">
+                        {{ isItalian() ? 'Torna alla storia' : 'Return to the story' }}
+                        <span aria-hidden="true">↑</span>
+                      </a>
+                    </aside>
                   }
                 </article>
               }
