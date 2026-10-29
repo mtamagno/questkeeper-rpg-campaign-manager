@@ -4,6 +4,7 @@
 
 import { type BilingualText } from '@guild/models/language.model';
 import { type ImageRef } from './character.model';
+import { type NarrativeBlockMoods, type NarrativeMood } from '@guild/models/narrativeMood.model';
 
 /**
  * A key event (momento saliente) within a session.
@@ -56,4 +57,8 @@ export interface Session {
   readonly storySoFar?: BilingualText;
   /** Curated OOC memories. These are explicitly separate from campaign canon. */
   readonly tableMoments?: ReadonlyArray<TableMoment>;
+  /** Chapter-level mood. Default inherits campaign/phase. */
+  readonly mood?: NarrativeMood;
+  /** Supported recap/prose overrides. Default inherits the chapter mood. */
+  readonly blockMoods?: NarrativeBlockMoods;
 }

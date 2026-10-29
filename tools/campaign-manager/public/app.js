@@ -992,6 +992,40 @@ function section(label) {
   return `<div class="form-section">${escapeHtml(label)}</div>`;
 }
 
+const MOOD_OPTIONS = [
+  ['default', 'Default · inherit'],
+  ['light', 'Light · open and warm'],
+  ['dark', 'Dark · tense and intimate'],
+];
+
+function moodField(name, label, value = 'default', hint = '') {
+  return `<div class="mood-field">${field(name, label, value, { type: 'select', values: MOOD_OPTIONS, hint })}<div class="mood-field__preview" aria-hidden="true"><i data-mood="default"></i><i data-mood="light"></i><i data-mood="dark"></i></div></div>`;
+}
+
+function moodPhaseCard(phase = {}, index = 0) {
+  return `<article class="mood-phase" data-mood-phase><header><strong>Published phase</strong><button type="button" class="icon-button" data-mood-phase-remove aria-label="Remove phase">×</button></header><div class="form-grid">${field(`moodPhaseId__${index}`, 'Stable phase ID', phase.id || `phase-${index + 1}`)}${field(`moodPhaseLabel__${index}`, 'Editor label', phase.label || '')}${field(`moodPhaseStart__${index}`, 'Starts at published session ID', phase.startsAtSessionId || '', { hint: 'The phase activates only when this public session exists.' })}${moodField(`moodPhaseMood__${index}`, 'Phase mood', phase.mood || 'default')}</div></article>`;
+}
+
+function campaignMoodEditor(narrativeMood = {}) {
+  const phases = narrativeMood.phases ?? [];
+  return `<section class="mood-editor field--wide" data-mood-editor><div><strong>Narrative mood</strong><p>Presentation only. It never changes canon or reads hidden notes.</p></div>${moodField('campaignMoodDefault', 'Campaign default', narrativeMood.default || 'default')}<div class="mood-phase-list" data-mood-phase-list>${phases.map(moodPhaseCard).join('')}</div><button type="button" class="secondary-button" data-mood-phase-add>Add published phase</button></section>`;
+}
+
+function narrativeMoodFromFields() {
+  const phases = [...fields.querySelectorAll('[data-mood-phase]')]
+    .map((card) => ({
+      id: card.querySelector('[name^="moodPhaseId__"]')?.value.trim(),
+      label: card.querySelector('[name^="moodPhaseLabel__"]')?.value.trim() || undefined,
+      startsAtSessionId: card.querySelector('[name^="moodPhaseStart__"]')?.value.trim(),
+      mood: card.querySelector('[name^="moodPhaseMood__"]')?.value || 'default',
+    }))
+    .filter((phase) => phase.id && phase.startsAtSessionId);
+  return {
+    default: fields.querySelector('[name="campaignMoodDefault"]')?.value || 'default',
+    ...(phases.length ? { phases } : {}),
+  };
+}
+
 const PALETTE_ROLE_LABELS = {
   background: 'Background',
   surface: 'Surface',
@@ -1589,6 +1623,8 @@ function campaignForm(campaign) {
       rulesetPicker({ id: 'generic', customLabels: {} }),
       customEditionField('', 'generic'),
       palettePicker('heroic'),
+      section('Narrative presentation'),
+      campaignMoodEditor({}),
       section('Your table'),
       field('dungeonMaster', 'Game Master', ''),
       field('partyName', 'Party name', ''),
@@ -1622,6 +1658,8 @@ function campaignForm(campaign) {
     rulesetPicker(gameSystem),
     customEditionField(details.edition ?? gameSystem.edition ?? '', gameSystem.id),
     palettePicker(entry.palette ?? 'heroic', entry.customPalette),
+    section('Narrative presentation'),
+    campaignMoodEditor(details.narrativeMood ?? {}),
     section('Your table'),
     field('dungeonMaster', 'Game Master', details.dungeonMaster ?? ''),
     field('partyName', 'Party name', details.partyName ?? ''),
@@ -1975,6 +2013,32 @@ function entityForm(type, item = {}) {
       ),
       `<div class="ai-compose field--wide"><div><strong>Turn notes into a reviewable draft</strong><small>Choose the engine for each job. Nothing is saved until you review and choose Save.</small></div><div class="ai-engine-grid">${engineSelect('proseEngine', 'Prose writer', 'prose', 'Turns raw notes into the editable chronicle.')}${engineSelect('imagePromptEngine', 'Visual prompt writer', 'imagePrompt', 'Plans what to illustrate and where it belongs.')}${engineSelect('imageEngine', 'Image renderer', 'image', 'Renders the approved visual prompts.')}</div><div class="action-row"><button class="secondary-button" type="button" data-ai-notes="text">Process notes</button><button class="primary-button" type="button" data-ai-notes="images">Process notes with images</button></div><label class="consent-check"><input name="remoteConsent" type="checkbox" /> I consent to sending these notes to any selected engine labelled <strong>Remote</strong>. Local-only tasks do not require this.</label><div class="ai-review" data-ai-review hidden></div></div>`,
       section('Review and edit the draft'),
+      section('Narrative presentation'),
+      moodField(
+        'sessionMood',
+        'Chapter mood',
+        item.mood ?? 'default',
+        'Inherits the campaign or published phase when left on Default.',
+      ),
+      moodField(
+        'summaryMood',
+        'Summary block mood',
+        item.blockMoods?.summary ?? 'default',
+        'Optional override for the session summary only.',
+      ),
+      moodField(
+        'storyMood',
+        'Story-so-far mood',
+        item.blockMoods?.storySoFar ?? 'default',
+        'Optional override for this recap entry only.',
+      ),
+      moodField(
+        'proseMood',
+        'Chronicle prose mood',
+        item.blockMoods?.prose ?? 'default',
+        'Optional override for the long-form chronicle only.',
+      ),
+      `<p class="field field--wide form-hint">AI may suggest a mood while drafting, but it never applies one silently. Only these reviewed controls change presentation.</p>`,
       ...localizedFields('title', 'Title', item.title, languages, { required: true }),
       ...localizedFields('location', 'Location', item.location, languages),
       ...localizedFields('summary', 'Summary', item.summary, languages, { type: 'textarea' }),
@@ -2076,6 +2140,7 @@ async function saveCampaign(form) {
   const languages = normalizeLanguageCodes(form.get('languages'));
   const defaultLanguage = form.get('defaultLanguage')?.toString().trim() || languages[0];
   const localizedValues = currentCampaignLocalizedValues();
+  const narrativeMood = narrativeMoodFromFields();
   const data = {
     id: creating ? form.get('id')?.toString().trim() || undefined : state.selectedId,
     languages,
@@ -2098,6 +2163,7 @@ async function saveCampaign(form) {
         ]),
       ),
     },
+    campaign: { narrativeMood },
   };
   if (data.palette === 'custom') data.customPalette = paletteDraftFromFields();
   if (creating) {
@@ -2111,6 +2177,7 @@ async function saveCampaign(form) {
         ...created.campaign,
         languages,
         defaultLanguage,
+        narrativeMood,
         heroImages: [image.path],
       };
       state.campaign = await api(`/api/campaigns/${encodeURIComponent(state.selectedId)}`, {
@@ -2132,6 +2199,7 @@ async function saveCampaign(form) {
       languages,
       defaultLanguage,
       storySoFar: localizedValues.story,
+      narrativeMood,
       translationState: state.editor.translationApplied
         ? {
             ...(state.campaign.campaign.translationState ?? {}),
@@ -2512,6 +2580,13 @@ async function buildEntity(type, form, original = {}) {
       1,
       splitProseScenes(form.get(`loc__prose__${placementLanguage}`)?.toString()).length,
     );
+    const sessionMood = form.get('sessionMood')?.toString() || 'default';
+    const blockMoods = {
+      summary: form.get('summaryMood')?.toString() || 'default',
+      storySoFar: form.get('storyMood')?.toString() || 'default',
+      prose: form.get('proseMood')?.toString() || 'default',
+    };
+    const hasBlockMood = Object.values(blockMoods).some((mood) => mood !== 'default');
     return {
       ...original,
       id,
@@ -2522,6 +2597,8 @@ async function buildEntity(type, form, original = {}) {
       location: localizedFormValue(form, 'location', '', languages),
       prose: localizedFormValue(form, 'prose', '', languages),
       storySoFar: localizedFormValue(form, 'story', '', languages),
+      mood: sessionMood === 'default' ? undefined : sessionMood,
+      blockMoods: hasBlockMood ? blockMoods : undefined,
       keyEvents: Array.from({ length: eventCount }, (_, index) => ({
         description: Object.fromEntries(
           languages.map((language) => [language, events[language][index] ?? '']),
@@ -3726,6 +3803,19 @@ content.addEventListener('submit', (event) => {
 });
 
 fields.addEventListener('click', (event) => {
+  if (event.target.closest('[data-mood-phase-add]')) {
+    const list = fields.querySelector('[data-mood-phase-list]');
+    const index = list?.querySelectorAll('[data-mood-phase]').length ?? 0;
+    list?.insertAdjacentHTML('beforeend', moodPhaseCard({}, index));
+    window.managerI18n?.translateTree?.(list?.lastElementChild);
+    list?.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+  const removeMoodPhase = event.target.closest('[data-mood-phase-remove]');
+  if (removeMoodPhase) {
+    removeMoodPhase.closest('[data-mood-phase]')?.remove();
+    return;
+  }
   const duplicatePalette = event.target.closest('[data-palette-duplicate]');
   if (duplicatePalette) {
     const base = duplicatePalette.dataset.paletteDuplicate;

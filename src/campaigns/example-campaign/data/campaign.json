@@ -15,6 +15,17 @@
   "startDate": "2026-01-01",
   "dungeonMaster": "Game Master",
   "partyName": "The Wayfarers",
+  "narrativeMood": {
+    "default": "light",
+    "phases": [
+      {
+        "id": "cold-beacon",
+        "label": "The beacon answers",
+        "startsAtSessionId": "session-2",
+        "mood": "dark"
+      }
+    ]
+  },
   "heroImages": ["images/group/hero.svg"],
   "storySoFar": {
     "en": "The Wayfarers stand inside the ruined Glass Beacon after following road signs that pointed the wrong way. They know its cold flame casts a shadow north, that Aria's lens shard answers that light, and that Mira's century-old letter shares the same seal. Keeper Rowan is waiting for news in Embercross, while Sable Finch still refuses to map the eastern pass. Their next choice is whether to follow the shadow before the valley's remaining lanterns go dark.",

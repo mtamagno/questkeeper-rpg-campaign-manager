@@ -15,6 +15,8 @@ import { BilingualTextPipe } from '@guild/components/bilingual-text/bilingual-te
 import { AccordionComponent } from '@guild/components/accordion/accordion.component';
 import { localizeText, type BilingualText } from '@guild/models/language.model';
 import { type Session } from '@guild/models/session.model';
+import { type Campaign } from '@guild/models/campaign.model';
+import { resolveNarrativeMood, type NarrativeMood } from '@guild/models/narrativeMood.model';
 
 /** A session entry that has a populated `storySoFar` snippet. */
 interface StorySoFarEntry {
@@ -23,6 +25,7 @@ interface StorySoFarEntry {
   readonly title: BilingualText;
   readonly date: string;
   readonly storySoFar: BilingualText;
+  readonly mood: NarrativeMood;
 }
 
 /**
@@ -30,7 +33,10 @@ interface StorySoFarEntry {
  * @param sessions - All sessions in chronological order.
  * @returns Entries ready to render, preserving order.
  */
-function selectRecapEntries(sessions: ReadonlyArray<Session>): ReadonlyArray<StorySoFarEntry> {
+function selectRecapEntries(
+  campaign: Campaign | undefined,
+  sessions: ReadonlyArray<Session>,
+): ReadonlyArray<StorySoFarEntry> {
   const entries: StorySoFarEntry[] = [];
   for (const session of sessions) {
     const recap = session.storySoFar;
@@ -41,6 +47,7 @@ function selectRecapEntries(sessions: ReadonlyArray<Session>): ReadonlyArray<Sto
         title: session.title,
         date: session.date,
         storySoFar: recap,
+        mood: resolveNarrativeMood(campaign, sessions, session, 'storySoFar'),
       });
     }
   }
@@ -74,8 +81,12 @@ export class StorySoFarComponent {
     () => this.dataService.campaign()?.storySoFar,
   );
 
+  readonly campaignMood: Signal<NarrativeMood> = computed(() =>
+    resolveNarrativeMood(this.dataService.campaign(), this.dataService.sortedSessions()),
+  );
+
   readonly entries: Signal<ReadonlyArray<StorySoFarEntry>> = computed(() =>
-    selectRecapEntries(this.dataService.sortedSessions()),
+    selectRecapEntries(this.dataService.campaign(), this.dataService.sortedSessions()),
   );
 
   /**

@@ -66,6 +66,8 @@
     padding: $spacing-lg $spacing-xl;
     box-shadow: 0 0 12px rgba(212, 175, 55, 0.15);
     @include drop-cap(2.75rem);
+    background: var(--narrative-surface, rgba(0, 0, 0, 0.25));
+    border-color: var(--narrative-border, $color-gold);
   }
 
   // --- Ornate divider between recap and per-session sections ---
@@ -84,7 +86,7 @@
   &__overview-text {
     margin: 0;
     line-height: $line-height-relaxed;
-    color: $color-text-primary;
+    color: var(--narrative-text, $color-text-primary);
     font-size: $font-size-md;
   }
 
@@ -113,6 +115,12 @@
   &__entry-text {
     margin: 0;
     line-height: $line-height-relaxed;
-    color: $color-text-primary;
+    color: var(--narrative-text, $color-text-primary);
+  }
+
+  &__entry[data-narrative-mood] &__entry-text {
+    padding: $spacing-sm;
+    border-radius: $border-radius-sm;
+    background: var(--narrative-surface);
   }
 }

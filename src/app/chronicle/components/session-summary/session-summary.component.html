@@ -1,5 +1,5 @@
 <!-- Session Summary — Single chronicle entry -->
-<article class="session-summary">
+<article class="session-summary" [attr.data-narrative-mood]="mood() === 'default' ? null : mood()">
   <!-- Header: session number + date -->
   <div class="session-summary__header">
     <h3 class="session-summary__number">Session {{ session().sessionNumber }}</h3>
@@ -13,7 +13,12 @@
   <span class="session-summary__location">📍 {{ session().location | bilingual }}</span>
 
   <!-- Summary text -->
-  <p class="session-summary__text">{{ session().summary | bilingual }}</p>
+  <p
+    class="session-summary__text"
+    [attr.data-narrative-mood]="summaryMood() === 'default' ? null : summaryMood()"
+  >
+    {{ session().summary | bilingual }}
+  </p>
 
   <!-- Read the Story link -->
   <a

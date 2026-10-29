@@ -10,6 +10,10 @@ import {
 import { normalizeCampaignLanguages, normalizeLanguageTag } from './language-catalog.mjs';
 import { normalizeGameSystem } from './ruleset-profiles.mjs';
 import { CAMPAIGN_PALETTE_IDS, normalizeCustomPalette } from './campaign-palettes.mjs';
+import {
+  normalizeCampaignNarrativeMood,
+  normalizeSessionNarrativeMood,
+} from './narrative-moods.mjs';
 import storagePaths from '../storage-paths.cjs';
 
 const { resolveStoragePaths } = storagePaths;
@@ -233,6 +237,7 @@ export async function createCampaign(projectRoot, input) {
   const root = campaignRoot(projectRoot, id);
   if (await exists(root)) throw new Error(`Campaign "${id}" already exists.`);
   const gameSystem = normalizeGameSystem(input.gameSystem, input.edition);
+  const narrativeMood = normalizeCampaignNarrativeMood(input.campaign?.narrativeMood);
 
   const base = join(root, 'data');
   await Promise.all([
@@ -270,6 +275,7 @@ export async function createCampaign(projectRoot, input) {
     startDate: input.startDate || new Date().toISOString().slice(0, 10),
     dungeonMaster: input.dungeonMaster?.trim() || 'Game Master',
     partyName: input.partyName?.trim() || 'The Party',
+    ...(narrativeMood ? { narrativeMood } : {}),
     heroImages: [],
     storySoFar: Object.fromEntries(languages.map((language) => [language, ''])),
   };
@@ -334,6 +340,11 @@ export async function updateCampaign(projectRoot, campaignId, input) {
     description: nextEntry.description,
     gameSystem: nextEntry.gameSystem,
   };
+  if (Object.hasOwn(input.campaign ?? {}, 'narrativeMood')) {
+    const narrativeMood = normalizeCampaignNarrativeMood(input.campaign.narrativeMood);
+    if (narrativeMood) nextCampaign.narrativeMood = narrativeMood;
+    else delete nextCampaign.narrativeMood;
+  }
   await Promise.all([
     writeJson(
       manifestPath,
@@ -381,8 +392,9 @@ export async function saveEntity(projectRoot, campaignId, type, entity, previous
     const base = dataRoot(projectRoot, campaignId);
     const campaign = await getCampaign(projectRoot, campaignId);
     const label = type === 'sessions' ? entity.title : entity.name;
+    const normalizedEntity = type === 'sessions' ? normalizeSessionNarrativeMood(entity) : entity;
     const prepared = {
-      ...entity,
+      ...normalizedEntity,
       id: entity.id || generateEntityId(campaign, type, localizedIdentityLabel(label)),
     };
     validateId(prepared.id, 'Entity ID');

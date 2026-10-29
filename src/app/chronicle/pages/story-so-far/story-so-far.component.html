@@ -23,7 +23,10 @@
     </header>
 
     @if (campaignRecap(); as recap) {
-      <section class="story-so-far__overview">
+      <section
+        class="story-so-far__overview"
+        [attr.data-narrative-mood]="campaignMood() === 'default' ? null : campaignMood()"
+      >
         <h2 class="story-so-far__overview-title">
           🗺️ {{ lang() === 'it' ? 'Riassunto della campagna' : 'Campaign Recap' }}
         </h2>
@@ -53,7 +56,10 @@
         </h2>
         <ol class="story-so-far__list">
           @for (entry of entries(); track entry.id; let i = $index; let isLast = $last) {
-            <li class="story-so-far__entry">
+            <li
+              class="story-so-far__entry"
+              [attr.data-narrative-mood]="entry.mood === 'default' ? null : entry.mood"
+            >
               <app-accordion [title]="entryAccordionTitle(entry)" icon="📖" [startOpen]="isLast">
                 <p class="story-so-far__entry-text">{{ entry.storySoFar | bilingual }}</p>
               </app-accordion>

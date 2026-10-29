@@ -4,6 +4,7 @@
 
 import { type BilingualText } from '@guild/models/language.model';
 import { type CampaignGameSystem } from '@guild/models/rulesetProfile.model';
+import { type CampaignNarrativeMood } from '@guild/models/narrativeMood.model';
 
 /** Top-level campaign information. */
 export interface Campaign {
@@ -26,4 +27,6 @@ export interface Campaign {
    * Must be updated every time a session's prose is written or modified.
    */
   readonly storySoFar?: BilingualText;
+  /** Optional semantic presentation; phases activate only from published session IDs. */
+  readonly narrativeMood?: CampaignNarrativeMood;
 }
