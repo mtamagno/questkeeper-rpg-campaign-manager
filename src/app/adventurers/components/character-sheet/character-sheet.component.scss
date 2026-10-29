@@ -299,6 +299,109 @@
     box-shadow: $shadow-sm;
   }
 
+  &__resources {
+    padding: $spacing-lg;
+    background:
+      radial-gradient(circle at 92% 10%, rgba($color-gothic-burgundy-light, 0.1), transparent 32%),
+      linear-gradient(145deg, rgba($color-bg-elevated, 0.94), rgba($color-bg-base, 0.98));
+    border: $border-width-thin solid $color-border-default;
+    border-radius: $border-radius-md;
+    box-shadow: $shadow-sm;
+  }
+
+  &__resource-heading {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: $spacing-md;
+    margin-bottom: $spacing-md;
+
+    > div > span {
+      color: $color-gold;
+      font-family: $font-family-heading;
+      font-size: $font-size-xs;
+      letter-spacing: $letter-spacing-wider;
+      text-transform: uppercase;
+    }
+
+    h3 {
+      margin: $spacing-xs 0 0;
+      color: $color-parchment-light;
+      font-family: $font-family-heading;
+      font-size: $font-size-lg;
+    }
+
+    small {
+      color: $color-text-muted;
+    }
+  }
+
+  &__resource-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+    gap: $spacing-sm;
+  }
+
+  &__resource {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: $spacing-sm $spacing-md;
+    padding: $spacing-md;
+    background: rgba($color-bg-deep, 0.72);
+    border: $border-width-thin solid $color-border-subtle;
+    border-radius: $border-radius-sm;
+
+    p {
+      grid-column: 1 / -1;
+      margin: 0;
+      color: $color-text-secondary;
+      font-size: $font-size-xs;
+      line-height: $line-height-base;
+    }
+  }
+
+  &__resource-copy {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+
+    strong {
+      color: $color-text-primary;
+      font-family: $font-family-heading;
+    }
+
+    span {
+      color: $color-text-muted;
+      font-size: $font-size-xs;
+    }
+  }
+
+  &__resource-value {
+    align-self: center;
+    color: $color-text-secondary;
+    font-family: $font-family-heading;
+
+    strong {
+      color: $color-gold-light;
+      font-size: $font-size-xl;
+    }
+  }
+
+  &__resource-track {
+    grid-column: 1 / -1;
+    height: 5px;
+    overflow: hidden;
+    background: $color-bg-deep;
+    border-radius: $border-radius-pill;
+
+    i {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, $color-gothic-burgundy-light, $color-gold);
+      border-radius: inherit;
+    }
+  }
+
   &__purse-heading {
     display: flex;
     align-items: center;
@@ -483,8 +586,7 @@
     line-height: $line-height-base;
   }
 
-  &__feature-list,
-  &__inventory-grid {
+  &__feature-list {
     padding: 0;
     margin: 0;
     list-style: none;
@@ -524,21 +626,74 @@
   &__inventory-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: $spacing-xs $spacing-lg;
+    gap: $spacing-sm;
+  }
 
-    li {
-      display: flex;
-      gap: $spacing-sm;
-      padding: $spacing-sm 0;
-      color: $color-text-primary;
-      border-bottom: $border-width-thin solid $color-border-subtle;
+  &__inventory-card {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+    min-width: 0;
+    padding: $spacing-md;
+    background: rgba($color-bg-base, 0.72);
+    border: $border-width-thin solid $color-border-subtle;
+    border-radius: $border-radius-sm;
 
-      span {
-        color: $color-gold-dark;
-        font-size: 0.6rem;
-        line-height: 2.2;
-      }
+    &--equipped {
+      background: linear-gradient(145deg, rgba($color-gold-dark, 0.12), $color-bg-base);
+      border-color: rgba($color-gold, 0.46);
     }
+
+    p {
+      margin: 0;
+      color: $color-text-secondary;
+      font-size: $font-size-xs;
+      line-height: $line-height-base;
+    }
+  }
+
+  &__inventory-title {
+    display: flex;
+    align-items: baseline;
+    gap: $spacing-sm;
+    color: $color-text-primary;
+
+    strong {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  &__inventory-mark {
+    color: $color-gold-dark;
+    font-size: 0.6rem;
+  }
+
+  &__quantity {
+    margin-left: auto;
+    color: $color-gold-light;
+    font-family: $font-family-heading;
+    font-size: $font-size-sm;
+  }
+
+  &__inventory-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-xs;
+
+    span {
+      padding: 0.15rem $spacing-sm;
+      color: $color-text-muted;
+      font-size: 0.65rem;
+      letter-spacing: $letter-spacing-wide;
+      text-transform: uppercase;
+      background: $color-bg-deep;
+      border-radius: $border-radius-pill;
+    }
+  }
+
+  &__equipped {
+    color: $color-gold-light !important;
   }
 
   &__empty,

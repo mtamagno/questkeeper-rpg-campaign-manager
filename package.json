@@ -46,6 +46,7 @@
     "test:character-profiles": "node scripts/verify-character-story-profiles.cjs",
     "test:character-pronouns": "node scripts/verify-character-pronouns.cjs",
     "test:character-rules": "node scripts/verify-character-rule-library.cjs",
+    "test:combat-resources": "node scripts/verify-combat-resources.cjs",
     "test:accessibility": "node scripts/verify-accessibility.cjs",
     "test:performance": "node scripts/verify-performance-budgets.cjs",
     "test:installer": "node scripts/verify-installer.cjs",
@@ -55,7 +56,7 @@
     "format": "prettier --write . --ignore-unknown",
     "format:check": "prettier --check . --ignore-unknown",
     "typecheck": "tsc --noEmit -p tsconfig.app.json",
-    "verify": "npm run lint && npm run format:check && npm run typecheck && npm run test:design-system && npm run test:custom-palettes && npm run test:first-visit && npm run test:guided-tour && npm run test:pwa && npm run test:offline && npm run test:command-palette && npm run test:journey-memory && npm run test:my-character && npm run test:user-settings && npm run test:character-reading-position && npm run test:lightbox-loading && npm run test:level-comparison && npm run test:demo && npm run test:game-night-brief && npm run test:table-moments && npm run test:notebooks && npm run test:character-profiles && npm run test:character-rules && npm run test:accessibility && npm run test:installer && npm run test:release && npm run test:local-compendia && npm run test:manager && npm run test:entity-ids && npm run test:transcriber && npm run build && npm run test:performance",
+    "verify": "npm run lint && npm run format:check && npm run typecheck && npm run test:design-system && npm run test:custom-palettes && npm run test:first-visit && npm run test:guided-tour && npm run test:pwa && npm run test:offline && npm run test:command-palette && npm run test:journey-memory && npm run test:my-character && npm run test:user-settings && npm run test:character-reading-position && npm run test:lightbox-loading && npm run test:level-comparison && npm run test:demo && npm run test:game-night-brief && npm run test:table-moments && npm run test:notebooks && npm run test:character-profiles && npm run test:character-rules && npm run test:combat-resources && npm run test:accessibility && npm run test:installer && npm run test:release && npm run test:local-compendia && npm run test:manager && npm run test:entity-ids && npm run test:transcriber && npm run build && npm run test:performance",
     "generate:thumbs": "node scripts/generate-thumbnails.cjs",
     "generate:display": "node scripts/generate-display-images.cjs"
   },

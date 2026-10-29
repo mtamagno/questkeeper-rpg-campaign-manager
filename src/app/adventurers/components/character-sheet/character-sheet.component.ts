@@ -18,6 +18,8 @@ import {
 import { PasswordService } from '@guild/services/password.service';
 import {
   type CharacterPublicProfile,
+  type CharacterCombatResource,
+  type CharacterInventoryCategory,
   type CharacterSheet as CharacterSheetModel,
   type CharacterSheetSnapshot,
 } from '@guild/models/character.model';
@@ -33,6 +35,11 @@ import { PasswordDialogComponent } from '@guild/components/password-dialog/passw
 import { CharacterSheetHistoryComponent } from '../character-sheet-history/character-sheet-history.component';
 import { CharacterSheetNavigationComponent } from '../character-sheet-navigation/character-sheet-navigation.component';
 import { CharacterRuleLibraryComponent } from '../character-rule-library/character-rule-library.component';
+import {
+  combatResourceViews,
+  inventoryViews,
+  type CharacterInventoryView,
+} from '../../utils/characterSheetPresentation';
 
 interface AbilityScoreEntry {
   readonly name: string;
@@ -231,6 +238,45 @@ export class CharacterSheetComponent {
     ];
     return values.filter((entry) => entry.value > 0);
   });
+
+  /** Structured inventory with transparent support for legacy string-only sheets. */
+  readonly inventoryItems: Signal<ReadonlyArray<CharacterInventoryView>> = computed(() =>
+    inventoryViews(this.sheet()),
+  );
+
+  /** Finite resources, defensively clamped for a trustworthy table view. */
+  readonly combatResources: Signal<ReadonlyArray<CharacterCombatResource>> = computed(() =>
+    combatResourceViews(this.sheet().combatResources),
+  );
+
+  inventoryCategoryLabel(category: CharacterInventoryCategory): string {
+    const labels: Readonly<Record<CharacterInventoryCategory, readonly [string, string]>> = {
+      weapon: ['Arma', 'Weapon'],
+      armor: ['Armatura', 'Armor'],
+      consumable: ['Consumabile', 'Consumable'],
+      tool: ['Strumento', 'Tool'],
+      quest: ['Missione', 'Quest'],
+      gear: ['Equipaggiamento', 'Gear'],
+      other: ['Altro', 'Other'],
+    };
+    return labels[category][this.isItalian() ? 0 : 1];
+  }
+
+  resourceRecoveryLabel(resource: CharacterCombatResource): string {
+    const labels = {
+      'short-rest': ['Riposo breve', 'Short rest'],
+      'long-rest': ['Riposo lungo', 'Long rest'],
+      dawn: ['All’alba', 'At dawn'],
+      manual: ['Manuale', 'Manual'],
+    } as const;
+    const recovery = resource.recovery ?? 'manual';
+    return labels[recovery][this.isItalian() ? 0 : 1];
+  }
+
+  resourceFill(resource: CharacterCombatResource): string {
+    if (resource.maximum <= 0) return '0%';
+    return `${Math.round((resource.current / resource.maximum) * 100)}%`;
+  }
 
   /** Opens the password dialog. */
   openDialog(): void {
