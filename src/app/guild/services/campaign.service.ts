@@ -24,6 +24,7 @@ import { type CampaignManifestEntry } from '@guild/models/campaignConfig.model';
 import { resolveRulesetProfile, type RulesetProfile } from '@guild/models/rulesetProfile.model';
 import {
   PLATFORM_PALETTE,
+  customPaletteStyles,
   resolveCampaignPalette,
   type CampaignPalette,
 } from '@guild/models/campaignPalette.model';
@@ -88,7 +89,20 @@ export class CampaignService {
       return PLATFORM_PALETTE;
     }
     const campaign = this._manifest().find((entry) => entry.id === id);
-    return resolveCampaignPalette(campaign?.palette);
+    return resolveCampaignPalette(campaign?.palette, campaign?.customPalette);
+  });
+
+  /** Valid custom semantic variables; invalid stored drafts deliberately yield no overrides. */
+  readonly activePaletteStyles: Signal<string | null> = computed(() => {
+    const id = this._activeCampaignId();
+    const campaign = this._manifest().find((entry) => entry.id === id);
+    const styles =
+      campaign?.palette === 'custom' ? customPaletteStyles(campaign.customPalette) : undefined;
+    return styles
+      ? Object.entries(styles)
+          .map(([property, value]) => `${property}:${value}`)
+          .join(';')
+      : null;
   });
 
   /** Terminology and identity-field contract selected by the active campaign. */

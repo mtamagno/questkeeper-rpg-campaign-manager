@@ -5,6 +5,7 @@ import { join, relative } from 'node:path';
 import test from 'node:test';
 
 import { normalizeCampaignLanguages, normalizeLanguageTag } from '../language-catalog.mjs';
+import { CURATED_PALETTE_ROLES } from '../campaign-palettes.mjs';
 
 import {
   createCampaign,
@@ -109,7 +110,7 @@ test('normalizes known rulesets while preserving custom editions', async (t) => 
   assert.equal(custom.campaign.edition, 'Moonlit d12');
 });
 
-test('stores curated campaign palettes and rejects unknown themes', async (t) => {
+test('stores curated and accessible custom campaign palettes', async (t) => {
   const root = await fixture(t);
   const campaign = await createCampaign(root, { ...campaignInput, palette: 'gothic' });
   assert.equal(campaign.manifestEntry.palette, 'gothic');
@@ -117,10 +118,48 @@ test('stores curated campaign palettes and rejects unknown themes', async (t) =>
   const updated = await updateCampaign(root, campaignInput.id, { palette: 'neutral' });
   assert.equal(updated.manifestEntry.palette, 'neutral');
 
+  const custom = await updateCampaign(root, campaignInput.id, {
+    palette: 'custom',
+    customPalette: {
+      version: 1,
+      name: 'Moonlit Archive',
+      base: 'neutral',
+      roles: CURATED_PALETTE_ROLES.neutral,
+    },
+  });
+  assert.equal(custom.manifestEntry.palette, 'custom');
+  assert.equal(custom.manifestEntry.customPalette.name, 'Moonlit Archive');
+
+  await assert.rejects(
+    updateCampaign(root, campaignInput.id, {
+      palette: 'custom',
+      customPalette: {
+        roles: { ...CURATED_PALETTE_ROLES.neutral, text: '#101318' },
+      },
+    }),
+    /contrast is unsafe/,
+  );
+
   await assert.rejects(
     updateCampaign(root, campaignInput.id, { palette: 'neon' }),
-    /heroic, gothic or neutral/,
+    /heroic, gothic, neutral or custom/,
   );
+});
+
+test('preserves a stored invalid custom draft while safely editing unrelated fields', async (t) => {
+  const root = await fixture(t);
+  await createCampaign(root, campaignInput);
+  const manifestPath = join(root, 'src', 'campaigns', 'campaigns.json');
+  const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
+  manifest[0].palette = 'custom';
+  manifest[0].customPalette = { version: 1, roles: { background: '#000000' } };
+  await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
+
+  const updated = await updateCampaign(root, campaignInput.id, {
+    campaign: { partyName: 'Still editable' },
+  });
+  assert.deepEqual(updated.manifestEntry.customPalette, manifest[0].customPalette);
+  assert.equal(updated.campaign.partyName, 'Still editable');
 });
 
 test('manages characters, sessions and maps without editing manifests', async (t) => {

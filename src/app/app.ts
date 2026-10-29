@@ -117,6 +117,7 @@ export class App implements OnInit {
 
   /** Semantic palette chosen by the campaign manifest. */
   readonly activePalette = this.campaignService.activePalette;
+  readonly activePaletteStyles = this.campaignService.activePaletteStyles;
 
   /** Current language, used by app-shell controls outside routed pages. */
   readonly isItalian = computed((): boolean => this.languageService.currentLanguage() === 'it');

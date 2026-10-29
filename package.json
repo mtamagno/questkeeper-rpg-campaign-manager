@@ -25,6 +25,7 @@
     "test:entity-ids": "npm run prepare:campaigns && node tools/campaign-manager/verify-entity-ids.mjs",
     "test:transcriber": "cd discord-transcriber && python -m unittest discover -s tests",
     "test:design-system": "node scripts/verify-design-system.cjs",
+    "test:custom-palettes": "node --test tools/campaign-manager/tests/campaign-palettes.test.mjs && node scripts/verify-custom-palettes.cjs",
     "test:first-visit": "node scripts/verify-first-visit.cjs",
     "test:guided-tour": "node scripts/verify-guided-tour.cjs",
     "test:pwa": "node scripts/verify-pwa.cjs",
@@ -52,7 +53,7 @@
     "format": "prettier --write . --ignore-unknown",
     "format:check": "prettier --check . --ignore-unknown",
     "typecheck": "tsc --noEmit -p tsconfig.app.json",
-    "verify": "npm run lint && npm run format:check && npm run typecheck && npm run test:design-system && npm run test:first-visit && npm run test:guided-tour && npm run test:pwa && npm run test:offline && npm run test:command-palette && npm run test:journey-memory && npm run test:my-character && npm run test:user-settings && npm run test:character-reading-position && npm run test:lightbox-loading && npm run test:level-comparison && npm run test:demo && npm run test:game-night-brief && npm run test:table-moments && npm run test:notebooks && npm run test:character-profiles && npm run test:character-rules && npm run test:accessibility && npm run test:installer && npm run test:release && npm run test:local-compendia && npm run test:manager && npm run test:entity-ids && npm run test:transcriber && npm run build && npm run test:performance",
+    "verify": "npm run lint && npm run format:check && npm run typecheck && npm run test:design-system && npm run test:custom-palettes && npm run test:first-visit && npm run test:guided-tour && npm run test:pwa && npm run test:offline && npm run test:command-palette && npm run test:journey-memory && npm run test:my-character && npm run test:user-settings && npm run test:character-reading-position && npm run test:lightbox-loading && npm run test:level-comparison && npm run test:demo && npm run test:game-night-brief && npm run test:table-moments && npm run test:notebooks && npm run test:character-profiles && npm run test:character-rules && npm run test:accessibility && npm run test:installer && npm run test:release && npm run test:local-compendia && npm run test:manager && npm run test:entity-ids && npm run test:transcriber && npm run build && npm run test:performance",
     "generate:thumbs": "node scripts/generate-thumbnails.cjs",
     "generate:display": "node scripts/generate-display-images.cjs"
   },

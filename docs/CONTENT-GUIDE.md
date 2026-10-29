@@ -68,6 +68,12 @@ Manager presents the same three choices when a campaign is created or edited.
 }
 ```
 
+The Manager can also create a versioned `customPalette` by duplicating one of
+those presets. Do not hand-author arbitrary component colours: custom themes
+store the eight documented semantic roles and must pass the Manager's contrast
+review before Save. Invalid legacy drafts are kept for repair while readers
+receive the safe Heroic fallback.
+
 The campaign folder name must exactly match its ID.
 
 ## Campaign and story

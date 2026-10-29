@@ -55,8 +55,27 @@ versioned manifest URL so a recent deployment cannot be hidden by a stale
 browser cache.
 
 The Campaign Manager exposes these presets when creating or editing a
-campaign. Custom palette editing belongs to the later Theme Studio milestone;
-do not add undocumented one-off colors to campaign data.
+campaign.
+
+## Custom semantic palettes
+
+Authors may duplicate any curated preset and edit eight named roles:
+background, surface, text, accent/focus, border, success, warning and danger.
+The Manager previews those roles on representative navigation, cards, buttons,
+focus, dialogs, protected content and state labels rather than presenting an
+abstract row of swatches.
+
+Required text pairs must reach WCAG AA 4.5:1; structural borders must reach
+3:1. The Manager explains every failing pair and disables Save until it is
+corrected. The server repeats the validation, so importing a handcrafted file
+cannot bypass the safety boundary. Palette files are versioned JSON and can be
+exported, imported, renamed or reset one role at a time to their source preset.
+
+Custom palettes live in `customPalette` beside the manifest's `palette:
+"custom"` selector. A legacy or damaged draft is preserved for repair, but the
+Companion falls back to Heroic instead of applying unreadable values. Campaigns
+without custom data remain byte-for-byte compatible with their existing
+curated preset.
 
 ## UI primitives
 
