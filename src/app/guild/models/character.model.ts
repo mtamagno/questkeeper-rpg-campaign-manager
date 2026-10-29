@@ -170,6 +170,9 @@ export interface CharacterCombatResource {
 export type CharacterInventoryCategory =
   'weapon' | 'armor' | 'consumable' | 'tool' | 'quest' | 'gear' | 'other';
 
+/** Mechanical attunement state; story meaning remains in `signatureItems`. */
+export type CharacterAttunementState = 'not-required' | 'required' | 'attuned';
+
 /** A structured carried item. Legacy `equipment` strings remain fully supported. */
 export interface CharacterInventoryItem {
   readonly id: string;
@@ -177,6 +180,9 @@ export interface CharacterInventoryItem {
   readonly quantity?: number;
   readonly category?: CharacterInventoryCategory;
   readonly equipped?: boolean;
+  readonly attunement?: CharacterAttunementState;
+  /** Explicit link to `publicProfile.signatureItems`; never matched by item name. */
+  readonly signatureItemId?: string;
   readonly note?: string;
 }
 

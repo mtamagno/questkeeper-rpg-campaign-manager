@@ -223,6 +223,8 @@ test('character imports require reviewable identity, rules and source-warning fi
   });
   assert.match(prompt, /Never infer pronouns from a portrait, name, voice, or sex\/gender/);
   assert.match(prompt, /only when the source states them explicitly/);
+  assert.match(prompt, /Set signatureItemId only to an exact existing signature-item ID/);
+  assert.match(prompt, /never match or invent the link from similar names/);
 });
 
 const minimalCampaign = {

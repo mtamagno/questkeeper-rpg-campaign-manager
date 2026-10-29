@@ -29,6 +29,21 @@ assert.match(manager, /parseInventory/);
 assert.match(manager, /parseResources/);
 assert.ok(demo.sheet.inventory.length >= 4, 'demo should exercise structured inventory');
 assert.ok(demo.sheet.combatResources.length >= 2, 'demo should exercise finite resources');
+const signatureIds = new Set(demo.publicProfile.signatureItems.map((item) => item.id));
+for (const item of demo.sheet.inventory) {
+  if (item.signatureItemId) {
+    assert.ok(signatureIds.has(item.signatureItemId), `${item.name} links to a real signature item`);
+    assert.equal(
+      Object.hasOwn(item, 'signatureDescription'),
+      false,
+      'inventory must not duplicate signature-item prose',
+    );
+  }
+}
+assert.ok(
+  demo.sheet.inventory.some((item) => item.attunement === 'attuned'),
+  'demo should exercise visible attunement state',
+);
 assert.deepEqual(
   demo.sheet.equipment,
   demo.sheet.inventory.map((item) => item.name),

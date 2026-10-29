@@ -268,6 +268,7 @@
         "quantity": 1,
         "category": "armor",
         "equipped": true,
+        "attunement": "not-required",
         "note": "Waxed canvas, repaired along the left shoulder."
       },
       {
@@ -275,21 +276,26 @@
         "name": "Red letter case",
         "quantity": 1,
         "category": "quest",
-        "equipped": true
+        "equipped": true,
+        "attunement": "not-required",
+        "signatureItemId": "red-letter-case"
       },
       {
         "id": "silver-whistle",
         "name": "Silver whistle",
         "quantity": 1,
         "category": "tool",
-        "equipped": true
+        "equipped": true,
+        "attunement": "not-required",
+        "signatureItemId": "silver-whistle"
       },
       {
         "id": "glass-beacon-shard",
         "name": "Glass-beacon shard",
         "quantity": 1,
         "category": "quest",
-        "equipped": false
+        "equipped": false,
+        "attunement": "attuned"
       }
     ],
     "combatResources": [
