@@ -37,9 +37,10 @@ export function resolveNarrativeMood(
   block?: NarrativeMoodBlock,
 ): NarrativeMood {
   let resolved = inherited('default', campaign?.narrativeMood?.default);
-  if (session) {
-    const ordered = [...sessions].sort((a, b) => a.sessionNumber - b.sessionNumber);
-    const targetIndex = ordered.findIndex(({ id }) => id === session.id);
+  const ordered = [...sessions].sort((a, b) => a.sessionNumber - b.sessionNumber);
+  const targetSession = session ?? ordered.at(-1);
+  if (targetSession) {
+    const targetIndex = ordered.findIndex(({ id }) => id === targetSession.id);
     if (targetIndex >= 0) {
       for (const phase of campaign?.narrativeMood?.phases ?? []) {
         const milestoneIndex = ordered.findIndex(({ id }) => id === phase.startsAtSessionId);
@@ -48,6 +49,8 @@ export function resolveNarrativeMood(
         }
       }
     }
+  }
+  if (session) {
     resolved = inherited(resolved, session.mood);
     if (block) resolved = inherited(resolved, session.blockMoods?.[block]);
   }

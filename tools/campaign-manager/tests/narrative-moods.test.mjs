@@ -87,6 +87,17 @@ test('never activates a phase whose public milestone is absent', () => {
   assert.equal(resolveNarrativeMood(campaign, sessions, sessions[2]), 'light');
 });
 
+test('campaign-wide surfaces follow the latest published phase without inheriting a session override', () => {
+  const campaign = {
+    narrativeMood: {
+      default: 'light',
+      phases: [{ id: 'gate', startsAtSessionId: 'session-2', mood: 'dark' }],
+    },
+  };
+  const published = [sessions[0], { ...sessions[1], mood: 'light' }];
+  assert.equal(resolveNarrativeMood(campaign, published), 'dark');
+});
+
 test('removes default session overrides while preserving reviewed non-default blocks', () => {
   assert.deepEqual(
     normalizeSessionNarrativeMood({
