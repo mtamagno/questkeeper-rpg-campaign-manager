@@ -5,6 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="manager-token" content="__MANAGER_TOKEN__" />
     <title>Campaign Companion · Manager</title>
+    <script>
+      (() => {
+        const key = 'questkeeper-manager-theme:v1';
+        const allowed = ['system', 'light', 'dark', 'contrast'];
+        let preference = 'system';
+        try {
+          const stored = localStorage.getItem(key);
+          if (allowed.includes(stored)) preference = stored;
+        } catch {}
+        const resolved =
+          preference === 'system'
+            ? matchMedia('(prefers-color-scheme: light)').matches
+              ? 'light'
+              : 'dark'
+            : preference;
+        document.documentElement.dataset.managerThemePreference = preference;
+        document.documentElement.dataset.managerTheme = resolved;
+      })();
+    </script>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -63,6 +82,10 @@
           </button>
           <button class="secondary-button" id="show-scribe">Discord Session Scribe</button>
           <button class="secondary-button" id="show-project">Preview & publish</button>
+          <button class="secondary-button manager-settings-link" id="show-manager-settings">
+            <span>Manager settings</span
+            ><small id="manager-theme-summary">Appearance · System</small>
+          </button>
         </div>
         <div class="sidebar__service-actions">
           <button class="sidebar__quit" id="quit-manager" type="button">
@@ -159,6 +182,58 @@
             >
           </button>
         </div>
+      </section>
+    </dialog>
+
+    <dialog id="manager-settings-dialog" class="dialog manager-settings-dialog">
+      <section aria-labelledby="manager-settings-title" aria-describedby="manager-settings-scope">
+        <header class="dialog__header">
+          <div>
+            <span class="eyebrow">Local preferences</span>
+            <h2 id="manager-settings-title">Manager settings</h2>
+          </div>
+          <button class="icon-button" id="manager-settings-close" type="button" aria-label="Close">
+            &times;
+          </button>
+        </header>
+        <div class="dialog__body manager-settings">
+          <div>
+            <h3>Manager appearance</h3>
+            <p id="manager-settings-scope">
+              This changes only the authoring app on this browser. Companion appearance remains
+              campaign data.
+            </p>
+          </div>
+          <fieldset class="manager-theme-grid">
+            <legend>Choose an authoring theme</legend>
+            <label
+              ><input type="radio" name="managerTheme" value="system" /><span
+                ><strong>System</strong><small>Follow this device</small></span
+              ></label
+            >
+            <label
+              ><input type="radio" name="managerTheme" value="light" /><span
+                ><strong>Light</strong><small>Bright parchment workspace</small></span
+              ></label
+            >
+            <label
+              ><input type="radio" name="managerTheme" value="dark" /><span
+                ><strong>Dark</strong><small>Low-light campaign studio</small></span
+              ></label
+            >
+            <label
+              ><input type="radio" name="managerTheme" value="contrast" /><span
+                ><strong>High contrast</strong><small>Maximum separation and focus</small></span
+              ></label
+            >
+          </fieldset>
+        </div>
+        <footer class="dialog__footer">
+          <button class="secondary-button" id="manager-theme-reset" type="button">
+            Reset to system
+          </button>
+          <button class="primary-button" id="manager-settings-done" type="button">Done</button>
+        </footer>
       </section>
     </dialog>
 
