@@ -11,9 +11,9 @@ database, cloud account, AI provider and preinstalled Node.js are not required.
 On Windows, macOS and Linux, the graphical setup can either prepare a private
 **Node.js 26** runtime or reuse a compatible installation already on the device.
 
-Node.js 26 is the supported QuestKeeper runtime. It is currently the upstream
-Current line and is scheduled to enter Active LTS on 28 October 2026; the
-installer always resolves the newest verified Node.js 26 patch.
+Node.js 26 is the supported QuestKeeper runtime and entered upstream Active LTS
+on 28 October 2026 with the codename Lithium. The installer always resolves the
+newest verified Node.js 26 patch.
 
 > **Looking around first?** Open the
 > [live Companion](https://mtamagno.github.io/questkeeper-rpg-campaign-manager/)

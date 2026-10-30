@@ -5,10 +5,9 @@ setup packages on Node.js 26.
 
 ## Current upstream status
 
-On 23 October 2026, Node.js 26 is the upstream **Current** release line. The
-official schedule moves it to **Active LTS on 28 October 2026**. QuestKeeper's
-own 1.1.3 LTS designation describes the product support channel; it does not
-claim that Node.js entered upstream LTS early.
+Node.js 26 entered upstream **Active LTS** on 28 October 2026 with the codename
+Lithium. QuestKeeper 1.1.5 therefore ships its supported runtime after the
+upstream transition rather than describing a future lifecycle milestone.
 
 ## Runtime rules
 

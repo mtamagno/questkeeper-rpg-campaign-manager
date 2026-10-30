@@ -1,6 +1,6 @@
 {
   "name": "questkeeper-rpg-campaign-manager",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "A self-hosted D&D and tabletop RPG companion for character sheets, session journals, party bonds, maps and campaign lore.",
   "questkeeper": {
     "releaseChannel": "lts"

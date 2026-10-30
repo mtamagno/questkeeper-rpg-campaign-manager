@@ -17,15 +17,15 @@ setting or visual identity from a commercial game.
 <table>
   <tr>
     <td width="38%" align="center" valign="middle">
-      <img src="docs/images/releases/v1.1.4-seamkeep-mira.png" alt="Mira Seamspell, a harefolk path-binder joining parchment ribbons with a glowing brass rune shuttle" width="330">
+      <img src="docs/images/releases/v1.1.5-storyforge-nym.png" alt="Nym Emberquill, a salamanderkin storysmith forging parchment memories into an open field chronicle" width="330">
     </td>
     <td width="62%" valign="middle">
-      <p><strong>QuestKeeper 1.1.4 · Seamkeep — LTS</strong></p>
-      <h3>The Portable Thread</h3>
-      <p><strong>Mira Seamspell</strong> · harefolk path-binder</p>
-      <blockquote>“Every thread must hold on every road.”</blockquote>
-      <p>Mira carries the Wayhold improvements through a native setup whose embedded runtime path holds across Windows, Linux and macOS checkouts.</p>
-      <p><a href="docs/releases/v1.1.4.md"><strong>Read the release notes →</strong></a> · <a href="https://github.com/mtamagno/questkeeper-rpg-campaign-manager/releases/tag/v1.1.4"><strong>Download 1.1.4 LTS →</strong></a></p>
+      <p><strong>QuestKeeper 1.1.5 · Storyforge — LTS</strong></p>
+      <h3>The Living Character</h3>
+      <p><strong>Nym Emberquill</strong> · salamanderkin storysmith</p>
+      <blockquote>“A living story remembers what changed—and helps you act on it.”</blockquote>
+      <p>Nym joins sheets, memories, relationships and hard-won rules into one chronicle that remains useful when the next session begins.</p>
+      <p><a href="docs/releases/v1.1.5.md"><strong>Read the release notes →</strong></a> · <a href="https://github.com/mtamagno/questkeeper-rpg-campaign-manager/releases/tag/v1.1.5"><strong>Download 1.1.5 LTS →</strong></a></p>
     </td>
   </tr>
 </table>
@@ -34,6 +34,10 @@ setting or visual identity from a commercial game.
 > Windows gate failed before a GitHub Release was published, so Seamkeep
 > supersedes it without rewriting the tag. Read the
 > [LTS policy](docs/LTS-POLICY.md) for the maintenance promise.
+
+> QuestKeeper 1.1.5 Storyforge succeeds Seamkeep as the active LTS after the
+> complete 1.1.4 feedback milestone, character toolkit and local-data safety
+> gates passed together.
 
 ---
 
@@ -50,7 +54,8 @@ milestone; after publication, its identity is permanent.
 | **1.1.1** | **Hearthkey**     | The Reopened Door       | **Twick Brasswhisker**, mousekin path-mender   | Windows shortcuts survive spaces in every local path.              | Released              |
 | **1.1.2** | **Hearthrest**    | The Quiet Farewell      | **Vesper Hushwing**, owlkin night steward      | Setup closes cleanly instead of leaving a local process.           | Released              |
 | **1.1.3** | **Wayhold**       | The Steady Chronicle    | **Tarn Evermark**, archive warden              | Feedback fixes, memory, access and speed become a dependable base. | Tag only · superseded |
-| **1.1.4** | **Seamkeep**      | The Portable Thread     | **Mira Seamspell**, path-binder                | Native setup holds across every supported operating-system path.   | Released · LTS        |
+| **1.1.4** | **Seamkeep**      | The Portable Thread     | **Mira Seamspell**, path-binder                | Native setup holds across every supported operating-system path.   | Released              |
+| **1.1.5** | **Storyforge**    | The Living Character    | **Nym Emberquill**, storysmith                 | Character growth becomes visible, useful and safely portable.      | Released · LTS        |
 | **1.2.0** | **Echobloom**     | Stories With Roots      | **Morrow Bellroot**, memory gardener           | Characters grow beyond a static sheet.                             | Planned               |
 | **1.3.0** | **Moonmoot**      | Gather at the Table     | **Pip Hearthroll**, goblin table scout         | The party can prepare and catch up together.                       | Planned               |
 | **1.4.0** | **Waywhisper**    | The Living Atlas        | **Orra Mosscompass**, centaur mapmaker         | People, places, clues and roads become connected.                  | Planned               |
