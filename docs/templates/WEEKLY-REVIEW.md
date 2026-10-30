@@ -29,14 +29,16 @@ baseline of each repository and any known compatibility difference.
 
 ## Product health
 
-| Signal                     | Result | Change | Follow-up |
-| -------------------------- | ------ | ------ | --------- |
-| Live demo's key journeys   |        |        |           |
-| Mobile and keyboard review |        |        |           |
-| CI/build status            |        |        |           |
-| Open regressions           |        |        |           |
-| New user feedback          |        |        |           |
-| Privacy/content concerns   |        |        |           |
+| Signal                      | Result | Change | Follow-up |
+| --------------------------- | ------ | ------ | --------- |
+| Live demo's key journeys    |        |        |           |
+| Page hierarchy and density  |        |        |           |
+| Mobile and keyboard review  |        |        |           |
+| Screen reader and 200% zoom |        |        |           |
+| CI/build status             |        |        |           |
+| Open regressions            |        |        |           |
+| New user feedback           |        |        |           |
+| Privacy/content concerns    |        |        |           |
 
 ## Dependency and runtime health
 
@@ -78,7 +80,9 @@ and release-artifact impact before opening or scheduling work.
 
 - [ ] The intended player or GM can complete the target journey.
 - [ ] Empty, error and recovery states are covered.
-- [ ] Desktop, 360 px mobile, keyboard and contrast are reviewed.
+- [ ] Purpose, primary action, hierarchy and progressive disclosure are clear.
+- [ ] 360 px, 768 px, desktop, wide-screen, 200% zoom, keyboard, screen reader
+      and contrast are reviewed.
 - [ ] Automated tests and documentation describe the delivered behavior.
 
 ### Candidate atomic commits

@@ -2,13 +2,13 @@
 
 **Status:** Product baseline
 
-**Target release:** 16 December 2026
+**Target release:** 4 January 2027
 
-**Planning window:** 18 October–16 December 2026
+**Planning window:** 18 October 2026–4 January 2027
 
 **Primary audiences:** tabletop RPG players and Game Masters
 
-**Related plan:** [60-day delivery plan](ROADMAP-60-DAYS.md)
+**Related plan:** [extended delivery plan](ROADMAP-60-DAYS.md)
 
 **Acceptance contract:**
 [Player and GM acceptance journeys](GAME-NIGHT-ACCEPTANCE-JOURNEYS.md)

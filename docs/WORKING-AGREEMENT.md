@@ -20,13 +20,13 @@ action, but must never obscure it.
 
 ## 2. Planning hierarchy
 
-| Horizon    | Source                                     | Purpose                                 |
-| ---------- | ------------------------------------------ | --------------------------------------- |
-| One year   | [`ROADMAP.md`](../ROADMAP.md)              | Outcomes players and GMs can expect     |
-| Sixty days | [`ROADMAP-60-DAYS.md`](ROADMAP-60-DAYS.md) | Delivery sequence and two daily commits |
-| One week   | Weekly review                              | Seven-day commitment and risks          |
-| One change | Issue or pull request                      | Acceptance criteria and proof           |
-| Continuous | [`DECISION-LOG.md`](DECISION-LOG.md)       | Durable reasoning and constraints       |
+| Horizon           | Source                                     | Purpose                                                  |
+| ----------------- | ------------------------------------------ | -------------------------------------------------------- |
+| One year          | [`ROADMAP.md`](../ROADMAP.md)              | Outcomes players and GMs can expect                      |
+| Extended delivery | [`ROADMAP-60-DAYS.md`](ROADMAP-60-DAYS.md) | Delivery sequence, quality windows and two daily commits |
+| One week          | Weekly review                              | Seven-day commitment and risks                           |
+| One change        | Issue or pull request                      | Acceptance criteria and proof                            |
+| Continuous        | [`DECISION-LOG.md`](DECISION-LOG.md)       | Durable reasoning and constraints                        |
 
 The roadmap is a direction, not a promise to preserve an outdated order. A
 weekly review may reorder future work when user evidence, risk or dependency
@@ -102,7 +102,7 @@ only after the containing release artifact has been published and verified.
 2. Review the live Companion, the decision log, completed artifacts, open
    feedback, failed workflows and unfinished work from the previous week.
 3. Select one player-facing weekly outcome and up to fourteen candidate atomic
-   commits from the 60-day plan.
+   commits from the extended delivery plan.
 4. Mark dependencies, risky migrations and work needing visual review.
 5. Confirm each item satisfies the Definition of Ready below.
 
@@ -120,7 +120,8 @@ only after the containing release artifact has been published and verified.
 - Keep the branch releasable. Run focused tests while working and
   `npm run verify` before a pull request or push to `main`.
 - Record discoveries that change scope in the weekly note.
-- Preview visual work at desktop and 360 px mobile widths before review.
+- Preview visual work at 360 px phone, 768 px tablet, desktop and wide-screen
+  widths, plus 200% zoom, before review.
 
 Use the reusable [daily closeout](templates/DAILY-CLOSEOUT.md) after the two
 scheduled tasks whenever more work is available that day.
@@ -139,8 +140,8 @@ scheduled tasks whenever more work is available that day.
 6. Audit how shipped work changes the assumptions, dependencies and acceptance
    criteria of every affected future task.
 7. Update the decision log and link each durable choice to its source.
-8. Update the 60-day plan checkboxes and only change the annual roadmap when a
-   user-visible checkpoint has materially changed.
+8. Update the extended delivery plan checkboxes and only change the annual
+   roadmap when a user-visible checkpoint has materially changed.
 9. Carry work forward deliberately, reduce it, or remove it; never let it
    remain ambiguous.
 
@@ -180,9 +181,16 @@ Exploration may start earlier, but it is not a delivery commitment yet.
 A change is done only when all relevant statements are true:
 
 - the complete user journey works, including empty and error states;
+- the page purpose, primary action and reading order are obvious without
+  presenting several unrelated actions at equal visual weight;
+- dense content uses deliberate grouping or progressive disclosure, and no
+  section is needlessly tall, duplicated, hidden or visually unfinished;
 - campaign data remains backward compatible or has a documented migration;
-- keyboard, focus, contrast and meaningful alternative text were checked;
-- desktop and small-screen layouts were visually reviewed;
+- keyboard, focus, headings, landmarks, screen-reader names, contrast,
+  meaningful alternative text, reduced motion and status announcements were
+  checked;
+- 360 px phone, 768 px tablet, desktop, wide-screen and 200% zoom layouts were
+  visually reviewed;
 - new behavior has automated coverage at the lowest useful level;
 - `npm run verify` succeeds from a clean installation;
 - user-facing copy and documentation match the implementation;
@@ -196,6 +204,16 @@ A change is done only when all relevant statements are true:
   log when relevant.
 - maintainer-owned shared work is implemented and validated in both delivery
   targets, or its explicit target exception is recorded.
+
+### Page-quality rule
+
+Every new page inherits the acceptance rubric in the
+[UI, UX and accessibility quality fortnight](UI-UX-ACCESSIBILITY-FORTNIGHT.md).
+A later feature may intentionally add density, but its review must explain why
+the information belongs together, how secondary detail is disclosed and how
+the same task remains understandable with keyboard, touch, zoom and assistive
+technology. “It fits on desktop” and “it looks fantasy-themed” are not evidence
+of a finished experience.
 
 ## 6. Code structure and ownership
 

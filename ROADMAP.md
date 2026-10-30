@@ -10,10 +10,10 @@ This is an intentionally ambitious twelve-month roadmap. AI-assisted
 development helps us move quickly, but everything generated from notes,
 transcripts or prompts remains reviewable by a human before publication.
 
-**Roadmap window:** October 2026–October 2027<br>
-**Current stable release:** QuestKeeper 1.0.0 · The First Chronicle<br>
-**Next major release:** QuestKeeper 1.5 · Game Night Edition<br>
-**Annual destination:** QuestKeeper 2.0
+**Roadmap window:** October 2026–November 2027<br>
+**Current stable release:** QuestKeeper 1.1.5 · Storyforge LTS<br>
+**Next major release:** QuestKeeper 1.5 · Game Night Edition · January 2027<br>
+**Annual destination:** QuestKeeper 2.0 · November 2027
 
 The milestones describe what players and Game Masters should experience—not the
 technology hidden behind the screen. Their order may change in response to real
@@ -41,7 +41,34 @@ can try the complete player journey immediately.
 
 ---
 
-## November 2026 · Characters become living stories
+## 4–17 November 2026 · Every page earns its place
+
+QuestKeeper pauses feature expansion to review the entire Companion and
+Campaign Manager page by page. This is a product checkpoint, not a cosmetic
+intermission.
+
+- Every page makes its purpose, primary action and reading order obvious.
+- Dense information uses deliberate grouping and progressive disclosure rather
+  than long, confusing walls of controls or cards.
+- Typography, spacing, imagery and empty space feel intentional instead of
+  approximate or unfinished.
+- Keyboard, screen-reader, contrast, zoom, touch, reduced-motion, loading and
+  error states receive the same care as the default desktop view.
+- The public example, completed Phandelver and active Curse of Strahd prove that
+  improvements work for both clean and content-heavy campaigns.
+- The local Campaign Manager and guided setup receive the same review as the
+  player-facing Companion.
+
+**Checkpoint:** every route and workspace has recorded evidence, no unowned
+blocker or high-severity accessibility defect remains, and later features inherit
+a clearer, calmer foundation.
+
+See the complete
+[UI, UX and accessibility quality fortnight](docs/UI-UX-ACCESSIBILITY-FORTNIGHT.md).
+
+---
+
+## November–December 2026 · Characters become living stories
 
 A character should feel like a person whose history grows with every session,
 not a collection of numbers frozen on one sheet.
@@ -59,7 +86,7 @@ contains something a normal character sheet cannot preserve.
 
 ---
 
-## December 2026 · QuestKeeper 1.5 · Game Night Edition
+## January 2027 · QuestKeeper 1.5 · Game Night Edition
 
 QuestKeeper becomes the page the group opens when everyone sits down to play.
 
@@ -76,7 +103,7 @@ digging through chat logs or asking the Game Master to retell everything.
 
 ---
 
-## January 2027 · The chronicle comes alive
+## February 2027 · The chronicle comes alive
 
 Session notes evolve into an illustrated history of decisions and consequences.
 
@@ -103,7 +130,7 @@ book the group is proud to keep.
 
 ---
 
-## February 2027 · A world that remembers
+## March 2027 · A world that remembers
 
 Every name, clue and location becomes part of one connected world.
 
@@ -120,7 +147,7 @@ QuestKeeper can lead the party back to the moment it mattered.
 
 ---
 
-## March 2027 · The Session Scribe matures
+## April 2027 · The Session Scribe matures
 
 Whether the group plays on Discord or around a physical table, recording a
 session should require less effort than remembering it unaided.
@@ -138,7 +165,7 @@ minutes, while the group keeps control of what is saved.
 
 ---
 
-## April 2027 · The Game Master's studio
+## May 2027 · The Game Master's studio
 
 Maintaining the campaign becomes a guided creative workflow instead of file
 management.
@@ -156,7 +183,7 @@ without editing data files or learning the project structure.
 
 ---
 
-## May 2027 · Every player can contribute
+## June 2027 · Every player can contribute
 
 The campaign archive should represent the whole party while the Game Master
 retains editorial control.
@@ -174,7 +201,7 @@ feel like the memory of an entire party.
 
 ---
 
-## June 2027 · Any language, any table
+## July 2027 · Any language, any table
 
 QuestKeeper becomes easier to adapt to different groups, systems and cultures.
 
@@ -191,7 +218,7 @@ creative process, not a workaround.
 
 ---
 
-## July 2027 · Your chronicle, your style
+## August 2027 · Your chronicle, your style
 
 Every campaign can express its own mood without requiring a designer.
 
@@ -208,7 +235,7 @@ remaining equally readable and easy to use.
 
 ---
 
-## August 2027 · A creative companion on your terms
+## September 2027 · A creative companion on your terms
 
 Optional AI tools help with repetitive creative work without taking authorship
 away from the group. Every workflow can remain manual, run privately on local
@@ -241,7 +268,7 @@ happens.
 
 ---
 
-## September 2027 · QuestKeeper goes everywhere
+## October 2027 · QuestKeeper goes everywhere
 
 A chronicle containing years of memories should feel safe and remain useful
 beyond one computer. QuestKeeper also becomes a first-class mobile companion
@@ -271,7 +298,7 @@ archive.
 
 ---
 
-## October 2027 · QuestKeeper 2.0
+## November 2027 · QuestKeeper 2.0
 
 QuestKeeper 2.0 unites the player Companion, Game Master's studio, Session
 Scribe and optional local creative tools into one coherent journey.
@@ -342,9 +369,9 @@ This roadmap is a direction, not a locked quest log. Bug reports,
 accessibility feedback and stories from real groups can change what comes first.
 
 Contributors who want the implementation cadence can also read the
-**[60-day AI-accelerated delivery plan](docs/ROADMAP-60-DAYS.md)**. It translates
-the first public milestones into 120 reviewable commits while keeping this page
-focused on outcomes for players and Game Masters.
+**[extended AI-accelerated delivery plan](docs/ROADMAP-60-DAYS.md)**. It preserves
+the original 60 delivery days, adds the dedicated 14-day quality fortnight and
+keeps this page focused on outcomes for players and Game Masters.
 
 - Try the [live Companion](https://mtamagno.github.io/questkeeper-rpg-campaign-manager/).
 - Explore the [interactive Campaign Manager demo](https://mtamagno.github.io/questkeeper-rpg-campaign-manager/manager-demo/).

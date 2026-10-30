@@ -1735,3 +1735,37 @@ mouse, touch, keyboard and assistive-technology controls equivalent.
 
 **Revisit when:** User testing shows that comparing multiple quotes at once is
 more valuable than the current compact reading flow.
+
+### QK-066 — Page quality is a release prerequisite
+
+**Date:** 31 October 2026
+
+**Status:** Active
+
+**Decision:** QuestKeeper pauses feature expansion from 4 through 17 November
+for a route-by-route UI, UX and accessibility audit. Every new or substantially
+changed page thereafter inherits the same hierarchy, density, visual-finish,
+responsive, zoom, keyboard, screen-reader, contrast and state-completeness
+rubric. Shared findings are implemented in both the public template and
+production Companion.
+
+**Why:** Individually useful features can still produce an exhausting product
+when primary actions compete, sections grow without structure, controls are
+duplicated or visual polish and accessibility vary by route. A dedicated audit
+creates evidence before more surfaces are added and prevents “works on desktop”
+from becoming the default definition of done.
+
+**Consequences:** Normal delivery pauses through 3 November. The original
+feature backlog is preserved but moves by 19 calendar days, with QuestKeeper
+1.5 targeting 4 January 2027 and the annual destination extending to November 2027. The fortnight records page-level evidence against the public example,
+completed Phandelver and active Curse of Strahd; blockers and high-severity
+accessibility findings must be resolved or explicitly owned before feature work
+resumes.
+
+**Source:**
+[UI, UX and accessibility quality fortnight](UI-UX-ACCESSIBILITY-FORTNIGHT.md)
+and the [extended delivery plan](ROADMAP-60-DAYS.md).
+
+**Revisit when:** The 17 November exit review shows that the route inventory is
+complete and remaining findings are safely prioritised, or real user evidence
+requires extending the quality window.

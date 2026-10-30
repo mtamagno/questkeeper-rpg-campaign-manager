@@ -2,7 +2,7 @@
 
 **Status:** Release acceptance contract
 
-**Target release:** 16 December 2026
+**Target release:** 4 January 2027
 
 **Product goals:** [Game Night Edition goals](GAME-NIGHT-EDITION-GOALS.md)
 

@@ -19,7 +19,7 @@ private by default and legally redistributable.
 7. Run `npm run verify` before opening a pull request.
 8. Use the pull request template and include screenshots for visual changes.
 
-The [60-day delivery plan](docs/ROADMAP-60-DAYS.md) describes the current
+The [extended delivery plan](docs/ROADMAP-60-DAYS.md) describes the current
 execution order. The [public roadmap](ROADMAP.md) describes the longer-term
 player and Game Master experience. Plans guide the work; evidence and user
 feedback may change their order during the weekly review.
