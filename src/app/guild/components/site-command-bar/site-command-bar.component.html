@@ -16,19 +16,6 @@
   </nav>
 
   <div class="command-bar__actions">
-    @if (managerUrl()) {
-      <button
-        class="command-bar__manager"
-        type="button"
-        (click)="openManager()"
-        [attr.aria-label]="
-          isItalian() ? 'Apri il Gestore campagne locale' : 'Open the local Campaign Manager'
-        "
-      >
-        <span aria-hidden="true">&#9881;</span>
-        <span class="command-bar__manager-label">{{ isItalian() ? 'Gestore' : 'Manager' }}</span>
-      </button>
-    }
     @if (activeCampaignId(); as campaignId) {
       <a
         class="command-bar__my-character"
@@ -62,63 +49,6 @@
         <span class="command-bar__continue-label">{{ isItalian() ? 'Continua' : 'Continue' }}</span>
       </a>
     }
-    @if (canRememberCurrent()) {
-      <button
-        class="command-bar__favorite"
-        type="button"
-        (click)="toggleCurrentFavorite()"
-        [attr.aria-pressed]="isCurrentFavorite()"
-        [attr.aria-label]="
-          isCurrentFavorite()
-            ? isItalian()
-              ? 'Rimuovi la pagina dai preferiti'
-              : 'Remove page from favorites'
-            : isItalian()
-              ? 'Aggiungi la pagina ai preferiti'
-              : 'Add page to favorites'
-        "
-      >
-        <span aria-hidden="true">{{ isCurrentFavorite() ? '★' : '☆' }}</span>
-        <span class="command-bar__favorite-label">{{
-          isItalian() ? 'Preferito' : 'Favorite'
-        }}</span>
-      </button>
-    }
-    @if (canInstall()) {
-      <button
-        class="command-bar__install"
-        type="button"
-        (click)="installCompanion()"
-        [attr.aria-label]="
-          isItalian()
-            ? 'Installa QuestKeeper su questo dispositivo'
-            : 'Install QuestKeeper on this device'
-        "
-      >
-        <span aria-hidden="true">&#8681;</span>
-        <span class="command-bar__install-label">{{ isItalian() ? 'Installa' : 'Install' }}</span>
-      </button>
-    }
-    <button
-      class="command-bar__tour"
-      type="button"
-      (click)="openTour()"
-      data-tour-control
-      [attr.aria-label]="tourActionLabel()"
-    >
-      <span aria-hidden="true">&#10022;</span>
-      <span class="command-bar__tour-label">{{ tourButtonLabel() }}</span>
-      @if (tourStatus() === 'paused') {
-        <span class="command-bar__tour-state" aria-hidden="true"></span>
-      }
-    </button>
-    @if (activeCampaignName(); as campaignName) {
-      <a class="command-bar__campaign-switch" routerLink="/">
-        <span class="command-bar__campaign-dot" aria-hidden="true"></span>
-        <span class="command-bar__campaign-name">{{ campaignName }}</span>
-        <span class="command-bar__switch-copy">{{ isItalian() ? 'Cambia' : 'Switch' }}</span>
-      </a>
-    }
     <button
       class="command-bar__search"
       type="button"
@@ -132,6 +62,69 @@
       <span class="command-bar__search-label">{{ isItalian() ? 'Vai a...' : 'Go to...' }}</span>
       <kbd>Ctrl K</kbd>
     </button>
+    <div
+      class="command-bar__mobile-more"
+      [class.command-bar__mobile-more--open]="isMobileActionsOpen()"
+    >
+      <button
+        class="command-bar__mobile-toggle"
+        type="button"
+        [attr.aria-expanded]="isMobileActionsOpen()"
+        [attr.aria-label]="isItalian() ? 'Altre azioni' : 'More actions'"
+        (click)="toggleMobileActions()"
+      >
+        <span aria-hidden="true">•••</span>
+      </button>
+      <div class="command-bar__mobile-menu">
+        @if (managerUrl()) {
+          <button
+            class="command-bar__manager"
+            type="button"
+            (click)="openManager(); closeMobileActions()"
+          >
+            <span aria-hidden="true">⚙</span>
+            <span>{{ isItalian() ? 'Gestore campagne' : 'Campaign Manager' }}</span>
+          </button>
+        }
+        @if (canRememberCurrent()) {
+          <button
+            class="command-bar__favorite"
+            type="button"
+            [attr.aria-pressed]="isCurrentFavorite()"
+            (click)="toggleCurrentFavorite(); closeMobileActions()"
+          >
+            <span aria-hidden="true">{{ isCurrentFavorite() ? '★' : '☆' }}</span>
+            <span>{{ isItalian() ? 'Preferito' : 'Favourite' }}</span>
+          </button>
+        }
+        @if (canInstall()) {
+          <button
+            class="command-bar__install"
+            type="button"
+            (click)="installCompanion(); closeMobileActions()"
+          >
+            <span aria-hidden="true">⇩</span>
+            <span>{{ isItalian() ? 'Installa QuestKeeper' : 'Install QuestKeeper' }}</span>
+          </button>
+        }
+        <button
+          class="command-bar__tour"
+          type="button"
+          (click)="openTour(); closeMobileActions()"
+          data-tour-control
+        >
+          <span aria-hidden="true">✦</span>
+          <span>{{ tourButtonLabel() }}</span>
+        </button>
+        @if (activeCampaignName(); as campaignName) {
+          <a class="command-bar__campaign-switch" routerLink="/" (click)="closeMobileActions()">
+            <span class="command-bar__campaign-dot" aria-hidden="true"></span>
+            <span class="command-bar__campaign-name">{{ campaignName }}</span>
+            <span class="command-bar__switch-copy">{{ isItalian() ? 'Cambia' : 'Switch' }}</span>
+          </a>
+        }
+      </div>
+    </div>
   </div>
 </div>
 

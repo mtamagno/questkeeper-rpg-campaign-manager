@@ -25,6 +25,8 @@
 
   // --- Mobile: off-screen by default ---
   @include respond-below(lg) {
+    width: min(88vw, 320px);
+    z-index: $z-index-header + 2;
     transform: translateX(-100%);
     box-shadow: none;
 
@@ -40,9 +42,14 @@
     padding: $spacing-lg $spacing-md;
     border-bottom: $border-width-thin solid $color-border-subtle;
     flex-shrink: 0;
+
+    @include respond-below(lg) {
+      padding-top: max(#{$spacing-lg}, calc(env(safe-area-inset-top) + #{$spacing-sm}));
+    }
   }
 
   &__title {
+    min-width: 0;
     font-family: $font-family-heading;
     font-size: $font-size-lg;
     font-weight: $font-weight-bold;
@@ -50,8 +57,11 @@
   }
 
   &__title-link {
+    display: block;
     color: $color-gold-light;
     text-decoration: none;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
     @include text-gold-glow;
     @include transition-colors;
 
@@ -69,6 +79,21 @@
     padding: $spacing-xs;
     line-height: 1;
     @include transition-colors;
+
+    @include respond-below(lg) {
+      display: grid;
+      width: 44px;
+      height: 44px;
+      flex: 0 0 44px;
+      place-items: center;
+      padding: 0;
+      border-radius: $border-radius-sm;
+
+      &:focus-visible {
+        outline: 2px solid var(--qk-color-accent);
+        outline-offset: 2px;
+      }
+    }
 
     &:hover {
       color: $color-text-primary;
@@ -92,6 +117,10 @@
     flex-shrink: 0;
     padding: $spacing-sm $spacing-md;
     border-top: $border-width-thin solid $color-border-subtle;
+
+    @include respond-below(lg) {
+      padding-bottom: max(#{$spacing-sm}, env(safe-area-inset-bottom));
+    }
   }
 
   &__settings {

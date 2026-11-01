@@ -49,7 +49,7 @@ but no action becomes harder to discover solely to make the bar shorter.
 
 | Date      | Task 1                                                                                                                          | Task 2                                                                                                                              | Same-day closeout                                                                                                 |
 | --------- | ------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| **1 Nov** | [x] **Character information architecture and accessible tab foundation**                                                        | [ ] Audit every current section, landmark and direct action against the four areas; record missing, duplicated or misplaced content | [ ] Verify the combined journey after both tasks                                                                  |
+| **1 Nov** | [x] **Character information architecture and accessible tab foundation**                                                        | [x] Audit every current section, landmark and direct action against the four areas; record missing, duplicated or misplaced content | [x] Verify the combined journey after both tasks                                                                  |
 | **2 Nov** | Refine Profile into a true at-a-glance start without deleting authored content                                                  | Refine Story & bonds: chapter discovery, relationship density, known-history sources and quotes                                     | Test short, empty and very long profiles                                                                          |
 | **3 Nov** | Review and refactor the heavy Sheet tab: inventory every value/action first, then make current play state immediately scannable | Refine Journal hierarchy: notebook, gallery and diary with useful progressive disclosure                                            | Prove Sheet content/function parity, then check protected state, remembered positions and large media collections |
 | **4 Nov** | Inventory the sticky command bar by frequency, context and screen size                                                          | Simplify its responsive hierarchy and overflow while preserving campaign switch, recovery and quick navigation                      | Keyboard, 360 px, 200% zoom and long-label review                                                                 |
@@ -100,6 +100,14 @@ phone, tablet, desktop, keyboard-only and 200% zoom sizes.
   User Settings.
 - The original public demo, completed Phandelver and active Curse of Strahd pass
   the affected profile, accessibility and build checks.
+
+## 1 November closeout
+
+The second task, mobile correction and combined journey review are recorded in
+[the character mobile audit](reviews/2026-11-01-character-mobile-audit.md). Its
+ownership table is the baseline for the remaining six days: no later density or
+settings work may silently move, duplicate or remove one of those surfaces or
+actions.
 
 ## Design references
 

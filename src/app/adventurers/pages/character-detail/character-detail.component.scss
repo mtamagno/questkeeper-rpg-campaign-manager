@@ -959,4 +959,143 @@
       color: $color-gold;
     }
   }
+
+  // Phone layout: keep every area visible without nested desktop-sized surfaces.
+  @include respond-below(sm) {
+    gap: $spacing-lg;
+
+    &__hero {
+      gap: $spacing-md;
+      padding: $spacing-md;
+      border-radius: $border-radius-md;
+    }
+
+    &__portrait-frame {
+      width: min(180px, 64vw);
+    }
+
+    &__header-info {
+      width: 100%;
+      gap: $spacing-xs;
+      padding: 0;
+    }
+
+    &__name {
+      font-size: clamp(1.55rem, 8vw, #{$font-size-2xl});
+      line-height: 1.08;
+    }
+
+    &__meta,
+    &__player {
+      font-size: $font-size-sm;
+    }
+
+    &__quick-stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      width: 100%;
+      gap: $spacing-xs;
+      margin-top: $spacing-xs;
+    }
+
+    &__quick-stat {
+      min-width: 0;
+      padding: $spacing-sm;
+
+      dd {
+        font-size: $font-size-base;
+        overflow-wrap: anywhere;
+      }
+    }
+
+    &__tabs-shell {
+      position: static;
+      padding: $spacing-xs;
+      overflow: visible;
+      border-radius: $border-radius-md;
+    }
+
+    &__tabs {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-auto-flow: row;
+      grid-auto-columns: auto;
+      gap: $spacing-xs;
+      overflow: visible;
+      scroll-snap-type: none;
+    }
+
+    &__tab {
+      min-width: 0;
+      min-height: 46px;
+      gap: $spacing-xs;
+      padding: $spacing-xs $spacing-sm;
+      font-size: $font-size-xs;
+      line-height: 1.25;
+      scroll-snap-align: none;
+    }
+
+    &__tab-description {
+      margin: $spacing-sm $spacing-xs 0;
+      font-size: $font-size-xs;
+      line-height: $line-height-base;
+      text-align: left;
+    }
+
+    &__tab-panel {
+      gap: $spacing-lg;
+    }
+
+    &__section {
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      scroll-margin-top: 5rem;
+    }
+
+    &__section-title {
+      margin-bottom: $spacing-md;
+      font-size: $font-size-lg;
+    }
+
+    &__section-intro {
+      margin-bottom: $spacing-md;
+      padding-bottom: $spacing-sm;
+      font-size: $font-size-sm;
+    }
+
+    &__quick-facts {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: $spacing-xs;
+      margin-bottom: $spacing-lg;
+    }
+
+    &__quick-fact {
+      min-width: 0;
+      padding: $spacing-sm;
+      border-radius: $border-radius-md;
+
+      dd {
+        overflow-wrap: anywhere;
+      }
+    }
+
+    &__highlight-card,
+    &__bond-card {
+      gap: $spacing-sm;
+      padding: $spacing-md;
+    }
+
+    &__bonds-toolbar {
+      gap: $spacing-sm;
+      margin-bottom: $spacing-md;
+    }
+
+    &__bond-carousel > .character-detail__bond-card {
+      width: calc(100vw - #{$spacing-2xl});
+      max-width: 340px;
+    }
+  }
 }

@@ -86,6 +86,7 @@ export class SiteCommandBarComponent {
   private previouslyFocused: HTMLElement | null = null;
 
   readonly isOpen = signal(false);
+  readonly isMobileActionsOpen = signal(false);
   readonly query = signal('');
   readonly activeIndex = signal(0);
   readonly isItalian = this.language.isItalian;
@@ -436,6 +437,15 @@ export class SiteCommandBarComponent {
 
   toggleCurrentFavorite(): void {
     this.journeyMemory.toggleCurrentFavorite();
+  }
+
+  toggleMobileActions(): void {
+    this.isMobileActionsOpen.update((isOpen): boolean => !isOpen);
+  }
+
+  /** Closes the compact mobile action menu after one of its commands runs. */
+  closeMobileActions(): void {
+    this.isMobileActionsOpen.set(false);
   }
 
   private focusTour(): void {

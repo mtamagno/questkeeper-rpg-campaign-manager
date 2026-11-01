@@ -37,7 +37,7 @@ const checks = [
   ['first-visit launch action', selector.includes('data-tour-launch="first-visit"')],
   ['role change resets tour context', selectorComponent.includes('this.guidedTour.reset()')],
   ['first-visit focus destination', selector.includes('id="first-visit-paths"')],
-  ['persistent command-bar launch action', commandBar.includes('(click)="openTour()"')],
+  ['persistent command-bar launch action', /\(click\)="openTour\(\)(?:;[^\"]*)?"/.test(commandBar)],
   [
     'command bar defers tour until a path is chosen',
     commandBarComponent.includes("this.audiencePreference.audience() === null"),
