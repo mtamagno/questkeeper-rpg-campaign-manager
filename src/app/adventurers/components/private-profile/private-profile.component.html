@@ -1,16 +1,18 @@
 <!-- Private Profile — Locked/Unlocked view -->
 <div class="private-profile">
   <div class="private-profile__header">
-    <h2 class="private-profile__title">🔒 Secret Profile</h2>
+    <h2 class="private-profile__title">
+      🔒 {{ lang() === 'it' ? 'Profilo segreto' : 'Secret Profile' }}
+    </h2>
 
     @if (isUnlocked()) {
       <button
         class="private-profile__lock-btn"
         type="button"
         (click)="lockProfile()"
-        aria-label="Lock private profile"
+        [attr.aria-label]="lang() === 'it' ? 'Blocca il profilo privato' : 'Lock private profile'"
       >
-        Lock
+        {{ lang() === 'it' ? 'Blocca' : 'Lock' }}
       </button>
     }
   </div>
@@ -18,18 +20,18 @@
   @if (isUnlocked()) {
     <div class="private-profile__content">
       <div class="private-profile__item">
-        <h3>Secret Backstory</h3>
+        <h3>{{ lang() === 'it' ? 'Passato segreto' : 'Secret Backstory' }}</h3>
         <p>{{ privateProfile().secretBackstory | bilingual }}</p>
       </div>
 
       <div class="private-profile__item">
-        <h3>Hidden Motivations</h3>
+        <h3>{{ lang() === 'it' ? 'Motivazioni nascoste' : 'Hidden Motivations' }}</h3>
         <p>{{ privateProfile().hiddenMotivations | bilingual }}</p>
       </div>
 
       @if (privateProfile().secrets.length > 0) {
         <div class="private-profile__item">
-          <h3>Secrets</h3>
+          <h3>{{ lang() === 'it' ? 'Segreti' : 'Secrets' }}</h3>
           <ul class="private-profile__secrets">
             @for (secret of privateProfile().secrets; track secret) {
               <li>{{ secret | bilingual }}</li>
@@ -38,9 +40,30 @@
         </div>
       }
 
+      @if (privateProfile().privateNarrative; as narrative) {
+        <details class="private-profile__narrative">
+          <summary>
+            <span class="private-profile__narrative-title">{{ narrative.title | bilingual }}</span>
+            <span class="private-profile__narrative-hint">
+              {{ lang() === 'it' ? 'Apri il racconto completo' : 'Open the complete story' }}
+            </span>
+          </summary>
+
+          <div class="private-profile__narrative-body">
+            @for (paragraph of narrative.paragraphs; track $index) {
+              @if (paragraph.en === '*' && paragraph.it === '*') {
+                <div class="private-profile__narrative-divider" aria-hidden="true">✦</div>
+              } @else {
+                <p>{{ paragraph | bilingual }}</p>
+              }
+            }
+          </div>
+        </details>
+      }
+
       @if (privateProfile().dmNotes) {
         <div class="private-profile__item private-profile__item--dm">
-          <h3>DM Notes</h3>
+          <h3>{{ lang() === 'it' ? 'Note per il DM' : 'DM Notes' }}</h3>
           <p>{{ privateProfile().dmNotes | bilingual }}</p>
         </div>
       }
@@ -48,9 +71,15 @@
   } @else {
     <div class="private-profile__locked">
       <span class="private-profile__lock-icon">🔒</span>
-      <p>This section contains the character's secrets.</p>
+      <p>
+        {{
+          lang() === 'it'
+            ? 'Questa sezione contiene i segreti del personaggio.'
+            : "This section contains the character's secrets."
+        }}
+      </p>
       <button class="private-profile__unlock-btn" type="button" (click)="openDialog()">
-        Enter Password
+        {{ lang() === 'it' ? 'Inserisci la password' : 'Enter Password' }}
       </button>
     </div>
   }

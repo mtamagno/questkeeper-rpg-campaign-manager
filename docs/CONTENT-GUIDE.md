@@ -126,6 +126,29 @@ large block. Keep secrets, unrevealed motives and GM-only facts in
 `privateProfile`; image content, alt text and captions in public chapters must
 not reveal them.
 
+When an author supplies a complete secret backstory, keep the concise protected
+summary in `privateProfile.secretBackstory` and add the optional
+`privateProfile.privateNarrative`. Give it a localized `title` and an ordered
+`paragraphs` array of bilingual text objects. The Companion renders this prose
+only after the character password is accepted and keeps the long story collapsed
+until the reader explicitly opens it. Do not repeat any of that private prose in
+public chapters, gallery metadata, recaps or AI-generated summaries.
+
+```json
+{
+  "privateProfile": {
+    "secretBackstory": { "en": "Concise secret summary.", "it": "Riassunto segreto conciso." },
+    "hiddenMotivations": { "en": "...", "it": "..." },
+    "secrets": [],
+    "dmNotes": { "en": "...", "it": "..." },
+    "privateNarrative": {
+      "title": { "en": "The Complete Story", "it": "La storia completa" },
+      "paragraphs": [{ "en": "First protected paragraph.", "it": "Primo paragrafo protetto." }]
+    }
+  }
+}
+```
+
 Story highlights are optional. Omit empty collections. Do not infer them from
 statistics or equipment, and do not label an event as a favourite unless the
 character's writing, dialogue or player explicitly supports that preference.

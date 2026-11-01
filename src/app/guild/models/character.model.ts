@@ -84,11 +84,18 @@ export interface CharacterPublicProfile {
 }
 
 /** Private profile — secrets only the player and DM know. */
+export interface CharacterPrivateNarrative {
+  readonly title: BilingualText;
+  readonly paragraphs: ReadonlyArray<BilingualText>;
+}
+
 export interface CharacterPrivateProfile {
   readonly secretBackstory: BilingualText;
   readonly hiddenMotivations: BilingualText;
   readonly secrets: ReadonlyArray<BilingualText>;
   readonly dmNotes: BilingualText;
+  /** Optional complete backstory, kept separate from the concise secret summary. */
+  readonly privateNarrative?: CharacterPrivateNarrative;
 }
 
 /** Visual mood used to style a page from a character-owned notebook. */

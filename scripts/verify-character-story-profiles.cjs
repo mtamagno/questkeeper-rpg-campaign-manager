@@ -20,6 +20,22 @@ const component = fs.readFileSync(
   path.join(componentRoot, 'character-detail.component.ts'),
   'utf8',
 );
+const privateProfileRoot = path.join(
+  projectRoot,
+  'src',
+  'app',
+  'adventurers',
+  'components',
+  'private-profile',
+);
+const privateProfileTemplate = fs.readFileSync(
+  path.join(privateProfileRoot, 'private-profile.component.html'),
+  'utf8',
+);
+const privateProfileStyles = fs.readFileSync(
+  path.join(privateProfileRoot, 'private-profile.component.scss'),
+  'utf8',
+);
 const npcDetailRoot = path.join(projectRoot, 'src', 'app', 'bestiary', 'pages', 'npc-detail');
 const npcDetailTemplate = fs.readFileSync(
   path.join(npcDetailRoot, 'npc-detail.component.html'),
@@ -138,6 +154,24 @@ assert(
   'Character model needs optional quick-fact, signature-item and favourite-moment contracts.',
 );
 assert(
+  characterModel.includes('CharacterPrivateNarrative') &&
+    characterModel.includes('readonly privateNarrative?: CharacterPrivateNarrative'),
+  'Character model needs an optional protected long-form narrative contract.',
+);
+assert(
+  privateProfileTemplate.includes('@if (isUnlocked())') &&
+    privateProfileTemplate.includes('privateProfile().privateNarrative') &&
+    privateProfileTemplate.includes('<details class="private-profile__narrative">') &&
+    privateProfileTemplate.indexOf('privateProfile().privateNarrative') >
+      privateProfileTemplate.indexOf('@if (isUnlocked())'),
+  'Complete private narratives must remain behind the character password and open on demand.',
+);
+assert(
+  privateProfileStyles.includes('&__narrative-body') &&
+    privateProfileStyles.includes('white-space: pre-line'),
+  'Protected long-form prose needs a bounded, paragraph-preserving reading surface.',
+);
+assert(
   managerApp.includes('storyHighlightsEditor') &&
     managerApp.includes('buildStoryHighlights') &&
     aiService.includes('Favourite moments are subjective'),
@@ -253,6 +287,17 @@ for (const campaign of campaigns) {
         `${label} ${field} source ${source.id} is missing.`,
       );
     };
+    if (character.privateProfile?.privateNarrative) {
+      const narrative = character.privateProfile.privateNarrative;
+      validateLocalized(narrative.title, 'privateProfile.privateNarrative.title');
+      assert(
+        Array.isArray(narrative.paragraphs) && narrative.paragraphs.length > 0,
+        `${label} private narrative needs at least one paragraph.`,
+      );
+      for (const [index, paragraph] of (narrative.paragraphs ?? []).entries()) {
+        validateLocalized(paragraph, `privateProfile.privateNarrative.paragraphs[${index}]`);
+      }
+    }
     for (const fact of character.publicProfile.quickFacts ?? []) {
       quickFactCount += 1;
       validateId(fact.id, 'quick fact');

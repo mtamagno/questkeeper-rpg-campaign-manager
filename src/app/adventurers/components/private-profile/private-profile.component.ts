@@ -15,6 +15,7 @@ import {
 } from '@angular/core';
 
 import { PasswordService } from '@guild/services/password.service';
+import { LanguageService } from '@guild/services/language.service';
 import { type CharacterPrivateProfile } from '@guild/models/character.model';
 import { BilingualTextPipe } from '@guild/components/bilingual-text/bilingual-text.pipe';
 import { PasswordDialogComponent } from '@guild/components/password-dialog/password-dialog.component';
@@ -33,6 +34,10 @@ import { PasswordDialogComponent } from '@guild/components/password-dialog/passw
 })
 export class PrivateProfileComponent {
   private readonly passwordService = inject(PasswordService);
+  private readonly languageService = inject(LanguageService);
+
+  /** Current language for labels around the protected authored narrative. */
+  readonly lang = this.languageService.currentLanguage;
 
   /** Character ID for password state tracking. */
   readonly characterId = input.required<string>();
