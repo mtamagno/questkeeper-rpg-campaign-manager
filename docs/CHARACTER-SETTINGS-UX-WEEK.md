@@ -47,15 +47,44 @@ but no action becomes harder to discover solely to make the bar shorter.
 
 ## Daily plan
 
-| Date      | Task 1                                                                                                    | Task 2                                                                                                                              | Same-day closeout                                                         |
-| --------- | --------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| **1 Nov** | [x] **Character information architecture and accessible tab foundation**                                  | [ ] Audit every current section, landmark and direct action against the four areas; record missing, duplicated or misplaced content | [ ] Verify the combined journey after both tasks                          |
-| **2 Nov** | Refine Profile into a true at-a-glance start without deleting authored content                            | Refine Story & bonds: chapter discovery, relationship density, known-history sources and quotes                                     | Test short, empty and very long profiles                                  |
-| **3 Nov** | Refine Sheet hierarchy: current values first, resources/rules/history next, PDF as a direct action        | Refine Journal hierarchy: notebook, gallery and diary with useful progressive disclosure                                            | Check protected content, remembered positions and large media collections |
-| **4 Nov** | Inventory the sticky command bar by frequency, context and screen size                                    | Simplify its responsive hierarchy and overflow while preserving campaign switch, recovery and quick navigation                      | Keyboard, 360 px, 200% zoom and long-label review                         |
-| **5 Nov** | Rebuild User Settings around RPG-style stable categories and clear global/campaign scope                  | Add save-state, descriptions, recovery and empty/error feedback without scattering editors                                          | Fresh user, returning player and two-campaign review                      |
-| **6 Nov** | Cross-surface accessibility pass: tabs, headings, focus, names/states, contrast, reduced motion and touch | Performance and rendering pass so inactive areas and heavy media do not punish the first view                                       | Phone, tablet, desktop, wide screen and 200% zoom evidence                |
-| **7 Nov** | Walk the complete player journey in the public demo, Phandelver and Curse of Strahd                       | Resolve regressions, reconcile docs/tests and rank only evidence-backed follow-ups                                                  | Weekly review, dependency/runtime health and downstream plan update       |
+| Date      | Task 1                                                                                                                          | Task 2                                                                                                                              | Same-day closeout                                                                                                 |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| **1 Nov** | [x] **Character information architecture and accessible tab foundation**                                                        | [ ] Audit every current section, landmark and direct action against the four areas; record missing, duplicated or misplaced content | [ ] Verify the combined journey after both tasks                                                                  |
+| **2 Nov** | Refine Profile into a true at-a-glance start without deleting authored content                                                  | Refine Story & bonds: chapter discovery, relationship density, known-history sources and quotes                                     | Test short, empty and very long profiles                                                                          |
+| **3 Nov** | Review and refactor the heavy Sheet tab: inventory every value/action first, then make current play state immediately scannable | Refine Journal hierarchy: notebook, gallery and diary with useful progressive disclosure                                            | Prove Sheet content/function parity, then check protected state, remembered positions and large media collections |
+| **4 Nov** | Inventory the sticky command bar by frequency, context and screen size                                                          | Simplify its responsive hierarchy and overflow while preserving campaign switch, recovery and quick navigation                      | Keyboard, 360 px, 200% zoom and long-label review                                                                 |
+| **5 Nov** | Rebuild User Settings around RPG-style stable categories and clear global/campaign scope                                        | Add save-state, descriptions, recovery and empty/error feedback without scattering editors                                          | Fresh user, returning player and two-campaign review                                                              |
+| **6 Nov** | Cross-surface accessibility pass: tabs, headings, focus, names/states, contrast, reduced motion and touch                       | Performance and rendering pass so inactive areas and heavy media do not punish the first view                                       | Phone, tablet, desktop, wide screen and 200% zoom evidence                                                        |
+| **7 Nov** | Walk the complete player journey in the public demo, Phandelver and Curse of Strahd                                             | Resolve regressions, reconcile docs/tests and rank only evidence-backed follow-ups                                                  | Weekly review, dependency/runtime health and downstream plan update                                               |
+
+### Sheet tab review and refactoring — 3 November
+
+The Sheet task is a preservation refactor, not a content reduction. Before its
+markup or hierarchy changes, record a before/after matrix for every existing
+surface and action:
+
+- unlock and relock state, current level identity and compact combat essentials;
+- ability scores, saving throws, skills, languages, features and traits;
+- currency, combat resources, structured and legacy inventory, equipment state
+  and attunement;
+- spellcasting values, slots, known/prepared spells and links to rule or spell
+  descriptions;
+- searchable rule library, filters, prepared/favourite state, annotations and
+  their User Settings ownership;
+- level history, two-level comparison and remembered reading position;
+- PDF export in every supported language, empty/loading/error states and all
+  keyboard or touch actions.
+
+The refactor may introduce a compact summary, internal navigation, sub-tabs,
+collapsible groups or progressive disclosure when evidence supports them. It
+must not silently remove, merge, truncate or make any current datum or action
+harder to find. Repeated facts may gain one canonical presentation only after
+every former use and destination has been mapped.
+
+The task closes only when the public demo, completed Phandelver and active Curse
+of Strahd prove the same content and functions before and after the change,
+including empty, short, spell-heavy, inventory-heavy and multi-level sheets at
+phone, tablet, desktop, keyboard-only and 200% zoom sizes.
 
 ## Task 1 acceptance criteria
 

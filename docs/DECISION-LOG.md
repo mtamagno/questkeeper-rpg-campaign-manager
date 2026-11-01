@@ -1791,7 +1791,11 @@ private preference editors or hiding PDF export away from the sheet it acts on.
 support arrow, Home and End keys; inactive content remains discoverable; PDF
 export stays in Sheet; audio, My Character and personal rule annotations remain
 in User Settings. The command bar is audited by frequency and context rather
-than treating every persistent choice as a shortcut.
+than treating every persistent choice as a shortcut. The Sheet area receives a
+dedicated preservation refactor on 3 November: every datum, state and action is
+inventoried before layout changes, and content/function parity across the public
+demo, Phandelver and Curse of Strahd is an exit condition rather than an
+assumption.
 
 **Source:** [Character and Settings UX Focus Week](CHARACTER-SETTINGS-UX-WEEK.md).
 
