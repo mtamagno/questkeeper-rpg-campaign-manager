@@ -13,7 +13,7 @@ import {
   type Signal,
 } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 
@@ -60,6 +60,15 @@ interface ProfileBondFeeling {
   readonly reason: string;
 }
 
+type CharacterDetailTabId = 'overview' | 'story' | 'sheet' | 'journal';
+
+interface CharacterDetailTab {
+  readonly id: CharacterDetailTabId;
+  readonly icon: string;
+  readonly label: string;
+  readonly description: string;
+}
+
 /**
  * Full character detail page.
  * Loads character by route param ID and displays all sections.
@@ -86,6 +95,7 @@ interface ProfileBondFeeling {
 })
 export class CharacterDetailComponent {
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly dataService = inject(DataService);
   private readonly campaignService = inject(CampaignService);
   private readonly languageService = inject(LanguageService);
@@ -113,6 +123,77 @@ export class CharacterDetailComponent {
   private readonly characterId: Signal<string | undefined> = toSignal(
     this.route.paramMap.pipe(map((params) => params.get('id') ?? undefined)),
   );
+
+  /** Shareable view selected from the URL without turning preferences into page actions. */
+  private readonly requestedTab: Signal<string | undefined> = toSignal(
+    this.route.queryParamMap.pipe(map((params) => params.get('tab') ?? undefined)),
+  );
+
+  /** Existing story links keep working and open the tab that owns their landmark. */
+  private readonly activeFragment: Signal<string | null | undefined> = toSignal(
+    this.route.fragment,
+  );
+
+  /** Stable task-oriented areas keep the complete profile readable without one endless page. */
+  readonly tabs: Signal<ReadonlyArray<CharacterDetailTab>> = computed(() => {
+    const italian = this.lang() === 'it';
+    return [
+      {
+        id: 'overview',
+        icon: '✦',
+        label: italian ? 'Profilo' : 'Profile',
+        description: italian
+          ? 'Identità, tratti e dettagli essenziali a colpo d’occhio.'
+          : 'Identity, traits and essential details at a glance.',
+      },
+      {
+        id: 'story',
+        icon: '📖',
+        label: italian ? 'Storia e legami' : 'Story & bonds',
+        description: italian
+          ? 'Capitoli personali, relazioni, citazioni e ciò che il gruppo conosce.'
+          : 'Personal chapters, relationships, quotes and what the party knows.',
+      },
+      {
+        id: 'sheet',
+        icon: '⚔',
+        label: italian ? 'Scheda' : 'Sheet',
+        description: italian
+          ? 'Statistiche, risorse, inventario, regole, livelli e download PDF.'
+          : 'Stats, resources, inventory, rules, levels and PDF download.',
+      },
+      {
+        id: 'journal',
+        icon: '🖋',
+        label: italian ? 'Diario' : 'Journal',
+        description: italian
+          ? 'Taccuino, immagini e memoria delle sessioni.'
+          : 'Notebook, images and session memories.',
+      },
+    ];
+  });
+
+  readonly activeTab: Signal<CharacterDetailTabId> = computed(
+    () =>
+      this.tabForFragment(this.activeFragment()) ??
+      this.normalizeTab(this.requestedTab()) ??
+      'overview',
+  );
+
+  readonly activeTabDescription = computed(
+    () => this.tabs().find((tab) => tab.id === this.activeTab())?.description ?? '',
+  );
+
+  /** Reveals legacy landmarks only after their owning tab has become visible. */
+  private readonly revealActiveFragment = effect(() => {
+    const fragment = this.activeFragment();
+    this.activeTab();
+    if (!fragment) return;
+
+    this.document.defaultView?.requestAnimationFrame(() => {
+      this.document.getElementById(fragment)?.scrollIntoView({ block: 'start' });
+    });
+  });
 
   /** The loaded character data. */
   readonly character: Signal<Character | undefined> = computed(() => {
@@ -316,6 +397,66 @@ export class CharacterDetailComponent {
   formatHeight(heightCm: number): string {
     const metres = (heightCm / 100).toFixed(2);
     return `${this.lang() === 'it' ? metres.replace('.', ',') : metres} m`;
+  }
+
+  isTab(tab: CharacterDetailTabId): boolean {
+    return this.activeTab() === tab;
+  }
+
+  /** Updates the shareable page state while clearing landmarks owned by another tab. */
+  selectTab(tab: CharacterDetailTabId, focusTab = false): void {
+    void this.router
+      .navigate([], {
+        relativeTo: this.route,
+        queryParams: { tab },
+        queryParamsHandling: 'merge',
+        fragment: undefined,
+        replaceUrl: true,
+      })
+      .then(() => {
+        if (!focusTab) return;
+        this.document.getElementById(`character-tab-${tab}`)?.focus();
+      });
+  }
+
+  /** Mirrors familiar RPG settings tabs for keyboard and switch-style navigation. */
+  onTabKeydown(event: KeyboardEvent): void {
+    const supportedKeys = ['ArrowLeft', 'ArrowRight', 'Home', 'End'];
+    if (!supportedKeys.includes(event.key)) return;
+
+    event.preventDefault();
+    const tabs = this.tabs();
+    const currentIndex = Math.max(
+      0,
+      tabs.findIndex((tab) => tab.id === this.activeTab()),
+    );
+    let nextIndex = currentIndex;
+    if (event.key === 'Home') nextIndex = 0;
+    if (event.key === 'End') nextIndex = tabs.length - 1;
+    if (event.key === 'ArrowLeft') nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+    if (event.key === 'ArrowRight') nextIndex = (currentIndex + 1) % tabs.length;
+    this.selectTab(tabs[nextIndex].id, true);
+  }
+
+  private normalizeTab(value: string | undefined): CharacterDetailTabId | undefined {
+    return value === 'overview' || value === 'story' || value === 'sheet' || value === 'journal'
+      ? value
+      : undefined;
+  }
+
+  private tabForFragment(fragment: string | null | undefined): CharacterDetailTabId | undefined {
+    if (fragment === 'profile-overview' || fragment === 'profile-highlights') return 'overview';
+    if (
+      fragment === 'personal-chapters' ||
+      fragment === 'profile-bonds' ||
+      fragment === 'quotes' ||
+      fragment === 'profile-memories'
+    ) {
+      return 'story';
+    }
+    if (fragment === 'private-profile' || fragment === 'character-sheet') return 'sheet';
+    if (fragment === 'notebook' || fragment === 'gallery' || fragment === 'diary') return 'journal';
+    return undefined;
   }
 
   /** Handles square profile image load errors. */

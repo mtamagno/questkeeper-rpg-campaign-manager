@@ -59,6 +59,10 @@ function assert(condition, message) {
 }
 
 for (const marker of [
+  'role="tablist"',
+  'character-detail__tabs',
+  'character-tab-panel',
+  'role="tabpanel"',
   'profile-overview',
   'personal-chapters',
   'profile-bonds',
@@ -71,6 +75,24 @@ for (const marker of [
 ]) {
   assert(template.includes(marker), `Character story profile is missing ${marker}.`);
 }
+
+assert(
+  component.includes("type CharacterDetailTabId = 'overview' | 'story' | 'sheet' | 'journal'") &&
+    component.includes("params.get('tab')") &&
+    component.includes('onTabKeydown') &&
+    component.includes('tabForFragment'),
+  'Character profile tabs need shareable URL state, keyboard navigation and legacy landmark routing.',
+);
+assert(
+  template.includes('[hidden]="!isTab(\'overview\')"') &&
+    template.includes('[hidden]="!isTab(\'story\')"') &&
+    template.includes('[hidden]="!isTab(\'sheet\')"') &&
+    template.includes('[hidden]="!isTab(\'journal\')"') &&
+    template.includes('id="private-profile"') &&
+    template.includes('id="character-sheet"') &&
+    template.includes('id="gallery"'),
+  'Every heavy profile surface must belong to one discoverable task tab.',
+);
 
 const storyStart = template.indexOf('<!-- Public profile:');
 const storyEnd = template.indexOf('<!-- Personal lore:');

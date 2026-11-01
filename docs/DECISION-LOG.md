@@ -1769,3 +1769,32 @@ and the [extended delivery plan](ROADMAP-60-DAYS.md).
 **Revisit when:** The 17 November exit review shows that the route inventory is
 complete and remaining findings are safely prioritised, or real user evidence
 requires extending the quality window.
+
+### QK-067 — Character navigation and preference ownership stay separate
+
+**Date:** 1 November 2026
+
+**Status:** Active
+
+**Decision:** Complete character profiles use four task-oriented areas —
+Profile, Story & bonds, Sheet and Journal — represented by accessible tabs and
+a shareable URL state. Tabs and direct content actions are navigation, not
+settings. Durable player choices keep one editor in User Settings and must name
+their global, campaign or character scope before implementation.
+
+**Why:** A complete profile had become one long stack, while the sticky command
+bar risked becoming a second settings surface. Stable task categories reduce
+scroll and competing actions without deleting authored content, duplicating
+private preference editors or hiding PDF export away from the sheet it acts on.
+
+**Consequences:** Existing landmarks must open the tab that owns them; tabs
+support arrow, Home and End keys; inactive content remains discoverable; PDF
+export stays in Sheet; audio, My Character and personal rule annotations remain
+in User Settings. The command bar is audited by frequency and context rather
+than treating every persistent choice as a shortcut.
+
+**Source:** [Character and Settings UX Focus Week](CHARACTER-SETTINGS-UX-WEEK.md).
+
+**Revisit when:** Usability evidence shows a category is consistently missed,
+the native apps require a different navigation model, or account sync changes
+the scope and persistence contract for player preferences.

@@ -10,6 +10,12 @@ experience page by page. The goal is not a cosmetic reskin. Every screen must
 make its purpose, primary action and reading order obvious while remaining
 comfortable on a phone, a large monitor, a keyboard and assistive technology.
 
+The [Character and Settings UX Focus Week](CHARACTER-SETTINGS-UX-WEEK.md) starts
+this evidence work on 1 November and front-loads the character, command-bar and
+User Settings routes. Its completed evidence satisfies the matching rows below;
+the 7 November closeout reassigns only genuinely unused audit capacity instead
+of repeating finished work or pulling feature work forward.
+
 The production Companion is the compatibility proof: completed Phandelver
 exercises dense legacy content, while active Curse of Strahd exercises current
 profiles, notebooks, relationships, sessions, secrets and campaign moods. No

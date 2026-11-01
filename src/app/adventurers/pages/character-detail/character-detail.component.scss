@@ -193,13 +193,130 @@
     }
   }
 
+  // --- Task tabs: compact RPG-style navigation without hiding profile content ---
+  &__tabs-shell {
+    position: sticky;
+    top: 5.25rem;
+    z-index: $z-index-header - 2;
+    padding: $spacing-sm;
+    border: $border-width-thin solid rgba($color-border-strong, 0.78);
+    border-radius: $border-radius-lg;
+    background: rgba($color-bg-deep, 0.92);
+    box-shadow: $shadow-md;
+    backdrop-filter: blur(16px) saturate(120%);
+  }
+
+  &__tabs {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: $spacing-sm;
+  }
+
+  &__tab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: $spacing-sm;
+    min-height: 48px;
+    padding: $spacing-sm $spacing-md;
+    border: $border-width-thin solid $color-border-default;
+    border-radius: $border-radius-md;
+    background: rgba($color-bg-surface, 0.68);
+    color: $color-text-secondary;
+    font-family: $font-family-heading;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    letter-spacing: $letter-spacing-wide;
+    cursor: pointer;
+    transition:
+      color $transition-fast,
+      border-color $transition-fast,
+      background $transition-fast,
+      transform $transition-fast;
+
+    &:hover {
+      border-color: var(--campaign-accent, #{$color-gold});
+      color: $color-parchment-light;
+      transform: translateY(-1px);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--campaign-accent-light, #{$color-gold-light});
+      outline-offset: 2px;
+    }
+
+    &.is-active {
+      border-color: var(--campaign-accent, #{$color-gold});
+      background: linear-gradient(
+        135deg,
+        rgba($color-gold-dark, 0.22),
+        rgba($color-bg-surface, 0.9)
+      );
+      color: var(--campaign-accent-light, #{$color-gold-light});
+      box-shadow: inset 0 -2px 0 var(--campaign-accent, #{$color-gold});
+    }
+  }
+
+  &__tab-description {
+    margin: $spacing-sm $spacing-sm 0;
+    color: $color-text-muted;
+    font-size: $font-size-sm;
+    line-height: $line-height-relaxed;
+    text-align: center;
+  }
+
+  &__tab-panel {
+    @include flex-column;
+    gap: $spacing-2xl;
+    min-width: 0;
+
+    &:focus-visible {
+      outline: 2px solid var(--campaign-accent-light, #{$color-gold-light});
+      outline-offset: $spacing-xs;
+    }
+
+    > [hidden] {
+      display: none !important;
+    }
+  }
+
   // --- Section containers ---
   &__section {
     @include surface-card;
     padding: $spacing-xl;
+    scroll-margin-top: 11rem;
 
     @include respond-below(md) {
       padding: $spacing-md;
+    }
+  }
+
+  @include respond-below(md) {
+    &__tabs-shell {
+      top: 4.75rem;
+      overflow: hidden;
+    }
+
+    &__tabs {
+      grid-template-columns: none;
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(150px, 1fr);
+      overflow-x: auto;
+      overscroll-behavior-inline: contain;
+      scroll-snap-type: inline mandatory;
+      scrollbar-width: thin;
+    }
+
+    &__tab {
+      scroll-snap-align: start;
+    }
+
+    &__tab-description {
+      text-align: left;
+    }
+
+    &__tab-panel {
+      gap: $spacing-xl;
     }
   }
 

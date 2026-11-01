@@ -90,9 +90,11 @@ PR and adds a hard Thursday verification/freeze gate without borrowing the Day
 
 ## Planned pause and quality rebaseline
 
-The project has no normal delivery quota from **31 October through 3 November**.
-This is an explicit pause, not an ambiguous backlog slip. Emergency fixes may
-still be made, but unfinished feature work is not silently counted as complete.
+The project has no normal feature-expansion quota from **31 October through 3
+November**. The maintainer may use 1–3 November for the targeted
+[Character and Settings UX Focus Week](CHARACTER-SETTINGS-UX-WEEK.md): this is
+quality work with its own acceptance evidence, not permission to pull later
+features forward or silently count unfinished backlog items as complete.
 
 From **4 through 17 November**, feature expansion gives way to the shared
 [UI, UX and accessibility quality fortnight](UI-UX-ACCESSIBILITY-FORTNIGHT.md).
@@ -101,6 +103,11 @@ plan. Every Companion route and Manager workspace is checked for hierarchy,
 density, visual finish, responsive behavior, keyboard access, screen-reader
 semantics, contrast, zoom, touch and complete loading/error states against the
 public example, Phandelver and Curse of Strahd.
+
+The focus week front-loads the matching character, command-bar and User Settings
+evidence. The 7 November closeout marks which fortnight entries are already
+satisfied and reassigns only the freed audit capacity; completed work is not
+repeated to manufacture a second commit.
 
 On **18 November**, delivery resumes with the deferred Day 13 journal-linking
 outcome plus a combined character-story integration review. Day 14 then resumes
