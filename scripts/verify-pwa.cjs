@@ -42,6 +42,10 @@ async function main() {
 
   const workerConfig = readJson('ngsw-config.json');
   assert.equal(workerConfig.index, '/index.html');
+  assert.ok(
+    workerConfig.navigationUrls.includes('!manager-demo/**'),
+    'The Companion service worker must not replace the standalone Manager demo',
+  );
   const workerFiles = JSON.stringify(workerConfig.assetGroups);
   assert.ok(workerFiles.includes('manifest.webmanifest'));
   const dataGroups = JSON.stringify(workerConfig.dataGroups);
@@ -57,6 +61,17 @@ async function main() {
   const appConfig = read('src/app/app.config.ts');
   assert.match(appConfig, /provideServiceWorker\('ngsw-worker\.js'/);
   assert.match(appConfig, /enabled: !isDevMode\(\)/);
+
+  const readme = read('README.md');
+  const liveCompanionUrl = 'https://mtamagno.github.io/questkeeper-rpg-campaign-manager/';
+  const managerDemoUrl = `${liveCompanionUrl}manager-demo/index.html`;
+  assert.ok(readme.includes(`href="${liveCompanionUrl}"`));
+  assert.ok(readme.includes(`href="${managerDemoUrl}"`));
+
+  const campaignSelector = read(
+    'src/app/guild/pages/campaign-selector/campaign-selector.component.ts',
+  );
+  assert.match(campaignSelector, /managerDemoUrl = 'manager-demo\/index\.html'/);
 
   const installService = read('src/app/guild/services/pwaInstall.service.ts');
   assert.match(installService, /beforeinstallprompt/);
@@ -92,6 +107,29 @@ async function main() {
           `Production output is missing ${output}`,
         );
       }
+
+      assert.ok(
+        fs.existsSync(path.join(browserDirectory, 'manager-demo', 'index.html')),
+        'Production output is missing the standalone Manager demo',
+      );
+
+      const generatedWorkerConfig = JSON.parse(
+        fs.readFileSync(path.join(browserDirectory, 'ngsw.json'), 'utf8'),
+      );
+      const workerBase = path.posix.dirname(generatedWorkerConfig.index);
+      const managerNavigation = path.posix.join(workerBase, 'manager-demo', 'index.html');
+      const managerCleanNavigation = `${path.posix.join(workerBase, 'manager-demo')}/`;
+      const navigationExclusions = generatedWorkerConfig.navigationUrls
+        .filter(({ positive }) => !positive)
+        .map(({ regex }) => new RegExp(regex));
+      assert.ok(
+        navigationExclusions.some((pattern) => pattern.test(managerNavigation)),
+        'Generated service worker must exclude the Manager demo document',
+      );
+      assert.ok(
+        navigationExclusions.some((pattern) => pattern.test(managerCleanNavigation)),
+        'Generated service worker must exclude the Manager demo clean URL',
+      );
     }
   }
 

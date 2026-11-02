@@ -54,7 +54,7 @@ export class CampaignSelectorComponent {
   private readonly guidedTour = inject(GuidedTourService);
 
   /** Public interactive destination used by the first-visit GM journey. */
-  readonly managerDemoUrl = 'manager-demo/';
+  readonly managerDemoUrl = 'manager-demo/index.html';
 
   /** All available campaigns from the manifest. */
   readonly campaigns: Signal<ReadonlyArray<CampaignManifestEntry>> = this.campaignService.manifest;

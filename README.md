@@ -9,7 +9,7 @@
   &nbsp;·&nbsp;
   <a href="https://mtamagno.github.io/questkeeper-rpg-campaign-manager/"><strong>⚔️ Live Companion</strong></a>
   &nbsp;·&nbsp;
-  <a href="https://mtamagno.github.io/questkeeper-rpg-campaign-manager/manager-demo/"><strong>🗺️ Manager Demo</strong></a>
+  <a href="https://mtamagno.github.io/questkeeper-rpg-campaign-manager/manager-demo/index.html"><strong>🗺️ Manager Demo</strong></a>
   &nbsp;·&nbsp;
   <a href="docs/INSTALLATION-GUIDE.md"><strong>🧭 Install</strong></a>
   &nbsp;·&nbsp;
@@ -51,7 +51,7 @@ portable folder you control.
       <p><strong><a href="docs/COMPANION-GUIDE.md">Explore the Companion guide →</a></strong></p>
     </td>
     <td width="50%" valign="top">
-      <a href="https://mtamagno.github.io/questkeeper-rpg-campaign-manager/manager-demo/"><img src="docs/images/campaign-manager-dashboard.webp" alt="QuestKeeper Campaign Manager dashboard" width="100%"></a>
+      <a href="https://mtamagno.github.io/questkeeper-rpg-campaign-manager/manager-demo/index.html"><img src="docs/images/campaign-manager-dashboard.webp" alt="QuestKeeper Campaign Manager dashboard" width="100%"></a>
       <h3>For the GM · Manager</h3>
       <p>Create campaigns through guided forms, import characters, turn notes into editable drafts, preview changes and publish when they are ready.</p>
       <p><strong><a href="docs/MANAGER-GUIDE.md">Open the Manager guide →</a></strong></p>

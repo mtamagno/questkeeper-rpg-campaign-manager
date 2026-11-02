@@ -374,7 +374,7 @@ the original 60 delivery days, adds the dedicated 14-day quality fortnight and
 keeps this page focused on outcomes for players and Game Masters.
 
 - Try the [live Companion](https://mtamagno.github.io/questkeeper-rpg-campaign-manager/).
-- Explore the [interactive Campaign Manager demo](https://mtamagno.github.io/questkeeper-rpg-campaign-manager/manager-demo/).
+- Explore the [interactive Campaign Manager demo](https://mtamagno.github.io/questkeeper-rpg-campaign-manager/manager-demo/index.html).
 - Share an idea through [GitHub Issues](https://github.com/mtamagno/questkeeper-rpg-campaign-manager/issues).
 
 <p align="center">◆ ───────────── ✦ ───────────── ◆</p>

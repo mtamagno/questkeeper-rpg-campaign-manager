@@ -17,7 +17,7 @@ newest verified Node.js 26 patch.
 
 > **Looking around first?** Open the
 > [live Companion](https://mtamagno.github.io/questkeeper-rpg-campaign-manager/)
-> or the [interactive Manager demo](https://mtamagno.github.io/questkeeper-rpg-campaign-manager/manager-demo/).
+> or the [interactive Manager demo](https://mtamagno.github.io/questkeeper-rpg-campaign-manager/manager-demo/index.html).
 
 ## 1. Download QuestKeeper
 

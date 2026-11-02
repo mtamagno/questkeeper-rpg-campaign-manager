@@ -17,7 +17,7 @@ Campaign Manager is the local control room for QuestKeeper. It provides guided
 forms for campaign files, automatic indexes and backups, validation, previews
 and publishing—without asking a GM to hand-edit JSON.
 
-Open the [interactive Manager demo](https://mtamagno.github.io/questkeeper-rpg-campaign-manager/manager-demo/)
+Open the [interactive Manager demo](https://mtamagno.github.io/questkeeper-rpg-campaign-manager/manager-demo/index.html)
 to explore the workflow safely in a browser.
 
 ## Local compendia
