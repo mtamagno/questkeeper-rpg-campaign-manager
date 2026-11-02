@@ -40,26 +40,12 @@ import { SessionDiaryComponent } from '../../components/session-diary/session-di
 import { CharacterLoreChaptersComponent } from '../../components/character-lore-chapters/character-lore-chapters.component';
 import { CharacterNotebookComponent } from '../../components/character-notebook/character-notebook.component';
 import { CharacterProfileOverviewComponent } from '../../components/character-profile-overview/character-profile-overview.component';
-
-interface ProfileBondPreview {
-  readonly key: string;
-  readonly entityId: string;
-  readonly entityPath: 'party' | 'npcs';
-  readonly name: string;
-  readonly avatarUrl: string;
-  readonly typeLabel: string;
-  readonly description: string;
-  readonly sourceId: string;
-  readonly targetId: string;
-  readonly sharedMemoryCount: number;
-  readonly feelings: ReadonlyArray<ProfileBondFeeling>;
-}
-
-interface ProfileBondFeeling {
-  readonly label: string;
-  readonly intensity: number;
-  readonly reason: string;
-}
+import { CharacterStoryOverviewComponent } from '../../components/character-story-overview/character-story-overview.component';
+import {
+  CharacterBondsCarouselComponent,
+  type ProfileBondPreview,
+} from '../../components/character-bonds-carousel/character-bonds-carousel.component';
+import { CharacterQuotesComponent } from '../../components/character-quotes/character-quotes.component';
 
 type CharacterDetailTabId = 'overview' | 'story' | 'sheet' | 'journal';
 
@@ -88,6 +74,9 @@ interface CharacterDetailTab {
     CharacterLoreChaptersComponent,
     CharacterNotebookComponent,
     CharacterProfileOverviewComponent,
+    CharacterStoryOverviewComponent,
+    CharacterBondsCarouselComponent,
+    CharacterQuotesComponent,
     RouterLink,
     DiceLoaderComponent,
   ],
@@ -186,17 +175,6 @@ export class CharacterDetailComponent {
     () => this.tabs().find((tab) => tab.id === this.activeTab())?.description ?? '',
   );
 
-  /** Reveals legacy landmarks only after their owning tab has become visible. */
-  private readonly revealActiveFragment = effect(() => {
-    const fragment = this.activeFragment();
-    this.activeTab();
-    if (!fragment) return;
-
-    this.document.defaultView?.requestAnimationFrame(() => {
-      this.document.getElementById(fragment)?.scrollIntoView({ block: 'start' });
-    });
-  });
-
   /** The loaded character data. */
   readonly character: Signal<Character | undefined> = computed(() => {
     const id = this.characterId();
@@ -204,6 +182,18 @@ export class CharacterDetailComponent {
       return undefined;
     }
     return this.dataService.getCharacterById(id)();
+  });
+
+  /** Reveals landmarks after both their owning tab and asynchronous character data are ready. */
+  private readonly revealActiveFragment = effect(() => {
+    const fragment = this.activeFragment();
+    this.activeTab();
+    const character = this.character();
+    if (!fragment || character === undefined) return;
+
+    this.document.defaultView?.requestAnimationFrame(() => {
+      this.document.getElementById(fragment)?.scrollIntoView({ block: 'start' });
+    });
   });
 
   /** Whether data is still loading. */
@@ -360,28 +350,10 @@ export class CharacterDetailComponent {
     return fragments[source.kind];
   }
 
-  /** Moves the relationship rail by one readable viewport while keeping native scrolling. */
-  scrollBondCarousel(direction: -1 | 1): void {
-    const carousel = this.document.getElementById('profile-bond-track');
-    if (carousel === null) return;
-    const firstCard = carousel.querySelector<HTMLElement>('.character-detail__bond-card');
-    const gap = Number.parseFloat(getComputedStyle(carousel).columnGap) || 0;
-    const step =
-      firstCard === null ? Math.max(carousel.clientWidth * 0.82, 280) : firstCard.offsetWidth + gap;
-    const maxScroll = Math.max(0, carousel.scrollWidth - carousel.clientWidth);
-    // Assigning scrollLeft is deliberately deterministic here. Smooth scrolling
-    // combined with scroll snapping can be cancelled on narrow touch viewports,
-    // leaving the carousel apparently unresponsive.
-    carousel.scrollLeft = Math.min(maxScroll, Math.max(0, carousel.scrollLeft + direction * step));
-  }
-
   /** Keeps author-provided feeling ratings inside the documented five-step scale. */
   normalizeFeelingIntensity(value: number): number {
     return Math.min(5, Math.max(1, Math.round(value)));
   }
-
-  /** Five stable steps used by the accessible feeling-strength meter. */
-  readonly feelingScale = [1, 2, 3, 4, 5] as const;
 
   /** Formats a canonical centimetre value as metres in the selected language. */
   formatHeight(heightCm: number): string {
@@ -438,6 +410,7 @@ export class CharacterDetailComponent {
     if (fragment === 'profile-overview' || fragment === 'profile-highlights') return 'overview';
     if (
       fragment === 'personal-chapters' ||
+      fragment?.startsWith('lore-chapter-') ||
       fragment === 'profile-bonds' ||
       fragment === 'quotes' ||
       fragment === 'profile-memories'
@@ -447,6 +420,15 @@ export class CharacterDetailComponent {
     if (fragment === 'private-profile' || fragment === 'character-sheet') return 'sheet';
     if (fragment === 'notebook' || fragment === 'gallery' || fragment === 'diary') return 'journal';
     return undefined;
+  }
+
+  /** Opens the owning story accordion when a stable landmark is requested directly. */
+  shouldOpenStorySection(sectionId: string): boolean {
+    const fragment = this.activeFragment();
+    return (
+      fragment === sectionId ||
+      (sectionId === 'personal-chapters' && fragment?.startsWith('lore-chapter-') === true)
+    );
   }
 
   /** Handles square profile image load errors. */

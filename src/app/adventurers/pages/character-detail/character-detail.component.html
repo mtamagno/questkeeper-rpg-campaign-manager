@@ -137,22 +137,40 @@
         <app-character-profile-overview [character]="char" />
       </section>
 
-      <!-- Personal lore: illustrated, public chapters before the shared adventure -->
-      @if (char.loreChapters?.length) {
+      <section class="character-detail__section" [hidden]="!isTab('story')">
+        <app-character-story-overview [character]="char" [bondCount]="profileBonds().length" />
+      </section>
+
+      <!-- Personal lore: illustrated chapters when available, legacy prose otherwise -->
+      @if ((char.loreChapters?.length ?? 0) > 0 || isRecorded(char.publicProfile.backstory)) {
         <section
           id="personal-chapters"
           class="character-detail__section"
           [hidden]="!isTab('story')"
         >
           <app-accordion
-            [title]="lang() === 'it' ? 'Capitoli personali' : 'Personal Chapters'"
+            [title]="
+              char.loreChapters?.length
+                ? lang() === 'it'
+                  ? 'Capitoli personali'
+                  : 'Personal Chapters'
+                : lang() === 'it'
+                  ? 'Origini'
+                  : 'Origins'
+            "
             icon="🧭"
-            [startOpen]="false"
+            [startOpen]="shouldOpenStorySection('personal-chapters')"
           >
-            <app-character-lore-chapters
-              [chapters]="char.loreChapters ?? []"
-              [characterName]="char.name"
-            />
+            @if (char.loreChapters?.length) {
+              <app-character-lore-chapters
+                [chapters]="char.loreChapters ?? []"
+                [characterName]="char.name"
+              />
+            } @else {
+              <div class="character-detail__history-copy">
+                <p>{{ char.publicProfile.backstory | bilingual }}</p>
+              </div>
+            }
           </app-accordion>
         </section>
       }
@@ -163,140 +181,13 @@
           <app-accordion
             [title]="lang() === 'it' ? 'Legami in viaggio' : 'Bonds along the road'"
             icon="🕸️"
-            [startOpen]="false"
+            [startOpen]="shouldOpenStorySection('profile-bonds')"
             [allowOverflow]="true"
           >
-            <div class="character-detail__bonds-toolbar">
-              <div>
-                <p class="character-detail__section-eyebrow">
-                  {{
-                    lang() === 'it'
-                      ? 'Compagni, incontri, promesse'
-                      : 'Companions, encounters, promises'
-                  }}
-                </p>
-                <p class="character-detail__bonds-intro">
-                  {{
-                    lang() === 'it'
-                      ? 'Ogni carta racconta il legame e i sentimenti, anche contraddittori, che questo personaggio prova.'
-                      : 'Each card tells the bond and the sometimes conflicting feelings this character holds.'
-                  }}
-                </p>
-              </div>
-              @if (profileBonds().length > 1) {
-                <div class="character-detail__carousel-controls">
-                  <button
-                    type="button"
-                    (click)="scrollBondCarousel(-1)"
-                    [attr.aria-label]="lang() === 'it' ? 'Legami precedenti' : 'Previous bonds'"
-                    aria-controls="profile-bond-track"
-                  >
-                    ←
-                  </button>
-                  <button
-                    type="button"
-                    (click)="scrollBondCarousel(1)"
-                    [attr.aria-label]="lang() === 'it' ? 'Legami successivi' : 'Next bonds'"
-                    aria-controls="profile-bond-track"
-                  >
-                    →
-                  </button>
-                </div>
-              }
-            </div>
-            <ul
-              #bondCarousel
-              id="profile-bond-track"
-              class="character-detail__bond-carousel"
-              tabindex="0"
-              [attr.aria-label]="lang() === 'it' ? 'Legami del personaggio' : 'Character bonds'"
-            >
-              @for (bond of profileBonds(); track bond.key) {
-                <li class="character-detail__bond-card">
-                  <header class="character-detail__bond-card-header">
-                    <a
-                      class="character-detail__bond-person"
-                      [routerLink]="['/', campaignId() ?? '', bond.entityPath, bond.entityId]"
-                    >
-                      <img [src]="bond.avatarUrl" alt="" loading="lazy" decoding="async" />
-                      <span
-                        ><strong>{{ bond.name }}</strong></span
-                      >
-                    </a>
-                    <span class="character-detail__bond-type">{{ bond.typeLabel }}</span>
-                  </header>
-                  <p class="character-detail__bond-description">{{ bond.description }}</p>
-                  @if (bond.feelings.length > 0) {
-                    <div class="character-detail__feelings">
-                      <h3>{{ lang() === 'it' ? 'Cosa prova' : 'How they feel' }}</h3>
-                      @for (feeling of bond.feelings; track feeling.label) {
-                        <article class="character-detail__feeling">
-                          <div class="character-detail__feeling-heading">
-                            <strong>{{ feeling.label }}</strong>
-                            <span
-                              class="character-detail__feeling-meter"
-                              role="img"
-                              [attr.aria-label]="
-                                (lang() === 'it' ? 'Intensità ' : 'Intensity ') +
-                                feeling.intensity +
-                                (lang() === 'it' ? ' su 5' : ' out of 5')
-                              "
-                            >
-                              @for (step of feelingScale; track step) {
-                                <i [class.is-active]="step <= feeling.intensity"></i>
-                              }
-                            </span>
-                          </div>
-                          <p>{{ feeling.reason }}</p>
-                        </article>
-                      }
-                    </div>
-                  } @else {
-                    <p class="character-detail__feelings-empty">
-                      {{
-                        lang() === 'it'
-                          ? 'I sentimenti di questo punto di vista non sono ancora stati registrati.'
-                          : 'The feelings from this point of view have not been recorded yet.'
-                      }}
-                    </p>
-                  }
-                  <a
-                    class="character-detail__bond-link"
-                    [routerLink]="[
-                      '/',
-                      campaignId() ?? '',
-                      'relationships',
-                      bond.sourceId,
-                      bond.targetId,
-                    ]"
-                  >
-                    {{ lang() === 'it' ? 'Apri la relazione' : 'Open relationship' }}
-                    @if (bond.sharedMemoryCount > 0) {
-                      <span>
-                        · {{ bond.sharedMemoryCount }}
-                        {{
-                          bond.sharedMemoryCount === 1
-                            ? lang() === 'it'
-                              ? 'memoria'
-                              : 'memory'
-                            : lang() === 'it'
-                              ? 'memorie'
-                              : 'memories'
-                        }}
-                      </span>
-                    }
-                  </a>
-                </li>
-              }
-            </ul>
-            <a
-              class="character-detail__story-route"
-              [routerLink]="['/', campaignId() ?? '', 'party', 'relationships']"
-            >
-              {{ lang() === 'it' ? 'Apri la mappa completa' : 'Open the complete map' }}
-              <span>· {{ profileBonds().length }}</span>
-              <span aria-hidden="true">→</span>
-            </a>
+            <app-character-bonds-carousel
+              [bonds]="profileBonds()"
+              [campaignId]="campaignId() ?? ''"
+            />
           </app-accordion>
         </section>
       }
@@ -455,20 +346,9 @@
           <app-accordion
             [title]="lang() === 'it' ? 'Citazioni iconiche' : 'Iconic Quotes'"
             icon="💬"
-            [startOpen]="true"
+            [startOpen]="shouldOpenStorySection('quotes')"
           >
-            <div class="character-detail__quotes">
-              @for (quote of char.quotes; track quote.sessionId) {
-                <blockquote class="character-detail__quote">
-                  <p class="character-detail__quote-text">{{ quote.text | bilingual }}</p>
-                  @if (quote.context) {
-                    <cite class="character-detail__quote-context">{{
-                      quote.context | bilingual
-                    }}</cite>
-                  }
-                </blockquote>
-              }
-            </div>
+            <app-character-quotes [quotes]="char.quotes" />
           </app-accordion>
         </section>
       }
@@ -479,7 +359,7 @@
           <app-accordion
             [title]="lang() === 'it' ? 'Cosa sa il gruppo' : 'What the Party Knows'"
             icon="📖"
-            [startOpen]="false"
+            [startOpen]="true"
           >
             <div class="character-detail__history-copy">
               <p>{{ char.publicProfile.knownHistory | bilingual }}</p>

@@ -1,6 +1,7 @@
 /** Illustrated, public chapters that turn a character background into a readable story. */
 
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 import { type CharacterLoreChapter } from '@guild/models/character.model';
 import { LanguageService } from '@guild/services/language.service';
@@ -10,7 +11,7 @@ import { BilingualTextPipe } from '@guild/components/bilingual-text/bilingual-te
 @Component({
   selector: 'app-character-lore-chapters',
   standalone: true,
-  imports: [BilingualTextPipe],
+  imports: [BilingualTextPipe, RouterLink],
   templateUrl: './character-lore-chapters.component.html',
   styleUrl: './character-lore-chapters.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

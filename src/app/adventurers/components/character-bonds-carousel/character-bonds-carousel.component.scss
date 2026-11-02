@@ -1,0 +1,265 @@
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+
+:host {
+  display: block;
+}
+
+.bonds-carousel {
+  &__toolbar,
+  &__footer,
+  &__card-header,
+  &__feeling-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $spacing-md;
+  }
+  &__toolbar {
+    align-items: flex-end;
+    margin-bottom: $spacing-lg;
+  }
+  &__eyebrow {
+    margin: 0;
+    color: $color-gold;
+    font-family: $font-family-heading;
+    font-size: $font-size-xs;
+    letter-spacing: $letter-spacing-wider;
+    text-transform: uppercase;
+  }
+  &__intro {
+    max-width: 720px;
+    margin: $spacing-xs 0 0;
+    color: $color-text-secondary;
+    line-height: $line-height-relaxed;
+  }
+  &__controls {
+    display: flex;
+    flex: 0 0 auto;
+    gap: $spacing-xs;
+  }
+  &__controls button {
+    display: grid;
+    width: 42px;
+    height: 42px;
+    place-items: center;
+    border: $border-width-thin solid $color-border-accent;
+    border-radius: 50%;
+    color: $color-gold-light;
+    background: rgba($color-bg-void, 0.32);
+    cursor: pointer;
+    font-size: $font-size-lg;
+  }
+  &__controls button:hover {
+    background: rgba($color-gold-dark, 0.18);
+  }
+  &__controls button:focus-visible {
+    outline: 2px solid $color-gold-light;
+    outline-offset: 3px;
+  }
+  &__track {
+    display: flex;
+    gap: $spacing-md;
+    margin: 0;
+    padding: 0 0 $spacing-sm;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scroll-snap-type: inline proximity;
+    scrollbar-color: $color-gold-dark rgba($color-bg-void, 0.35);
+    list-style: none;
+  }
+  &__track:focus-visible {
+    outline: 2px solid $color-gold-light;
+    outline-offset: 5px;
+    border-radius: $border-radius-sm;
+  }
+  &__card {
+    display: flex;
+    width: clamp(320px, 42vw, 460px);
+    flex: 0 0 auto;
+    flex-direction: column;
+    gap: $spacing-md;
+    padding: $spacing-lg;
+    border: $border-width-thin solid $color-border-default;
+    border-radius: $border-radius-md;
+    background:
+      radial-gradient(circle at 100% 0%, rgba($color-gold-dark, 0.12), transparent 38%),
+      rgba($color-bg-void, 0.22);
+    box-shadow: $shadow-sm;
+    scroll-snap-align: start;
+  }
+  &__person {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-sm;
+    min-width: 0;
+    color: $color-gold-light;
+    text-decoration: none;
+  }
+  &__person img {
+    width: 50px;
+    height: 50px;
+    flex: 0 0 auto;
+    border: $border-width-thin solid $color-border-accent;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  &__person strong {
+    overflow: hidden;
+    font-family: $font-family-heading;
+    font-size: $font-size-md;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  &__person:hover strong {
+    color: $color-gold;
+  }
+  &__type {
+    flex: 0 0 auto;
+    padding: $spacing-2xs $spacing-sm;
+    border: $border-width-thin solid $color-border-accent;
+    border-radius: $border-radius-pill;
+    color: $color-text-accent;
+    font-family: $font-family-heading;
+    font-size: $font-size-xs;
+    letter-spacing: $letter-spacing-wide;
+    text-transform: uppercase;
+  }
+  &__description {
+    margin: 0;
+    color: $color-text-primary;
+    line-height: $line-height-relaxed;
+  }
+  &__feelings {
+    border-top: $border-width-thin solid $color-border-subtle;
+  }
+  &__feelings summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $spacing-sm 0;
+    color: $color-text-muted;
+    cursor: pointer;
+    font-family: $font-family-heading;
+    font-size: $font-size-xs;
+    letter-spacing: $letter-spacing-wide;
+    text-transform: uppercase;
+  }
+  &__feelings summary strong {
+    display: grid;
+    min-width: 1.5rem;
+    height: 1.5rem;
+    place-items: center;
+    border-radius: 50%;
+    color: $color-bg-deep;
+    background: $color-gold-muted;
+  }
+  &__feelings summary:focus-visible {
+    outline: 2px solid $color-gold-light;
+    outline-offset: 3px;
+  }
+  &__feelings-list {
+    display: grid;
+    gap: $spacing-sm;
+    padding-top: $spacing-xs;
+  }
+  &__feeling {
+    padding: $spacing-sm;
+    border-radius: $border-radius-sm;
+    background: rgba($color-bg-surface, 0.62);
+  }
+  &__feeling p {
+    margin: $spacing-xs 0 0;
+    color: $color-text-secondary;
+    font-size: $font-size-sm;
+    line-height: $line-height-relaxed;
+  }
+  &__feeling-heading > strong {
+    color: $color-parchment-light;
+    font-family: $font-family-heading;
+    font-size: $font-size-sm;
+  }
+  &__feeling-meter {
+    display: inline-flex;
+    gap: 4px;
+  }
+  &__feeling-meter i {
+    width: 14px;
+    height: 5px;
+    border-radius: $border-radius-pill;
+    background: $color-border-default;
+  }
+  &__feeling-meter i.is-active {
+    background: $color-gold;
+    box-shadow: 0 0 8px rgba($color-gold, 0.2);
+  }
+  &__feelings-empty {
+    margin: 0;
+    padding: $spacing-sm $spacing-md;
+    border-left: $border-width-thick solid $color-border-subtle;
+    color: $color-text-muted;
+    font-size: $font-size-sm;
+    font-style: italic;
+  }
+  &__bond-link,
+  &__map-link,
+  &__reveal {
+    color: $color-text-link;
+    font-family: $font-family-heading;
+    font-size: $font-size-sm;
+    letter-spacing: $letter-spacing-wide;
+  }
+  &__bond-link {
+    display: inline-flex;
+    gap: $spacing-xs;
+    margin-top: auto;
+    text-decoration: none;
+  }
+  &__footer {
+    flex-wrap: wrap;
+    margin-top: $spacing-md;
+  }
+  &__map-link {
+    display: inline-flex;
+    gap: $spacing-xs;
+    margin-left: auto;
+    text-decoration: none;
+  }
+  &__reveal {
+    min-height: 42px;
+    padding: $spacing-xs $spacing-md;
+    border: $border-width-thin solid $color-border-accent;
+    border-radius: $border-radius-pill;
+    background: rgba($color-gold-dark, 0.08);
+    cursor: pointer;
+  }
+  &__bond-link:hover,
+  &__map-link:hover,
+  &__reveal:hover {
+    color: $color-text-link-hover;
+  }
+  &__bond-link:focus-visible,
+  &__map-link:focus-visible,
+  &__reveal:focus-visible {
+    outline: 2px solid $color-gold-light;
+    outline-offset: 3px;
+  }
+
+  @include respond-below(sm) {
+    &__toolbar {
+      align-items: flex-start;
+    }
+    &__card {
+      width: min(100%, 350px);
+    }
+    &__footer {
+      align-items: stretch;
+    }
+    &__reveal,
+    &__map-link {
+      width: 100%;
+      justify-content: center;
+      margin-left: 0;
+    }
+  }
+}

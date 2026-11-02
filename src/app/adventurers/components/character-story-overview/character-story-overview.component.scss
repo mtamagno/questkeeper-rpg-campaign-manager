@@ -1,0 +1,125 @@
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+
+:host {
+  display: block;
+}
+
+.story-overview {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.7fr) minmax(0, 1.3fr);
+  gap: clamp($spacing-lg, 4vw, $spacing-3xl);
+  padding: clamp($spacing-lg, 4vw, $spacing-2xl);
+  border: $border-width-thin solid $color-border-default;
+  border-radius: $border-radius-lg;
+  background:
+    radial-gradient(circle at 0 0, rgba($color-gold-dark, 0.14), transparent 48%),
+    rgba($color-bg-elevated, 0.72);
+
+  @include respond-below(md) {
+    grid-template-columns: 1fr;
+  }
+  &__heading {
+    align-self: center;
+  }
+  &__heading h2 {
+    margin: $spacing-xs 0 $spacing-sm;
+    color: $color-gold-light;
+    font-family: $font-family-heading;
+    font-size: clamp($font-size-xl, 4vw, $font-size-2xl);
+    line-height: $line-height-tight;
+  }
+  &__heading p {
+    margin: 0;
+    color: $color-text-secondary;
+    line-height: $line-height-relaxed;
+  }
+  &__kicker {
+    color: $color-gold;
+    font-family: $font-family-heading;
+    font-size: $font-size-xs;
+    letter-spacing: $letter-spacing-wider;
+    text-transform: uppercase;
+  }
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: $spacing-sm;
+  }
+  &__card {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    gap: $spacing-sm;
+    align-items: center;
+    min-height: 86px;
+    padding: $spacing-md;
+    border: $border-width-thin solid $color-border-default;
+    border-radius: $border-radius-md;
+    background: rgba($color-bg-void, 0.28);
+    color: $color-text-primary;
+    text-decoration: none;
+    transition:
+      border-color $transition-fast,
+      background $transition-fast,
+      transform $transition-fast;
+  }
+  &__card:is(a):hover {
+    border-color: $color-border-accent;
+    background: rgba($color-gold-dark, 0.12);
+    transform: translateY(-1px);
+  }
+  &__card:is(a):focus-visible {
+    outline: 2px solid $color-gold-light;
+    outline-offset: 3px;
+  }
+  &__card--empty {
+    grid-template-columns: auto minmax(0, 1fr);
+    opacity: 0.62;
+  }
+  &__icon {
+    display: grid;
+    width: 2.2rem;
+    height: 2.2rem;
+    place-items: center;
+    border: $border-width-thin solid $color-border-accent;
+    border-radius: 50%;
+    background: rgba($color-gold-dark, 0.1);
+  }
+  &__copy {
+    min-width: 0;
+  }
+  &__copy strong,
+  &__copy small {
+    display: block;
+  }
+  &__copy strong {
+    color: $color-parchment-light;
+    font-family: $font-family-heading;
+    font-size: $font-size-sm;
+  }
+  &__copy small {
+    margin-top: $spacing-2xs;
+    color: $color-text-muted;
+    line-height: $line-height-base;
+  }
+  &__count {
+    display: grid;
+    min-width: 1.65rem;
+    height: 1.65rem;
+    place-items: center;
+    border-radius: 50%;
+    color: $color-bg-deep;
+    background: $color-gold-muted;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+  }
+  &__arrow {
+    color: $color-gold;
+  }
+
+  @include respond-below(sm) {
+    &__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+}

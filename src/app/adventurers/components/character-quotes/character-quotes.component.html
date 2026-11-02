@@ -1,0 +1,30 @@
+<div class="character-quotes">
+  <div class="character-quotes__list">
+    @for (quote of visibleQuotes(); track $index) {
+      <blockquote class="character-quotes__quote">
+        <p>{{ quote.text | bilingual }}</p>
+        @if (quote.context) {
+          <cite>{{ quote.context | bilingual }}</cite>
+        }
+      </blockquote>
+    }
+  </div>
+  @if (hasMore()) {
+    <button
+      type="button"
+      class="character-quotes__reveal"
+      (click)="toggleAll()"
+      [attr.aria-expanded]="showAll()"
+    >
+      {{
+        showAll()
+          ? lang() === 'it'
+            ? 'Mostra meno citazioni'
+            : 'Show fewer quotes'
+          : lang() === 'it'
+            ? 'Mostra tutte le ' + quotes().length + ' citazioni'
+            : 'Show all ' + quotes().length + ' quotes'
+      }}
+    </button>
+  }
+</div>

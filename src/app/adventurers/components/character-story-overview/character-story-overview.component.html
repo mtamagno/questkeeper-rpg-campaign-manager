@@ -1,0 +1,48 @@
+<section class="story-overview" aria-labelledby="story-overview-title">
+  <header class="story-overview__heading">
+    <span class="story-overview__kicker">{{
+      lang() === 'it' ? 'Percorso narrativo' : 'Story path'
+    }}</span>
+    <h2 id="story-overview-title">
+      {{ lang() === 'it' ? 'Una storia, quattro prospettive' : 'One story, four perspectives' }}
+    </h2>
+    <p>
+      {{
+        lang() === 'it'
+          ? 'Scegli da dove iniziare: ogni tappa porta al contenuto completo senza mescolare segreti o meccaniche.'
+          : 'Choose where to begin: every stop leads to the complete public story without mixing in secrets or mechanics.'
+      }}
+    </p>
+  </header>
+
+  <nav
+    class="story-overview__grid"
+    [attr.aria-label]="lang() === 'it' ? 'Indice della storia' : 'Story index'"
+  >
+    @for (destination of destinations(); track destination.id) {
+      @if (destination.available) {
+        <a class="story-overview__card" [routerLink]="[]" [fragment]="destination.id">
+          <span class="story-overview__icon" aria-hidden="true">{{ destination.icon }}</span>
+          <span class="story-overview__copy">
+            <strong>{{ destination.title }}</strong>
+            <small>{{ destination.description }}</small>
+          </span>
+          @if (destination.count !== undefined) {
+            <span class="story-overview__count" [attr.aria-label]="destination.count + ''">{{
+              destination.count
+            }}</span>
+          }
+          <span class="story-overview__arrow" aria-hidden="true">↓</span>
+        </a>
+      } @else {
+        <div class="story-overview__card story-overview__card--empty">
+          <span class="story-overview__icon" aria-hidden="true">{{ destination.icon }}</span>
+          <span class="story-overview__copy">
+            <strong>{{ destination.title }}</strong>
+            <small>{{ lang() === 'it' ? 'Non ancora registrato.' : 'Not recorded yet.' }}</small>
+          </span>
+        </div>
+      }
+    }
+  </nav>
+</section>

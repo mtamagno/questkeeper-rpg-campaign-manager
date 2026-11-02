@@ -1,0 +1,65 @@
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+
+:host {
+  display: block;
+}
+
+.character-quotes {
+  &__list {
+    display: grid;
+    gap: $spacing-md;
+  }
+  &__quote {
+    margin: 0;
+    padding: $spacing-md $spacing-lg;
+    border-left: $border-width-thick solid $color-gold-dark;
+    border-radius: 0 $border-radius-sm $border-radius-sm 0;
+    background: rgba($color-bg-elevated, 0.5);
+  }
+  &__quote p {
+    margin: 0;
+    color: $color-parchment-light;
+    font-family: $font-family-body;
+    font-size: $font-size-lg;
+    font-style: italic;
+    line-height: $line-height-relaxed;
+  }
+  &__quote p::before {
+    content: '\201C';
+    color: $color-gold;
+  }
+  &__quote p::after {
+    content: '\201D';
+    color: $color-gold;
+  }
+  &__quote cite {
+    display: block;
+    margin-top: $spacing-xs;
+    color: $color-text-muted;
+    font-size: $font-size-sm;
+    font-style: normal;
+  }
+  &__reveal {
+    display: block;
+    min-height: 42px;
+    margin: $spacing-lg auto 0;
+    padding: $spacing-xs $spacing-lg;
+    border: $border-width-thin solid $color-border-accent;
+    border-radius: $border-radius-pill;
+    color: $color-text-link;
+    background: rgba($color-gold-dark, 0.08);
+    cursor: pointer;
+    font-family: $font-family-heading;
+    font-size: $font-size-sm;
+    letter-spacing: $letter-spacing-wide;
+  }
+  &__reveal:hover {
+    color: $color-text-link-hover;
+    background: rgba($color-gold-dark, 0.16);
+  }
+  &__reveal:focus-visible {
+    outline: 2px solid $color-gold-light;
+    outline-offset: 3px;
+  }
+}

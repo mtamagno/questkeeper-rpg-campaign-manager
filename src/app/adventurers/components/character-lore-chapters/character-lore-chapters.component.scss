@@ -41,12 +41,55 @@
     gap: $spacing-2xl;
   }
 
+  &__index {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: $spacing-sm;
+
+    a {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: $spacing-sm;
+      align-items: center;
+      min-height: 48px;
+      padding: $spacing-sm $spacing-md;
+      border: $border-width-thin solid $color-border-default;
+      border-radius: $border-radius-md;
+      color: $color-parchment-light;
+      background: rgba($color-bg-void, 0.22);
+      text-decoration: none;
+
+      span {
+        color: $color-gold;
+        font-family: $font-family-heading;
+        font-size: $font-size-xs;
+        letter-spacing: $letter-spacing-wide;
+      }
+      strong {
+        overflow: hidden;
+        font-family: $font-family-heading;
+        font-size: $font-size-sm;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      &:hover {
+        border-color: $color-border-accent;
+        background: rgba($color-gold-dark, 0.12);
+      }
+      &:focus-visible {
+        outline: 2px solid $color-gold-light;
+        outline-offset: 3px;
+      }
+    }
+  }
+
   &__chapter {
     display: grid;
     grid-template-columns: minmax(0, 1.16fr) minmax(280px, 0.84fr);
     gap: clamp($spacing-lg, 4vw, $spacing-3xl);
     align-items: center;
     position: relative;
+    scroll-margin-top: 8rem;
 
     &--reverse {
       grid-template-columns: minmax(280px, 0.84fr) minmax(0, 1.16fr);

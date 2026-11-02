@@ -19,9 +19,22 @@
     </p>
   </header>
 
+  <nav
+    class="lore-chapters__index"
+    [attr.aria-label]="lang() === 'it' ? 'Indice dei capitoli personali' : 'Personal chapter index'"
+  >
+    @for (chapter of chapters(); track chapter.id; let chapterIndex = $index) {
+      <a [routerLink]="[]" [fragment]="'lore-chapter-' + chapter.id">
+        <span aria-hidden="true">{{ (chapterIndex + 1).toString().padStart(2, '0') }}</span>
+        <strong>{{ chapter.title | bilingual }}</strong>
+      </a>
+    }
+  </nav>
+
   <div class="lore-chapters__list">
     @for (chapter of chapters(); track chapter.id; let chapterIndex = $index) {
       <article
+        [id]="'lore-chapter-' + chapter.id"
         class="lore-chapters__chapter"
         [class.lore-chapters__chapter--reverse]="chapterIndex % 2 === 1"
       >

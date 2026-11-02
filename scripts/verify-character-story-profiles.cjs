@@ -20,6 +20,22 @@ const component = fs.readFileSync(
   path.join(componentRoot, 'character-detail.component.ts'),
   'utf8',
 );
+const bondsRoot = path.join(
+  projectRoot,
+  'src',
+  'app',
+  'adventurers',
+  'components',
+  'character-bonds-carousel',
+);
+const bondsTemplate = fs.readFileSync(
+  path.join(bondsRoot, 'character-bonds-carousel.component.html'),
+  'utf8',
+);
+const bondsComponent = fs.readFileSync(
+  path.join(bondsRoot, 'character-bonds-carousel.component.ts'),
+  'utf8',
+);
 const privateProfileRoot = path.join(
   projectRoot,
   'src',
@@ -82,7 +98,7 @@ for (const marker of [
   'profile-overview',
   'personal-chapters',
   'profile-bonds',
-  'character-detail__bond-carousel',
+  'app-character-bonds-carousel',
   'profile-highlights',
   'app-character-profile-overview',
   'profile-memories',
@@ -134,12 +150,13 @@ assert(
   'Memory previews must stay derived, compact and linked to their source.',
 );
 assert(
-  template.includes('@for (bond of profileBonds(); track bond.key)') &&
-    component.includes('scrollBondCarousel') &&
+  template.includes('<app-character-bonds-carousel') &&
+    bondsTemplate.includes('@for (bond of visibleBonds(); track bond.key)') &&
+    bondsComponent.includes('scroll(direction: -1 | 1)') &&
     template.includes(
       "[title]=\"lang() === 'it' ? 'Legami in viaggio' : 'Bonds along the road'\"",
     ) &&
-    template.includes('bond.feelings'),
+    bondsTemplate.includes('bond.feelings'),
   'Relationships need one closable card carousel with directional feelings.',
 );
 assert(

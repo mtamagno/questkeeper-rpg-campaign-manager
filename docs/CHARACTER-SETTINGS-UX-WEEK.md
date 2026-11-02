@@ -50,7 +50,7 @@ but no action becomes harder to discover solely to make the bar shorter.
 | Date      | Task 1                                                                                                                          | Task 2                                                                                                                              | Same-day closeout                                                                                                 |
 | --------- | ------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
 | **1 Nov** | [x] **Character information architecture and accessible tab foundation**                                                        | [x] Audit every current section, landmark and direct action against the four areas; record missing, duplicated or misplaced content | [x] Verify the combined journey after both tasks                                                                  |
-| **2 Nov** | [x] **Refine Profile into a true at-a-glance start without deleting authored content**                                          | Refine Story & bonds: chapter discovery, relationship density, known-history sources and quotes                                     | Test short, empty and very long profiles                                                                          |
+| **2 Nov** | [x] **Refine Profile into a true at-a-glance start without deleting authored content**                                          | [x] **Refine Story & bonds: chapter discovery, relationship density, known-history sources and quotes**                             | [x] Test short, empty and very long profiles                                                                      |
 | **3 Nov** | Review and refactor the heavy Sheet tab: inventory every value/action first, then make current play state immediately scannable | Refine Journal hierarchy: notebook, gallery and diary with useful progressive disclosure                                            | Prove Sheet content/function parity, then check protected state, remembered positions and large media collections |
 | **4 Nov** | Inventory the sticky command bar by frequency, context and screen size                                                          | Simplify its responsive hierarchy and overflow while preserving campaign switch, recovery and quick navigation                      | Keyboard, 360 px, 200% zoom and long-label review                                                                 |
 | **5 Nov** | Rebuild User Settings around RPG-style stable categories and clear global/campaign scope                                        | Add save-state, descriptions, recovery and empty/error feedback without scattering editors                                          | Fresh user, returning player and two-campaign review                                                              |
@@ -131,6 +131,28 @@ performance budgets pass. Visual review covered Shyra's very long profile and
 Sennar's compact legacy profile at 390 x 844, plus Shyra at 1440 x 1000. The
 second task and same-day closeout still own Story density and the combined
 short, empty and long-profile journey.
+
+-
+
+## 2 November Task 2 and closeout
+
+Story & bonds now opens with one compact narrative map linking to origins, bonds,
+quotes and the party-known account. Personal chapters gain a stable, shareable
+index. Relationship rails render six cards for the first read, preserve the full
+set behind an announced disclosure and move plural feelings into native details;
+quote collections follow the same lossless pattern with three initial cards.
+Known history remains the concluding public account before the Journal and keeps
+its chapter, relationship, notebook, quote, chronicle and latest-memory sources.
+
+Direct fragments now wait for asynchronous character data and can open an
+accordion after initial render, fixing a systemic deep-link failure rather than
+special-casing this page. The dedicated Story guard covers compact/legacy, dense
+and structural empty states while rejecting private-profile access. Shared
+TypeScript, lint, story/profile/mobile/accessibility/entity-ID, build and
+performance gates pass. Visual review covered Shyra and Vulf at 390 x 844 plus
+Shyra at 1440 x 1000, including direct links to bonds and quotes. Extracting the
+new components also removed the character-detail style-budget warning and
+reduced its production lazy chunk by roughly 6.4 kB.
 
 ## Design references
 

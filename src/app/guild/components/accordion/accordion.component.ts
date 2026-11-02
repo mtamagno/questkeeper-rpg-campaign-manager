@@ -14,9 +14,9 @@
 import {
   Component,
   ChangeDetectionStrategy,
+  effect,
   input,
   signal,
-  type OnInit,
   type WritableSignal,
 } from '@angular/core';
 
@@ -28,7 +28,7 @@ import {
   styleUrl: './accordion.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AccordionComponent implements OnInit {
+export class AccordionComponent {
   /** Title displayed in the accordion header. */
   readonly title = input.required<string>();
 
@@ -44,12 +44,12 @@ export class AccordionComponent implements OnInit {
   /** Whether the accordion panel is currently expanded. */
   readonly isOpen: WritableSignal<boolean> = signal(false);
 
-  /** Initializes the open state from the startOpen input. */
-  ngOnInit(): void {
+  /** Opens when a direct landmark becomes active without overriding a user's manual close. */
+  private readonly revealRequestedLandmark = effect(() => {
     if (this.startOpen()) {
       this.isOpen.set(true);
     }
-  }
+  });
 
   /** Toggles the accordion open/closed state. */
   toggle(): void {
