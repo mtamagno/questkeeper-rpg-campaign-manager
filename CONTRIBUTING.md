@@ -4,6 +4,9 @@ Thank you for helping parties remember the stories they create together.
 Contributions are welcome when they keep QuestKeeper approachable, reusable,
 private by default and legally redistributable.
 
+Participation in this project is governed by the
+[QuestKeeper Community Code of Conduct](CODE_OF_CONDUCT.md).
+
 ## Start here
 
 1. Read the [working agreement](docs/WORKING-AGREEMENT.md).
