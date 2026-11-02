@@ -37,6 +37,36 @@ Then update the issue body to the first containing version, add the
 the issue. If a fix is reverted, reopen the issue and remove the resolved label
 until a new containing release is verified.
 
+## Research readiness and epic promotion
+
+An issue labelled `needs-research` is a research task, not an implementation-
+ready feature. Its next useful outcome is a documented decision based on current
+primary or authoritative sources, existing QuestKeeper contracts and relevant
+user evidence.
+
+The research must record:
+
+1. the user problem and why it matters now;
+2. evidence, source dates and any uncertainty that remains;
+3. affected journeys, repositories, data, privacy, licensing and accessibility;
+4. viable approaches, dependencies, risks and explicit non-goals;
+5. a recommendation with testable exit criteria;
+6. one of these dispositions: `no action`, `ready as one issue`, `split into
+linked issues`, or `promote to epic`.
+
+Promote the work to an epic when several independently deliverable capabilities
+must land in a deliberate sequence, different owners or milestones are useful,
+or the parent outcome cannot be verified honestly in one atomic change. The
+epic must describe the user-visible outcome, non-goals, dependency order, exit
+criteria and a linked checklist of child issues. Each child owns one coherent
+result and links back to the epic. Do not create an epic merely to make a small
+issue look larger.
+
+After research, remove `needs-research` only when the disposition and next
+action are explicit. A low-priority or future-horizon issue remains unscheduled
+until a weekly review deliberately promotes it; research completion alone does
+not move it into the active roadmap.
+
 ## Labels
 
 - `reported-in:x.y.z`: version in which the feedback was observed;
@@ -45,7 +75,7 @@ until a new containing release is verified.
 - `area:*`: primary product area;
 - `epic`: a user outcome intentionally split into linked issues;
 - `needs-research`: a decision or compatibility matrix must be completed before
-  implementation is ready.
+  implementation is ready; follow the research and epic-promotion rule above.
 
 Never include API keys, passwords, private campaign notes, transcripts,
 licensed rulebook text or protected media in an issue. Use the smallest safe

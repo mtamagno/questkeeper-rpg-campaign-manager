@@ -74,6 +74,22 @@ and release-artifact impact before opening or scheduling work.
 | -------------- | -------------------------------- | -------------------------------------------------- | --------------- |
 |                |                                  | Enables / constrains / reorders / splits / removes |                 |
 
+## Daily `2 + 1 + 1` cadence
+
+Review outcomes rather than rewarding activity. An issue may span several days
+when each daily slice is independently useful and the parent remains honestly
+open.
+
+| Date | Planned task 1 | Planned task 2 | Issue or atomic slice | Analysis and plan effect |
+| ---- | -------------- | -------------- | --------------------- | ------------------------ |
+|      |                |                |                       |                          |
+
+- [ ] No future-dated roadmap task was borrowed without an explicit re-plan.
+- [ ] Partially advanced issues retain visible acceptance criteria and release
+      state.
+- [ ] Analysis findings changed the relevant plan, decision, documentation or
+      issue instead of remaining only in conversation.
+
 ## This week's commitment
 
 ### Outcome and acceptance evidence

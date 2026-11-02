@@ -20,13 +20,13 @@ action, but must never obscure it.
 
 ## 2. Planning hierarchy
 
-| Horizon           | Source                                     | Purpose                                                  |
-| ----------------- | ------------------------------------------ | -------------------------------------------------------- |
-| One year          | [`ROADMAP.md`](../ROADMAP.md)              | Outcomes players and GMs can expect                      |
-| Extended delivery | [`ROADMAP-60-DAYS.md`](ROADMAP-60-DAYS.md) | Delivery sequence, quality windows and two daily commits |
-| One week          | Weekly review                              | Seven-day commitment and risks                           |
-| One change        | Issue or pull request                      | Acceptance criteria and proof                            |
-| Continuous        | [`DECISION-LOG.md`](DECISION-LOG.md)       | Durable reasoning and constraints                        |
+| Horizon           | Source                                     | Purpose                                                          |
+| ----------------- | ------------------------------------------ | ---------------------------------------------------------------- |
+| One year          | [`ROADMAP.md`](../ROADMAP.md)              | Outcomes players and GMs can expect                              |
+| Extended delivery | [`ROADMAP-60-DAYS.md`](ROADMAP-60-DAYS.md) | Delivery sequence, quality windows and daily `2 + 1 + 1` cadence |
+| One week          | Weekly review                              | Seven-day commitment and risks                                   |
+| One change        | Issue or pull request                      | Acceptance criteria and proof                                    |
+| Continuous        | [`DECISION-LOG.md`](DECISION-LOG.md)       | Durable reasoning and constraints                                |
 
 The roadmap is a direction, not a promise to preserve an outdated order. A
 weekly review may reorder future work when user evidence, risk or dependency
@@ -108,13 +108,29 @@ only after the containing release artifact has been published and verified.
 
 ### During the week: deliver in small chapters
 
-- Aim for two useful, independently understandable commits per working day.
+- Use the daily `2 + 1 + 1` cadence: two scheduled roadmap tasks, one issue
+  slice and one cross-cutting analysis.
 - Treat the two dated roadmap items as that day's delivery boundary. Finishing
   early does not automatically pull work from tomorrow or a later date.
-- Use any third work block for a same-day closeout: exercise the combined
-  journey, find omissions and regressions, reconcile tests and documentation,
-  and record how the day's work changes later tasks. Start a future-dated item
-  only after an explicit re-plan that updates the roadmap and states why.
+- Select the issue slot from actionable work in this order: blockers, data
+  loss, security and high-severity regressions; current-milestone or field
+  feedback; a ready research slice explicitly marked for promotion; then
+  low-priority future work only after a deliberate re-plan.
+- Treat an issue labelled `needs-research` as an analysis assignment, not an
+  implementation-ready feature. Complete the research contract in
+  [issue tracking](ISSUE-TRACKING.md), decide whether it remains one issue or
+  becomes an epic with linked atomic children, and do not promote it merely
+  because the research finished.
+- Keep the issue slot atomic. A large issue may advance through one independently
+  verifiable slice, but it remains open and its remaining acceptance criteria
+  stay visible. Never mark an issue resolved merely because its daily slot is
+  over.
+- Use the analysis slot to exercise the combined journey, find omissions and
+  regressions, reconcile tests and documentation, and record how all three
+  delivery slots change later tasks. It is review work, not a fourth feature.
+- Start a future-dated roadmap item only after an explicit re-plan that updates
+  the roadmap and states why. Neither spare capacity nor a related issue grants
+  implicit permission to borrow it.
 - Commit one concern at a time; do not split a single broken change merely to
   reach a number.
 - Keep the branch releasable. Run focused tests while working and
@@ -123,8 +139,10 @@ only after the containing release artifact has been published and verified.
 - Preview visual work at 360 px phone, 768 px tablet, desktop and wide-screen
   widths, plus 200% zoom, before review.
 
-Use the reusable [daily closeout](templates/DAILY-CLOSEOUT.md) after the two
-scheduled tasks whenever more work is available that day.
+Record all four slots in the reusable
+[daily closeout](templates/DAILY-CLOSEOUT.md). If a slot cannot be completed,
+record the blocker and its deliberate carry-forward instead of silently
+substituting another day's work.
 
 ### Friday or Sunday: review and re-plan
 
@@ -173,6 +191,10 @@ A change is ready to begin when:
 - affected data, privacy, accessibility and copyright risks are known;
 - required references or licensed assets are available;
 - acceptance checks fit in a short list.
+
+An issue carrying `needs-research` does not meet this Definition of Ready until
+its evidence, recommendation, disposition and any required epic decomposition
+are recorded according to [issue tracking](ISSUE-TRACKING.md).
 
 Exploration may start earlier, but it is not a delivery commitment yet.
 

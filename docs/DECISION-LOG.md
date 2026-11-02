@@ -514,7 +514,8 @@ two minutes.
 
 **Date:** 20 October 2026
 
-**Status:** Active
+**Status:** Superseded by
+[QK-068](#qk-068--daily-delivery-balances-planned-progress-feedback-and-reflection)
 
 **Decision:** The two dated items in the 60-day plan define the scheduled scope
 for that day. A third work block is normally a closeout review that tests the
@@ -1802,3 +1803,37 @@ assumption.
 **Revisit when:** Usability evidence shows a category is consistently missed,
 the native apps require a different navigation model, or account sync changes
 the scope and persistence contract for player preferences.
+
+### QK-068 — Daily delivery balances planned progress, feedback and reflection
+
+**Date:** 2 November 2026
+
+**Status:** Active
+
+**Decision:** Each active delivery day uses a `2 + 1 + 1` cadence: the two
+tasks already assigned by the extended plan, one prioritized GitHub issue or
+independently verifiable slice of a larger issue, and one cross-cutting
+analysis. The analysis reviews the combined user journey and updates affected
+tests, documentation, decisions and future work; it is not another feature.
+
+**Why:** Roadmap-only work can postpone real field feedback, while reacting
+only to issues can dissolve the product sequence. A separate analysis slot
+prevents fast AI-assisted delivery from treating tasks as isolated work that
+stops influencing the project after merge.
+
+**Consequences:** Issue selection favors blockers, data loss, security,
+high-severity regressions and current-milestone evidence before low-priority
+future ideas. Large issues remain open unless their complete acceptance
+criteria are met. Neither the issue slot nor spare capacity may silently pull a
+future-dated task forward. The daily closeout and weekly review preserve the
+evidence and downstream plan effects. An issue labelled `needs-research` first
+produces a sourced recommendation and explicit disposition; it becomes an epic
+only when several independently deliverable, ordered outcomes are required.
+
+**Source:** [Working agreement](WORKING-AGREEMENT.md),
+[extended delivery plan](ROADMAP-60-DAYS.md) and
+[daily closeout template](templates/DAILY-CLOSEOUT.md).
+
+**Revisit when:** Four consecutive weekly reviews show that the cadence delays
+urgent recovery work, creates artificial slicing or leaves analysis findings
+without an actionable owner.

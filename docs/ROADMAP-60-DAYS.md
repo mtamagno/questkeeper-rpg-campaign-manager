@@ -4,8 +4,9 @@
 
 **Target:** QuestKeeper 1.5 · Game Night Edition
 
-**Cadence:** two meaningful, buildable commits per active day; 60 original
-delivery days plus a 14-day UI, UX and accessibility quality fortnight.
+**Cadence:** two planned delivery tasks, one prioritized issue slice and one
+cross-cutting analysis per active day; 60 original delivery days plus a 14-day
+UI, UX and accessibility quality fortnight.
 
 This plan assumes AI-assisted implementation, testing, writing and asset
 preparation. The increased speed is used to ship broader player-facing slices,
@@ -16,10 +17,11 @@ campaign content.
 Delivery follows the [QuestKeeper working agreement](WORKING-AGREEMENT.md).
 Every week begins with one player/GM outcome and closes with the reusable
 [weekly review](templates/WEEKLY-REVIEW.md): shipped evidence, product health,
-decisions, risks and deliberate re-planning. The two-commit cadence is a target,
-never a reason to split broken work or bypass `npm run verify`. This file keeps
-its historical path so existing issues, reviews and release notes do not lose
-their links.
+decisions, risks and deliberate re-planning. The two scheduled task commits are
+a target, never a reason to split broken work or bypass `npm run verify`. The
+issue and analysis slots may require separate atomic commits, but activity count
+never outranks a complete, releasable outcome. This file keeps its historical
+path so existing issues, reviews and release notes do not lose their links.
 
 ## Week 1 — A compelling first experience
 
@@ -209,7 +211,8 @@ rather than introducing a second AI workflow.
 
 ## Parallel AI-accelerated tracks
 
-These run throughout the sixty days and do not replace the two daily commits:
+These run throughout the sixty days and do not replace the two daily planned
+tasks:
 
 - generate test fixtures and edge cases for every new content flow;
 - maintain English and Italian interface copy together;
@@ -225,11 +228,18 @@ These run throughout the sixty days and do not replace the two daily commits:
 - The second daily commit should usually deepen the first, not merely rename it.
 - The two dated commits are the day's scheduled scope. Do not borrow tomorrow's
   work simply because today's work finished early.
-- A third task is normally a review/refinement pass across the day's combined
-  experience: find mistakes, close gaps, connect prior decisions and update
-  downstream tasks using the [daily closeout](templates/DAILY-CLOSEOUT.md).
+- After the two scheduled tasks, complete one prioritized issue slot. Prefer a
+  blocker, data-loss/security risk, high-severity regression or current
+  milestone feedback. If the issue is too large, deliver and document one
+  independently verifiable slice without falsely closing the parent issue.
+- Finish with one cross-cutting analysis of the three delivery slots: exercise
+  their combined journey, find mistakes, close gaps, connect prior decisions
+  and update downstream tasks using the
+  [daily closeout](templates/DAILY-CLOSEOUT.md). The analysis is not another
+  feature slot.
 - Moving a future-dated task earlier requires an explicit re-plan and a visible
-  roadmap update; it is never an implicit use of spare capacity.
+  roadmap update; neither spare capacity nor an issue that overlaps it grants
+  implicit permission.
 - Build and focused tests run before every push.
 - The second push of the day is verified on GitHub Pages in Chrome and mobile view.
 - A working release candidate is tagged at the end of every week.
