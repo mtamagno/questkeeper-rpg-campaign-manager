@@ -9,6 +9,7 @@ export const SAFE_SHEET_ANCHORS = [
   'training',
   'inventory',
   'spells',
+  'progression',
 ] as const;
 
 export type SafeSheetAnchor = (typeof SAFE_SHEET_ANCHORS)[number];

@@ -6,7 +6,6 @@
 import {
   Component,
   ChangeDetectionStrategy,
-  HostListener,
   effect,
   inject,
   input,
@@ -15,6 +14,8 @@ import {
   type Signal,
   type WritableSignal,
 } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { ActivatedRoute } from '@angular/router';
 import { PasswordService } from '@guild/services/password.service';
 import {
   type CharacterPublicProfile,
@@ -28,14 +29,13 @@ import {
 import { LanguageService } from '@guild/services/language.service';
 import { type BilingualText } from '@guild/models/language.model';
 import { CampaignService } from '@guild/services/campaign.service';
-import {
-  CharacterReadingPositionService,
-  SAFE_SHEET_ANCHORS,
-  type SafeSheetAnchor,
-} from '@guild/services/characterReadingPosition.service';
+import { CharacterReadingPositionService } from '@guild/services/characterReadingPosition.service';
 import { PasswordDialogComponent } from '@guild/components/password-dialog/password-dialog.component';
 import { CharacterSheetHistoryComponent } from '../character-sheet-history/character-sheet-history.component';
-import { CharacterSheetNavigationComponent } from '../character-sheet-navigation/character-sheet-navigation.component';
+import {
+  CharacterSheetNavigationComponent,
+  type CharacterSheetWorkspace,
+} from '../character-sheet-navigation/character-sheet-navigation.component';
 import { CharacterRuleLibraryComponent } from '../character-rule-library/character-rule-library.component';
 import {
   combatResourceViews,
@@ -81,9 +81,9 @@ export class CharacterSheetComponent {
   private readonly languageService = inject(LanguageService);
   private readonly campaignService = inject(CampaignService);
   private readonly readingPosition = inject(CharacterReadingPositionService);
+  private readonly route = inject(ActivatedRoute);
   private restoredIdentity = '';
-  private scrollFrame: number | undefined;
-  private isRestoringPosition = false;
+  private readonly routeFragment = toSignal(this.route.fragment, { initialValue: null });
 
   /** Shared terminology profile used by the Companion and PDF export. */
   readonly rulesetProfile = this.campaignService.activeRuleset;
@@ -167,11 +167,18 @@ export class CharacterSheetComponent {
     this.passwordService.isUnlocked(this.characterId())(),
   );
 
+  /** Compact sheet workspace currently presented to the reader. */
+  readonly activeWorkspace = signal<CharacterSheetWorkspace>('overview');
+
+  /** Workspaces stay mounted after first visit so local filters and comparisons are preserved. */
+  readonly visitedWorkspaces = signal<ReadonlySet<CharacterSheetWorkspace>>(new Set(['overview']));
+
   private readonly restoreReadingPosition = effect(() => {
     const campaignId = this.campaignService.activeCampaignId();
     const characterId = this.characterId();
     const unlocked = this.isUnlocked();
-    const identity = `${campaignId ?? ''}:${characterId}`;
+    const fragment = this.routeFragment();
+    const identity = `${campaignId ?? ''}:${characterId}:${fragment ?? ''}`;
     if (!unlocked) {
       this.restoredIdentity = '';
       return;
@@ -179,13 +186,9 @@ export class CharacterSheetComponent {
     if (this.restoredIdentity === identity) return;
     this.restoredIdentity = identity;
 
-    const anchor = this.readingPosition.get(campaignId, characterId)?.sheetAnchor;
-    if (anchor === undefined) return;
-    this.isRestoringPosition = true;
-    setTimeout(() => {
-      this.scrollToSection(anchor, false);
-      setTimeout(() => (this.isRestoringPosition = false), 500);
-    });
+    const requestedWorkspace = this.workspaceForFragment(fragment, characterId);
+    const storedAnchor = this.readingPosition.get(campaignId, characterId)?.sheetAnchor;
+    this.selectWorkspace(requestedWorkspace ?? this.workspaceForAnchor(storedAnchor), false);
   });
 
   /** Whether the character sheet is empty (not yet compiled). */
@@ -334,6 +337,14 @@ export class CharacterSheetComponent {
     }
   }
 
+  /** Locks the protected character areas again without discarding remembered reading state. */
+  lockSheet(): void {
+    this.passwordService.lock(this.characterId());
+    this.pdfError.set(false);
+    this.activeWorkspace.set('overview');
+    this.visitedWorkspaces.set(new Set(['overview']));
+  }
+
   /** Opens a preserved version of the sheet without affecting the latest data. */
   selectSheetLevel(level: number): void {
     this.selectedLevel.set(level === this.currentSheet().level ? undefined : level);
@@ -344,44 +355,39 @@ export class CharacterSheetComponent {
     this.selectedLevel.set(undefined);
   }
 
-  /** Scrolls to a section without causing an Angular route navigation. */
-  scrollToSection(section: string, remember = true): void {
-    if (!SAFE_SHEET_ANCHORS.includes(section as SafeSheetAnchor)) return;
+  /** Changes the compact workspace and remembers it as the safe reading position. */
+  selectWorkspace(workspace: CharacterSheetWorkspace, remember = true): void {
+    this.activeWorkspace.set(workspace);
+    this.visitedWorkspaces.update((visited) => new Set([...visited, workspace]));
     if (remember) {
       this.readingPosition.rememberSheet(
         this.campaignService.activeCampaignId(),
         this.characterId(),
-        section as SafeSheetAnchor,
+        workspace,
       );
     }
-    document
-      .getElementById(`character-sheet-${section}-${this.characterId()}`)
-      ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  @HostListener('window:scroll')
-  rememberVisibleSection(): void {
-    if (!this.isUnlocked() || this.isRestoringPosition || this.scrollFrame !== undefined) return;
-    this.scrollFrame = requestAnimationFrame(() => {
-      this.scrollFrame = undefined;
-      const visible = SAFE_SHEET_ANCHORS.map((anchor) => ({
-        anchor,
-        element: document.getElementById(`character-sheet-${anchor}-${this.characterId()}`),
-      }))
-        .filter((entry) => entry.element !== null)
-        .map((entry) => ({
-          ...entry,
-          distance: Math.abs(entry.element!.getBoundingClientRect().top - 160),
-        }))
-        .sort((a, b) => a.distance - b.distance)[0];
-      if (visible !== undefined) {
-        this.readingPosition.rememberSheet(
-          this.campaignService.activeCampaignId(),
-          this.characterId(),
-          visible.anchor,
-        );
-      }
-    });
+  hasVisitedWorkspace(workspace: CharacterSheetWorkspace): boolean {
+    return this.visitedWorkspaces().has(workspace);
+  }
+
+  private workspaceForAnchor(anchor: string | undefined): CharacterSheetWorkspace {
+    if (anchor === 'abilities' || anchor === 'training') return 'training';
+    if (anchor === 'inventory' || anchor === 'spells' || anchor === 'progression') return anchor;
+    return 'overview';
+  }
+
+  private workspaceForFragment(
+    fragment: string | null,
+    characterId: string,
+  ): CharacterSheetWorkspace | undefined {
+    const prefix = 'character-sheet-';
+    const suffix = `-${characterId}`;
+    if (fragment === null || !fragment.startsWith(prefix) || !fragment.endsWith(suffix)) {
+      return undefined;
+    }
+    return this.workspaceForAnchor(fragment.slice(prefix.length, -suffix.length));
   }
 
   /** Builds and downloads a three-page illustrated PDF in the active language. */

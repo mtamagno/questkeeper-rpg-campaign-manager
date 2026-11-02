@@ -1,130 +1,145 @@
 @use '../../../../styles/variables' as *;
-@use '../../../../styles/mixins' as *;
-
-:host {
-  position: sticky;
-  top: $spacing-sm;
-  z-index: 5;
-  align-self: flex-start;
-  width: 100%;
-}
 
 .sheet-navigation {
-  display: flex;
+  display: grid;
+  gap: $spacing-sm;
+  padding: $spacing-sm;
+  border: 1px solid rgba($color-gold, 0.28);
+  border-radius: $border-radius-lg;
+  background: rgba($color-gothic-burgundy-dark, 0.34);
+  box-shadow: $shadow-sm;
+}
+
+.sheet-navigation__tabs {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: $spacing-xs;
+}
+
+.sheet-navigation__tab {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: $spacing-xs;
+  min-height: 3.5rem;
   padding: $spacing-sm;
-  width: 100%;
-  overflow-x: auto;
-  background: rgba($color-bg-deep, 0.94);
-  border: $border-width-thin solid $color-border-default;
-  border-radius: $border-radius-pill;
-  box-shadow: $shadow-md;
-  backdrop-filter: blur(12px);
+  border: 1px solid rgba($color-parchment, 0.14);
+  border-radius: $border-radius-md;
+  color: rgba($color-parchment, 0.78);
+  background: rgba($color-bg-deep, 0.48);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color $transition-fast,
+    color $transition-fast,
+    background $transition-fast,
+    transform $transition-fast;
 
-  > span {
-    flex: 0 0 auto;
-    padding: 0 $spacing-sm;
-    color: $color-text-muted;
-    font-family: $font-family-heading;
-    font-size: 0.62rem;
-    letter-spacing: $letter-spacing-wider;
-    text-transform: uppercase;
+  &:hover {
+    border-color: rgba($color-gold, 0.5);
+    color: $color-parchment;
   }
 
-  > button {
-    flex: 0 0 auto;
-    padding: $spacing-xs $spacing-md;
-    color: $color-text-secondary;
-    font-family: $font-family-heading;
-    font-size: $font-size-xs;
-    letter-spacing: $letter-spacing-wide;
-    cursor: pointer;
-    background: transparent;
-    border: $border-width-thin solid transparent;
-    border-radius: $border-radius-pill;
-    transition:
-      color $transition-fast,
-      background $transition-fast,
-      border-color $transition-fast;
-
-    &:hover,
-    &:focus-visible {
-      color: $color-gold-light;
-      background: rgba($color-gold, 0.1);
-      border-color: rgba($color-gold, 0.35);
-      outline: none;
-    }
+  &:focus-visible {
+    outline: 3px solid rgba($color-gold, 0.72);
+    outline-offset: 2px;
   }
 
-  &__archive {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: $spacing-lg;
-    padding: $spacing-md $spacing-lg;
-    color: $color-text-secondary;
-    background: linear-gradient(90deg, rgba($color-gold, 0.12), rgba($color-bg-elevated, 0.8));
-    border: $border-width-thin solid rgba($color-gold, 0.4);
-    border-radius: $border-radius-md;
-
-    div {
-      display: flex;
-      flex-direction: column;
-      gap: $spacing-2xs;
-    }
-
-    strong {
-      color: $color-gold-light;
-      font-family: $font-family-heading;
-    }
-
-    span {
-      font-size: $font-size-sm;
-    }
-
-    button {
-      flex: 0 0 auto;
-      padding: $spacing-sm $spacing-md;
-      color: $color-bg-deep;
-      font-family: $font-family-heading;
-      font-weight: $font-weight-bold;
-      cursor: pointer;
-      background: $color-gold-light;
-      border: 0;
-      border-radius: $border-radius-sm;
-
-      &:hover,
-      &:focus-visible {
-        background: $color-parchment-light;
-        outline: 2px solid $color-gold-light;
-        outline-offset: 2px;
-      }
-    }
-  }
-
-  @include respond-below(sm) {
-    margin-right: (-$spacing-xs);
-    margin-left: (-$spacing-xs);
-    border-radius: $border-radius-md;
-
-    > span {
-      display: none;
-    }
-
-    &__archive {
-      align-items: stretch;
-      flex-direction: column;
-
-      button {
-        width: 100%;
-      }
-    }
+  &--active {
+    border-color: rgba($color-gold, 0.82);
+    color: $color-parchment;
+    background: linear-gradient(135deg, rgba($color-gold, 0.18), rgba($color-bg-deep, 0.72));
   }
 }
 
-@include respond-below(sm) {
-  :host {
-    top: $spacing-xs;
+.sheet-navigation__icon {
+  color: $color-gold;
+  font-size: 1.05rem;
+}
+
+.sheet-navigation__label {
+  font-family: $font-family-heading;
+  font-size: 0.76rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.sheet-navigation__count {
+  display: grid;
+  min-width: 1.45rem;
+  min-height: 1.45rem;
+  place-items: center;
+  padding-inline: 0.3rem;
+  border-radius: 999px;
+  background: rgba($color-parchment, 0.1);
+  color: rgba($color-parchment, 0.72);
+  font-size: 0.68rem;
+}
+
+.sheet-navigation__description {
+  min-height: 1.25rem;
+  margin: 0;
+  color: rgba($color-parchment, 0.65);
+  font-size: 0.82rem;
+  text-align: center;
+}
+
+.sheet-navigation__archive {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-md;
+  border-left: 3px solid $color-gold;
+  border-radius: $border-radius-sm;
+  background: rgba($color-gold, 0.1);
+  color: rgba($color-parchment, 0.84);
+  font-size: 0.82rem;
+
+  button {
+    flex: 0 0 auto;
+    min-height: 2.75rem;
+    padding: $spacing-xs $spacing-sm;
+    border: 1px solid rgba($color-gold, 0.55);
+    border-radius: $border-radius-sm;
+    color: $color-parchment;
+    background: rgba($color-bg-deep, 0.5);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+  }
+}
+
+@media (max-width: 1024px) {
+  .sheet-navigation__tabs {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .sheet-navigation {
+    padding: $spacing-xs;
+  }
+
+  .sheet-navigation__tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sheet-navigation__tab:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .sheet-navigation__archive {
+    align-items: stretch;
+    flex-direction: column;
+
+    button {
+      width: 100%;
+    }
   }
 }

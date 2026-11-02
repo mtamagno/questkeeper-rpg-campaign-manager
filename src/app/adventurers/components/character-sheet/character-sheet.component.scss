@@ -31,6 +31,12 @@
     letter-spacing: $letter-spacing-wide;
   }
 
+  &__header-actions {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+  }
+
   &__pdf-button {
     display: inline-flex;
     align-items: center;
@@ -99,6 +105,34 @@
     animation: pdf-spin 0.8s linear infinite;
   }
 
+  &__lock-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: $spacing-xs;
+    min-height: 42px;
+    padding: $spacing-sm $spacing-md;
+    color: $color-text-secondary;
+    font-family: $font-family-heading;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    cursor: pointer;
+    background: $color-bg-elevated;
+    border: $border-width-thin solid $color-border-default;
+    border-radius: $border-radius-sm;
+    @include transition-colors;
+
+    &:hover {
+      color: $color-gold-light;
+      border-color: $color-gold-dark;
+    }
+
+    &:focus-visible {
+      outline: 2px solid $color-gold-light;
+      outline-offset: 3px;
+    }
+  }
+
   &__pdf-error {
     margin: (-$spacing-sm) 0 $spacing-lg;
     padding: $spacing-sm $spacing-md;
@@ -114,6 +148,53 @@
     flex-direction: column;
     gap: $spacing-lg;
     animation: fade-in-up $transition-base;
+  }
+
+  &__workspace {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+    min-width: 0;
+
+    &[hidden] {
+      display: none;
+    }
+
+    &:focus-visible {
+      outline: 2px solid rgba($color-gold, 0.55);
+      outline-offset: $spacing-xs;
+    }
+  }
+
+  &__workspace-empty {
+    display: grid;
+    justify-items: center;
+    gap: $spacing-sm;
+    min-height: 13rem;
+    padding: $spacing-xl;
+    place-content: center;
+    color: $color-text-muted;
+    text-align: center;
+    background: rgba($color-bg-elevated, 0.74);
+    border: $border-width-thin dashed $color-border-default;
+    border-radius: $border-radius-md;
+
+    span {
+      color: $color-gold;
+      font-size: $font-size-2xl;
+    }
+
+    strong {
+      color: $color-text-secondary;
+      font-family: $font-family-heading;
+      font-size: $font-size-lg;
+    }
+
+    p {
+      max-width: 36rem;
+      margin: 0;
+      line-height: $line-height-relaxed;
+    }
   }
 
   .sr-only {
@@ -844,7 +925,11 @@
 
     &__pdf-button {
       justify-content: center;
-      width: 100%;
+    }
+
+    &__header-actions {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
     }
 
     &__identity {

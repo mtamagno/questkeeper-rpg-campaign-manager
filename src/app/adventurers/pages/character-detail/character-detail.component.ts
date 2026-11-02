@@ -417,7 +417,13 @@ export class CharacterDetailComponent {
     ) {
       return 'story';
     }
-    if (fragment === 'private-profile' || fragment === 'character-sheet') return 'sheet';
+    if (
+      fragment === 'private-profile' ||
+      fragment === 'character-sheet' ||
+      fragment?.startsWith('character-sheet-')
+    ) {
+      return 'sheet';
+    }
     if (fragment === 'notebook' || fragment === 'gallery' || fragment === 'diary') return 'journal';
     return undefined;
   }
@@ -429,6 +435,12 @@ export class CharacterDetailComponent {
       fragment === sectionId ||
       (sectionId === 'personal-chapters' && fragment?.startsWith('lore-chapter-') === true)
     );
+  }
+
+  /** Opens the protected Sheet accordion for stable sheet landmarks. */
+  shouldOpenSheet(): boolean {
+    const fragment = this.activeFragment();
+    return fragment === 'character-sheet' || fragment?.startsWith('character-sheet-') === true;
   }
 
   /** Handles square profile image load errors. */

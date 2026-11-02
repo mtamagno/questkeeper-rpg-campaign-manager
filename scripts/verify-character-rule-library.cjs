@@ -16,7 +16,7 @@ const sheetTemplate = read(
   'src/app/adventurers/components/character-sheet/character-sheet.component.html',
 );
 const navigation = read(
-  'src/app/adventurers/components/character-sheet-navigation/character-sheet-navigation.component.html',
+  'src/app/adventurers/components/character-sheet-navigation/character-sheet-navigation.component.ts',
 );
 const preferences = read('src/app/guild/services/characterRulePreferences.service.ts');
 
@@ -49,7 +49,7 @@ assert.match(preferences, /MAX_NOTE_LENGTH = 2000/);
 assert.match(preferences, /MAX_ENTRIES = 500/);
 assert.match(preferences, /encodeURIComponent/);
 assert.match(preferences, /campaignId.*characterId.*entryId/s);
-assert.match(navigation, /Library/);
+assert.match(navigation, /Rules/);
 assert.match(sheetTemplate, /app-character-rule-library/);
 
 const campaignsRoot = path.join('src', 'campaigns');

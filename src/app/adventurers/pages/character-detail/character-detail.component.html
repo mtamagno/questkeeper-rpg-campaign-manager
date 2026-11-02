@@ -310,7 +310,7 @@
         <app-accordion
           [title]="lang() === 'it' ? 'Scheda personaggio' : 'Character Sheet'"
           icon="📋"
-          [startOpen]="hasSheetReadingPosition(char.id)"
+          [startOpen]="hasSheetReadingPosition(char.id) || shouldOpenSheet()"
           [allowOverflow]="true"
         >
           <app-character-sheet
