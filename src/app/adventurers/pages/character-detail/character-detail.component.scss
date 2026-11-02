@@ -661,39 +661,11 @@
   }
 
   // --- Public profile grid ---
-  &__profile-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
-    gap: $spacing-lg;
-  }
-
-  &__quick-facts {
-    display: flex;
-    flex-wrap: wrap;
-    gap: $spacing-sm;
-    margin: 0 0 $spacing-xl;
-  }
-
-  &__quick-fact {
-    min-width: min(100%, 170px);
-    padding: $spacing-sm $spacing-md;
-    border: $border-width-thin solid $color-border-default;
-    border-radius: $border-radius-pill;
-    background: rgba($color-bg-void, 0.24);
-
-    dt {
-      color: $color-text-muted;
-      font-family: $font-family-heading;
-      font-size: $font-size-xs;
-      letter-spacing: $letter-spacing-wide;
-      text-transform: uppercase;
-    }
-
-    dd {
-      margin: $spacing-2xs 0 0;
-      color: $color-parchment-light;
-      line-height: $line-height-base;
-    }
+  &__profile-overview {
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 0 0, rgba($color-gold-dark, 0.14), transparent min(34rem, 58vw)),
+      linear-gradient(145deg, rgba($color-bg-elevated, 0.96), rgba($color-bg-surface, 0.92));
   }
 
   &__highlight-columns {
@@ -782,46 +754,6 @@
     border-radius: 50%;
     color: $color-gold-light;
     background: rgba($color-gold-dark, 0.12);
-  }
-
-  &__profile-empty {
-    margin: 0;
-    padding: $spacing-lg;
-    text-align: center;
-    color: $color-text-secondary;
-    font-style: italic;
-    border: $border-width-thin dashed $color-border-default;
-    border-radius: $border-radius-md;
-    background: rgba($color-bg-void, 0.18);
-  }
-
-  &__profile-item {
-    @include flex-column;
-    gap: $spacing-xs;
-
-    h3,
-    h4 {
-      font-family: $font-family-heading;
-      font-size: $font-size-sm;
-      font-weight: $font-weight-semibold;
-      color: $color-gold;
-      letter-spacing: $letter-spacing-wide;
-      text-transform: uppercase;
-      margin: 0;
-    }
-
-    p {
-      font-size: $font-size-base;
-      color: $color-text-primary;
-      line-height: $line-height-relaxed;
-      margin: 0;
-    }
-
-    &--wide {
-      grid-column: 1 / -1;
-      padding-top: $spacing-md;
-      border-top: $border-width-thin solid $color-border-subtle;
-    }
   }
 
   // --- Known History ---
@@ -1063,23 +995,6 @@
       margin-bottom: $spacing-md;
       padding-bottom: $spacing-sm;
       font-size: $font-size-sm;
-    }
-
-    &__quick-facts {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: $spacing-xs;
-      margin-bottom: $spacing-lg;
-    }
-
-    &__quick-fact {
-      min-width: 0;
-      padding: $spacing-sm;
-      border-radius: $border-radius-md;
-
-      dd {
-        overflow-wrap: anywhere;
-      }
     }
 
     &__highlight-card,

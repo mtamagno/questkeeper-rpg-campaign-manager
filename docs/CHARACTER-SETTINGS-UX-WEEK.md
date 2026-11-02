@@ -50,7 +50,7 @@ but no action becomes harder to discover solely to make the bar shorter.
 | Date      | Task 1                                                                                                                          | Task 2                                                                                                                              | Same-day closeout                                                                                                 |
 | --------- | ------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
 | **1 Nov** | [x] **Character information architecture and accessible tab foundation**                                                        | [x] Audit every current section, landmark and direct action against the four areas; record missing, duplicated or misplaced content | [x] Verify the combined journey after both tasks                                                                  |
-| **2 Nov** | Refine Profile into a true at-a-glance start without deleting authored content                                                  | Refine Story & bonds: chapter discovery, relationship density, known-history sources and quotes                                     | Test short, empty and very long profiles                                                                          |
+| **2 Nov** | [x] **Refine Profile into a true at-a-glance start without deleting authored content**                                          | Refine Story & bonds: chapter discovery, relationship density, known-history sources and quotes                                     | Test short, empty and very long profiles                                                                          |
 | **3 Nov** | Review and refactor the heavy Sheet tab: inventory every value/action first, then make current play state immediately scannable | Refine Journal hierarchy: notebook, gallery and diary with useful progressive disclosure                                            | Prove Sheet content/function parity, then check protected state, remembered positions and large media collections |
 | **4 Nov** | Inventory the sticky command bar by frequency, context and screen size                                                          | Simplify its responsive hierarchy and overflow while preserving campaign switch, recovery and quick navigation                      | Keyboard, 360 px, 200% zoom and long-label review                                                                 |
 | **5 Nov** | Rebuild User Settings around RPG-style stable categories and clear global/campaign scope                                        | Add save-state, descriptions, recovery and empty/error feedback without scattering editors                                          | Fresh user, returning player and two-campaign review                                                              |
@@ -108,6 +108,29 @@ The second task, mobile correction and combined journey review are recorded in
 ownership table is the baseline for the remaining six days: no later density or
 settings work may silently move, duplicate or remove one of those surfaces or
 actions.
+
+## 2 November Task 1 outcome
+
+Profile now opens with one semantic, always-visible identity surface instead of
+an expanded accordion nested inside the page card. Quick facts lead into a
+compact facet grid for personality, ideals, authored bonds, vulnerabilities and
+pastimes; keepsakes and favourite moments remain the secondary, closable Profile
+section established by the ownership audit.
+
+The overview is a dedicated shared component rather than more weight inside the
+already dense character-detail component. Short copy stays fully visible. Long
+copy remains complete in the document and gains a keyboard-accessible,
+state-announcing `Read full text` / `Show less` disclosure after a five-line
+visual preview. No campaign data, public/private boundary or profile schema
+changed.
+
+The focused overview guard exercises compact and enriched fixtures, checks the
+honest empty state and rejects destructive string truncation. Strict TypeScript,
+profile, mobile and accessibility checks, both builds, entity-ID checks and
+performance budgets pass. Visual review covered Shyra's very long profile and
+Sennar's compact legacy profile at 390 x 844, plus Shyra at 1440 x 1000. The
+second task and same-day closeout still own Story density and the combined
+short, empty and long-profile journey.
 
 ## Design references
 

@@ -89,6 +89,7 @@ __pycache__/
 !/scripts/verify-user-settings.cjs
 !/scripts/verify-table-moments.cjs
 !/scripts/verify-character-notebooks.cjs
+!/scripts/verify-character-profile-overview.cjs
 !/scripts/verify-character-story-profiles.cjs
 !/scripts/verify-character-pronouns.cjs
 !/scripts/verify-character-rule-library.cjs

@@ -1,0 +1,81 @@
+<section class="profile-overview" aria-labelledby="profile-overview-title">
+  <header class="profile-overview__heading">
+    <div>
+      <p class="profile-overview__eyebrow">
+        {{ lang() === 'it' ? 'Profilo pubblico' : 'Public profile' }}
+      </p>
+      <h2 id="profile-overview-title" class="profile-overview__title">
+        {{ lang() === 'it' ? character().name + ' in breve' : character().name + ' at a glance' }}
+      </h2>
+    </div>
+    <p class="profile-overview__intro">
+      {{
+        lang() === 'it'
+          ? 'Personalità, principi, legami e fragilità: ciò che serve per capire subito chi è.'
+          : 'Personality, principles, bonds and vulnerabilities: what makes this character immediately recognizable.'
+      }}
+    </p>
+  </header>
+
+  @if (character().publicProfile.quickFacts?.length) {
+    <dl
+      class="profile-overview__quick-facts"
+      [attr.aria-label]="lang() === 'it' ? 'Fatti rapidi' : 'Quick facts'"
+    >
+      @for (fact of character().publicProfile.quickFacts; track fact.id) {
+        <div class="profile-overview__quick-fact">
+          <dt>{{ fact.label | bilingual }}</dt>
+          <dd>{{ fact.value | bilingual }}</dd>
+        </div>
+      }
+    </dl>
+  }
+
+  <div class="profile-overview__grid">
+    @for (facet of facets(); track facet.id) {
+      <article class="profile-overview__item" [class.profile-overview__item--wide]="facet.wide">
+        <span class="profile-overview__mark" aria-hidden="true">{{ facet.icon }}</span>
+        <div>
+          <h3>{{ facet.label }}</h3>
+          <p
+            [id]="'profile-facet-' + facet.id"
+            class="profile-overview__copy"
+            [class.is-collapsed]="isLong(facet.value) && !isExpanded(facet.id)"
+          >
+            {{ facet.value | bilingual }}
+          </p>
+          @if (isLong(facet.value)) {
+            <button
+              type="button"
+              class="profile-overview__toggle"
+              [attr.aria-expanded]="isExpanded(facet.id)"
+              [attr.aria-controls]="'profile-facet-' + facet.id"
+              (click)="toggleExpanded(facet.id)"
+            >
+              {{
+                isExpanded(facet.id)
+                  ? lang() === 'it'
+                    ? 'Riduci'
+                    : 'Show less'
+                  : lang() === 'it'
+                    ? 'Leggi tutto'
+                    : 'Read full text'
+              }}
+              <span aria-hidden="true">{{ isExpanded(facet.id) ? '↑' : '↓' }}</span>
+            </button>
+          }
+        </div>
+      </article>
+    }
+  </div>
+
+  @if (facets().length === 0) {
+    <p class="profile-overview__empty">
+      {{
+        lang() === 'it'
+          ? 'Il profilo pubblico deve ancora essere raccontato.'
+          : 'The public profile is still waiting to be told.'
+      }}
+    </p>
+  }
+</section>

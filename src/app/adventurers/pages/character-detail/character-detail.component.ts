@@ -39,6 +39,7 @@ import { CharacterSheetComponent } from '../../components/character-sheet/charac
 import { SessionDiaryComponent } from '../../components/session-diary/session-diary.component';
 import { CharacterLoreChaptersComponent } from '../../components/character-lore-chapters/character-lore-chapters.component';
 import { CharacterNotebookComponent } from '../../components/character-notebook/character-notebook.component';
+import { CharacterProfileOverviewComponent } from '../../components/character-profile-overview/character-profile-overview.component';
 
 interface ProfileBondPreview {
   readonly key: string;
@@ -86,6 +87,7 @@ interface CharacterDetailTab {
     SessionDiaryComponent,
     CharacterLoreChaptersComponent,
     CharacterNotebookComponent,
+    CharacterProfileOverviewComponent,
     RouterLink,
     DiceLoaderComponent,
   ],
@@ -327,18 +329,6 @@ export class CharacterDetailComponent {
   isRecorded(value: BilingualText): boolean {
     const normalized = `${value.en} ${value.it}`.toLowerCase();
     return !normalized.includes('not yet recorded') && !normalized.includes('non ancora registrat');
-  }
-
-  /** Whether the compact public summary contains at least one authored field. */
-  hasAtAGlanceProfile(character: Character): boolean {
-    return (
-      this.isRecorded(character.publicProfile.traits) ||
-      this.isRecorded(character.publicProfile.ideals) ||
-      this.isRecorded(character.publicProfile.bonds) ||
-      this.isRecorded(character.publicProfile.flaws) ||
-      (character.publicProfile.hobbies !== undefined &&
-        this.isRecorded(character.publicProfile.hobbies))
-    );
   }
 
   /** Returns a compact, word-safe preview while preserving the full source elsewhere. */

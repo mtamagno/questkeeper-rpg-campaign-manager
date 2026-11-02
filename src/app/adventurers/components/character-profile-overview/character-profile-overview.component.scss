@@ -1,0 +1,229 @@
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+
+:host {
+  display: block;
+}
+
+.profile-overview {
+  &__heading {
+    display: grid;
+    grid-template-columns: minmax(220px, 0.8fr) minmax(320px, 1.2fr);
+    align-items: end;
+    gap: $spacing-xl;
+    margin-bottom: $spacing-lg;
+    padding-bottom: $spacing-lg;
+    border-bottom: $border-width-thin solid $color-border-subtle;
+
+    @include respond-below(md) {
+      grid-template-columns: 1fr;
+      align-items: start;
+      gap: $spacing-sm;
+    }
+  }
+
+  &__eyebrow {
+    margin: 0;
+    color: $color-gold;
+    font-family: $font-family-heading;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  &__title {
+    margin: $spacing-2xs 0 0;
+    color: $color-parchment-light;
+    font-family: $font-family-heading;
+    font-size: clamp($font-size-xl, 2.4vw, $font-size-2xl);
+    line-height: $line-height-tight;
+    letter-spacing: $letter-spacing-wide;
+  }
+
+  &__intro {
+    max-width: 680px;
+    margin: 0;
+    color: $color-text-secondary;
+    line-height: $line-height-relaxed;
+  }
+
+  &__quick-facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+    gap: $spacing-sm;
+    margin: 0 0 $spacing-lg;
+  }
+
+  &__quick-fact {
+    min-width: 0;
+    padding: $spacing-sm $spacing-md;
+    border: $border-width-thin solid $color-border-default;
+    border-radius: $border-radius-md;
+    background: rgba($color-bg-void, 0.3);
+    box-shadow: inset 3px 0 0 rgba($color-gold-dark, 0.72);
+
+    dt {
+      color: $color-text-muted;
+      font-family: $font-family-heading;
+      font-size: $font-size-xs;
+      letter-spacing: $letter-spacing-wide;
+      text-transform: uppercase;
+    }
+
+    dd {
+      margin: $spacing-2xs 0 0;
+      color: $color-parchment-light;
+      line-height: $line-height-base;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+    gap: $spacing-md;
+
+    @include respond-below(md) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__item {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-content: start;
+    gap: $spacing-md;
+    min-width: 0;
+    height: 100%;
+    padding: $spacing-md;
+    border: $border-width-thin solid $color-border-default;
+    border-radius: $border-radius-md;
+    background: rgba($color-bg-void, 0.22);
+
+    h3 {
+      margin: 0;
+      color: $color-gold;
+      font-family: $font-family-heading;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-semibold;
+      letter-spacing: $letter-spacing-wide;
+      text-transform: uppercase;
+    }
+
+    &--wide {
+      grid-column: 1 / -1;
+      background:
+        radial-gradient(circle at 100% 0%, rgba($color-gold-dark, 0.11), transparent 48%),
+        rgba($color-bg-void, 0.22);
+    }
+  }
+
+  &__mark {
+    display: grid;
+    width: 2rem;
+    height: 2rem;
+    place-items: center;
+    border: $border-width-thin solid $color-border-accent;
+    border-radius: 50%;
+    color: $color-gold-light;
+    background: rgba($color-gold-dark, 0.13);
+    line-height: 1;
+  }
+
+  &__copy {
+    margin: $spacing-xs 0 0;
+    color: $color-text-primary;
+    font-size: $font-size-base;
+    line-height: $line-height-relaxed;
+
+    &.is-collapsed {
+      display: -webkit-box;
+      overflow: hidden;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 5;
+    }
+  }
+
+  &__toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-xs;
+    min-height: 40px;
+    margin-top: $spacing-xs;
+    padding: $spacing-xs 0;
+    border: 0;
+    color: $color-text-link;
+    background: transparent;
+    font: inherit;
+    font-size: $font-size-sm;
+    cursor: pointer;
+
+    &:hover {
+      color: $color-text-link-hover;
+    }
+
+    &:focus-visible {
+      outline: 2px solid $color-gold-light;
+      outline-offset: 3px;
+    }
+  }
+
+  &__empty {
+    margin: 0;
+    padding: $spacing-lg;
+    border: $border-width-thin dashed $color-border-default;
+    border-radius: $border-radius-md;
+    color: $color-text-secondary;
+    background: rgba($color-bg-void, 0.18);
+    font-style: italic;
+    text-align: center;
+  }
+
+  @include respond-below(sm) {
+    &__heading {
+      gap: $spacing-xs;
+      margin-bottom: $spacing-md;
+      padding-bottom: $spacing-md;
+    }
+
+    &__title {
+      font-size: $font-size-xl;
+    }
+
+    &__intro,
+    &__copy {
+      font-size: $font-size-sm;
+    }
+
+    &__quick-facts {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: $spacing-xs;
+      margin-bottom: $spacing-lg;
+    }
+
+    &__quick-fact,
+    &__item {
+      padding: $spacing-sm;
+    }
+
+    &__grid,
+    &__item {
+      gap: $spacing-sm;
+    }
+
+    &__item {
+      height: auto;
+
+      h3 {
+        font-size: $font-size-xs;
+      }
+    }
+
+    &__mark {
+      width: 1.75rem;
+      height: 1.75rem;
+    }
+  }
+}

@@ -84,7 +84,7 @@ for (const marker of [
   'profile-bonds',
   'character-detail__bond-carousel',
   'profile-highlights',
-  'character-detail__quick-facts',
+  'app-character-profile-overview',
   'profile-memories',
   'character-detail__history-links',
   'id="diary"',

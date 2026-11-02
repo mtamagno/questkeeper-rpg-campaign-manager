@@ -131,76 +131,10 @@
       <!-- Public profile: compact identity before the longer story sections. -->
       <section
         id="profile-overview"
-        class="character-detail__section"
+        class="character-detail__section character-detail__profile-overview"
         [hidden]="!isTab('overview')"
       >
-        <app-accordion
-          [title]="lang() === 'it' ? 'Il personaggio in breve' : 'Character at a Glance'"
-          icon="✦"
-          [startOpen]="true"
-        >
-          <p class="character-detail__section-intro">
-            {{
-              lang() === 'it'
-                ? 'Personalità, principi, legami e fragilità: ciò che serve per riconoscerlo subito.'
-                : 'Personality, principles, bonds and vulnerabilities: what you need to recognize them at once.'
-            }}
-          </p>
-          @if (char.publicProfile.quickFacts?.length) {
-            <dl
-              class="character-detail__quick-facts"
-              [attr.aria-label]="lang() === 'it' ? 'Fatti rapidi' : 'Quick facts'"
-            >
-              @for (fact of char.publicProfile.quickFacts; track fact.id) {
-                <div class="character-detail__quick-fact">
-                  <dt>{{ fact.label | bilingual }}</dt>
-                  <dd>{{ fact.value | bilingual }}</dd>
-                </div>
-              }
-            </dl>
-          }
-          <div class="character-detail__profile-grid">
-            @if (isRecorded(char.publicProfile.traits)) {
-              <div class="character-detail__profile-item">
-                <h3>{{ lang() === 'it' ? 'Tratti caratteriali' : 'Personality Traits' }}</h3>
-                <p>{{ char.publicProfile.traits | bilingual }}</p>
-              </div>
-            }
-            @if (isRecorded(char.publicProfile.ideals)) {
-              <div class="character-detail__profile-item">
-                <h3>{{ lang() === 'it' ? 'Ideali' : 'Ideals' }}</h3>
-                <p>{{ char.publicProfile.ideals | bilingual }}</p>
-              </div>
-            }
-            @if (isRecorded(char.publicProfile.bonds)) {
-              <div class="character-detail__profile-item">
-                <h3>{{ lang() === 'it' ? 'Legami' : 'Bonds' }}</h3>
-                <p>{{ char.publicProfile.bonds | bilingual }}</p>
-              </div>
-            }
-            @if (isRecorded(char.publicProfile.flaws)) {
-              <div class="character-detail__profile-item">
-                <h3>{{ lang() === 'it' ? 'Fragilità' : 'Vulnerabilities' }}</h3>
-                <p>{{ char.publicProfile.flaws | bilingual }}</p>
-              </div>
-            }
-            @if (char.publicProfile.hobbies && isRecorded(char.publicProfile.hobbies)) {
-              <div class="character-detail__profile-item character-detail__profile-item--wide">
-                <h3>{{ lang() === 'it' ? 'Abitudini e passatempi' : 'Habits & Pastimes' }}</h3>
-                <p>{{ char.publicProfile.hobbies | bilingual }}</p>
-              </div>
-            }
-          </div>
-          @if (!hasAtAGlanceProfile(char)) {
-            <p class="character-detail__profile-empty">
-              {{
-                lang() === 'it'
-                  ? 'Il profilo pubblico deve ancora essere raccontato.'
-                  : 'The public profile is still waiting to be told.'
-              }}
-            </p>
-          }
-        </app-accordion>
+        <app-character-profile-overview [character]="char" />
       </section>
 
       <!-- Personal lore: illustrated, public chapters before the shared adventure -->
