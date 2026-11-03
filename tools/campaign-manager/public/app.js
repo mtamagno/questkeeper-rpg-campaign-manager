@@ -1697,6 +1697,44 @@ function openDialog({ title, eyebrow, html, editor }) {
   fields.querySelector('input, textarea, select')?.focus();
 }
 
+function localeRegistryForEditor(languages, defaultLanguage) {
+  const current = state.campaign?.localeContract?.registry;
+  const currentByTag = new Map((current?.locales ?? []).map((locale) => [locale.tag, locale]));
+  const configured = new Set(languages);
+  const sourceLocale = configured.has(current?.sourceLocale)
+    ? current.sourceLocale
+    : defaultLanguage;
+  return {
+    version: 1,
+    locales: languages.map((tag) => {
+      const existing = currentByTag.get(tag);
+      const fallbacks = (existing?.fallbacks ?? []).filter((fallback) => configured.has(fallback));
+      return {
+        tag,
+        direction: existing?.direction ?? 'auto',
+        ...(fallbacks.length ? { fallbacks } : {}),
+      };
+    }),
+    defaultLocale: defaultLanguage,
+    sourceLocale,
+  };
+}
+
+function campaignLocaleMigrationPanel(campaign) {
+  const contract = campaign?.localeContract;
+  if (!contract?.migration?.required) return '';
+  const tags = contract.registry.locales.map(({ tag }) => tag);
+  const orphaned = contract.migration.orphanLocaleKeys ?? [];
+  return `<aside class="ai-review field--wide" data-locale-migration-panel>
+    <strong>Review the campaign language upgrade</strong>
+    <p>This campaign still uses legacy language metadata. QuestKeeper detected <strong>${tags.map(escapeHtml).join(', ')}</strong>. Review the original writing language before creating the versioned locale registry.</p>
+    <label class="field"><span>Original writing language</span><select name="localeMigrationSource">${tags.map((tag) => `<option value="${escapeHtml(tag)}"${tag === contract.registry.sourceLocale ? ' selected' : ''}>${escapeHtml(languageName(tag))} (${escapeHtml(tag)})</option>`).join('')}</select><small>This controls translation provenance; it does not rewrite campaign prose.</small></label>
+    ${orphaned.length ? `<p class="notice">Unregistered locale keys need review: ${orphaned.map(escapeHtml).join(', ')}.</p>` : ''}
+    <p><small>The migration updates only <code>campaigns.json</code> and <code>data/campaign.json</code>, after creating a full recovery backup.</small></p>
+    <div class="action-row"><button class="primary-button" type="button" data-locale-migration>Preview and migrate</button></div>
+  </aside>`;
+}
+
 function campaignForm(campaign) {
   const entry = campaign?.manifestEntry ?? {};
   const details = campaign?.campaign ?? {};
@@ -1740,6 +1778,7 @@ function campaignForm(campaign) {
     field('startDate', 'Start date', details.startDate ?? new Date().toISOString().slice(0, 10), {
       type: 'date',
     }),
+    campaignLocaleMigrationPanel(campaign),
     section('Languages'),
     campaignLanguagePicker(languages, entry.defaultLanguage ?? languages[0]),
     campaignLocalizedBlock(
@@ -1776,7 +1815,40 @@ function openCampaignEditor(editing = false) {
   if (editing && fields.querySelector('[name="id"]')) {
     fields.querySelector('[name="id"]').disabled = true;
   }
+  fields
+    .querySelector('[data-locale-migration]')
+    ?.addEventListener('click', () =>
+      migrateCampaignLocales().catch((error) => toast(error.message, true)),
+    );
   refreshPaletteStudio();
+}
+
+async function migrateCampaignLocales() {
+  const campaignId = state.selectedId;
+  const preview = await api(`/api/campaigns/${encodeURIComponent(campaignId)}/locale-migration`);
+  if (!preview.required) {
+    toast('The campaign language registry is already current.');
+    return;
+  }
+  const sourceLocale = fields.querySelector('[name="localeMigrationSource"]')?.value;
+  const summary = [
+    `Create locale registry v${preview.registry.version} for ${preview.registry.locales.map(({ tag }) => tag).join(', ')}?`,
+    `Original writing language: ${sourceLocale}.`,
+    `Files: ${preview.affectedFiles.join(', ')}.`,
+    'A full backup will be created. Campaign prose will not be rewritten.',
+  ].join('\n\n');
+  if (!confirm(summary)) return;
+  const result = await api(`/api/campaigns/${encodeURIComponent(campaignId)}/locale-migration`, {
+    method: 'POST',
+    body: JSON.stringify({ revision: preview.revision, sourceLocale }),
+  });
+  state.campaign = result.campaign;
+  openCampaignEditor(true);
+  toast(
+    result.changed
+      ? `Language registry created. Recovery backup: ${result.backup?.destination}`
+      : 'The campaign language registry was already current.',
+  );
 }
 
 function currentCampaignLocalizedValues() {
@@ -2275,6 +2347,9 @@ async function saveCampaign(form) {
     },
     campaign: { narrativeMood },
   };
+  if (creating || !state.campaign?.localeContract?.migration?.required) {
+    data.localeRegistry = localeRegistryForEditor(languages, defaultLanguage);
+  }
   if (data.palette === 'custom') data.customPalette = paletteDraftFromFields();
   if (creating) {
     const created = await api('/api/campaigns', { method: 'POST', body: JSON.stringify(data) });

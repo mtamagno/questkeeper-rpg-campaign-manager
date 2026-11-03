@@ -31,8 +31,8 @@ src/campaigns/
     └── images/
 ```
 
-Use lowercase URL-safe IDs. Declare the campaign's language codes and default
-language in both `campaigns.json` and `data/campaign.json`:
+Use lowercase URL-safe IDs. Declare the versioned locale registry in both
+`campaigns.json` and `data/campaign.json`:
 
 Character, NPC, session and map IDs share one namespace inside a campaign. An
 ID such as `test` may identify exactly one of those records, never one record
@@ -42,16 +42,32 @@ namespace. Existing IDs stay stable when a display name or translation changes.
 
 ```json
 {
-  "languages": ["en", "es", "pt-BR"],
+  "localeRegistry": {
+    "version": 1,
+    "locales": [
+      { "tag": "es", "direction": "auto" },
+      { "tag": "pt-BR", "direction": "auto", "fallbacks": ["es"] }
+    ],
+    "defaultLocale": "es",
+    "sourceLocale": "es"
+  },
+  "languages": ["es", "pt-BR"],
   "defaultLanguage": "es"
 }
 ```
 
-Every localized value is a map keyed by those codes, for example
-`{"en": "The Lantern Road", "es": "El Camino de las Linternas"}`. Use normal
-BCP-47-style codes such as `de`, `ja`, `fr-CA` or `pt-BR`. English is the
-technical fallback; if it is omitted, the manager safely copies the first
-available translation into `en` while keeping the chosen default language.
+Every localized value is a map keyed by configured tags, for example
+`{"es": "El Camino de las Linternas", "pt-BR": "A Estrada das Lanternas"}`.
+Use canonical BCP 47 tags such as `de`, `ja`, `fr-CA`, `sr-Latn` or `pt-BR`.
+No locale is mandatory and English has no special fallback status. Resolution
+uses only the registry's requested locale, explicit fallback chains, default
+locale and source locale, in that order.
+
+`languages` and `defaultLanguage` are temporary downgrade-safe compatibility
+fields derived from the registry. Do not edit them independently. Legacy
+campaigns are read without mutation; the Manager offers an explicit preview,
+requires confirmation of the original writing language, creates a full backup
+and then writes only registry metadata. It never rewrites localized prose.
 
 ## Campaign manifest
 

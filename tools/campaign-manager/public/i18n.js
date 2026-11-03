@@ -415,6 +415,15 @@
     'Language removed.': 'Lingua rimossa.',
     'Default language updated. Required fields changed below.':
       'Lingua predefinita aggiornata. I campi obbligatori qui sotto sono cambiati.',
+    'Review the campaign language upgrade': "Controlla l'aggiornamento delle lingue",
+    'Original writing language': 'Lingua originale di scrittura',
+    'This controls translation provenance; it does not rewrite campaign prose.':
+      'Definisce la provenienza delle traduzioni; non riscrive i testi della campagna.',
+    'Preview and migrate': 'Controlla e migra',
+    'The campaign language registry is already current.':
+      'Il registro delle lingue della campagna Ã¨ giÃ  aggiornato.',
+    'The campaign language registry was already current.':
+      'Il registro delle lingue della campagna era giÃ  aggiornato.',
     Equipment: 'Equipaggiamento',
     'Features and traits': 'Privilegi e tratti',
     'One per line.': 'Uno per riga.',

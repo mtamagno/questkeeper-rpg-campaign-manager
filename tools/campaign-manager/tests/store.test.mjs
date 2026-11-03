@@ -15,6 +15,8 @@ import {
   getCampaign,
   getState,
   importCampaign,
+  migrateCampaignLocaleRegistry,
+  previewCampaignLocaleMigration,
   saveEntity,
   updateCampaign,
 } from '../store.mjs';
@@ -47,12 +49,71 @@ test('creates a complete campaign and reports its counts', async (t) => {
   const campaign = await createCampaign(root, campaignInput);
   assert.equal(campaign.manifestEntry.id, campaignInput.id);
   assert.equal(campaign.manifestEntry.palette, 'heroic');
+  assert.deepEqual(campaign.manifestEntry.localeRegistry, campaign.campaign.localeRegistry);
+  assert.equal(campaign.manifestEntry.localeRegistry.version, 1);
   assert.deepEqual((await getState(root)).campaigns[0].counts, {
     characters: 0,
     npcs: 0,
     sessions: 0,
     maps: 0,
   });
+});
+
+test('previews and applies a lossless, backed-up legacy locale migration', async (t) => {
+  const root = await fixture(t);
+  await createCampaign(root, {
+    ...campaignInput,
+    id: 'legacy-locales',
+    languages: ['it', 'en'],
+    defaultLanguage: 'it',
+  });
+  const manifestPath = join(root, 'src', 'campaigns', 'campaigns.json');
+  const campaignPath = join(root, 'src', 'campaigns', 'legacy-locales', 'data', 'campaign.json');
+  const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
+  const campaignData = JSON.parse(await readFile(campaignPath, 'utf8'));
+  delete manifest[0].localeRegistry;
+  delete campaignData.localeRegistry;
+  campaignData.storySoFar = { it: 'Testo intatto.', en: 'Untouched prose.' };
+  await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
+  await writeFile(campaignPath, `${JSON.stringify(campaignData, null, 2)}\n`, 'utf8');
+
+  const preview = await previewCampaignLocaleMigration(root, 'legacy-locales');
+  assert.equal(preview.required, true);
+  assert.equal(preview.proseWillBeRewritten, false);
+  assert.equal(preview.provisionalSource, true);
+
+  const migrated = await migrateCampaignLocaleRegistry(root, 'legacy-locales', {
+    revision: preview.revision,
+    sourceLocale: 'it',
+  });
+  assert.equal(migrated.changed, true);
+  assert.equal(migrated.campaign.localeContract.migration.required, false);
+  assert.equal(migrated.campaign.campaign.storySoFar.it, 'Testo intatto.');
+  assert.ok(migrated.backup.destination);
+  const savedManifest = JSON.parse(await readFile(manifestPath, 'utf8'));
+  const savedCampaign = JSON.parse(await readFile(campaignPath, 'utf8'));
+  assert.deepEqual(savedManifest[0].localeRegistry, savedCampaign.localeRegistry);
+  assert.equal(savedCampaign.localeRegistry.sourceLocale, 'it');
+
+  const repeated = await migrateCampaignLocaleRegistry(root, 'legacy-locales');
+  assert.equal(repeated.changed, false);
+});
+
+test('rejects a stale locale migration preview before writing files', async (t) => {
+  const root = await fixture(t);
+  await createCampaign(root, { ...campaignInput, id: 'stale-locales' });
+  const campaignPath = join(root, 'src', 'campaigns', 'stale-locales', 'data', 'campaign.json');
+  const campaign = JSON.parse(await readFile(campaignPath, 'utf8'));
+  delete campaign.localeRegistry;
+  await writeFile(campaignPath, `${JSON.stringify(campaign, null, 2)}\n`, 'utf8');
+  const preview = await previewCampaignLocaleMigration(root, 'stale-locales');
+  campaign.partyName = 'Changed after preview';
+  await writeFile(campaignPath, `${JSON.stringify(campaign, null, 2)}\n`, 'utf8');
+
+  await assert.rejects(
+    migrateCampaignLocaleRegistry(root, 'stale-locales', { revision: preview.revision }),
+    /changed after the locale migration preview/,
+  );
 });
 
 test('generates stable collision-safe campaign IDs from localized names', async (t) => {
@@ -303,6 +364,32 @@ test('exports, imports and recoverably deletes a campaign', async (t) => {
   await assert.rejects(deleteCampaign(target, campaignInput.id, 'sbagliato'));
   await deleteCampaign(target, campaignInput.id, campaignInput.id);
   assert.equal((await getState(target)).campaigns.length, 0);
+});
+
+test('round-trips configured custom locale values through export and import', async (t) => {
+  const source = await fixture(t);
+  const target = await fixture(t);
+  await createCampaign(source, {
+    ...campaignInput,
+    id: 'regional-locale',
+    localeRegistry: {
+      version: 1,
+      locales: [
+        { tag: 'de-CH-1996', direction: 'ltr' },
+        { tag: 'en-x-table', direction: 'auto', fallbacks: ['de-CH-1996'] },
+      ],
+      defaultLocale: 'de-CH-1996',
+      sourceLocale: 'de-CH-1996',
+    },
+    name: { 'de-CH-1996': 'Chronik', 'en-x-table': 'Table chronicle' },
+    description: { 'de-CH-1996': 'Bewahrt.', 'en-x-table': 'Preserved.' },
+  });
+  const imported = await importCampaign(target, await exportCampaign(source, 'regional-locale'));
+  assert.equal(imported.manifestEntry.name['en-x-table'], 'Table chronicle');
+  assert.deepEqual(imported.manifestEntry.localeRegistry.locales, [
+    { tag: 'de-CH-1996', direction: 'ltr' },
+    { tag: 'en-x-table', direction: 'auto', fallbacks: ['de-CH-1996'] },
+  ]);
 });
 
 test('rejects a colliding import before creating partial campaign files', async (t) => {

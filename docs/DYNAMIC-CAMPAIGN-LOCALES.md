@@ -1,9 +1,9 @@
 # Dynamic campaign locales
 
 **Date:** 2026-11-03  
-**Status:** Accepted research contract; implementation is tracked by
-[#115](https://github.com/mtamagno/questkeeper-rpg-campaign-manager/issues/115)
-through
+**Status:** Accepted contract; registry and lossless migration implemented for
+[#115](https://github.com/mtamagno/questkeeper-rpg-campaign-manager/issues/115),
+pending release smoke tests. Reader and authoring follow-ups are tracked by
 [#118](https://github.com/mtamagno/questkeeper-rpg-campaign-manager/issues/118).  
 **Classification:** `shared`  
 **Research issue:**

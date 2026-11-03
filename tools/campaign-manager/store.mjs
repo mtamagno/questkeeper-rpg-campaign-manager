@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { mkdir, readFile, rename, stat, writeFile } from 'node:fs/promises';
 import { dirname, join, relative, resolve } from 'node:path';
 
@@ -7,7 +8,13 @@ import {
   ENTITY_TYPES,
   generateEntityId,
 } from './entity-identity.mjs';
-import { normalizeCampaignLanguages, normalizeLanguageTag } from './language-catalog.mjs';
+import { normalizeLanguageTag } from './language-catalog.mjs';
+import {
+  inspectCampaignLocales,
+  legacyFieldsFromLocaleRegistry,
+  localeRegistryFromLanguages,
+  normalizeLocaleRegistry,
+} from './campaign-locales.mjs';
 import { normalizeGameSystem } from './ruleset-profiles.mjs';
 import { CAMPAIGN_PALETTE_IDS, normalizeCustomPalette } from './campaign-palettes.mjs';
 import {
@@ -16,7 +23,7 @@ import {
 } from './narrative-moods.mjs';
 import storagePaths from '../storage-paths.cjs';
 
-const { resolveStoragePaths } = storagePaths;
+const { createCampaignBackup, resolveStoragePaths } = storagePaths;
 
 const ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const ENTITY_TYPE_SET = new Set(ENTITY_TYPES);
@@ -49,16 +56,51 @@ export function validateId(value, label = 'ID') {
   return value;
 }
 
-function normalizeLanguages(values) {
-  return normalizeCampaignLanguages(values);
+function registryFromInput(input, context = 'campaign.localeRegistry') {
+  if (input.localeRegistry) return normalizeLocaleRegistry(input.localeRegistry, context);
+  const languages = input.languages ?? ['en'];
+  const defaultLocale = input.defaultLanguage ?? languages[0];
+  return localeRegistryFromLanguages(languages, defaultLocale, defaultLocale, context);
 }
 
-function defaultCampaignLanguage(value, languages) {
-  const requested = value ? normalizeLanguageTag(value) : languages[0];
-  if (!languages.includes(requested)) {
+function registryFromLanguageUpdate(currentRegistry, input, context) {
+  if (input.localeRegistry) return normalizeLocaleRegistry(input.localeRegistry, context);
+  if (!input.languages && !input.defaultLanguage) return currentRegistry;
+
+  const currentByTag = new Map(currentRegistry.locales.map((locale) => [locale.tag, locale]));
+  const requestedTags = (input.languages ?? currentRegistry.locales.map(({ tag }) => tag)).map(
+    (tag) => normalizeLanguageTag(tag),
+  );
+  const configured = new Set(requestedTags);
+  const defaultLocale = normalizeLanguageTag(
+    input.defaultLanguage ??
+      (configured.has(currentRegistry.defaultLocale)
+        ? currentRegistry.defaultLocale
+        : requestedTags[0]),
+  );
+  if (!configured.has(defaultLocale)) {
     throw new Error('The default language must be one of the selected campaign languages.');
   }
-  return requested;
+  const sourceLocale = configured.has(currentRegistry.sourceLocale)
+    ? currentRegistry.sourceLocale
+    : defaultLocale;
+  return normalizeLocaleRegistry(
+    {
+      version: currentRegistry.version,
+      locales: requestedTags.map((tag) => {
+        const current = currentByTag.get(tag);
+        const fallbacks = (current?.fallbacks ?? []).filter((fallback) => configured.has(fallback));
+        return {
+          tag,
+          direction: current?.direction ?? 'auto',
+          ...(fallbacks.length ? { fallbacks } : {}),
+        };
+      }),
+      defaultLocale,
+      sourceLocale,
+    },
+    context,
+  );
 }
 
 function normalizeCampaignPalette(value, fallback = 'heroic') {
@@ -182,6 +224,7 @@ export async function getState(projectRoot) {
     campaigns.push({
       ...entry,
       details: campaign,
+      localeContract: inspectCampaignLocales({ manifestEntry: entry, campaign }, entry.id),
       counts: {
         characters: characters.length,
         npcs: npcs.length,
@@ -214,7 +257,7 @@ export async function getCampaign(projectRoot, campaignId) {
     campaign.gameSystem ?? manifestEntry.gameSystem,
     campaign.edition,
   );
-  return {
+  const bundle = {
     manifestEntry: { ...manifestEntry, gameSystem },
     campaign: { ...campaign, gameSystem },
     characters,
@@ -224,11 +267,15 @@ export async function getCampaign(projectRoot, campaignId) {
     partyRelationships,
     npcRelationships,
   };
+  return {
+    ...bundle,
+    localeContract: inspectCampaignLocales(bundle, campaignId),
+  };
 }
 
 export async function createCampaign(projectRoot, input) {
-  const languages = normalizeLanguages(input.languages);
-  const defaultLanguage = defaultCampaignLanguage(input.defaultLanguage, languages);
+  const localeRegistry = registryFromInput(input);
+  const { languages, defaultLanguage } = legacyFieldsFromLocaleRegistry(localeRegistry);
   assertDefaultLocalizedValue(input.name, defaultLanguage, 'Campaign name');
 
   const manifestPath = join(campaignsRoot(projectRoot), 'campaigns.json');
@@ -253,6 +300,7 @@ export async function createCampaign(projectRoot, input) {
 
   const entry = {
     id,
+    localeRegistry,
     languages,
     defaultLanguage,
     palette: normalizeCampaignPalette(input.palette),
@@ -268,6 +316,7 @@ export async function createCampaign(projectRoot, input) {
   const campaign = {
     name: input.name,
     description: input.description ?? { [defaultLanguage]: '' },
+    localeRegistry,
     languages,
     defaultLanguage,
     edition: gameSystem.edition || 'Custom RPG',
@@ -297,15 +346,33 @@ export async function updateCampaign(projectRoot, campaignId, input) {
   const current = await getCampaign(projectRoot, campaignId);
   const manifestPath = join(campaignsRoot(projectRoot), 'campaigns.json');
   const manifest = await readJson(manifestPath, []);
-  const languages = normalizeLanguages(
-    input.languages ?? current.manifestEntry.languages ?? current.campaign.languages ?? ['en'],
-  );
-  const requestedDefault =
-    input.defaultLanguage ??
-    current.manifestEntry.defaultLanguage ??
-    current.campaign.defaultLanguage ??
-    languages[0];
-  const defaultLanguage = defaultCampaignLanguage(requestedDefault, languages);
+  const currentRegistry = current.localeContract.registry;
+  const currentLegacy = legacyFieldsFromLocaleRegistry(currentRegistry);
+  if (current.localeContract.migration.required && input.localeRegistry) {
+    throw new Error(
+      `Campaign "${campaignId}" must use the reviewed locale migration before localeRegistry can be saved.`,
+    );
+  }
+  if (current.localeContract.migration.required) {
+    const requestedLanguages = input.languages
+      ? input.languages.map((tag) => normalizeLanguageTag(tag))
+      : currentLegacy.languages;
+    const requestedDefault = input.defaultLanguage
+      ? normalizeLanguageTag(input.defaultLanguage)
+      : currentLegacy.defaultLanguage;
+    if (
+      JSON.stringify(requestedLanguages) !== JSON.stringify(currentLegacy.languages) ||
+      requestedDefault !== currentLegacy.defaultLanguage
+    ) {
+      throw new Error(
+        `Campaign "${campaignId}" locale metadata must be migrated before changing languages.`,
+      );
+    }
+  }
+  const localeRegistry = current.localeContract.migration.required
+    ? currentRegistry
+    : registryFromLanguageUpdate(currentRegistry, input, `campaign[${campaignId}].localeRegistry`);
+  const { languages, defaultLanguage } = legacyFieldsFromLocaleRegistry(localeRegistry);
   const nextName = input.name ?? current.manifestEntry.name;
   assertDefaultLocalizedValue(nextName, defaultLanguage, 'Campaign name');
   const nextPalette = normalizeCampaignPalette(input.palette ?? current.manifestEntry.palette);
@@ -316,10 +383,12 @@ export async function updateCampaign(projectRoot, campaignId, input) {
   if (nextPalette === 'custom' && !nextCustomPalette) {
     throw new Error('Custom palette data is required. Duplicate a preset to begin.');
   }
+  const localeFields = current.localeContract.migration.required
+    ? {}
+    : { localeRegistry, languages, defaultLanguage };
   const nextEntry = {
     ...current.manifestEntry,
-    languages,
-    defaultLanguage,
+    ...localeFields,
     palette: nextPalette,
     ...(nextCustomPalette ? { customPalette: nextCustomPalette } : {}),
     name: nextName,
@@ -331,11 +400,14 @@ export async function updateCampaign(projectRoot, campaignId, input) {
       input.edition ?? input.campaign?.edition ?? current.campaign.edition,
     ),
   };
+  const campaignPatch = { ...(input.campaign ?? {}) };
+  delete campaignPatch.localeRegistry;
+  delete campaignPatch.languages;
+  delete campaignPatch.defaultLanguage;
   const nextCampaign = {
     ...current.campaign,
-    ...(input.campaign ?? {}),
-    languages,
-    defaultLanguage,
+    ...campaignPatch,
+    ...localeFields,
     name: nextEntry.name,
     description: nextEntry.description,
     gameSystem: nextEntry.gameSystem,
@@ -353,6 +425,80 @@ export async function updateCampaign(projectRoot, campaignId, input) {
     writeJson(join(dataRoot(projectRoot, campaignId), 'campaign.json'), nextCampaign),
   ]);
   return getCampaign(projectRoot, campaignId);
+}
+
+function localeRevision(manifestEntry, campaign) {
+  return createHash('sha256').update(JSON.stringify({ manifestEntry, campaign })).digest('hex');
+}
+
+async function readLocaleSource(projectRoot, campaignId) {
+  const manifestPath = join(campaignsRoot(projectRoot), 'campaigns.json');
+  const manifest = await readJson(manifestPath, []);
+  const manifestEntry = manifest.find((entry) => entry.id === campaignId);
+  if (!manifestEntry) throw new Error(`Campaign "${campaignId}" does not exist.`);
+  const campaignPath = join(dataRoot(projectRoot, campaignId), 'campaign.json');
+  const campaign = await readJson(campaignPath, {});
+  return { manifest, manifestPath, manifestEntry, campaign, campaignPath };
+}
+
+export async function previewCampaignLocaleMigration(projectRoot, campaignId) {
+  const source = await readLocaleSource(projectRoot, campaignId);
+  const localeContract = inspectCampaignLocales(source, campaignId);
+  return {
+    campaignId,
+    revision: localeRevision(source.manifestEntry, source.campaign),
+    registry: localeContract.registry,
+    origin: localeContract.origin,
+    ...localeContract.migration,
+    legacyFields: legacyFieldsFromLocaleRegistry(localeContract.registry),
+    backupRequired: localeContract.migration.required,
+  };
+}
+
+export async function migrateCampaignLocaleRegistry(projectRoot, campaignId, input = {}) {
+  return withCampaignWrite(campaignId, async () => {
+    const source = await readLocaleSource(projectRoot, campaignId);
+    const currentRevision = localeRevision(source.manifestEntry, source.campaign);
+    if (input.revision && input.revision !== currentRevision) {
+      throw new Error(
+        `Campaign "${campaignId}" changed after the locale migration preview. Review it again.`,
+      );
+    }
+    const inspected = inspectCampaignLocales(source, campaignId);
+    let registry = input.localeRegistry
+      ? normalizeLocaleRegistry(input.localeRegistry, `campaign[${campaignId}].localeRegistry`)
+      : inspected.registry;
+    if (input.sourceLocale) {
+      registry = normalizeLocaleRegistry(
+        { ...registry, sourceLocale: input.sourceLocale },
+        `campaign[${campaignId}].localeRegistry`,
+      );
+    }
+    const legacyFields = legacyFieldsFromLocaleRegistry(registry);
+    const complete =
+      !inspected.migration.required &&
+      JSON.stringify(source.manifestEntry.localeRegistry) === JSON.stringify(registry) &&
+      JSON.stringify(source.campaign.localeRegistry) === JSON.stringify(registry);
+    if (complete) {
+      return {
+        changed: false,
+        backup: undefined,
+        campaign: await getCampaign(projectRoot, campaignId),
+      };
+    }
+
+    const backup = await createCampaignBackup(projectRoot);
+    const nextEntry = { ...source.manifestEntry, ...legacyFields, localeRegistry: registry };
+    const nextCampaign = { ...source.campaign, ...legacyFields, localeRegistry: registry };
+    await Promise.all([
+      writeJson(
+        source.manifestPath,
+        source.manifest.map((entry) => (entry.id === campaignId ? nextEntry : entry)),
+      ),
+      writeJson(source.campaignPath, nextCampaign),
+    ]);
+    return { changed: true, backup, campaign: await getCampaign(projectRoot, campaignId) };
+  });
 }
 
 async function moveToTrash(projectRoot, source, label) {
@@ -521,10 +667,12 @@ export async function importCampaign(projectRoot, bundle) {
     maps: bundle.maps ?? [],
   });
   const id = validateId(bundle.manifestEntry?.id, 'Campaign ID');
+  const localeRegistry = inspectCampaignLocales(bundle, id).registry;
+  const legacyFields = legacyFieldsFromLocaleRegistry(localeRegistry);
   await createCampaign(projectRoot, {
     id,
-    languages: bundle.manifestEntry.languages,
-    defaultLanguage: bundle.manifestEntry.defaultLanguage,
+    localeRegistry,
+    ...legacyFields,
     name: bundle.manifestEntry.name,
     description: bundle.manifestEntry.description,
     status: bundle.manifestEntry.status,

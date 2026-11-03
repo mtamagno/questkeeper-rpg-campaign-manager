@@ -26,6 +26,25 @@ test('campaign language picker exposes searchable, custom and accessible control
   assert.match(styles, /\.language-picker__selected/);
 });
 
+test('legacy locale migration is explicit, previewed and recoverable', async () => {
+  const [app, server] = await Promise.all([
+    readFile(join(root, 'public', 'app.js'), 'utf8'),
+    readFile(join(root, 'server.mjs'), 'utf8'),
+  ]);
+  for (const contract of [
+    'data-locale-migration-panel',
+    'Original writing language',
+    'Campaign prose will not be rewritten',
+    'revision: preview.revision',
+    'localeRegistryForEditor',
+  ]) {
+    assert.match(app, new RegExp(contract));
+  }
+  assert.match(server, /parts\[3\] === 'locale-migration'/);
+  assert.match(server, /previewCampaignLocaleMigration/);
+  assert.match(server, /migrateCampaignLocaleRegistry/);
+});
+
 test('entity IDs stay optional unless advanced authoring is enabled', async () => {
   const app = await readFile(join(root, 'public', 'app.js'), 'utf8');
   assert.match(app, /questkeeper-manager-advanced/);
