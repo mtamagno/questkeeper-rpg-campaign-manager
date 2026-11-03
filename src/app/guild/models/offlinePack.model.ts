@@ -1,5 +1,5 @@
 import { type CharacterPublicProfile } from '@guild/models/character.model';
-import { type BilingualText } from '@guild/models/language.model';
+import { type BilingualText, type CampaignLocaleRegistry } from '@guild/models/language.model';
 
 /** Public-only character identity saved for game-night reading. */
 export interface OfflineCharacterSnapshot {
@@ -28,8 +28,10 @@ export interface OfflineRecapSnapshot {
 
 /** One campaign's explicit, removable offline reading pack. */
 export interface OfflineCampaignPack {
-  readonly version: 1;
+  readonly version: 2;
   readonly campaignId: string;
+  readonly contentLocale: string;
+  readonly localeRegistry: CampaignLocaleRegistry;
   readonly campaignName: BilingualText;
   readonly preparedAt: string;
   readonly characters: ReadonlyArray<OfflineCharacterSnapshot>;

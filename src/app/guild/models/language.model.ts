@@ -79,7 +79,7 @@ export function resolveLocalizedText(
   return { requestedLocale, value: '', isFallback: false, isMissing: true };
 }
 
-/** Resolves localized content with predictable English/first-value fallbacks. */
+/** Resolves localized content through the registry or, for legacy callers, first populated value. */
 export function localizeText(
   value: LocalizedText | undefined,
   language: SupportedLanguage,
@@ -87,7 +87,5 @@ export function localizeText(
 ): string {
   if (value === undefined) return '';
   if (registry) return resolveLocalizedText(value, language, registry).value;
-  return (
-    value[language] || value['en'] || Object.values(value).find((entry) => entry.length > 0) || ''
-  );
+  return value[language] || Object.values(value).find((entry) => entry.length > 0) || '';
 }

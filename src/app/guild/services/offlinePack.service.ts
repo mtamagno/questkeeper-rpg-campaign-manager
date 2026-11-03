@@ -3,7 +3,7 @@ import { Injectable, signal } from '@angular/core';
 import { type Campaign } from '@guild/models/campaign.model';
 import { type Character } from '@guild/models/character.model';
 import { type Session } from '@guild/models/session.model';
-import { type BilingualText } from '@guild/models/language.model';
+import { type BilingualText, type CampaignLocaleRegistry } from '@guild/models/language.model';
 import {
   type OfflineCampaignPack,
   type OfflineCharacterSnapshot,
@@ -11,7 +11,7 @@ import {
   type OfflineRecapSnapshot,
 } from '@guild/models/offlinePack.model';
 
-const STORAGE_KEY = 'campaign-companion:offline-packs:v1';
+const STORAGE_KEY = 'campaign-companion:offline-packs:v2';
 const RECENT_RECAP_LIMIT = 3;
 
 interface PrepareOfflinePackInput {
@@ -20,6 +20,8 @@ interface PrepareOfflinePackInput {
   readonly characters: ReadonlyArray<Character>;
   readonly sessions: ReadonlyArray<Session>;
   readonly selectedCharacterIds: ReadonlySet<string>;
+  readonly contentLocale: string;
+  readonly localeRegistry: CampaignLocaleRegistry;
 }
 
 function isOfflineCampaignPack(value: unknown): value is OfflineCampaignPack {
@@ -28,9 +30,11 @@ function isOfflineCampaignPack(value: unknown): value is OfflineCampaignPack {
   }
   const candidate = value as Partial<OfflineCampaignPack>;
   return (
-    candidate.version === 1 &&
+    candidate.version === 2 &&
     typeof candidate.campaignId === 'string' &&
     typeof candidate.preparedAt === 'string' &&
+    typeof candidate.contentLocale === 'string' &&
+    candidate.localeRegistry !== undefined &&
     candidate.campaignName !== undefined &&
     Array.isArray(candidate.characters) &&
     Array.isArray(candidate.recaps)
@@ -165,10 +169,16 @@ export class OfflinePackService {
       return { ok: false, cachedImageCount: 0, characterCount: 0, recapCount: 0, reason: 'empty' };
     }
 
-    const fallbackName: BilingualText = { en: input.campaignId, it: input.campaignId };
+    const fallbackName: BilingualText = {
+      en: input.campaignId,
+      it: input.campaignId,
+      [input.contentLocale]: input.campaignId,
+    };
     const pack: OfflineCampaignPack = {
-      version: 1,
+      version: 2,
       campaignId: input.campaignId,
+      contentLocale: input.contentLocale,
+      localeRegistry: input.localeRegistry,
       campaignName: input.campaign?.name ?? fallbackName,
       preparedAt: new Date().toISOString(),
       characters,

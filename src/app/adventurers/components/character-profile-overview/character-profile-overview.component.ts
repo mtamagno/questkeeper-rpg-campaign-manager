@@ -2,8 +2,9 @@ import { ChangeDetectionStrategy, Component, computed, inject, input, signal } f
 
 import { BilingualTextPipe } from '@guild/components/bilingual-text/bilingual-text.pipe';
 import { type Character } from '@guild/models/character.model';
-import { localizeText, type BilingualText } from '@guild/models/language.model';
+import { type BilingualText } from '@guild/models/language.model';
 import { LanguageService } from '@guild/services/language.service';
+import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
 
 type ProfileFacetId = 'traits' | 'ideals' | 'bonds' | 'flaws' | 'hobbies';
 
@@ -28,6 +29,7 @@ const COLLAPSED_COPY_LIMIT = 260;
 })
 export class CharacterProfileOverviewComponent {
   private readonly languageService = inject(LanguageService);
+  private readonly campaignLocale = inject(CampaignLocaleService);
 
   readonly character = input.required<Character>();
   readonly lang = this.languageService.currentLanguage;
@@ -89,7 +91,7 @@ export class CharacterProfileOverviewComponent {
   });
 
   isLong(value: BilingualText): boolean {
-    return localizeText(value, this.lang()).trim().length > COLLAPSED_COPY_LIMIT;
+    return this.campaignLocale.resolve(value).trim().length > COLLAPSED_COPY_LIMIT;
   }
 
   isExpanded(fieldId: ProfileFacetId): boolean {

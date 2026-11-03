@@ -2,11 +2,11 @@ import { ChangeDetectionStrategy, Component, computed, inject, type Signal } fro
 import { RouterLink } from '@angular/router';
 
 import { SfxHoverDirective } from '@guild/directives/sfxHover.directive';
-import { localizeText } from '@guild/models/language.model';
 import { type Session } from '@guild/models/session.model';
 import { CampaignService } from '@guild/services/campaign.service';
 import { DataService } from '@guild/services/data.service';
 import { LanguageService } from '@guild/services/language.service';
+import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
 
 interface GameNightBrief {
   readonly latestSessionId: string;
@@ -32,6 +32,7 @@ export class GameNightBriefComponent {
   private readonly dataService = inject(DataService);
   private readonly campaignService = inject(CampaignService);
   private readonly languageService = inject(LanguageService);
+  private readonly campaignLocale = inject(CampaignLocaleService);
 
   readonly lang = this.languageService.currentLanguage;
   readonly campaignId = this.campaignService.activeCampaignId;
@@ -49,7 +50,6 @@ export class GameNightBriefComponent {
       return undefined;
     }
 
-    const language = this.lang();
     const spotlight =
       this.dataService.characters().find((character) => character.diary.length > 0) ??
       this.dataService.characters()[0];
@@ -57,14 +57,16 @@ export class GameNightBriefComponent {
 
     return {
       latestSessionId: session.id,
-      latestSessionTitle: localizeText(session.title, language),
-      latestEvent: localizeText(latestEvent, language),
-      currentLocation: localizeText(session.location, language),
-      storySoFar: localizeText(campaign.storySoFar, language),
+      latestSessionTitle: this.campaignLocale.resolve(session.title),
+      latestEvent: this.campaignLocale.resolve(latestEvent),
+      currentLocation: this.campaignLocale.resolve(session.location),
+      storySoFar: this.campaignLocale.resolve(campaign.storySoFar),
       characterId: spotlight?.id,
       characterName: spotlight?.name,
       characterThread:
-        spotlight === undefined ? undefined : localizeText(spotlight.publicProfile.bonds, language),
+        spotlight === undefined
+          ? undefined
+          : this.campaignLocale.resolve(spotlight.publicProfile.bonds),
     };
   });
 }

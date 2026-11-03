@@ -18,8 +18,8 @@ import {
   type DiaryEntry,
   type ImageRef,
 } from '@guild/models/character.model';
-import { localizeText } from '@guild/models/language.model';
 import { CampaignService } from '@guild/services/campaign.service';
+import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
 import { CharacterReadingPositionService } from '@guild/services/characterReadingPosition.service';
 import { LanguageService } from '@guild/services/language.service';
 import { BilingualTextPipe } from '@guild/components/bilingual-text/bilingual-text.pipe';
@@ -53,6 +53,7 @@ interface CharacterJournalDestination {
 export class CharacterJournalComponent {
   private readonly languageService = inject(LanguageService);
   private readonly campaignService = inject(CampaignService);
+  private readonly campaignLocale = inject(CampaignLocaleService);
   private readonly readingPosition = inject(CharacterReadingPositionService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -186,7 +187,7 @@ export class CharacterJournalComponent {
   }
 
   diaryExcerpt(entry: DiaryEntry, maxLength = 170): string {
-    const text = localizeText(entry.content, this.isItalian() ? 'it' : 'en').trim();
+    const text = this.campaignLocale.resolve(entry.content).trim();
     if (text.length <= maxLength) return text;
     const boundary = text.lastIndexOf(' ', maxLength);
     return `${text.slice(0, boundary > maxLength / 2 ? boundary : maxLength).trim()}…`;

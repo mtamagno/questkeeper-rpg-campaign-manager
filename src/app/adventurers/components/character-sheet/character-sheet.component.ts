@@ -28,6 +28,7 @@ import {
 } from '@guild/models/character.model';
 import { LanguageService } from '@guild/services/language.service';
 import { type BilingualText } from '@guild/models/language.model';
+import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
 import { CampaignService } from '@guild/services/campaign.service';
 import { CharacterReadingPositionService } from '@guild/services/characterReadingPosition.service';
 import { PasswordDialogComponent } from '@guild/components/password-dialog/password-dialog.component';
@@ -79,6 +80,7 @@ interface InventoryStoryView extends CharacterInventoryView {
 export class CharacterSheetComponent {
   private readonly passwordService = inject(PasswordService);
   private readonly languageService = inject(LanguageService);
+  private readonly campaignLocale = inject(CampaignLocaleService);
   private readonly campaignService = inject(CampaignService);
   private readonly readingPosition = inject(CharacterReadingPositionService);
   private readonly route = inject(ActivatedRoute);
@@ -291,7 +293,7 @@ export class CharacterSheetComponent {
   }
 
   storyText(value: BilingualText): string {
-    return this.isItalian() ? value.it || value.en : value.en || value.it;
+    return this.campaignLocale.resolve(value);
   }
 
   resourceRecoveryLabel(resource: CharacterCombatResource): string {
@@ -399,7 +401,8 @@ export class CharacterSheetComponent {
     try {
       const { generateCampaignCharacterSheetPdf } =
         await import('../../services/campaignCharacterSheetPdf.service');
-      const language = this.isItalian() ? 'it' : 'en';
+      const language = this.campaignLocale.currentLocale();
+      const interfaceLanguage = this.isItalian() ? 'it' : 'en';
       const blob = await generateCampaignCharacterSheetPdf(
         this.characterName(),
         this.sheet(),
@@ -411,8 +414,12 @@ export class CharacterSheetComponent {
           portraitImageUrl: this.portraitImageUrl(),
           chapterTitle: this.activeSnapshot()?.title,
           recordedAt: this.activeSnapshot()?.recordedAt,
+          localeRegistry: this.campaignLocale.registry(),
           identityLabels: Object.fromEntries(
-            this.rulesetProfile().fields.map((field) => [field.storageKey, field.labels[language]]),
+            this.rulesetProfile().fields.map((field) => [
+              field.storageKey,
+              field.labels[interfaceLanguage],
+            ]),
           ),
         },
       );

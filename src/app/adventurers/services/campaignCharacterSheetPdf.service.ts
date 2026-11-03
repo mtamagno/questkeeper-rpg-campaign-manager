@@ -12,12 +12,16 @@ import {
   type CharacterPublicProfile,
   type CharacterSheet,
 } from '@guild/models/character.model';
-import { type BilingualText } from '@guild/models/language.model';
+import {
+  localizeText,
+  type BilingualText,
+  type CampaignLocaleRegistry,
+} from '@guild/models/language.model';
 import { inventoryViews } from '../utils/characterSheetPresentation';
 import { SPELL_CATEGORIES } from '@arcana/constants/spells.constants';
 import { SPELL_SCHOOLS, isSpellEntry, type SpellEntry } from '@arcana/models/compendium.model';
 
-export type CampaignPdfLanguage = 'en' | 'it';
+export type CampaignPdfLanguage = string;
 
 type AbilityKey = keyof AbilityScores;
 
@@ -41,6 +45,7 @@ export interface CampaignCharacterPdfOptions {
   readonly portraitImageUrl?: string;
   readonly chapterTitle?: BilingualText;
   readonly recordedAt?: string;
+  readonly localeRegistry?: CampaignLocaleRegistry;
   readonly identityLabels?: Partial<
     Record<'classType' | 'background' | 'race' | 'subclass', string>
   >;
@@ -184,7 +189,10 @@ function drawProfilePage(
   doc.text(characterName, 47, 45);
   doc.setFont('times', 'italic');
   doc.setTextColor(...COLOR.muted);
-  const pronouns = options.pronouns === undefined ? '' : localized(options.pronouns, language);
+  const pronouns =
+    options.pronouns === undefined
+      ? ''
+      : localized(options.pronouns, language, options.localeRegistry);
   let identityY = 53;
   if (pronouns.trim()) {
     doc.setFontSize(8);
@@ -203,7 +211,7 @@ function drawProfilePage(
   const chapterText =
     chapterTitle === undefined
       ? chapterLabel
-      : `${chapterLabel} - ${language === 'it' ? chapterTitle.it : chapterTitle.en}`;
+      : `${chapterLabel} - ${localized(chapterTitle, language, options.localeRegistry)}`;
   doc.setFontSize(8);
   doc.setTextColor(...COLOR.gold);
   const chapterY = identityY + 8;
@@ -248,7 +256,7 @@ function drawProfilePage(
   let leftY = drawProfileText(
     doc,
     language === 'it' ? 'Storia' : 'Backstory',
-    localized(profile.backstory, language),
+    localized(profile.backstory, language, options.localeRegistry),
     PAGE.margin,
     78,
     110,
@@ -259,7 +267,7 @@ function drawProfilePage(
   const knownEnd = drawProfileText(
     doc,
     language === 'it' ? 'Storia conosciuta' : 'Known history',
-    localized(profile.knownHistory, language),
+    localized(profile.knownHistory, language, options.localeRegistry),
     PAGE.margin,
     knownY,
     PAGE.contentWidth,
@@ -272,7 +280,7 @@ function drawProfilePage(
   leftY = drawProfileText(
     doc,
     language === 'it' ? 'Tratti caratteriali' : 'Personality traits',
-    localized(profile.traits, language),
+    localized(profile.traits, language, options.localeRegistry),
     PAGE.margin,
     detailsY,
     columnWidth,
@@ -281,7 +289,7 @@ function drawProfilePage(
   drawProfileText(
     doc,
     language === 'it' ? 'Ideali' : 'Ideals',
-    localized(profile.ideals, language),
+    localized(profile.ideals, language, options.localeRegistry),
     PAGE.margin,
     leftY + 4,
     columnWidth,
@@ -292,7 +300,7 @@ function drawProfilePage(
   let rightY = drawProfileText(
     doc,
     language === 'it' ? 'Legami' : 'Bonds',
-    localized(profile.bonds, language),
+    localized(profile.bonds, language, options.localeRegistry),
     rightX,
     detailsY,
     columnWidth,
@@ -301,7 +309,7 @@ function drawProfilePage(
   rightY = drawProfileText(
     doc,
     language === 'it' ? 'Difetti' : 'Flaws',
-    localized(profile.flaws, language),
+    localized(profile.flaws, language, options.localeRegistry),
     rightX,
     rightY + 4,
     columnWidth,
@@ -1069,8 +1077,12 @@ function imageFormat(dataUrl: string): 'PNG' | 'JPEG' {
   return dataUrl.startsWith('data:image/png') ? 'PNG' : 'JPEG';
 }
 
-function localized(text: BilingualText, language: CampaignPdfLanguage): string {
-  return language === 'it' ? text.it : text.en;
+function localized(
+  text: BilingualText,
+  language: CampaignPdfLanguage,
+  registry?: CampaignLocaleRegistry,
+): string {
+  return localizeText(text, language, registry);
 }
 
 function sectionTitle(

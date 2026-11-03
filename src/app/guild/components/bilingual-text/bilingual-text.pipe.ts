@@ -5,8 +5,8 @@
 
 import { Pipe, inject, type PipeTransform } from '@angular/core';
 
-import { LanguageService } from '@guild/services/language.service';
-import { localizeText, type BilingualText } from '@guild/models/language.model';
+import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
+import { type LocalizedText } from '@guild/models/language.model';
 
 /**
  * Transforms a BilingualText into the active language string.
@@ -22,14 +22,14 @@ import { localizeText, type BilingualText } from '@guild/models/language.model';
   pure: false,
 })
 export class BilingualTextPipe implements PipeTransform {
-  private readonly languageService = inject(LanguageService);
+  private readonly campaignLocale = inject(CampaignLocaleService);
 
   /**
    * Extracts the string for the currently active language.
    * @param value - The bilingual text object.
    * @returns The string in the active language.
    */
-  transform(value: BilingualText): string {
-    return localizeText(value, this.languageService.currentLanguage());
+  transform(value: LocalizedText): string {
+    return this.campaignLocale.resolve(value);
   }
 }

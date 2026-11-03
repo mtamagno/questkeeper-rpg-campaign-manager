@@ -21,7 +21,7 @@ import { CampaignService } from '@guild/services/campaign.service';
 import { type Character } from '@guild/models/character.model';
 import { type Npc } from '@guild/models/npc.model';
 import { LanguageService } from '@guild/services/language.service';
-import { localizeText } from '@guild/models/language.model';
+import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
 
 /** Simple group of NPCs by category for the sidebar. */
 interface NpcCategoryGroup {
@@ -69,6 +69,7 @@ export class SidebarComponent {
   private readonly dataService = inject(DataService);
   private readonly campaignService = inject(CampaignService);
   private readonly languageService = inject(LanguageService);
+  private readonly campaignLocale = inject(CampaignLocaleService);
 
   /** Active campaign ID for building route links. */
   readonly activeCampaignId: Signal<string | undefined> = this.campaignService.activeCampaignId;
@@ -79,7 +80,7 @@ export class SidebarComponent {
     if (campaign === undefined) {
       return 'QuestKeeper';
     }
-    return localizeText(campaign.name, this.languageService.currentLanguage());
+    return this.campaignLocale.resolve(campaign.name);
   });
 
   /** All player characters for the party section. */

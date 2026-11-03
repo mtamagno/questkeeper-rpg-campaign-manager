@@ -22,6 +22,7 @@ import { BilingualTextPipe } from '@guild/components/bilingual-text/bilingual-te
 import { ImageLightboxComponent } from '@guild/components/image-lightbox/image-lightbox.component';
 import { PasswordDialogComponent } from '@guild/components/password-dialog/password-dialog.component';
 import { LanguageService } from '@guild/services/language.service';
+import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
 import { PasswordService } from '@guild/services/password.service';
 import { CampaignService } from '@guild/services/campaign.service';
 import { CharacterReadingPositionService } from '@guild/services/characterReadingPosition.service';
@@ -52,6 +53,7 @@ type NotebookSlide =
 export class CharacterNotebookComponent {
   private readonly passwordService = inject(PasswordService);
   private readonly languageService = inject(LanguageService);
+  private readonly campaignLocale = inject(CampaignLocaleService);
   private readonly campaignService = inject(CampaignService);
   private readonly readingPosition = inject(CharacterReadingPositionService);
   private restoredIdentity = '';
@@ -179,9 +181,7 @@ export class CharacterNotebookComponent {
 
   notebookText(value: CharacterNotebookText): string {
     if (typeof value === 'string') return value;
-    return (
-      value[this.lang()] || value.en || Object.values(value).find((entry) => entry.length > 0) || ''
-    );
+    return this.campaignLocale.resolve(value);
   }
 
   slideLabel(slide: NotebookSlide): string {

@@ -11,7 +11,10 @@ const snapshotSection = service.slice(
   service.indexOf('function publicCharacterSnapshot'),
   service.indexOf('function recapSnapshot'),
 );
-assert.match(service, /offline-packs:v1/);
+assert.match(service, /offline-packs:v2/);
+assert.match(service, /version: 2/);
+assert.match(service, /contentLocale/);
+assert.match(service, /localeRegistry/);
 assert.match(service, /RECENT_RECAP_LIMIT = 3/);
 assert.match(service, /localStorage\.setItem/);
 assert.match(service, /remove\(campaignId: string\)/);

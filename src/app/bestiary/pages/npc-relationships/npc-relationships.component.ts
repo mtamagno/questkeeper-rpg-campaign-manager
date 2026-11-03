@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 import { CampaignService } from '@guild/services/campaign.service';
 import { DataService } from '@guild/services/data.service';
 import { LanguageService } from '@guild/services/language.service';
+import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
 import {
   type Relationship,
   type RelationshipNode,
@@ -36,6 +37,7 @@ export class NpcRelationshipsComponent {
   private readonly campaignService = inject(CampaignService);
   private readonly router = inject(Router);
   private readonly languageService = inject(LanguageService);
+  private readonly campaignLocale = inject(CampaignLocaleService);
 
   /** Current language for page copy and loading states. */
   readonly lang = this.languageService.currentLanguage;
@@ -70,7 +72,11 @@ export class NpcRelationshipsComponent {
       .filter((n) => involvedIds.has(n.id))
       .map((npc): RelationshipNode => ({
         id: npc.id,
-        name: getNpcDisplayName(npc),
+        name: getNpcDisplayName(
+          npc,
+          this.campaignLocale.currentLocale(),
+          this.campaignLocale.registry(),
+        ),
         avatarUrl: npc.profileImageUrl ?? npc.avatar.url,
         nodeType: NODE_TYPES.NPC,
       }));
