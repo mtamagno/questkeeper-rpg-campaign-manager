@@ -3,14 +3,18 @@ const fs = require('node:fs');
 
 const read = (path) => fs.readFileSync(path, 'utf8');
 const sheet = read('src/app/adventurers/components/character-sheet/character-sheet.component.ts');
-const template = read('src/app/adventurers/components/character-sheet/character-sheet.component.html');
+const template = read(
+  'src/app/adventurers/components/character-sheet/character-sheet.component.html',
+);
 const navigation = read(
   'src/app/adventurers/components/character-sheet-navigation/character-sheet-navigation.component.ts',
 );
 const navigationTemplate = read(
   'src/app/adventurers/components/character-sheet-navigation/character-sheet-navigation.component.html',
 );
-const detailTemplate = read('src/app/adventurers/pages/character-detail/character-detail.component.html');
+const detailTemplate = read(
+  'src/app/adventurers/pages/character-detail/character-detail.component.html',
+);
 
 for (const workspace of ['overview', 'training', 'inventory', 'spells', 'progression']) {
   assert.match(navigation, new RegExp(`'${workspace}'`));
@@ -39,7 +43,10 @@ for (const preservedContent of [
   'downloadPdf',
   'lockSheet',
 ]) {
-  assert.ok(sheet.includes(preservedContent) || template.includes(preservedContent), preservedContent);
+  assert.ok(
+    sheet.includes(preservedContent) || template.includes(preservedContent),
+    preservedContent,
+  );
 }
 
 assert.match(template, /Nessun equipaggiamento registrato/);
