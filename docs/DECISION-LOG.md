@@ -1869,3 +1869,37 @@ contract in UI, entry flow and migration.
 **Revisit when:** A supported hosting provider can prove equivalent
 per-campaign authorization, conflict, revocation, transfer and audit guarantees
 without a QuestKeeper-operated service.
+
+### QK-070 — Campaign content locales belong to a versioned campaign registry
+
+**Date:** 3 November 2026
+
+**Status:** Accepted; implementation remains tracked by #115–#118
+
+**Decision:** Separate product-interface language from campaign-authored
+content language. Every campaign owns a versioned, ordered registry of one or
+more canonical BCP 47 tags, an explicit default locale, an explicit authoring
+source locale and optional acyclic fallbacks. Localized values remain portable
+locale-keyed maps. A shared resolver returns the requested and actual locale,
+value, fallback state and missing state; it never assumes English, Italian or
+the first object property.
+
+**Why:** The Manager already accepts dynamic tags while reusable types, reader
+state, search, PDFs and offline output still contain fixed EN/IT behavior. A
+selector-only fix would create campaigns that can be authored but not read or
+exported consistently. Existing Phandelver and Curse of Strahd content also
+needs a lossless read-through path before metadata is written.
+
+**Consequences:** #115 provides the registry, resolver and previewed legacy
+migration first. #116 and #117 then make authoring and reading dynamic in
+coordinated slices; #118 consumes their registry and fallback/status contracts
+for independent source/target translation jobs. UI chrome remains a separate
+user preference. Routes and entity IDs stay locale-neutral, preferences become
+campaign-scoped, and fallback content is marked with its actual language.
+
+**Source:** [Dynamic campaign locales](DYNAMIC-CAMPAIGN-LOCALES.md) and
+[research issue #114](https://github.com/mtamagno/questkeeper-rpg-campaign-manager/issues/114).
+
+**Revisit when:** A real campaign needs structured variant negotiation beyond
+the explicit fallback graph, or migration evidence shows that locale-keyed maps
+cannot round-trip safely across supported QuestKeeper versions.
