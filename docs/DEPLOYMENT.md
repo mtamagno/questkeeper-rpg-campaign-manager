@@ -30,6 +30,14 @@ and site files without encryption. QuestKeeper displays a warning and requires
 an explicit acknowledgement for every test or upload. Prefer FTPS or your
 host's HTTPS/SFTP tooling whenever possible.
 
+Direct FTP and FTPS are **owner-managed publishing**. Everyone who holds the
+same unrestricted hosting credential can write every campaign and folder that
+credential can reach; FTPS encrypts the connection but does not create
+per-person or per-campaign permissions. Do not use shared credentials as a
+collaboration boundary between mutually untrusted Managers. The selected secure
+multi-Manager model and migration requirements are documented in
+[Publishing Authority and Shared Hosting](PUBLISHING-AUTHORITY.md).
+
 ## Apache
 
 Build with the path where the app will live:

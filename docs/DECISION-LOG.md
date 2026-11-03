@@ -1837,3 +1837,35 @@ only when several independently deliverable, ordered outcomes are required.
 **Revisit when:** Four consecutive weekly reviews show that the cadence delays
 urgent recovery work, creates artificial slicing or leaves analysis findings
 without an actionable owner.
+
+### QK-069 — Shared publishing requires server-enforced campaign authority
+
+**Date:** 3 November 2026
+
+**Status:** Accepted; implementation remains tracked by #113
+
+**Decision:** Keep direct FTP/FTPS, GitHub and local publication as explicit
+owner-managed trust modes. Multi-Manager publishing requires a trusted service
+that verifies a short-lived campaign-scoped grant, canonical destination and
+strong current revision before atomically activating a release. Per-directory
+SFTP/WebDAV or GitHub App integrations may be adapters when their provider
+enforces equivalent scope; they do not replace QuestKeeper's role, transfer and
+recovery contract.
+
+**Why:** Identical unrestricted hosting credentials give every holder identical
+authority. UI roles, installation identifiers or signed files on the same raw
+FTP destination cannot stop accidental or crafted cross-campaign publication.
+FTPS encrypts that authority but does not narrow it.
+
+**Consequences:** Legacy FTPS remains compatible but is labelled a single trust
+domain. Shared mode derives paths from campaign identity, rejects stale writes
+with a strong revision precondition, keeps hosting credentials away from local
+Managers and records redacted audit evidence. #120 defines identities and
+capabilities; #121 implements enforcement and conflicts; #122-#124 consume the
+contract in UI, entry flow and migration.
+
+**Source:** [Publishing authority and shared hosting](PUBLISHING-AUTHORITY.md).
+
+**Revisit when:** A supported hosting provider can prove equivalent
+per-campaign authorization, conflict, revocation, transfer and audit guarantees
+without a QuestKeeper-operated service.
