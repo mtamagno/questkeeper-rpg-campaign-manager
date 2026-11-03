@@ -272,23 +272,6 @@
         </section>
       }
 
-      @if (char.notebook; as notebook) {
-        <section id="notebook" class="character-detail__section" [hidden]="!isTab('journal')">
-          <app-accordion
-            [title]="notebook.title | bilingual"
-            icon="📓"
-            [startOpen]="hasNotebookReadingPosition(char.id)"
-            [allowOverflow]="true"
-          >
-            <app-character-notebook
-              [characterId]="char.id"
-              [characterName]="char.name"
-              [notebook]="notebook"
-            />
-          </app-accordion>
-        </section>
-      }
-
       <!-- Private Profile (password-protected) -->
       <section id="private-profile" class="character-detail__section" [hidden]="!isTab('sheet')">
         <app-accordion
@@ -326,19 +309,6 @@
           />
         </app-accordion>
       </section>
-
-      <!-- Image Gallery -->
-      @if (char.gallery.length > 0) {
-        <section id="gallery" class="character-detail__section" [hidden]="!isTab('journal')">
-          <app-accordion
-            [title]="lang() === 'it' ? 'Galleria' : 'Gallery'"
-            icon="🖼️"
-            [startOpen]="true"
-          >
-            <app-image-gallery [images]="char.gallery" galleryTitle="" />
-          </app-accordion>
-        </section>
-      }
 
       <!-- Iconic Quotes -->
       @if (char.quotes.length > 0) {
@@ -421,18 +391,20 @@
         </section>
       }
 
-      <!-- Session Diary -->
-      @if (char.diary.length > 0) {
-        <section id="diary" class="character-detail__section" [hidden]="!isTab('journal')">
-          <app-accordion
-            [title]="lang() === 'it' ? 'Diario delle sessioni' : 'Session Diary'"
-            icon="📓"
-            [startOpen]="true"
-          >
-            <app-session-diary [entries]="char.diary" />
-          </app-accordion>
-        </section>
-      }
+      <!-- Journal follows the complete public story and renders one collection at a time. -->
+      <section
+        id="character-journal"
+        class="character-detail__section"
+        [hidden]="!isTab('journal')"
+      >
+        <app-character-journal
+          [characterId]="char.id"
+          [characterName]="char.name"
+          [notebook]="char.notebook"
+          [gallery]="char.gallery"
+          [diary]="char.diary"
+        />
+      </section>
     </div>
   </article>
 } @else {

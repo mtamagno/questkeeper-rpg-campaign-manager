@@ -1,0 +1,207 @@
+<div class="journal-hub">
+  <header class="journal-hub__header">
+    <div>
+      <span class="journal-hub__eyebrow">
+        {{ isItalian() ? 'Archivio personale' : 'Personal archive' }}
+      </span>
+      <h2>{{ isItalian() ? 'Memorie di' : 'Memories of' }} {{ characterName() }}</h2>
+      <p>
+        {{
+          isItalian()
+            ? 'Scegli una raccolta: solo quella aperta occupa la pagina, senza perdere il punto in cui eri arrivato.'
+            : 'Choose a collection: only the open one occupies the page, without losing your place.'
+        }}
+      </p>
+    </div>
+  </header>
+
+  <nav
+    class="journal-hub__tabs"
+    role="tablist"
+    [attr.aria-label]="isItalian() ? 'Raccolte del diario' : 'Journal collections'"
+  >
+    @for (destination of destinations(); track destination.id) {
+      <button
+        type="button"
+        role="tab"
+        class="journal-hub__tab"
+        [class.journal-hub__tab--active]="activeWorkspace() === destination.id"
+        [id]="tabId(destination.id)"
+        [attr.aria-selected]="activeWorkspace() === destination.id"
+        [attr.aria-controls]="panelId(destination.id)"
+        [attr.tabindex]="activeWorkspace() === destination.id ? 0 : -1"
+        (click)="selectWorkspace(destination.id)"
+        (keydown)="onTabKeydown($event)"
+      >
+        <span class="journal-hub__tab-icon" aria-hidden="true">{{ destination.icon }}</span>
+        <span class="journal-hub__tab-copy">
+          <strong>{{ destination.label }}</strong>
+          <small>{{ destination.description }}</small>
+        </span>
+        @if (destination.count !== undefined) {
+          <span class="journal-hub__count">{{ destination.count }}</span>
+        }
+      </button>
+    }
+  </nav>
+
+  <section
+    class="journal-hub__workspace journal-hub__workspace--index"
+    [hidden]="activeWorkspace() !== 'index'"
+    [id]="panelId('index')"
+    [attr.aria-labelledby]="tabId('index')"
+    role="tabpanel"
+    tabindex="0"
+  >
+    @if (destinations().length > 1) {
+      <div class="journal-hub__index-heading">
+        <span aria-hidden="true">✦</span>
+        <div>
+          <h3>{{ isItalian() ? 'Scegli cosa ricordare' : 'Choose what to remember' }}</h3>
+          <p>
+            {{
+              isItalian()
+                ? 'Le raccolte restano separate per rendere leggibile anche un archivio molto grande.'
+                : 'Collections stay separate so even a large archive remains readable.'
+            }}
+          </p>
+        </div>
+      </div>
+      <div class="journal-hub__index-grid">
+        @if (notebook(); as notebookData) {
+          <button
+            type="button"
+            class="journal-hub__index-card"
+            (click)="selectWorkspace('notebook')"
+          >
+            <span class="journal-hub__index-icon" aria-hidden="true">📓</span>
+            <span>
+              <small>
+                {{
+                  hasNotebookReadingPosition()
+                    ? isItalian()
+                      ? 'Riprendi la lettura'
+                      : 'Continue reading'
+                    : isItalian()
+                      ? 'Taccuino protetto'
+                      : 'Protected notebook'
+                }}
+              </small>
+              <strong>{{ notebookData.title | bilingual }}</strong>
+              <span>{{ notebookData.description | bilingual }}</span>
+            </span>
+            <b>{{ notebookData.pages.length }}</b>
+          </button>
+        }
+        @if (gallery().length > 0) {
+          <button
+            type="button"
+            class="journal-hub__index-card"
+            (click)="selectWorkspace('gallery')"
+          >
+            <span class="journal-hub__index-icon" aria-hidden="true">🖼️</span>
+            <span>
+              <small>{{ isItalian() ? 'Archivio visivo' : 'Visual archive' }}</small>
+              <strong>{{ isItalian() ? 'Galleria' : 'Gallery' }}</strong>
+              <span>
+                {{
+                  isItalian()
+                    ? 'Ritratti e scene si caricano solo quando apri questa raccolta.'
+                    : 'Portraits and scenes load only when you open this collection.'
+                }}
+              </span>
+            </span>
+            <b>{{ gallery().length }}</b>
+          </button>
+        }
+        @if (latestDiaryEntry(); as latest) {
+          <button type="button" class="journal-hub__index-card" (click)="selectWorkspace('diary')">
+            <span class="journal-hub__index-icon" aria-hidden="true">📜</span>
+            <span>
+              <small>{{ latest.date }}</small>
+              <strong>{{ latest.title | bilingual }}</strong>
+              <span>{{ diaryExcerpt(latest) }}</span>
+            </span>
+            <b>{{ diary().length }}</b>
+          </button>
+        }
+      </div>
+    } @else {
+      <div class="journal-hub__empty">
+        <span aria-hidden="true">📖</span>
+        <strong>{{
+          isItalian() ? 'Nessuna memoria pubblicata' : 'No memories published yet'
+        }}</strong>
+        <p>
+          {{
+            isItalian()
+              ? 'Taccuino, immagini e diario compariranno qui quando verranno aggiunti.'
+              : 'A notebook, images and session diary will appear here when they are added.'
+          }}
+        </p>
+      </div>
+    }
+  </section>
+
+  @if (notebook() && hasVisited('notebook')) {
+    <section
+      class="journal-hub__workspace"
+      [hidden]="activeWorkspace() !== 'notebook'"
+      [id]="panelId('notebook')"
+      [attr.aria-labelledby]="tabId('notebook')"
+      role="tabpanel"
+      tabindex="0"
+    >
+      <span id="notebook" class="journal-hub__anchor" aria-hidden="true"></span>
+      <app-character-notebook
+        [characterId]="characterId()"
+        [characterName]="characterName()"
+        [notebook]="notebook()!"
+      />
+    </section>
+  }
+
+  @if (gallery().length > 0 && hasVisited('gallery')) {
+    <section
+      class="journal-hub__workspace"
+      [hidden]="activeWorkspace() !== 'gallery'"
+      [id]="panelId('gallery')"
+      [attr.aria-labelledby]="tabId('gallery')"
+      role="tabpanel"
+      tabindex="0"
+    >
+      <span id="gallery" class="journal-hub__anchor" aria-hidden="true"></span>
+      <div class="journal-hub__workspace-heading">
+        <span aria-hidden="true">🖼️</span>
+        <div>
+          <h3>{{ isItalian() ? 'Galleria' : 'Gallery' }}</h3>
+          <p>
+            {{
+              isItalian()
+                ? gallery().length + ' immagini raccolte lungo il viaggio.'
+                : gallery().length + ' images gathered along the journey.'
+            }}
+          </p>
+        </div>
+      </div>
+      <app-image-gallery [images]="gallery()" galleryTitle="" />
+    </section>
+  }
+
+  @if (diary().length > 0 && hasVisited('diary')) {
+    <section
+      class="journal-hub__workspace"
+      [hidden]="activeWorkspace() !== 'diary'"
+      [id]="panelId('diary')"
+      [attr.aria-labelledby]="tabId('diary')"
+      role="tabpanel"
+      tabindex="0"
+    >
+      <span id="diary" class="journal-hub__anchor" aria-hidden="true"></span>
+      <app-session-diary
+        [entries]="diary()"
+        [title]="isItalian() ? 'Diario delle sessioni' : 'Session Diary'"
+      />
+    </section>
+  }
+</div>

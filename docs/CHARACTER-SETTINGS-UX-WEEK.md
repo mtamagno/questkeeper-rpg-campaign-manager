@@ -47,15 +47,15 @@ but no action becomes harder to discover solely to make the bar shorter.
 
 ## Daily plan
 
-| Date      | Task 1                                                                                                                                  | Task 2                                                                                                                              | Same-day closeout                                                                                                 |
-| --------- | --------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| **1 Nov** | [x] **Character information architecture and accessible tab foundation**                                                                | [x] Audit every current section, landmark and direct action against the four areas; record missing, duplicated or misplaced content | [x] Verify the combined journey after both tasks                                                                  |
-| **2 Nov** | [x] **Refine Profile into a true at-a-glance start without deleting authored content**                                                  | [x] **Refine Story & bonds: chapter discovery, relationship density, known-history sources and quotes**                             | [x] Test short, empty and very long profiles                                                                      |
-| **3 Nov** | [x] **Review and refactor the heavy Sheet tab: inventory every value/action first, then make current play state immediately scannable** | Refine Journal hierarchy: notebook, gallery and diary with useful progressive disclosure                                            | Prove Sheet content/function parity, then check protected state, remembered positions and large media collections |
-| **4 Nov** | Inventory the sticky command bar by frequency, context and screen size                                                                  | Simplify its responsive hierarchy and overflow while preserving campaign switch, recovery and quick navigation                      | Keyboard, 360 px, 200% zoom and long-label review                                                                 |
-| **5 Nov** | Rebuild User Settings around RPG-style stable categories and clear global/campaign scope                                                | Add save-state, descriptions, recovery and empty/error feedback without scattering editors                                          | Fresh user, returning player and two-campaign review                                                              |
-| **6 Nov** | Cross-surface accessibility pass: tabs, headings, focus, names/states, contrast, reduced motion and touch                               | Performance and rendering pass so inactive areas and heavy media do not punish the first view                                       | Phone, tablet, desktop, wide screen and 200% zoom evidence                                                        |
-| **7 Nov** | Walk the complete player journey in the public demo, Phandelver and Curse of Strahd                                                     | Resolve regressions, reconcile docs/tests and rank only evidence-backed follow-ups                                                  | Weekly review, dependency/runtime health and downstream plan update                                               |
+| Date      | Task 1                                                                                                                                  | Task 2                                                                                                                              | Same-day closeout                                                                                                     |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| **1 Nov** | [x] **Character information architecture and accessible tab foundation**                                                                | [x] Audit every current section, landmark and direct action against the four areas; record missing, duplicated or misplaced content | [x] Verify the combined journey after both tasks                                                                      |
+| **2 Nov** | [x] **Refine Profile into a true at-a-glance start without deleting authored content**                                                  | [x] **Refine Story & bonds: chapter discovery, relationship density, known-history sources and quotes**                             | [x] Test short, empty and very long profiles                                                                          |
+| **3 Nov** | [x] **Review and refactor the heavy Sheet tab: inventory every value/action first, then make current play state immediately scannable** | [x] **Refine Journal hierarchy: notebook, gallery and diary with useful progressive disclosure**                                    | [x] Prove Sheet content/function parity, then check protected state, remembered positions and large media collections |
+| **4 Nov** | Inventory the sticky command bar by frequency, context and screen size                                                                  | Simplify its responsive hierarchy and overflow while preserving campaign switch, recovery and quick navigation                      | Keyboard, 360 px, 200% zoom and long-label review                                                                     |
+| **5 Nov** | Rebuild User Settings around RPG-style stable categories and clear global/campaign scope                                                | Add save-state, descriptions, recovery and empty/error feedback without scattering editors                                          | Fresh user, returning player and two-campaign review                                                                  |
+| **6 Nov** | Cross-surface accessibility pass: tabs, headings, focus, names/states, contrast, reduced motion and touch                               | Performance and rendering pass so inactive areas and heavy media do not punish the first view                                       | Phone, tablet, desktop, wide screen and 200% zoom evidence                                                            |
+| **7 Nov** | Walk the complete player journey in the public demo, Phandelver and Curse of Strahd                                                     | Resolve regressions, reconcile docs/tests and rank only evidence-backed follow-ups                                                  | Weekly review, dependency/runtime health and downstream plan update                                                   |
 
 ### Sheet tab review and refactoring — 3 November
 
@@ -124,6 +124,30 @@ Headless Chrome reviewed Shyra at phone, tablet and desktop widths; the desktop
 table-ready view fits one reading viewport and phone views expose only the
 selected task. Task 2 still owns the Journal hierarchy and the combined media
 closeout.
+
+## 3 November Task 2 and closeout
+
+Journal now opens as a compact personal-archive index instead of rendering a
+notebook, gallery and full diary in one continuous page. Only collections that
+exist are offered. Notebook, Gallery and Sessions are nested accessible
+workspaces; each heavy workspace is created on first use and remains mounted so
+password state, reading position and lightbox context survive navigation.
+
+Legacy `#notebook`, `#gallery` and `#diary` links still reveal the outer Journal
+and now select the correct inner panel. The index identifies a remembered
+notebook position as **Continue reading**, previews the newest public diary
+entry and gives an explicit empty archive when no memories are published. The
+shared [Journal contract](CHARACTER-JOURNAL.md) prevents future media growth
+from returning the page to an endless stack.
+
+The combined Sheet-to-Journal preservation matrix is recorded in the
+[3 November closeout](reviews/2026-11-03-character-sheet-journal-closeout.md).
+Focused journal, notebook, reading-position, profile, mobile and accessibility
+checks pass with both builds. Production validates eight characters across
+Phandelver and Curse of Strahd, including one notebook, four galleries and
+eight diaries; public fixtures cover notebook and diary behavior. Desktop and
+390 px visual checks confirm a compact index, two-column mobile navigation,
+isolated gallery media and a readable diary without document overflow.
 
 ## 1 November closeout
 

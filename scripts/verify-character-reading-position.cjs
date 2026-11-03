@@ -10,8 +10,15 @@ const navigation = read(
 const notebook = read(
   'src/app/adventurers/components/character-notebook/character-notebook.component.ts',
 );
-const detailTemplate = read('src/app/adventurers/pages/character-detail/character-detail.component.html');
-const detailComponent = read('src/app/adventurers/pages/character-detail/character-detail.component.ts');
+const journal = read(
+  'src/app/adventurers/components/character-journal/character-journal.component.ts',
+);
+const detailTemplate = read(
+  'src/app/adventurers/pages/character-detail/character-detail.component.html',
+);
+const detailComponent = read(
+  'src/app/adventurers/pages/character-detail/character-detail.component.ts',
+);
 
 assert.match(service, /questkeeper:character-reading-position:v1/);
 assert.match(service, /SAFE_SHEET_ANCHORS/);
@@ -26,7 +33,8 @@ assert.doesNotMatch(sheet, /HostListener|rememberVisibleSection/);
 assert.match(navigation, /CHARACTER_SHEET_WORKSPACES/);
 assert.match(notebook, /rememberNotebook/);
 assert.match(notebook, /notebookSlide/);
-assert.match(detailTemplate, /hasNotebookReadingPosition\(char\.id\)/);
+assert.match(journal, /hasNotebookReadingPosition/);
+assert.match(detailTemplate, /app-character-journal/);
 assert.match(detailTemplate, /hasSheetReadingPosition\(char\.id\)/);
 assert.match(detailComponent, /startsWith\('character-sheet-'\)/);
 

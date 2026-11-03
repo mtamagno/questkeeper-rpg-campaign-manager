@@ -1,0 +1,311 @@
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+
+:host {
+  display: block;
+}
+
+.journal-hub {
+  display: grid;
+  gap: $spacing-lg;
+  padding: clamp($spacing-md, 3vw, $spacing-xl);
+  border: $border-width-thin solid $color-border-default;
+  border-radius: $border-radius-lg;
+  background:
+    radial-gradient(circle at 8% 0, rgba($color-gold-dark, 0.13), transparent 34%),
+    rgba($color-bg-elevated, 0.76);
+  box-shadow: $shadow-sm;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    gap: $spacing-lg;
+
+    h2 {
+      margin: $spacing-xs 0;
+      color: $color-gold-light;
+      font-family: $font-family-heading;
+      font-size: clamp($font-size-xl, 4vw, $font-size-2xl);
+      line-height: $line-height-tight;
+    }
+
+    p {
+      max-width: 68ch;
+      margin: 0;
+      color: $color-text-secondary;
+      line-height: $line-height-relaxed;
+    }
+  }
+
+  &__eyebrow {
+    color: $color-gold;
+    font-family: $font-family-heading;
+    font-size: $font-size-xs;
+    letter-spacing: $letter-spacing-wider;
+    text-transform: uppercase;
+  }
+
+  &__tabs {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: $spacing-xs;
+    padding: $spacing-xs;
+    border: $border-width-thin solid rgba($color-gold, 0.25);
+    border-radius: $border-radius-md;
+    background: rgba($color-bg-void, 0.3);
+
+    @include respond-below(md) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  &__tab {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: $spacing-sm;
+    align-items: center;
+    min-height: 4.5rem;
+    padding: $spacing-sm;
+    border: $border-width-thin solid transparent;
+    border-radius: $border-radius-md;
+    background: rgba($color-bg-deep, 0.5);
+    color: $color-text-secondary;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition:
+      border-color $transition-fast,
+      background $transition-fast,
+      color $transition-fast,
+      transform $transition-fast;
+
+    &:hover {
+      border-color: rgba($color-gold, 0.5);
+      color: $color-text-primary;
+      transform: translateY(-1px);
+    }
+
+    &:focus-visible {
+      outline: 3px solid rgba($color-gold, 0.72);
+      outline-offset: 2px;
+    }
+
+    &--active {
+      border-color: $color-border-accent;
+      background: linear-gradient(135deg, rgba($color-gold-dark, 0.2), rgba($color-bg-deep, 0.7));
+      color: $color-text-primary;
+    }
+  }
+
+  &__tab-icon,
+  &__index-icon {
+    color: $color-gold;
+    font-size: $font-size-lg;
+  }
+
+  &__tab-copy {
+    display: grid;
+    gap: 0.2rem;
+    min-width: 0;
+
+    strong {
+      color: inherit;
+      font-family: $font-family-heading;
+      font-size: $font-size-sm;
+      letter-spacing: $letter-spacing-wide;
+    }
+
+    small {
+      color: $color-text-muted;
+      font-size: $font-size-xs;
+      line-height: $line-height-tight;
+    }
+  }
+
+  &__count {
+    display: grid;
+    min-width: 1.7rem;
+    min-height: 1.7rem;
+    place-items: center;
+    padding: 0 0.35rem;
+    border-radius: $border-radius-pill;
+    background: rgba($color-gold, 0.13);
+    color: $color-gold-light;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+  }
+
+  &__workspace {
+    min-width: 0;
+    padding: clamp($spacing-sm, 2vw, $spacing-lg);
+    border: $border-width-thin solid $color-border-subtle;
+    border-radius: $border-radius-md;
+    background: rgba($color-bg-void, 0.2);
+
+    &[hidden] {
+      display: none;
+    }
+
+    &:focus-visible {
+      outline: 3px solid rgba($color-gold, 0.6);
+      outline-offset: 3px;
+    }
+  }
+
+  &__anchor {
+    display: block;
+    scroll-margin-top: 6rem;
+  }
+
+  &__index-heading,
+  &__workspace-heading {
+    display: flex;
+    gap: $spacing-md;
+    align-items: flex-start;
+    margin-bottom: $spacing-lg;
+
+    > span {
+      color: $color-gold;
+      font-size: $font-size-xl;
+    }
+
+    h3 {
+      margin: 0 0 $spacing-xs;
+      color: $color-gold-light;
+      font-family: $font-family-heading;
+      font-size: $font-size-xl;
+    }
+
+    p {
+      margin: 0;
+      color: $color-text-secondary;
+      line-height: $line-height-relaxed;
+    }
+  }
+
+  &__index-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: $spacing-sm;
+
+    @include respond-below(md) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__index-card {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: $spacing-sm;
+    align-items: start;
+    min-width: 0;
+    padding: $spacing-md;
+    border: $border-width-thin solid $color-border-default;
+    border-radius: $border-radius-md;
+    background: rgba($color-bg-deep, 0.48);
+    color: $color-text-primary;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition:
+      border-color $transition-fast,
+      background $transition-fast,
+      transform $transition-fast;
+
+    &:hover {
+      border-color: $color-border-accent;
+      background: rgba($color-gold-dark, 0.12);
+      transform: translateY(-2px);
+    }
+
+    &:focus-visible {
+      outline: 3px solid rgba($color-gold, 0.72);
+      outline-offset: 2px;
+    }
+
+    > span:nth-child(2) {
+      display: grid;
+      gap: $spacing-xs;
+      min-width: 0;
+    }
+
+    small {
+      color: $color-gold;
+      font-size: $font-size-xs;
+      letter-spacing: $letter-spacing-wide;
+      text-transform: uppercase;
+    }
+
+    strong {
+      color: $color-parchment;
+      font-family: $font-family-heading;
+      font-size: $font-size-lg;
+    }
+
+    span span {
+      display: -webkit-box;
+      overflow: hidden;
+      color: $color-text-secondary;
+      line-height: $line-height-relaxed;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
+    }
+
+    b {
+      color: $color-gold-light;
+      font-family: $font-family-heading;
+      font-size: $font-size-lg;
+    }
+  }
+
+  &__empty {
+    display: grid;
+    justify-items: center;
+    gap: $spacing-sm;
+    padding: $spacing-2xl $spacing-lg;
+    color: $color-text-secondary;
+    text-align: center;
+
+    > span {
+      font-size: $font-size-2xl;
+    }
+
+    strong {
+      color: $color-gold-light;
+      font-family: $font-family-heading;
+      font-size: $font-size-lg;
+    }
+
+    p {
+      max-width: 52ch;
+      margin: 0;
+      line-height: $line-height-relaxed;
+    }
+  }
+
+  @include respond-below(sm) {
+    padding: $spacing-sm;
+    border-radius: $border-radius-md;
+
+    &__tabs {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    &__tab {
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      min-height: 3.75rem;
+    }
+
+    &__tab-copy small {
+      display: none;
+    }
+
+    &__workspace {
+      padding: $spacing-sm;
+    }
+
+    &__index-card {
+      padding: $spacing-sm;
+    }
+  }
+}

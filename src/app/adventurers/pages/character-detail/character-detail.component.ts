@@ -32,13 +32,11 @@ import { CharacterReadingPositionService } from '@guild/services/characterReadin
 import { BilingualTextPipe } from '@guild/components/bilingual-text/bilingual-text.pipe';
 import { LanguageToggleComponent } from '@guild/components/language-toggle/language-toggle.component';
 import { DiceLoaderComponent } from '@guild/components/dice-loader/dice-loader.component';
-import { ImageGalleryComponent } from '@guild/components/image-gallery/image-gallery.component';
 import { AccordionComponent } from '@guild/components/accordion/accordion.component';
 import { PrivateProfileComponent } from '../../components/private-profile/private-profile.component';
 import { CharacterSheetComponent } from '../../components/character-sheet/character-sheet.component';
-import { SessionDiaryComponent } from '../../components/session-diary/session-diary.component';
 import { CharacterLoreChaptersComponent } from '../../components/character-lore-chapters/character-lore-chapters.component';
-import { CharacterNotebookComponent } from '../../components/character-notebook/character-notebook.component';
+import { CharacterJournalComponent } from '../../components/character-journal/character-journal.component';
 import { CharacterProfileOverviewComponent } from '../../components/character-profile-overview/character-profile-overview.component';
 import { CharacterStoryOverviewComponent } from '../../components/character-story-overview/character-story-overview.component';
 import {
@@ -66,13 +64,11 @@ interface CharacterDetailTab {
   imports: [
     BilingualTextPipe,
     LanguageToggleComponent,
-    ImageGalleryComponent,
     AccordionComponent,
     PrivateProfileComponent,
     CharacterSheetComponent,
-    SessionDiaryComponent,
     CharacterLoreChaptersComponent,
-    CharacterNotebookComponent,
+    CharacterJournalComponent,
     CharacterProfileOverviewComponent,
     CharacterStoryOverviewComponent,
     CharacterBondsCarouselComponent,
@@ -104,10 +100,6 @@ export class CharacterDetailComponent {
 
   hasSheetReadingPosition(characterId: string): boolean {
     return this.readingPosition.hasSheetPosition(this.campaignId(), characterId);
-  }
-
-  hasNotebookReadingPosition(characterId: string): boolean {
-    return this.readingPosition.hasNotebookPosition(this.campaignId(), characterId);
   }
 
   /** Character ID from route params. */
@@ -424,7 +416,14 @@ export class CharacterDetailComponent {
     ) {
       return 'sheet';
     }
-    if (fragment === 'notebook' || fragment === 'gallery' || fragment === 'diary') return 'journal';
+    if (
+      fragment === 'character-journal' ||
+      fragment === 'notebook' ||
+      fragment === 'gallery' ||
+      fragment === 'diary'
+    ) {
+      return 'journal';
+    }
     return undefined;
   }
 

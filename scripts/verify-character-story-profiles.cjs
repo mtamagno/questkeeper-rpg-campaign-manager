@@ -20,6 +20,18 @@ const component = fs.readFileSync(
   path.join(componentRoot, 'character-detail.component.ts'),
   'utf8',
 );
+const journalTemplate = fs.readFileSync(
+  path.join(
+    projectRoot,
+    'src',
+    'app',
+    'adventurers',
+    'components',
+    'character-journal',
+    'character-journal.component.html',
+  ),
+  'utf8',
+);
 const bondsRoot = path.join(
   projectRoot,
   'src',
@@ -103,7 +115,6 @@ for (const marker of [
   'app-character-profile-overview',
   'profile-memories',
   'character-detail__history-links',
-  'id="diary"',
 ]) {
   assert(template.includes(marker), `Character story profile is missing ${marker}.`);
 }
@@ -122,7 +133,10 @@ assert(
     template.includes('[hidden]="!isTab(\'journal\')"') &&
     template.includes('id="private-profile"') &&
     template.includes('id="character-sheet"') &&
-    template.includes('id="gallery"'),
+    template.includes('app-character-journal') &&
+    journalTemplate.includes('id="notebook"') &&
+    journalTemplate.includes('id="gallery"') &&
+    journalTemplate.includes('id="diary"'),
   'Every heavy profile surface must belong to one discoverable task tab.',
 );
 
@@ -228,14 +242,14 @@ const chaptersIndex = template.indexOf('id="personal-chapters"');
 const bondsIndex = template.indexOf('id="profile-bonds"');
 const highlightsIndex = template.indexOf('id="profile-highlights"');
 const memoriesIndex = template.indexOf('id="profile-memories"');
-const diaryIndex = template.indexOf('id="diary"');
+const journalIndex = template.indexOf('id="character-journal"');
 assert(
   overviewIndex < chaptersIndex &&
     chaptersIndex < bondsIndex &&
     bondsIndex < highlightsIndex &&
     highlightsIndex < memoriesIndex &&
-    memoriesIndex < diaryIndex,
-  'Profile hierarchy must remain glance, chapters, bond carousel, known story and diary.',
+    memoriesIndex < journalIndex,
+  'Profile hierarchy must remain glance, chapters, bond carousel, known story and the journal hub.',
 );
 
 for (const campaign of campaigns) {
