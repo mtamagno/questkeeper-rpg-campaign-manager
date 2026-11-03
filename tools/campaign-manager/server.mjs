@@ -13,6 +13,8 @@ import {
   getCampaign,
   getState,
   importCampaign,
+  migrateCampaignLocaleRegistry,
+  previewCampaignLocaleMigration,
   saveEntity,
   saveRelationshipSet,
   saveImage,
@@ -934,6 +936,18 @@ async function routeApi(request, response, url) {
   }
 
   const campaignId = parts[2];
+  if (request.method === 'GET' && parts[3] === 'locale-migration' && parts.length === 4) {
+    sendJson(response, 200, await previewCampaignLocaleMigration(PROJECT_ROOT, campaignId));
+    return;
+  }
+  if (request.method === 'POST' && parts[3] === 'locale-migration' && parts.length === 4) {
+    sendJson(
+      response,
+      200,
+      await migrateCampaignLocaleRegistry(PROJECT_ROOT, campaignId, await readBody(request)),
+    );
+    return;
+  }
   if (
     request.method === 'GET' &&
     parts[3] === 'translations' &&

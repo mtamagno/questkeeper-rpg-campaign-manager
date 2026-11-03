@@ -2,12 +2,14 @@
  * Campaign metadata model.
  */
 
-import { type BilingualText } from '@guild/models/language.model';
+import { type BilingualText, type CampaignLocaleRegistry } from '@guild/models/language.model';
 import { type CampaignGameSystem } from '@guild/models/rulesetProfile.model';
 import { type CampaignNarrativeMood } from '@guild/models/narrativeMood.model';
 
 /** Top-level campaign information. */
 export interface Campaign {
+  /** Versioned authored-content locale contract. */
+  readonly localeRegistry?: CampaignLocaleRegistry;
   /** Content language codes available for this campaign. */
   readonly languages?: ReadonlyArray<string>;
   /** Preferred language when a visitor has no compatible saved choice. */

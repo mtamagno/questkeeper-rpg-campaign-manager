@@ -3,7 +3,7 @@
  * Each entry in `campaigns.json` maps to this interface.
  */
 
-import { type BilingualText } from '@guild/models/language.model';
+import { type BilingualText, type CampaignLocaleRegistry } from '@guild/models/language.model';
 import {
   type CampaignCustomPalette,
   type CampaignPalette,
@@ -13,6 +13,8 @@ import { type CampaignGameSystem } from '@guild/models/rulesetProfile.model';
 /** A single campaign listed in the global campaigns manifest. */
 export interface CampaignManifestEntry {
   readonly id: string;
+  /** Versioned authored-content locale contract, duplicated in campaign.json. */
+  readonly localeRegistry?: CampaignLocaleRegistry;
   /** Content languages available for this campaign (for example en, es, fr-CA). */
   readonly languages?: ReadonlyArray<string>;
   /** Language selected for first-time visitors when their saved choice is unavailable. */
