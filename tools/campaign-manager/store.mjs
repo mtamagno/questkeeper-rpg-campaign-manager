@@ -10,6 +10,7 @@ import {
 } from './entity-identity.mjs';
 import { normalizeLanguageTag } from './language-catalog.mjs';
 import {
+  findLocaleReferences,
   inspectCampaignLocales,
   legacyFieldsFromLocaleRegistry,
   localeRegistryFromLanguages,
@@ -372,6 +373,22 @@ export async function updateCampaign(projectRoot, campaignId, input) {
   const localeRegistry = current.localeContract.migration.required
     ? currentRegistry
     : registryFromLanguageUpdate(currentRegistry, input, `campaign[${campaignId}].localeRegistry`);
+  if (!current.localeContract.migration.required) {
+    const nextTags = new Set(localeRegistry.locales.map(({ tag }) => tag));
+    const removedTags = currentRegistry.locales
+      .map(({ tag }) => tag)
+      .filter((tag) => !nextTags.has(tag));
+    for (const tag of removedTags) {
+      const references = findLocaleReferences(current, tag);
+      if (references.length > 0 && input.localeRemovalResolutions?.[tag] !== 'archive') {
+        throw new Error(
+          `Campaign language ${tag} still has ${references.length} populated reference(s) ` +
+            `(${references.slice(0, 3).join(', ')}). Choose the explicit archive option before ` +
+            `removing it from the active registry.`,
+        );
+      }
+    }
+  }
   const { languages, defaultLanguage } = legacyFieldsFromLocaleRegistry(localeRegistry);
   const nextName = input.name ?? current.manifestEntry.name;
   assertDefaultLocalizedValue(nextName, defaultLanguage, 'Campaign name');

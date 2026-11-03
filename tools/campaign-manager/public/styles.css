@@ -2282,7 +2282,7 @@ html[data-manager-theme='contrast'] button:disabled {
 
 .language-picker__selected {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 0.55rem;
   margin: 0;
   padding: 0;
@@ -2290,7 +2290,8 @@ html[data-manager-theme='contrast'] button:disabled {
 }
 
 .language-picker__selected li {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 0.6rem;
   align-items: center;
   justify-content: space-between;
@@ -2299,6 +2300,46 @@ html[data-manager-theme='contrast'] button:disabled {
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   background: var(--surface);
+}
+
+.language-picker__identity,
+.language-picker__row-actions,
+.language-picker__roles,
+.language-picker__fallbacks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.language-picker__identity {
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.language-picker__selected .field,
+.language-picker__fallbacks {
+  grid-column: 1 / -1;
+}
+
+.language-picker__roles {
+  align-items: start;
+}
+
+.language-picker__roles > * {
+  flex: 1 1 15rem;
+}
+
+.language-picker__fallbacks {
+  padding: 0.55rem;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-sm);
+}
+
+.language-picker__fallbacks legend {
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 0.82rem;
 }
 
 .language-picker__selected span,

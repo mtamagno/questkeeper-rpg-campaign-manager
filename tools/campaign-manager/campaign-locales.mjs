@@ -141,6 +141,35 @@ export function legacyFieldsFromLocaleRegistry(registry) {
   };
 }
 
+export function findLocaleReferences(
+  value,
+  localeTag,
+  path = '$',
+  references = [],
+  visited = new Set(),
+) {
+  if (!value || typeof value !== 'object' || visited.has(value)) return references;
+  visited.add(value);
+  if (Array.isArray(value)) {
+    value.forEach((entry, index) =>
+      findLocaleReferences(entry, localeTag, `${path}[${index}]`, references, visited),
+    );
+    return references;
+  }
+  for (const [key, entry] of Object.entries(value)) {
+    const nextPath = `${path}.${key}`;
+    if (key === localeTag) {
+      const populated =
+        (typeof entry === 'string' && entry.trim().length > 0) ||
+        (Array.isArray(entry) && entry.length > 0) ||
+        (entry && typeof entry === 'object' && Object.keys(entry).length > 0);
+      if (populated) references.push(nextPath);
+    }
+    findLocaleReferences(entry, localeTag, nextPath, references, visited);
+  }
+  return references;
+}
+
 function canonicalObjectKeys(value) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return [];
   const result = [];
