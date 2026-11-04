@@ -5,6 +5,12 @@ const { pathToFileURL } = require('node:url');
 
 const root = path.resolve(__dirname, '..');
 const read = (relativePath) => fs.readFileSync(path.join(root, relativePath), 'utf8');
+const sourceFiles = (directory) =>
+  fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const absolute = path.join(directory, entry.name);
+    if (entry.isDirectory()) return sourceFiles(absolute);
+    return /\.(?:html|ts)$/.test(entry.name) ? [absolute] : [];
+  });
 
 const service = read('src/app/guild/services/campaignLocale.service.ts');
 for (const contract of [
@@ -32,11 +38,45 @@ assert.match(pipe, /campaignLocale\.resolve/);
 const selector = read('src/app/guild/components/language-toggle/language-toggle.component.ts');
 assert.match(selector, /campaignLocale\.locales/);
 assert.match(selector, /campaignLocale\.setLocale/);
+assert.match(selector, /interfaceLanguage\.followContentLanguage/);
+assert.match(selector, /interfaceLanguage\.setLanguage/);
 assert.doesNotMatch(selector, /=== 'en' \? 'it' : 'en'/);
 
+const interfaceLanguage = read('src/app/guild/services/language.service.ts');
+assert.match(interfaceLanguage, /followsContentLanguage/);
+assert.match(interfaceLanguage, /followContentLanguage/);
+assert.match(interfaceLanguage, /base === 'en' \|\| base === 'it'/);
+
+const campaignSelectorTs = read('src/app/guild/pages/campaign-selector/campaign-selector.component.ts');
+const campaignSelectorHtml = read(
+  'src/app/guild/pages/campaign-selector/campaign-selector.component.html',
+);
+assert.match(campaignSelectorTs, /campaignName\(campaign: CampaignManifestEntry\)/);
+assert.doesNotMatch(campaignSelectorHtml, /campaign\.(?:name|description)\[lang\(\)\]/);
+
+const tableRulesPath = path.join(
+  root,
+  'src/app/chronicle/pages/table-rules/table-rules.component.html',
+);
+if (fs.existsSync(tableRulesPath)) {
+  const tableRules = fs.readFileSync(tableRulesPath, 'utf8');
+  assert.match(tableRules, /\| bilingual/);
+  assert.doesNotMatch(tableRules, /\[lang\(\)\]/);
+  assert.doesNotMatch(tableRules, /title\.en/);
+}
+
+const directLocaleIndexing = sourceFiles(path.join(root, 'src/app')).filter((file) =>
+  fs.readFileSync(file, 'utf8').includes('[lang()]'),
+);
+assert.deepEqual(
+  directLocaleIndexing,
+  [],
+  `Localized maps must use the campaign resolver instead of interface-language indexing: ${directLocaleIndexing.join(', ')}`,
+);
+
 const settings = read('src/app/guild/pages/user-settings/user-settings.component.html');
-assert.match(settings, /Interface language/);
-assert.match(settings, /Campaign content language is selected inside each campaign/);
+assert.match(settings, /language\.interfaceLabel/);
+assert.match(settings, /follow-content-language/);
 
 const pdf = read('src/app/adventurers/services/campaignCharacterSheetPdf.service.ts');
 assert.match(pdf, /CampaignPdfLanguage = string/);

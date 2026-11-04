@@ -6,17 +6,28 @@ Settings page is available globally at `/settings` and in campaign context at
 
 ## Scope matrix
 
-| Preference           | Scope                  | Current storage                               | Privacy                                         |
-| -------------------- | ---------------------- | --------------------------------------------- | ----------------------------------------------- |
-| Audio mute           | Device-wide            | Existing audio preference payload             | Public preference                               |
-| Audio volume         | Device-wide            | Existing audio preference payload             | Public preference                               |
-| My Character         | Per campaign           | `my-character:v1`, campaign ID → character ID | Public identifiers only                         |
-| Character rule state | Per campaign/character | `character-rule-preferences:v1`               | Private device notes; never published or synced |
+| Preference              | Scope                  | Current storage                                     | Privacy                                         |
+| ----------------------- | ---------------------- | --------------------------------------------------- | ----------------------------------------------- |
+| Audio mute              | Device-wide            | Existing audio preference payload                   | Public preference                               |
+| Audio volume            | Device-wide            | Existing audio preference payload                   | Public preference                               |
+| Interface language      | Device-wide            | `dnd_companion_language`                            | Public preference                               |
+| Menu/content alignment  | Device-wide            | `questkeeper:interface-follows-content:v1`          | Public preference                               |
+| Campaign content locale | Per campaign           | `questkeeper:campaign-content-locale:v1:<campaign>` | Public preference                               |
+| My Character            | Per campaign           | `my-character:v1`, campaign ID → character ID       | Public identifiers only                         |
+| Character rule state    | Per campaign/character | `character-rule-preferences:v1`                     | Private device notes; never published or synced |
 
 Global settings behave the same in every campaign on the current browser.
 Campaign settings are isolated by stable campaign ID. Opening global Settings
 offers campaign choices; entering from a campaign keeps that campaign's data
 and visual palette active.
+
+Menu/content alignment is enabled by default. Choosing a campaign content
+locale that QuestKeeper's interface supports (`en` or `it`, including regional
+variants) updates product-owned menu labels too, so a normal language change
+does not leave navigation and prose in different languages. A user may disable
+the alignment in Global Settings and keep the interface language independent.
+Campaign locales that the interface does not yet support never overwrite the
+current interface preference.
 
 ## UI ownership
 

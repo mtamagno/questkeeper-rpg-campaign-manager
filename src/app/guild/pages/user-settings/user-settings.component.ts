@@ -7,6 +7,7 @@ import { CampaignService } from '@guild/services/campaign.service';
 import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
 import { DataService } from '@guild/services/data.service';
 import { LanguageService } from '@guild/services/language.service';
+import { UiTextService } from '@guild/services/uiText.service';
 import { MyCharacterService } from '@guild/services/myCharacter.service';
 import {
   CharacterRulePreferencesService,
@@ -31,11 +32,13 @@ export class UserSettingsComponent {
   private readonly campaignLocale = inject(CampaignLocaleService);
   private readonly data = inject(DataService);
   private readonly language = inject(LanguageService);
+  readonly uiText = inject(UiTextService);
   private readonly myCharacter = inject(MyCharacterService);
   private readonly rulePreferences = inject(CharacterRulePreferencesService);
 
   readonly isItalian = this.language.isItalian;
   readonly interfaceLanguage = this.language.currentLanguage;
+  readonly followsContentLanguage = this.language.followsContentLanguage;
   readonly activeCampaignId = this.campaigns.activeCampaignId;
   readonly campaignEntries = this.campaigns.manifest;
   readonly characters = this.data.characters;
@@ -77,6 +80,14 @@ export class UserSettingsComponent {
   selectInterfaceLanguage(event: Event): void {
     if (event.target instanceof HTMLSelectElement) {
       this.language.setLanguage(event.target.value);
+    }
+  }
+
+  toggleLanguageSync(event: Event): void {
+    if (!(event.target instanceof HTMLInputElement)) return;
+    this.language.setFollowsContentLanguage(event.target.checked);
+    if (event.target.checked && this.activeCampaignId() !== undefined) {
+      this.language.followContentLanguage(this.campaignLocale.currentLocale());
     }
   }
 

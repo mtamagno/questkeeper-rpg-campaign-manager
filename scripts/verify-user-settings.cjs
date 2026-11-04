@@ -12,7 +12,7 @@ const commands = read('src/app/guild/components/site-command-bar/site-command-ba
 
 assert.match(routes, /path: 'settings'/);
 assert.ok((routes.match(/user-settings\.component/g) ?? []).length >= 2);
-assert.match(sidebar, /Impostazioni utente/);
+assert.match(sidebar, /sidebar\.userSettings/);
 assert.doesNotMatch(sidebar, /app-audio-toggle|sidebar__my-character/);
 assert.match(page, /id="global-settings"/);
 assert.match(page, /id="campaign-settings"/);

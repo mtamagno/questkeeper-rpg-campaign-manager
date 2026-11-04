@@ -1,17 +1,11 @@
-@if (hasCampaign()) {
-  <label class="lang-toggle">
-    <span class="sr-only">{{ label() }}</span>
-    <span class="lang-toggle__sigil" aria-hidden="true">文</span>
-    <select
-      [value]="currentLanguage()"
-      [attr.aria-label]="label()"
-      (change)="selectLanguage($event)"
-    >
-      @for (language of languages(); track language) {
-        <option [value]="language">
-          {{ languageName(language) }} · {{ language.toUpperCase() }}
-        </option>
-      }
-    </select>
-  </label>
-}
+<label class="lang-toggle">
+  <span class="sr-only">{{ label() }}</span>
+  <span class="lang-toggle__sigil" aria-hidden="true">文</span>
+  <select [value]="currentLanguage()" [attr.aria-label]="label()" (change)="selectLanguage($event)">
+    @for (language of languages(); track language) {
+      <option [value]="language">
+        {{ languageName(language) }} · {{ language.toUpperCase() }}
+      </option>
+    }
+  </select>
+</label>

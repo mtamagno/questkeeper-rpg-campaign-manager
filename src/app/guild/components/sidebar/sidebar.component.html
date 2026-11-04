@@ -8,23 +8,20 @@
           campaignTitle()
         }}</a>
       } @else {
-        <a routerLink="/" class="sidebar__title-link" (click)="close()">QuestKeeper</a>
+        <a routerLink="/" class="sidebar__title-link" (click)="close()">{{ campaignTitle() }}</a>
       }
     </div>
     <button
       class="sidebar__close"
       type="button"
       (click)="close()"
-      [attr.aria-label]="isItalian() ? 'Chiudi navigazione' : 'Close navigation'"
+      [attr.aria-label]="uiText.text('sidebar.closeNavigation')"
     >
       ✕
     </button>
   </div>
 
-  <nav
-    class="sidebar__nav"
-    [attr.aria-label]="isItalian() ? 'Navigazione principale' : 'Main navigation'"
-  >
+  <nav class="sidebar__nav" [attr.aria-label]="uiText.text('sidebar.mainNavigation')">
     <!-- Campaign selector link -->
     <a
       class="sidebar__home-link"
@@ -33,7 +30,7 @@
       [routerLinkActiveOptions]="{ exact: true }"
       (click)="close()"
     >
-      🏠 {{ isItalian() ? 'Campagne' : 'Campaigns' }}
+      🏠 {{ uiText.text('sidebar.campaigns') }}
     </a>
 
     <!-- Campaign-specific sections — only visible when a campaign is active -->
@@ -41,13 +38,13 @@
       <!-- Party section -->
       <section class="sidebar__section">
         <h2 class="sidebar__section-title">
-          <span>⚔️ {{ isItalian() ? 'Il gruppo' : 'The Party' }}</span>
+          <span>⚔️ {{ uiText.text('sidebar.party') }}</span>
           <span class="sidebar__section-count">{{ characters().length }}</span>
         </h2>
 
         @if (isLoading()) {
           <app-dice-loader
-            [label]="isItalian() ? 'Convocazione avventurieri...' : 'Loading adventurers...'"
+            [label]="uiText.text('sidebar.loadingAdventurers')"
             [size]="28"
             [playSound]="false"
           />
@@ -64,11 +61,13 @@
                   <span class="sidebar__name">{{ character.name }}</span>
                   @if (character.sheet.level > 0) {
                     <span class="sidebar__detail"
-                      >{{ character.sheet.classType }} · Lv {{ character.sheet.level }}</span
+                      >{{ character.sheet.classType }} ·
+                      {{ uiText.text('sidebar.levelAbbreviation') }}
+                      {{ character.sheet.level }}</span
                     >
                   } @else {
                     <span class="sidebar__detail sidebar__detail--pending">
-                      {{ isItalian() ? 'Scheda in preparazione' : 'Sheet in preparation' }}
+                      {{ uiText.text('sidebar.sheetInPreparation') }}
                     </span>
                   }
                 </a>
@@ -83,7 +82,7 @@
           routerLinkActive="sidebar__section-link--active"
           (click)="close()"
         >
-          🔗 {{ isItalian() ? 'Legami del gruppo' : 'Party Relationships' }}
+          🔗 {{ uiText.text('sidebar.partyRelationships') }}
         </a>
       </section>
 
@@ -96,7 +95,7 @@
 
         @if (isLoading()) {
           <app-dice-loader
-            [label]="isItalian() ? 'Ricerca dei PNG...' : 'Loading NPCs...'"
+            [label]="uiText.text('sidebar.loadingNpcs')"
             [size]="28"
             [playSound]="false"
           />
@@ -153,7 +152,7 @@
           [routerLinkActiveOptions]="{ exact: true }"
           (click)="close()"
         >
-          📋 {{ isItalian() ? 'Lista NPC' : 'NPC List' }}
+          📋 {{ uiText.text('sidebar.npcList') }}
         </a>
 
         <a
@@ -162,13 +161,13 @@
           routerLinkActive="sidebar__section-link--active"
           (click)="close()"
         >
-          🗺️ {{ isItalian() ? 'Relazioni PNG' : 'NPC Relationships' }}
+          🗺️ {{ uiText.text('sidebar.npcRelationships') }}
         </a>
       </section>
 
       <!-- Campaign & Maps links -->
       <section class="sidebar__section">
-        <h2 class="sidebar__section-title">📜 {{ isItalian() ? 'Campagna' : 'Campaign' }}</h2>
+        <h2 class="sidebar__section-title">📜 {{ uiText.text('sidebar.campaign') }}</h2>
 
         <a
           class="sidebar__section-link"
@@ -176,7 +175,7 @@
           routerLinkActive="sidebar__section-link--active"
           (click)="close()"
         >
-          ⇩ {{ isItalian() ? 'Kit offline' : 'Offline Pack' }}
+          ⇩ {{ uiText.text('sidebar.offlinePack') }}
         </a>
 
         @if (hasSessions()) {
@@ -186,7 +185,7 @@
             routerLinkActive="sidebar__section-link--active"
             (click)="close()"
           >
-            📖 {{ isItalian() ? 'Ultimo Capitolo' : 'Latest Chapter' }}
+            📖 {{ uiText.text('sidebar.latestChapter') }}
           </a>
         }
 
@@ -196,7 +195,7 @@
           routerLinkActive="sidebar__section-link--active"
           (click)="close()"
         >
-          📚 {{ isItalian() ? 'La Storia Fin Qui' : 'The Story So Far' }}
+          📚 {{ uiText.text('sidebar.storySoFar') }}
         </a>
 
         <a
@@ -206,7 +205,7 @@
           [routerLinkActiveOptions]="{ exact: true }"
           (click)="close()"
         >
-          📜 {{ isItalian() ? 'Cronache delle sessioni' : 'Session Chronicles' }}
+          📜 {{ uiText.text('sidebar.sessionChronicles') }}
         </a>
 
         <a
@@ -215,7 +214,7 @@
           routerLinkActive="sidebar__section-link--active"
           (click)="close()"
         >
-          🎭 {{ isItalian() ? 'Momenti al tavolo' : 'Around the Table' }}
+          🎭 {{ uiText.text('sidebar.tableMoments') }}
         </a>
 
         <a
@@ -224,7 +223,7 @@
           routerLinkActive="sidebar__section-link--active"
           (click)="close()"
         >
-          🗺️ {{ isItalian() ? 'Luoghi Esplorati' : 'Explored Locations' }}
+          🗺️ {{ uiText.text('sidebar.exploredLocations') }}
         </a>
 
         <a
@@ -233,7 +232,7 @@
           routerLinkActive="sidebar__section-link--active"
           (click)="close()"
         >
-          🖼️ {{ isItalian() ? 'Galleria' : 'Gallery' }}
+          🖼️ {{ uiText.text('sidebar.gallery') }}
         </a>
       </section>
     }
@@ -248,7 +247,7 @@
       (click)="close()"
     >
       <span aria-hidden="true">⚙</span>
-      <span>{{ isItalian() ? 'Impostazioni utente' : 'User settings' }}</span>
+      <span>{{ uiText.text('sidebar.userSettings') }}</span>
     </a>
   </footer>
 </aside>

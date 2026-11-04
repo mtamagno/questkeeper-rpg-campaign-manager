@@ -3,16 +3,10 @@
   <header class="campaign-selector__hero">
     <div class="campaign-selector__language"><app-language-toggle /></div>
     <div class="campaign-selector__hero-copy">
-      <span class="campaign-selector__eyebrow">QuestKeeper · Party Companion</span>
+      <span class="campaign-selector__eyebrow">{{ uiText.text('campaignSelector.eyebrow') }}</span>
       <h1 class="campaign-selector__title">{{ pageTitle() }}</h1>
       <p class="campaign-selector__subtitle">{{ pageSubtitle() }}</p>
-      <p class="campaign-selector__intro">
-        {{
-          lang() === 'it'
-            ? 'Schede, ricordi, legami e luoghi della compagnia raccolti in un unico archivio vivente.'
-            : 'Character sheets, memories, bonds and places gathered in one living party archive.'
-        }}
-      </p>
+      <p class="campaign-selector__intro">{{ uiText.text('campaignSelector.intro') }}</p>
     </div>
     <div class="campaign-selector__crest" aria-hidden="true">
       <span>20</span>
@@ -28,18 +22,10 @@
     @if (audience() === null) {
       <div class="campaign-selector__audience-heading">
         <span class="campaign-selector__section-kicker">{{
-          lang() === 'it' ? 'Il tuo ingresso' : 'Choose your path'
+          uiText.text('campaignSelector.choosePath')
         }}</span>
-        <h2 id="first-visit-title">
-          {{ lang() === 'it' ? 'Come userai QuestKeeper?' : 'How will you use QuestKeeper?' }}
-        </h2>
-        <p>
-          {{
-            lang() === 'it'
-              ? 'QuestKeeper è il compagno del tuo tavolo: non è un VTT né un negozio di regole. Scegli da dove iniziare; potrai cambiare idea in ogni momento.'
-              : 'QuestKeeper is your table companion—not a VTT or a rules store. Choose where to begin; you can change this at any time.'
-          }}
-        </p>
+        <h2 id="first-visit-title">{{ uiText.text('campaignSelector.usageQuestion') }}</h2>
+        <p>{{ uiText.text('campaignSelector.usageHelp') }}</p>
       </div>
       <div class="campaign-selector__audience-grid">
         <a
@@ -50,16 +36,12 @@
         >
           <span class="campaign-selector__path-icon" aria-hidden="true">⚔</span>
           <span class="campaign-selector__path-copy">
-            <small>{{ lang() === 'it' ? 'Al tavolo' : 'At the table' }}</small>
-            <strong>{{ lang() === 'it' ? 'Sono un giocatore' : "I'm a player" }}</strong>
-            <span>{{
-              lang() === 'it'
-                ? 'Trova la tua campagna, riprendi il personaggio e ricorda cosa è successo.'
-                : 'Find your campaign, return to your character and remember what happened.'
-            }}</span>
+            <small>{{ uiText.text('campaignSelector.atTable') }}</small>
+            <strong>{{ uiText.text('campaignSelector.player') }}</strong>
+            <span>{{ uiText.text('campaignSelector.playerHelp') }}</span>
           </span>
           <span class="campaign-selector__path-cta">
-            {{ lang() === 'it' ? 'Trova la mia campagna' : 'Find my campaign' }}
+            {{ uiText.text('campaignSelector.findCampaign') }}
             <span aria-hidden="true">↓</span>
           </span>
         </a>
@@ -71,26 +53,18 @@
         >
           <span class="campaign-selector__path-icon" aria-hidden="true">✦</span>
           <span class="campaign-selector__path-copy">
-            <small>{{ lang() === 'it' ? 'Dietro lo schermo' : 'Behind the screen' }}</small>
-            <strong>{{ lang() === 'it' ? 'Sono il Game Master' : "I'm the Game Master" }}</strong>
-            <span>{{
-              lang() === 'it'
-                ? 'Gestisci file locali con moduli guidati: nessun account cloud e niente JSON.'
-                : 'Manage local files with guided forms: no cloud account and no JSON editing.'
-            }}</span>
+            <small>{{ uiText.text('campaignSelector.behindScreen') }}</small>
+            <strong>{{ uiText.text('campaignSelector.gameMaster') }}</strong>
+            <span>{{ uiText.text('campaignSelector.gameMasterHelp') }}</span>
           </span>
           <span class="campaign-selector__path-cta">
-            {{ lang() === 'it' ? 'Scegli il percorso GM' : 'Choose the GM path' }}
+            {{ uiText.text('campaignSelector.chooseGmPath') }}
             <span aria-hidden="true">→</span>
           </span>
         </button>
       </div>
       <p class="campaign-selector__audience-privacy">
-        {{
-          lang() === 'it'
-            ? 'La scelta resta solo in questo browser e non cambia i permessi della campagna.'
-            : 'This choice stays only in this browser and never changes campaign permissions.'
-        }}
+        {{ uiText.text('campaignSelector.privacy') }}
       </p>
     } @else {
       <div class="campaign-selector__audience-summary">
@@ -100,22 +74,16 @@
         <div>
           <span class="campaign-selector__section-kicker">{{ audienceLabel() }}</span>
           <h2 id="first-visit-title">{{ audienceDescription() }}</h2>
-          <p>
-            {{
-              lang() === 'it'
-                ? 'Preferenza salvata soltanto su questo dispositivo.'
-                : 'Preference saved only on this device.'
-            }}
-          </p>
+          <p>{{ uiText.text('campaignSelector.preferenceSaved') }}</p>
         </div>
         <div class="campaign-selector__audience-actions">
           @if (audience() === 'gm') {
             <a class="qk-button qk-button--primary" [href]="managerDemoUrl">
-              {{ lang() === 'it' ? 'Apri il Manager' : 'Open Manager' }}
+              {{ uiText.text('campaignSelector.openManager') }}
             </a>
           } @else {
             <a class="qk-button qk-button--primary" href="#campaigns">
-              {{ lang() === 'it' ? 'Continua alle campagne' : 'Continue to campaigns' }}
+              {{ uiText.text('campaignSelector.continueCampaigns') }}
             </a>
           }
           <button
@@ -126,15 +94,15 @@
             (click)="openTour()"
           >
             @if (tourStatus() === 'paused') {
-              {{ lang() === 'it' ? 'Riprendi il tour' : 'Resume tour' }}
+              {{ uiText.text('campaignSelector.resumeTour') }}
             } @else if (tourStatus() === 'completed') {
-              {{ lang() === 'it' ? 'Rifai il tour' : 'Restart tour' }}
+              {{ uiText.text('campaignSelector.restartTour') }}
             } @else {
-              {{ lang() === 'it' ? 'Tour di 2 minuti' : '2-minute tour' }}
+              {{ uiText.text('campaignSelector.shortTour') }}
             }
           </button>
           <button class="qk-button qk-button--ghost" type="button" (click)="resetAudience()">
-            {{ lang() === 'it' ? 'Cambia percorso' : 'Change path' }}
+            {{ uiText.text('campaignSelector.changePath') }}
           </button>
         </div>
       </div>
@@ -142,26 +110,25 @@
   </section>
 
   @if (isLoaded() && campaigns().length > 0) {
-    <dl class="campaign-selector__overview" aria-label="Campaign overview">
+    <dl
+      class="campaign-selector__overview"
+      [attr.aria-label]="uiText.text('campaignSelector.overviewLabel')"
+    >
       <div class="campaign-selector__overview-item">
-        <dt>{{ lang() === 'it' ? 'Cronache' : 'Chronicles' }}</dt>
+        <dt>{{ uiText.text('campaignSelector.chronicles') }}</dt>
         <dd>{{ campaigns().length }}</dd>
       </div>
       <div class="campaign-selector__overview-item campaign-selector__overview-item--active">
-        <dt>{{ lang() === 'it' ? 'In corso' : 'In progress' }}</dt>
+        <dt>{{ uiText.text('campaignSelector.inProgress') }}</dt>
         <dd>{{ activeCampaignCount() }}</dd>
       </div>
       <div class="campaign-selector__overview-item">
-        <dt>{{ lang() === 'it' ? 'Completate' : 'Completed' }}</dt>
+        <dt>{{ uiText.text('campaignSelector.completed') }}</dt>
         <dd>{{ completedCampaignCount() }}</dd>
       </div>
       <div class="campaign-selector__overview-note">
-        <strong>{{ lang() === 'it' ? 'Prima del prossimo tiro' : 'Before the next roll' }}</strong>
-        <span>{{
-          lang() === 'it'
-            ? 'Ripassa l’ultima sessione, riapri la scheda e torna subito in personaggio.'
-            : 'Catch up, reopen your sheet and step straight back into character.'
-        }}</span>
+        <strong>{{ uiText.text('campaignSelector.beforeNextRoll') }}</strong>
+        <span>{{ uiText.text('campaignSelector.beforeNextRollHelp') }}</span>
       </div>
     </dl>
   }
@@ -169,33 +136,20 @@
   <div id="campaigns" class="campaign-selector__campaign-anchor" aria-hidden="true"></div>
 
   @if (!isLoaded()) {
-    <app-dice-loader
-      [label]="
-        lang() === 'it' ? 'Apro il registro delle campagne...' : 'Opening the campaign ledger...'
-      "
-      [playSound]="false"
-    />
+    <app-dice-loader [label]="uiText.text('campaignSelector.loading')" [playSound]="false" />
   } @else if (campaigns().length === 0) {
     <div class="empty-state campaign-selector__empty">
       <span class="empty-state__icon" aria-hidden="true">◇</span>
-      <h2 class="empty-state__title">
-        {{ lang() === 'it' ? 'Nessuna campagna disponibile' : 'No campaigns available' }}
-      </h2>
-      <p class="empty-state__text">
-        {{
-          lang() === 'it'
-            ? 'Il registro è ancora vuoto. Le prossime avventure compariranno qui.'
-            : 'The ledger is still empty. New adventures will appear here.'
-        }}
-      </p>
+      <h2 class="empty-state__title">{{ uiText.text('campaignSelector.emptyTitle') }}</h2>
+      <p class="empty-state__text">{{ uiText.text('campaignSelector.emptyHelp') }}</p>
     </div>
   } @else {
     <div class="campaign-selector__section-heading">
       <div>
         <span class="campaign-selector__section-kicker">{{
-          lang() === 'it' ? 'Registro delle avventure' : 'Adventure ledger'
+          uiText.text('campaignSelector.ledger')
         }}</span>
-        <h2>{{ lang() === 'it' ? 'Le nostre campagne' : 'Our campaigns' }}</h2>
+        <h2>{{ uiText.text('campaignSelector.ourCampaigns') }}</h2>
       </div>
       <span class="campaign-selector__section-count">{{ campaigns().length }}</span>
     </div>
@@ -206,7 +160,7 @@
           class="campaign-selector__card"
           [attr.data-qk-palette]="campaignPalette(campaign)"
           [attr.aria-label]="
-            (lang() === 'it' ? 'Entra nella campagna ' : 'Enter campaign ') + campaign.name[lang()]
+            uiText.text('campaignSelector.enterCampaign', { name: campaignName(campaign) })
           "
           (click)="selectCampaign(campaign)"
           appSfxHover
@@ -216,7 +170,7 @@
               <img
                 class="campaign-selector__card-image"
                 [src]="campaign.thumbnail"
-                [alt]="campaign.name[lang()]"
+                [alt]="campaignName(campaign)"
                 loading="eager"
                 decoding="async"
               />
@@ -224,23 +178,25 @@
               <div
                 class="campaign-selector__card-fallback"
                 role="img"
-                [attr.aria-label]="campaign.name[lang()]"
+                [attr.aria-label]="campaignName(campaign)"
               >
                 <span class="campaign-selector__mist" aria-hidden="true"></span>
                 <span class="campaign-selector__sigil" aria-hidden="true">✦</span>
-                <span class="campaign-selector__fallback-label">Campaign</span>
+                <span class="campaign-selector__fallback-label">{{
+                  uiText.text('campaignSelector.fallbackImage')
+                }}</span>
               </div>
             }
             @if (campaign.status; as status) {
-              <span class="campaign-selector__status">{{ status[lang()] }}</span>
+              <span class="campaign-selector__status">{{ campaignStatus(campaign) }}</span>
             }
           </div>
           <div class="campaign-selector__card-body">
             <span class="campaign-selector__ruleset">{{ campaignRuleset(campaign) }}</span>
-            <h2 class="campaign-selector__card-title">{{ campaign.name[lang()] }}</h2>
-            <p class="campaign-selector__card-description">{{ campaign.description[lang()] }}</p>
+            <h2 class="campaign-selector__card-title">{{ campaignName(campaign) }}</h2>
+            <p class="campaign-selector__card-description">{{ campaignDescription(campaign) }}</p>
             <span class="campaign-selector__card-cta">
-              {{ lang() === 'it' ? 'Apri la cronaca' : 'Open the chronicle' }}
+              {{ uiText.text('campaignSelector.openChronicle') }}
               <span aria-hidden="true">&rarr;</span>
             </span>
           </div>
@@ -266,22 +222,18 @@
       aria-describedby="spoiler-warning-message spoiler-warning-remember"
     >
       <h2 id="spoiler-warning-title" class="spoiler-modal__title">
-        ⚠️ {{ lang() === 'it' ? 'Attenzione — Spoiler' : 'Warning — Spoilers' }}
+        ⚠️ {{ uiText.text('campaignSelector.warningTitle') }}
       </h2>
       <p id="spoiler-warning-message" class="spoiler-modal__message">{{ warningMessage() }}</p>
       <p id="spoiler-warning-remember" class="spoiler-modal__remember">
-        {{
-          lang() === 'it'
-            ? 'Se scegli “Entra”, ricorderemo questa decisione su questo dispositivo.'
-            : 'If you choose “Enter”, we will remember this decision on this device.'
-        }}
+        {{ uiText.text('campaignSelector.rememberWarning') }}
       </p>
       <div class="spoiler-modal__actions">
         <button type="button" class="spoiler-modal__cancel" (click)="cancelEntry()">
-          {{ lang() === 'it' ? 'Annulla' : 'Cancel' }}
+          {{ uiText.text('campaignSelector.cancel') }}
         </button>
         <button type="button" class="spoiler-modal__confirm" (click)="confirmEntry()">
-          {{ lang() === 'it' ? 'Entra' : 'Enter' }}
+          {{ uiText.text('campaignSelector.enter') }}
         </button>
       </div>
     </div>

@@ -42,13 +42,27 @@
       </div>
     </div>
 
+    <div class="settings-card__control-row">
+      <div>
+        <label for="follow-content-language">{{ uiText.text('language.matchMenusLabel') }}</label>
+        <p>{{ uiText.text('language.matchMenusHelp') }}</p>
+      </div>
+      <input
+        id="follow-content-language"
+        class="settings-switch"
+        type="checkbox"
+        role="switch"
+        [checked]="followsContentLanguage()"
+        (change)="toggleLanguageSync($event)"
+      />
+    </div>
+
     <div class="settings-card__field">
-      <label for="interface-language">{{
-        isItalian() ? 'Lingua dell’interfaccia' : 'Interface language'
-      }}</label>
+      <label for="interface-language">{{ uiText.text('language.interfaceLabel') }}</label>
       <select
         id="interface-language"
         [value]="interfaceLanguage()"
+        [disabled]="followsContentLanguage()"
         (change)="selectInterfaceLanguage($event)"
       >
         <option value="en">English</option>
@@ -56,9 +70,9 @@
       </select>
       <p class="settings-card__help">
         {{
-          isItalian()
-            ? 'Cambia menu e comandi. La lingua dei contenuti si sceglie dentro ogni campagna.'
-            : 'Changes menus and commands. Campaign content language is selected inside each campaign.'
+          uiText.text(
+            followsContentLanguage() ? 'language.followingHelp' : 'language.independentHelp'
+          )
         }}
       </p>
     </div>
