@@ -24,8 +24,10 @@ assert.match(appTemplate, /app-layout--nav-open/);
 assert.match(appStyles, /height:\s*100dvh/);
 assert.match(appStyles, /overflow:\s*hidden/);
 
-assert.match(commandTemplate, /command-bar__mobile-more/);
-assert.match(commandTemplate, /command-bar__mobile-menu/);
+assert.match(commandTemplate, /command-bar__overflow/);
+assert.match(commandTemplate, /command-bar__overflow-menu/);
+assert.match(commandTemplate, /aria-controls="command-bar-overflow"/);
+assert.match(commandTemplate, /\[hidden\]="!isActionsOpen\(\)"/);
 for (const action of [
   'openManager',
   'toggleCurrentFavorite',
@@ -34,8 +36,10 @@ for (const action of [
 ]) {
   assert.match(commandTemplate, new RegExp(action));
 }
-assert.match(commandStyles, /&__mobile-menu/);
+assert.match(commandStyles, /&__overflow-menu/);
 assert.match(commandStyles, /width:\s*min\(19rem/);
+assert.match(commandStyles, /min-height:\s*48px/);
+assert.doesNotMatch(commandStyles, /&__mobile-(?:more|menu|toggle)/);
 
 assert.match(sidebarStyles, /width:\s*min\(88vw,\s*320px\)/);
 assert.match(sidebarStyles, /z-index:\s*\$z-index-header\s*\+\s*2/);

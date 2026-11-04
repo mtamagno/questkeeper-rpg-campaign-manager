@@ -30,6 +30,8 @@ for (const phrase of [
   'event.ctrlKey || event.metaKey',
   'trapTabKey(dialog, event)',
   'this.previouslyFocused',
+  'closeActionsOnOutsidePointer',
+  'this.closeActions(true)',
 ]) {
   assert.ok(component.includes(phrase), `Keyboard or focus contract is missing: ${phrase}`);
 }
@@ -46,6 +48,8 @@ for (const phrase of [
   'aria-keyshortcuts="Control+K Meta+K"',
   'Pagina attuale',
   'Current page',
+  'aria-controls="command-bar-overflow"',
+  '[hidden]="!isActionsOpen()"',
 ]) {
   assert.ok(template.includes(phrase), `Accessible palette UI is missing: ${phrase}`);
 }
@@ -53,6 +57,11 @@ for (const phrase of [
 assert.match(styles, /&--active/);
 assert.match(styles, /prefers-reduced-motion: reduce/);
 assert.match(styles, /@include respond-below\(sm\)/);
+assert.doesNotMatch(styles, /&__overflow\s*\{[^}]*display:\s*contents/);
+assert.ok(
+  template.indexOf('command-bar__campaign-switch') < template.indexOf('command-bar__favorite'),
+  'Campaign switching should be the first contextual overflow action.',
+);
 assert.match(roadmap, /\[x\].*global command palette navigation/);
 assert.match(guide, /does not inspect\s+protected\s+sheets/);
 assert.match(guide, /recent pages and\s+favourites as explicit local navigation metadata/);

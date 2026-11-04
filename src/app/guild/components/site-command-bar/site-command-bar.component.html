@@ -62,46 +62,61 @@
       <span class="command-bar__search-label">{{ isItalian() ? 'Vai a...' : 'Go to...' }}</span>
       <kbd>Ctrl K</kbd>
     </button>
-    <div
-      class="command-bar__mobile-more"
-      [class.command-bar__mobile-more--open]="isMobileActionsOpen()"
-    >
+    <div #actionsShell class="command-bar__overflow">
       <button
-        class="command-bar__mobile-toggle"
+        #actionsToggle
+        class="command-bar__overflow-toggle"
         type="button"
-        [attr.aria-expanded]="isMobileActionsOpen()"
+        aria-controls="command-bar-overflow"
+        aria-haspopup="true"
+        [attr.aria-expanded]="isActionsOpen()"
         [attr.aria-label]="isItalian() ? 'Altre azioni' : 'More actions'"
-        (click)="toggleMobileActions()"
+        (click)="toggleActions()"
       >
         <span aria-hidden="true">•••</span>
+        <span class="command-bar__overflow-label">{{ isItalian() ? 'Altro' : 'More' }}</span>
       </button>
-      <div class="command-bar__mobile-menu">
-        @if (managerUrl()) {
-          <button
-            class="command-bar__manager"
-            type="button"
-            (click)="openManager(); closeMobileActions()"
-          >
-            <span aria-hidden="true">⚙</span>
-            <span>{{ isItalian() ? 'Gestore campagne' : 'Campaign Manager' }}</span>
-          </button>
+      <div
+        #actionsMenu
+        id="command-bar-overflow"
+        class="command-bar__overflow-menu"
+        role="group"
+        [hidden]="!isActionsOpen()"
+        [attr.aria-label]="isItalian() ? 'Altre azioni' : 'More actions'"
+      >
+        @if (activeCampaignName(); as campaignName) {
+          <a class="command-bar__campaign-switch" routerLink="/" (click)="closeActions()">
+            <span class="command-bar__campaign-dot" aria-hidden="true"></span>
+            <span class="command-bar__campaign-name">{{ campaignName }}</span>
+            <span class="command-bar__switch-copy">{{ isItalian() ? 'Cambia' : 'Switch' }}</span>
+          </a>
         }
         @if (canRememberCurrent()) {
           <button
             class="command-bar__favorite"
             type="button"
             [attr.aria-pressed]="isCurrentFavorite()"
-            (click)="toggleCurrentFavorite(); closeMobileActions()"
+            (click)="toggleCurrentFavorite(); closeActions()"
           >
             <span aria-hidden="true">{{ isCurrentFavorite() ? '★' : '☆' }}</span>
             <span>{{ isItalian() ? 'Preferito' : 'Favourite' }}</span>
+          </button>
+        }
+        @if (managerUrl()) {
+          <button
+            class="command-bar__manager"
+            type="button"
+            (click)="openManager(); closeActions()"
+          >
+            <span aria-hidden="true">⚙</span>
+            <span>{{ isItalian() ? 'Gestore campagne' : 'Campaign Manager' }}</span>
           </button>
         }
         @if (canInstall()) {
           <button
             class="command-bar__install"
             type="button"
-            (click)="installCompanion(); closeMobileActions()"
+            (click)="installCompanion(); closeActions()"
           >
             <span aria-hidden="true">⇩</span>
             <span>{{ isItalian() ? 'Installa QuestKeeper' : 'Install QuestKeeper' }}</span>
@@ -110,19 +125,12 @@
         <button
           class="command-bar__tour"
           type="button"
-          (click)="openTour(); closeMobileActions()"
+          (click)="openTour(); closeActions()"
           data-tour-control
         >
           <span aria-hidden="true">✦</span>
           <span>{{ tourButtonLabel() }}</span>
         </button>
-        @if (activeCampaignName(); as campaignName) {
-          <a class="command-bar__campaign-switch" routerLink="/" (click)="closeMobileActions()">
-            <span class="command-bar__campaign-dot" aria-hidden="true"></span>
-            <span class="command-bar__campaign-name">{{ campaignName }}</span>
-            <span class="command-bar__switch-copy">{{ isItalian() ? 'Cambia' : 'Switch' }}</span>
-          </a>
-        }
       </div>
     </div>
   </div>

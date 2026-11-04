@@ -84,10 +84,12 @@ export class SiteCommandBarComponent {
   private readonly currentUrl = signal(this.router.url);
   private readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
   private readonly paletteDialog = viewChild<ElementRef<HTMLElement>>('paletteDialog');
+  private readonly actionsShell = viewChild<ElementRef<HTMLElement>>('actionsShell');
+  private readonly actionsToggle = viewChild<ElementRef<HTMLButtonElement>>('actionsToggle');
   private previouslyFocused: HTMLElement | null = null;
 
   readonly isOpen = signal(false);
-  readonly isMobileActionsOpen = signal(false);
+  readonly isActionsOpen = signal(false);
   readonly query = signal('');
   readonly activeIndex = signal(0);
   readonly isItalian = this.language.isItalian;
@@ -394,10 +396,14 @@ export class SiteCommandBarComponent {
         filter((event): event is NavigationEnd => event instanceof NavigationEnd),
         takeUntilDestroyed(this.destroyRef),
       )
-      .subscribe((event): void => this.currentUrl.set(event.urlAfterRedirects));
+      .subscribe((event): void => {
+        this.currentUrl.set(event.urlAfterRedirects);
+        this.closeActions();
+      });
   }
 
   open(): void {
+    this.closeActions();
     this.previouslyFocused = activeElement();
     this.query.set('');
     this.activeIndex.set(0);
@@ -445,13 +451,17 @@ export class SiteCommandBarComponent {
     this.journeyMemory.toggleCurrentFavorite();
   }
 
-  toggleMobileActions(): void {
-    this.isMobileActionsOpen.update((isOpen): boolean => !isOpen);
+  toggleActions(): void {
+    this.isActionsOpen.update((isOpen): boolean => !isOpen);
   }
 
-  /** Closes the compact mobile action menu after one of its commands runs. */
-  closeMobileActions(): void {
-    this.isMobileActionsOpen.set(false);
+  /** Closes the global overflow and optionally returns focus to its trigger. */
+  closeActions(restoreTriggerFocus = false): void {
+    const wasOpen = this.isActionsOpen();
+    this.isActionsOpen.set(false);
+    if (restoreTriggerFocus && wasOpen) {
+      setTimeout((): void => this.actionsToggle()?.nativeElement.focus());
+    }
   }
 
   private focusTour(): void {
@@ -560,6 +570,18 @@ export class SiteCommandBarComponent {
     }
   }
 
+  @HostListener('document:pointerdown', ['$event'])
+  closeActionsOnOutsidePointer(event: Event): void {
+    const target = event.target;
+    if (
+      this.isActionsOpen() &&
+      target instanceof Node &&
+      !this.actionsShell()?.nativeElement.contains(target)
+    ) {
+      this.closeActions();
+    }
+  }
+
   @HostListener('document:keydown', ['$event'])
   handleKeyboardShortcut(event: KeyboardEvent): void {
     if ((event.ctrlKey || event.metaKey) && event.key.toLocaleLowerCase() === 'k') {
@@ -569,9 +591,14 @@ export class SiteCommandBarComponent {
       } else {
         this.open();
       }
-    } else if (event.key === 'Escape' && this.isOpen()) {
-      event.preventDefault();
-      this.close();
+    } else if (event.key === 'Escape') {
+      if (this.isOpen()) {
+        event.preventDefault();
+        this.close();
+      } else if (this.isActionsOpen()) {
+        event.preventDefault();
+        this.closeActions(true);
+      }
     }
   }
 }
