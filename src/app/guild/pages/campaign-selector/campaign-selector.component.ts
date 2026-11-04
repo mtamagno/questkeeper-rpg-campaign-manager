@@ -30,6 +30,7 @@ import { DiceLoaderComponent } from '@guild/components/dice-loader/dice-loader.c
 import { type CampaignManifestEntry } from '@guild/models/campaignConfig.model';
 import { resolveCampaignPalette, type CampaignPalette } from '@guild/models/campaignPalette.model';
 import { GuidedTourService } from '@guild/services/guidedTour.service';
+import { UiTextService } from '@guild/services/uiText.service';
 import { rulesetDisplayIdentity } from '@guild/models/rulesetProfile.model';
 
 /**
@@ -53,6 +54,7 @@ export class CampaignSelectorComponent {
   private readonly audiencePreference = inject(AudiencePreferenceService);
   private readonly router = inject(Router);
   private readonly guidedTour = inject(GuidedTourService);
+  readonly uiText = inject(UiTextService);
 
   /** Public interactive destination used by the first-visit GM journey. */
   readonly managerDemoUrl = 'manager-demo/index.html';
@@ -72,37 +74,27 @@ export class CampaignSelectorComponent {
 
   readonly audienceLabel: Signal<string> = computed(() => {
     const selected = this.audience();
-    if (selected === 'gm') {
-      return this.lang() === 'it' ? 'Percorso Game Master' : 'Game Master path';
-    }
-    return this.lang() === 'it' ? 'Percorso giocatore' : 'Player path';
+    return this.uiText.text(
+      selected === 'gm' ? 'campaignSelector.gmPath' : 'campaignSelector.playerPath',
+    );
   });
 
   readonly audienceDescription: Signal<string> = computed(() => {
     const selected = this.audience();
-    if (selected === 'gm') {
-      return this.lang() === 'it'
-        ? 'Gestisci campagne locali con moduli guidati, anteprima e pubblicazione.'
-        : 'Manage local campaigns with guided forms, preview and publishing.';
-    }
-    return this.lang() === 'it'
-      ? 'Apri una cronaca per ritrovare personaggio, legami e ultima sessione.'
-      : 'Open a chronicle to recover your character, bonds and latest session.';
+    return this.uiText.text(
+      selected === 'gm' ? 'campaignSelector.gmDescription' : 'campaignSelector.playerDescription',
+    );
   });
 
   /** The campaign the user clicked — drives the warning modal. */
   readonly pendingCampaign: WritableSignal<CampaignManifestEntry | undefined> = signal(undefined);
 
   /** Page title based on current language. */
-  readonly pageTitle: Signal<string> = computed(() =>
-    this.lang() === 'it' ? 'Il tuo party. La tua storia.' : 'Your party. Your story.',
-  );
+  readonly pageTitle: Signal<string> = computed(() => this.uiText.text('campaignSelector.title'));
 
   /** Subtitle based on current language. */
   readonly pageSubtitle: Signal<string> = computed(() =>
-    this.lang() === 'it'
-      ? 'Ritrova il tuo personaggio e riprendi il viaggio.'
-      : 'Find your character and return to the adventure.',
+    this.uiText.text('campaignSelector.subtitle'),
   );
 
   /** At-a-glance lifecycle totals for the campaign ledger. */
@@ -165,9 +157,7 @@ export class CampaignSelectorComponent {
       return '';
     }
     const name = this.campaignLocale.resolveForCampaign(campaign, campaign.name);
-    return this.lang() === 'it'
-      ? `Stai per accedere alla campagna "${name}". Se non sei un giocatore di questa campagna, rischi di leggere spoiler!`
-      : `You are about to enter the campaign "${name}". If you are not a player in this campaign, you risk reading spoilers!`;
+    return this.uiText.text('campaignSelector.warningMessage', { name });
   });
 
   /**

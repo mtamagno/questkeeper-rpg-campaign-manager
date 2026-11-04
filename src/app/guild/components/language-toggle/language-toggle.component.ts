@@ -13,6 +13,7 @@ import {
 
 import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
 import { LanguageService } from '@guild/services/language.service';
+import { UiTextService } from '@guild/services/uiText.service';
 import { type SupportedLanguage } from '@guild/models/language.model';
 
 @Component({
@@ -26,6 +27,7 @@ import { type SupportedLanguage } from '@guild/models/language.model';
 export class LanguageToggleComponent {
   private readonly campaignLocale = inject(CampaignLocaleService);
   private readonly interfaceLanguage = inject(LanguageService);
+  private readonly uiText = inject(UiTextService);
 
   readonly hasCampaign = computed(() => this.campaignLocale.activeCampaign() !== undefined);
   /** Campaign content locale when reading a campaign; interface locale everywhere else. */
@@ -35,13 +37,7 @@ export class LanguageToggleComponent {
       : this.interfaceLanguage.currentLanguage(),
   );
   readonly label = computed(() =>
-    this.hasCampaign()
-      ? this.interfaceLanguage.isItalian()
-        ? 'Lingua dei contenuti'
-        : 'Content language'
-      : this.interfaceLanguage.isItalian()
-        ? 'Lingua dell’interfaccia'
-        : 'Interface language',
+    this.uiText.text(this.hasCampaign() ? 'language.contentLabel' : 'language.interfaceLabel'),
   );
 
   /** Languages configured by the active campaign, with sensible legacy fallbacks. */

@@ -20,8 +20,8 @@ import { DataService } from '@guild/services/data.service';
 import { CampaignService } from '@guild/services/campaign.service';
 import { type Character } from '@guild/models/character.model';
 import { type Npc } from '@guild/models/npc.model';
-import { LanguageService } from '@guild/services/language.service';
 import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
+import { UiTextService } from '@guild/services/uiText.service';
 
 /** Simple group of NPCs by category for the sidebar. */
 interface NpcCategoryGroup {
@@ -34,11 +34,14 @@ interface NpcCategoryGroup {
  * @param npcs - The full NPC list.
  * @returns Array of category groups, sorted alphabetically by category name.
  */
-function groupNpcsByCategory(npcs: ReadonlyArray<Npc>): ReadonlyArray<NpcCategoryGroup> {
+function groupNpcsByCategory(
+  npcs: ReadonlyArray<Npc>,
+  fallbackCategory: string,
+): ReadonlyArray<NpcCategoryGroup> {
   const categoryMap = new Map<string, Array<Npc>>();
 
   for (const npc of npcs) {
-    const category = npc.category ?? 'Other';
+    const category = npc.category ?? fallbackCategory;
     const existing = categoryMap.get(category);
     if (existing) {
       existing.push(npc);
@@ -68,8 +71,8 @@ function groupNpcsByCategory(npcs: ReadonlyArray<Npc>): ReadonlyArray<NpcCategor
 export class SidebarComponent {
   private readonly dataService = inject(DataService);
   private readonly campaignService = inject(CampaignService);
-  private readonly languageService = inject(LanguageService);
   private readonly campaignLocale = inject(CampaignLocaleService);
+  readonly uiText = inject(UiTextService);
 
   /** Active campaign ID for building route links. */
   readonly activeCampaignId: Signal<string | undefined> = this.campaignService.activeCampaignId;
@@ -78,7 +81,7 @@ export class SidebarComponent {
   readonly campaignTitle: Signal<string> = computed(() => {
     const campaign = this.dataService.campaign();
     if (campaign === undefined) {
-      return 'QuestKeeper';
+      return this.uiText.text('common.productName');
     }
     return this.campaignLocale.resolve(campaign.name);
   });
@@ -105,14 +108,14 @@ export class SidebarComponent {
 
   /** NPCs grouped by category for the sidebar. Minor NPCs are excluded here but remain listed in the full NPC page. */
   readonly npcGroups: Signal<ReadonlyArray<NpcCategoryGroup>> = computed(() =>
-    groupNpcsByCategory(this.npcs().filter((n) => n.isMinor !== true)),
+    groupNpcsByCategory(
+      this.npcs().filter((n) => n.isMinor !== true),
+      this.uiText.text('common.other'),
+    ),
   );
 
   /** Set of open NPC category toggles. */
   readonly openNpcCategories = signal<ReadonlySet<string>>(new Set());
-
-  /** Whether Italian is the active language. */
-  readonly isItalian = computed((): boolean => this.languageService.currentLanguage() === 'it');
 
   /** Route to the latest story chapter (last session by number). */
   readonly latestChapterRoute: Signal<ReadonlyArray<string>> = computed(

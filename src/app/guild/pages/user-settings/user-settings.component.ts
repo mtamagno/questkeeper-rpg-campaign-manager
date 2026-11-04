@@ -7,6 +7,7 @@ import { CampaignService } from '@guild/services/campaign.service';
 import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
 import { DataService } from '@guild/services/data.service';
 import { LanguageService } from '@guild/services/language.service';
+import { UiTextService } from '@guild/services/uiText.service';
 import { MyCharacterService } from '@guild/services/myCharacter.service';
 import {
   CharacterRulePreferencesService,
@@ -31,6 +32,7 @@ export class UserSettingsComponent {
   private readonly campaignLocale = inject(CampaignLocaleService);
   private readonly data = inject(DataService);
   private readonly language = inject(LanguageService);
+  readonly uiText = inject(UiTextService);
   private readonly myCharacter = inject(MyCharacterService);
   private readonly rulePreferences = inject(CharacterRulePreferencesService);
 

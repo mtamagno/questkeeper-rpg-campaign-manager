@@ -44,16 +44,8 @@
 
     <div class="settings-card__control-row">
       <div>
-        <label for="follow-content-language">{{
-          isItalian() ? 'Allinea menu e contenuti' : 'Match menus to campaign content'
-        }}</label>
-        <p>
-          {{
-            isItalian()
-              ? 'Quando scegli Italiano o English nella campagna, aggiorna anche menu e comandi.'
-              : 'When you choose Italiano or English in a campaign, update menus and commands too.'
-          }}
-        </p>
+        <label for="follow-content-language">{{ uiText.text('language.matchMenusLabel') }}</label>
+        <p>{{ uiText.text('language.matchMenusHelp') }}</p>
       </div>
       <input
         id="follow-content-language"
@@ -66,9 +58,7 @@
     </div>
 
     <div class="settings-card__field">
-      <label for="interface-language">{{
-        isItalian() ? 'Lingua dell’interfaccia' : 'Interface language'
-      }}</label>
+      <label for="interface-language">{{ uiText.text('language.interfaceLabel') }}</label>
       <select
         id="interface-language"
         [value]="interfaceLanguage()"
@@ -80,13 +70,9 @@
       </select>
       <p class="settings-card__help">
         {{
-          isItalian()
-            ? followsContentLanguage()
-              ? 'Segue automaticamente la lingua dei contenuti della campagna, quando supportata.'
-              : 'Cambia solo menu e comandi; la lingua dei contenuti resta indipendente.'
-            : followsContentLanguage()
-              ? 'Automatically follows the campaign content language when supported.'
-              : 'Changes menus and commands only; campaign content remains independent.'
+          uiText.text(
+            followsContentLanguage() ? 'language.followingHelp' : 'language.independentHelp'
+          )
         }}
       </p>
     </div>

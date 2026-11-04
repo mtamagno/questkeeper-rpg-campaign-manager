@@ -75,7 +75,7 @@ assert.deepEqual(
 );
 
 const settings = read('src/app/guild/pages/user-settings/user-settings.component.html');
-assert.match(settings, /Interface language/);
+assert.match(settings, /language\.interfaceLabel/);
 assert.match(settings, /follow-content-language/);
 
 const pdf = read('src/app/adventurers/services/campaignCharacterSheetPdf.service.ts');
