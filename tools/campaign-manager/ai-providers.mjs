@@ -86,17 +86,60 @@ function cleanCapabilities(value) {
   return [...new Set(requested.filter((item) => AI_CAPABILITIES.includes(item)))];
 }
 
+function cleanLanguageTags(value) {
+  const requested = Array.isArray(value)
+    ? value
+    : String(value || '')
+        .split(',')
+        .map((item) => item.trim());
+  const tags = [];
+  for (const item of requested.filter(Boolean)) {
+    try {
+      tags.push(Intl.getCanonicalLocales(item)[0]);
+    } catch {
+      // Invalid provider metadata is ignored rather than blocking unrelated setup edits.
+    }
+  }
+  return [...new Set(tags)];
+}
+
+function cleanLanguagePairs(value) {
+  const requested = Array.isArray(value)
+    ? value
+    : String(value || '')
+        .split(',')
+        .map((item) => item.trim());
+  const pairs = [];
+  for (const item of requested.filter(Boolean)) {
+    const [source, target, extra] = item.split('>').map((entry) => entry.trim());
+    if (!source || !target || extra) continue;
+    try {
+      pairs.push(`${Intl.getCanonicalLocales(source)[0]}>${Intl.getCanonicalLocales(target)[0]}`);
+    } catch {
+      // Invalid provider metadata is ignored rather than trusted.
+    }
+  }
+  return [...new Set(pairs)];
+}
+
 export function normalizeProviderModels(value, defaults = []) {
   const entries = Array.isArray(value) ? value : String(value || '').split(/\r?\n/);
   const normalized = entries
     .map((entry) => {
       if (typeof entry === 'string') {
-        const [id, capabilityList = ''] = entry.split('|', 2);
-        return { id: id.trim(), capabilities: cleanCapabilities(capabilityList) };
+        const [id, capabilityList = '', languages = '', languagePairs = ''] = entry.split('|', 4);
+        return {
+          id: id.trim(),
+          capabilities: cleanCapabilities(capabilityList),
+          languages: cleanLanguageTags(languages),
+          languagePairs: cleanLanguagePairs(languagePairs),
+        };
       }
       return {
         id: String(entry?.id || '').trim(),
         capabilities: cleanCapabilities(entry?.capabilities),
+        languages: cleanLanguageTags(entry?.languages),
+        languagePairs: cleanLanguagePairs(entry?.languagePairs),
       };
     })
     .filter((entry) => entry.id)
@@ -110,6 +153,12 @@ export function normalizeProviderModels(value, defaults = []) {
       id,
       capabilities: [
         ...new Set([...(current?.capabilities ?? []), ...cleanCapabilities(entry.capabilities)]),
+      ],
+      languages: [
+        ...new Set([...(current?.languages ?? []), ...cleanLanguageTags(entry.languages)]),
+      ],
+      languagePairs: [
+        ...new Set([...(current?.languagePairs ?? []), ...cleanLanguagePairs(entry.languagePairs)]),
       ],
     });
   }
@@ -162,6 +211,29 @@ export function assertEngineCapability(config, engine, role) {
   }
   if (!config.providers[engine.provider].apiKey) {
     throw new Error(`Add the ${provider.label} API key in AI setup first.`);
+  }
+  return engine;
+}
+
+/** Enforces optional provider/model language metadata before a paid or local request starts. */
+export function assertTranslationPairSupport(config, engine, sourceLanguage, targetLanguage) {
+  if (engine.provider === 'ollama') return engine;
+  const model = providerModel(config, engine.provider, engine.model);
+  if (!model) throw new Error('The selected translation model is not in the saved catalog.');
+  const source = Intl.getCanonicalLocales(sourceLanguage)[0];
+  const target = Intl.getCanonicalLocales(targetLanguage)[0];
+  if (model.languages?.length) {
+    const supported = new Set(model.languages);
+    if (!supported.has(source) || !supported.has(target)) {
+      throw new Error(
+        `${engine.provider}/${engine.model} does not declare support for ${source} and ${target}.`,
+      );
+    }
+  }
+  if (model.languagePairs?.length && !model.languagePairs.includes(`${source}>${target}`)) {
+    throw new Error(
+      `${engine.provider}/${engine.model} does not declare the ${source}>${target} translation pair.`,
+    );
   }
   return engine;
 }

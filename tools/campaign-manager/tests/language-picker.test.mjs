@@ -67,6 +67,10 @@ test('translation workspace requires review, consent and overwrite confirmation'
   for (const contract of [
     'Translation workspace',
     'translationRemoteConsent',
+    'translationTargets',
+    'data-translation-review-target',
+    'Create missing target drafts',
+    'Exact execution plan',
     'data-translation-review',
     'data-apply-translation',
     'The target language already contains text',
@@ -80,5 +84,7 @@ test('translation workspace requires review, consent and overwrite confirmation'
   }
   assert.match(server, /No translation batch was published/);
   assert.match(server, /would receive exactly/);
+  assert.match(server, /runTranslationTargetBatch/);
+  assert.match(server, /assertTranslationPairSupport/);
   assert.match(server, /status: 'applied'/);
 });

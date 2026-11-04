@@ -4,6 +4,7 @@ import test from 'node:test';
 import { normalizeAiConfig, publicAiConfig, recommendModels } from '../ai-config.mjs';
 import {
   assertEngineCapability,
+  assertTranslationPairSupport,
   modelSupportsRole,
   normalizeProviderModels,
 } from '../ai-providers.mjs';
@@ -103,6 +104,30 @@ test('filters configured models by explicit task capabilities', () => {
   assert.throws(
     () => assertEngineCapability(config, { provider: 'xai', model: 'writer' }, 'image'),
     /does not support/,
+  );
+});
+
+test('detects declared translation language and pair limitations before execution', () => {
+  const models = normalizeProviderModels([
+    {
+      id: 'limited-writer',
+      capabilities: ['text', 'structured-output'],
+      languages: ['en', 'fr', 'de'],
+      languagePairs: ['en>fr'],
+    },
+  ]);
+  const config = normalizeAiConfig({
+    providers: { xai: { apiKey: 'secret', models } },
+  });
+  const engine = { provider: 'xai', model: 'limited-writer' };
+  assert.doesNotThrow(() => assertTranslationPairSupport(config, engine, 'en', 'fr'));
+  assert.throws(
+    () => assertTranslationPairSupport(config, engine, 'en', 'de'),
+    /does not declare the en>de translation pair/,
+  );
+  assert.throws(
+    () => assertTranslationPairSupport(config, engine, 'en', 'it'),
+    /does not declare support/,
   );
 });
 

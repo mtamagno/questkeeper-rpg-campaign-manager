@@ -7,8 +7,11 @@ import test from 'node:test';
 import {
   applyTranslationDraft,
   buildTranslationPlan,
+  buildTranslationPlans,
   mergeAppliedRecords,
+  normalizeTranslationTargets,
   readTranslationWorkspace,
+  runTranslationTargetBatch,
   writeTranslationWorkspace,
 } from '../entity-translation.mjs';
 
@@ -38,6 +41,86 @@ const campaign = {
   ],
   npcRelationships: [],
 };
+
+test('plans one, two and N targets independently without duplicating locale work', () => {
+  const multilingual = structuredClone(campaign);
+  for (const entity of [
+    ...multilingual.characters,
+    ...multilingual.npcs,
+    ...multilingual.sessions,
+    ...multilingual.partyRelationships,
+  ]) {
+    const visit = (value) => {
+      if (!value || typeof value !== 'object') return;
+      if (!Array.isArray(value) && typeof value.en === 'string') {
+        value.fr ??= '';
+        value.de ??= '';
+        return;
+      }
+      for (const child of Object.values(value)) visit(child);
+    };
+    visit(entity);
+  }
+  const batch = buildTranslationPlans({
+    campaign: multilingual,
+    availableLanguages: ['en', 'it', 'fr', 'de'],
+    sourceLanguage: 'en',
+    targetLanguages: ['it', 'fr', 'de', 'fr'],
+  });
+  assert.deepEqual(batch.targetLanguages, ['it', 'fr', 'de']);
+  assert.deepEqual(Object.keys(batch.drafts), ['it', 'fr', 'de']);
+  assert.ok(batch.drafts.fr.items.every((item) => item.targetLanguage === undefined));
+  assert.ok(batch.drafts.fr.items.some((item) => item.status === 'missing'));
+});
+
+test('rejects self-translation and removed campaign locales without touching drafts', () => {
+  assert.throws(
+    () =>
+      normalizeTranslationTargets({
+        availableLanguages: ['en', 'fr'],
+        sourceLanguage: 'en',
+        targetLanguages: ['en'],
+      }),
+    /different/,
+  );
+  assert.throws(
+    () =>
+      normalizeTranslationTargets({
+        availableLanguages: ['en', 'fr'],
+        sourceLanguage: 'en',
+        targetLanguages: ['de'],
+      }),
+    /no longer configured/,
+  );
+});
+
+test('preserves successful targets and retries only partial failures', async () => {
+  const attempts = [];
+  const first = await runTranslationTargetBatch({
+    targetLanguages: ['it', 'fr', 'de'],
+    worker: async (target) => {
+      attempts.push(target);
+      if (target === 'fr') throw new Error('temporary provider failure');
+      return { status: 'draft', value: target.toUpperCase() };
+    },
+  });
+  assert.deepEqual(Object.keys(first.results), ['it', 'de']);
+  assert.match(first.failures.fr, /temporary/);
+
+  attempts.length = 0;
+  const resumed = await runTranslationTargetBatch({
+    targetLanguages: ['it', 'fr', 'de'],
+    completedTargets: Object.keys(first.results),
+    worker: async (target) => {
+      attempts.push(target);
+      return { status: 'draft', value: target.toUpperCase() };
+    },
+  });
+  assert.deepEqual(attempts, ['fr']);
+  assert.equal(resumed.results.it.status, 'preserved');
+  assert.equal(resumed.results.fr.value, 'FR');
+  assert.equal(resumed.results.de.status, 'preserved');
+});
 
 test('plans exact entity scopes while protecting identity and media paths', () => {
   const all = buildTranslationPlan({ campaign, sourceLanguage: 'en', targetLanguage: 'it' });
@@ -71,6 +154,7 @@ test('tracks missing, stale and current targets and defaults only work that need
   const applied = mergeAppliedRecords(
     {},
     {
+      targetLanguage: 'it',
       applied: [{ key: quote.key, sourceHash: quote.sourceHash, targetHash: quote.targetHash }],
     },
   );
@@ -83,6 +167,7 @@ test('tracks missing, stale and current targets and defaults only work that need
   const current = next.items.find((item) => item.key === quote.key);
   assert.equal(current.status, 'current');
   assert.equal(current.selected, false);
+  assert.ok(applied[`it:${quote.key}`]);
 });
 
 test('requires review and overwrite consent and applies atomically to a clone', () => {
