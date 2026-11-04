@@ -29,6 +29,15 @@ export interface CampaignLocaleRegistry {
   readonly sourceLocale: string;
 }
 
+export interface CampaignLocaleManifestLike {
+  readonly localeRegistry?: CampaignLocaleRegistry;
+  readonly languages?: ReadonlyArray<string>;
+  readonly defaultLanguage?: string;
+  readonly name?: LocalizedText;
+  readonly description?: LocalizedText;
+  readonly status?: LocalizedText;
+}
+
 export interface ResolvedLocalizedText {
   readonly requestedLocale: string;
   readonly resolvedLocale?: string;
@@ -43,6 +52,44 @@ function canonicalLocale(value: string): string | undefined {
   } catch {
     return undefined;
   }
+}
+
+function localizedLocaleTags(value: LocalizedText | undefined): ReadonlyArray<string> {
+  return Object.keys(value ?? {}).flatMap((tag) => {
+    const canonical = canonicalLocale(tag);
+    return canonical === undefined ? [] : [canonical];
+  });
+}
+
+/** Build a safe reader registry for explicit and pre-registry campaign manifests. */
+export function campaignLocaleRegistryFromManifest(
+  entry: CampaignLocaleManifestLike | undefined,
+): CampaignLocaleRegistry {
+  if (entry?.localeRegistry !== undefined) return entry.localeRegistry;
+
+  const declared = (entry?.languages ?? []).flatMap((tag) => {
+    const canonical = canonicalLocale(tag);
+    return canonical === undefined ? [] : [canonical];
+  });
+  const inferred = [entry?.name, entry?.description, entry?.status].flatMap(localizedLocaleTags);
+  const requestedDefault = canonicalLocale(entry?.defaultLanguage ?? '');
+  const fallback = requestedDefault ?? 'en';
+  const locales = [
+    ...new Set(declared.length ? declared : inferred.length ? inferred : [fallback]),
+  ];
+  const defaultLocale =
+    requestedDefault !== undefined && locales.includes(requestedDefault)
+      ? requestedDefault
+      : locales.includes('en')
+        ? 'en'
+        : locales[0];
+
+  return {
+    version: 1,
+    locales: locales.map((tag) => ({ tag, direction: 'auto' as const })),
+    defaultLocale,
+    sourceLocale: defaultLocale,
+  };
 }
 
 /** Resolve campaign prose through explicit fallbacks, default and source locale. */
