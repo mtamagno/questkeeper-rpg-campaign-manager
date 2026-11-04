@@ -19,8 +19,8 @@ import { map } from 'rxjs';
 import { DataService } from '@guild/services/data.service';
 import { CampaignService } from '@guild/services/campaign.service';
 import { LanguageService } from '@guild/services/language.service';
+import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
 import { type Npc } from '@guild/models/npc.model';
-import { localizeText } from '@guild/models/language.model';
 import {
   PARTY_PERCEPTION_LABELS,
   RELATIONSHIP_TYPE_LABELS,
@@ -82,6 +82,7 @@ export class NpcDetailComponent {
   private readonly dataService = inject(DataService);
   private readonly campaignService = inject(CampaignService);
   private readonly languageService = inject(LanguageService);
+  private readonly campaignLocale = inject(CampaignLocaleService);
 
   /** Current display language for relationship labels and perspective copy. */
   readonly lang = this.languageService.currentLanguage;
@@ -137,8 +138,6 @@ export class NpcDetailComponent {
         },
       ]),
     );
-    const language = this.lang();
-
     return this.dataService
       .getRelationshipsForEntity(npc.id)()
       .flatMap((relationship): ReadonlyArray<NpcRelationshipPreview> => {
@@ -151,9 +150,9 @@ export class NpcDetailComponent {
           (relationship.perspectives ?? [])
             .find((perspective) => perspective.entityId === entityId)
             ?.feelings.map((feeling) => ({
-              label: localizeText(feeling.label, language),
+              label: this.campaignLocale.resolve(feeling.label),
               intensity: this.normalizeFeelingIntensity(feeling.intensity),
-              reason: localizeText(feeling.reason, language),
+              reason: this.campaignLocale.resolve(feeling.reason),
             })) ?? [];
         const perception = relationship.partyPerception;
 
@@ -165,8 +164,8 @@ export class NpcDetailComponent {
             otherName: other.name,
             otherAvatarUrl: toDisplayUrl(other.avatarUrl),
             otherIsNpc: other.isNpc,
-            typeLabel: localizeText(RELATIONSHIP_TYPE_LABELS[relationship.type], language),
-            description: localizeText(relationship.description, language),
+            typeLabel: this.campaignLocale.resolve(RELATIONSHIP_TYPE_LABELS[relationship.type]),
+            description: this.campaignLocale.resolve(relationship.description),
             sourceId: relationship.sourceId,
             targetId: relationship.targetId,
             sharedMemoryCount: relationship.sharedEvents?.length ?? 0,
@@ -176,8 +175,10 @@ export class NpcDetailComponent {
               perception === undefined
                 ? undefined
                 : {
-                    label: localizeText(PARTY_PERCEPTION_LABELS[perception.certainty], language),
-                    basis: localizeText(perception.basis, language),
+                    label: this.campaignLocale.resolve(
+                      PARTY_PERCEPTION_LABELS[perception.certainty],
+                    ),
+                    basis: this.campaignLocale.resolve(perception.basis),
                   },
           },
         ];

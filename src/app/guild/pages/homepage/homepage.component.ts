@@ -10,10 +10,10 @@ import { RouterLink } from '@angular/router';
 import { DataService } from '@guild/services/data.service';
 import { CampaignService } from '@guild/services/campaign.service';
 import { LanguageService } from '@guild/services/language.service';
+import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
 import { type Character, type CharacterQuote } from '@guild/models/character.model';
 import { LanguageToggleComponent } from '@guild/components/language-toggle/language-toggle.component';
 import { SfxHoverDirective } from '@guild/directives/sfxHover.directive';
-import { localizeText } from '@guild/models/language.model';
 import {
   rulesetDisplayIdentity,
   type RulesetDisplayIdentity,
@@ -55,6 +55,7 @@ export class HomepageComponent {
   private readonly dataService = inject(DataService);
   private readonly campaignService = inject(CampaignService);
   private readonly languageService = inject(LanguageService);
+  private readonly campaignLocale = inject(CampaignLocaleService);
 
   /** Current language for localized interface labels. */
   readonly lang = this.languageService.currentLanguage;
@@ -86,7 +87,7 @@ export class HomepageComponent {
     if (campaign === undefined) {
       return '';
     }
-    return localizeText(campaign.name, this.languageService.currentLanguage());
+    return this.campaignLocale.resolve(campaign.name);
   });
 
   /** Campaign subtitle/tagline. */
@@ -95,7 +96,7 @@ export class HomepageComponent {
     if (campaign === undefined) {
       return '';
     }
-    return localizeText(campaign.description, this.languageService.currentLanguage());
+    return this.campaignLocale.resolve(campaign.description);
   });
 
   /** Canonical game system and edition, including safe legacy/custom fallbacks. */
@@ -108,8 +109,6 @@ export class HomepageComponent {
   /** A random character quote — picked once on load. */
   readonly randomQuote: Signal<DisplayQuote | undefined> = computed(() => {
     const characters = this.dataService.characters();
-    const lang = this.languageService.currentLanguage();
-
     const charactersWithQuotes = characters.filter((c: Character) => c.quotes.length > 0);
 
     const character = pickRandom(charactersWithQuotes);
@@ -123,8 +122,8 @@ export class HomepageComponent {
     }
 
     return {
-      text: localizeText(quote.text, lang),
-      context: localizeText(quote.context, lang),
+      text: this.campaignLocale.resolve(quote.text),
+      context: this.campaignLocale.resolve(quote.context),
       characterName: character.name,
     };
   });

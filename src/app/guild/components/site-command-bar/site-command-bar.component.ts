@@ -14,10 +14,10 @@ import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { filter } from 'rxjs/operators';
 
 import { CampaignService } from '@guild/services/campaign.service';
+import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
 import { AudiencePreferenceService } from '@guild/services/audiencePreference.service';
 import { LanguageService } from '@guild/services/language.service';
 import { GuidedTourService } from '@guild/services/guidedTour.service';
-import { localizeText } from '@guild/models/language.model';
 import { PwaInstallService } from '@guild/services/pwaInstall.service';
 import { JourneyMemoryService, type JourneyPage } from '@guild/services/journeyMemory.service';
 import { activeElement, restoreFocus, trapTabKey } from '@guild/utils/focusTrap';
@@ -73,6 +73,7 @@ export class SiteCommandBarComponent {
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly campaigns = inject(CampaignService);
+  private readonly campaignLocale = inject(CampaignLocaleService);
   private readonly audiencePreference = inject(AudiencePreferenceService);
   private readonly language = inject(LanguageService);
   private readonly guidedTour = inject(GuidedTourService);
@@ -132,8 +133,10 @@ export class SiteCommandBarComponent {
 
   readonly activeCampaignName = computed((): string | undefined => {
     const campaignId = this.activeCampaignId();
-    const lang = this.language.currentLanguage();
-    return localizeText(this.campaigns.manifest().find(({ id }) => id === campaignId)?.name, lang);
+    const campaign = this.campaigns.manifest().find(({ id }) => id === campaignId);
+    return campaign === undefined
+      ? undefined
+      : this.campaignLocale.resolveForCampaign(campaign, campaign.name);
   });
 
   readonly breadcrumbs = computed((): ReadonlyArray<BreadcrumbItem> => {
@@ -152,7 +155,9 @@ export class SiteCommandBarComponent {
       const mapped = ROUTE_LABELS[segment];
       items.push({
         label:
-          (campaign === undefined ? undefined : localizeText(campaign.name, lang)) ||
+          (campaign === undefined
+            ? undefined
+            : this.campaignLocale.resolveForCampaign(campaign, campaign.name)) ||
           mapped?.[lang === 'it' ? 'it' : 'en'] ||
           humanizeSegment(segment),
         url: path,
@@ -185,12 +190,13 @@ export class SiteCommandBarComponent {
         scope: 'global',
       },
     ];
-    const lang = this.language.currentLanguage();
     const campaignEntries = this.campaigns.manifest().map((campaign): NavigationCommand => ({
       id: `campaign-${campaign.id}`,
       icon: '\u2691',
-      title: localizeText(campaign.name, lang),
-      detail: localizeText(campaign.status, lang) || (it ? 'Campagna' : 'Campaign'),
+      title: this.campaignLocale.resolveForCampaign(campaign, campaign.name),
+      detail:
+        this.campaignLocale.resolveForCampaign(campaign, campaign.status) ||
+        (it ? 'Campagna' : 'Campaign'),
       url: `/${campaign.id}`,
       keywords: `${campaign.id} ${Object.values(campaign.description).join(' ')}`,
       scope: 'campaign',

@@ -18,6 +18,7 @@ import { Router } from '@angular/router';
 
 import { CampaignService } from '@guild/services/campaign.service';
 import { LanguageService } from '@guild/services/language.service';
+import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
 import { SpoilerConsentService } from '@guild/services/spoilerConsent.service';
 import {
   AudiencePreferenceService,
@@ -28,7 +29,6 @@ import { SfxHoverDirective } from '@guild/directives/sfxHover.directive';
 import { DiceLoaderComponent } from '@guild/components/dice-loader/dice-loader.component';
 import { type CampaignManifestEntry } from '@guild/models/campaignConfig.model';
 import { resolveCampaignPalette, type CampaignPalette } from '@guild/models/campaignPalette.model';
-import { localizeText } from '@guild/models/language.model';
 import { GuidedTourService } from '@guild/services/guidedTour.service';
 import { rulesetDisplayIdentity } from '@guild/models/rulesetProfile.model';
 
@@ -48,6 +48,7 @@ import { rulesetDisplayIdentity } from '@guild/models/rulesetProfile.model';
 export class CampaignSelectorComponent {
   private readonly campaignService = inject(CampaignService);
   private readonly languageService = inject(LanguageService);
+  private readonly campaignLocale = inject(CampaignLocaleService);
   private readonly consentService = inject(SpoilerConsentService);
   private readonly audiencePreference = inject(AudiencePreferenceService);
   private readonly router = inject(Router);
@@ -151,7 +152,7 @@ export class CampaignSelectorComponent {
     if (campaign === undefined) {
       return '';
     }
-    const name = localizeText(campaign.name, this.lang());
+    const name = this.campaignLocale.resolveForCampaign(campaign, campaign.name);
     return this.lang() === 'it'
       ? `Stai per accedere alla campagna "${name}". Se non sei un giocatore di questa campagna, rischi di leggere spoiler!`
       : `You are about to enter the campaign "${name}". If you are not a player in this campaign, you risk reading spoilers!`;

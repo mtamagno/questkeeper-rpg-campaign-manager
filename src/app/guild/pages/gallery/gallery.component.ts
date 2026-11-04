@@ -15,16 +15,13 @@ import { NgTemplateOutlet } from '@angular/common';
 
 import { DataService } from '@guild/services/data.service';
 import { LanguageService } from '@guild/services/language.service';
+import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
 import { LanguageToggleComponent } from '@guild/components/language-toggle/language-toggle.component';
 import { DiceLoaderComponent } from '@guild/components/dice-loader/dice-loader.component';
 import { ImageLightboxComponent } from '@guild/components/image-lightbox/image-lightbox.component';
 import { AccordionComponent } from '@guild/components/accordion/accordion.component';
 import { BilingualTextPipe } from '@guild/components/bilingual-text/bilingual-text.pipe';
-import {
-  localizeText,
-  type BilingualText,
-  type SupportedLanguage,
-} from '@guild/models/language.model';
+import { type BilingualText } from '@guild/models/language.model';
 import { type ImageRef } from '@guild/models/character.model';
 import { type Npc } from '@guild/models/npc.model';
 import { getNpcDisplayName } from '@guild/utils/npcDisplay';
@@ -93,6 +90,7 @@ function isGalleryImage(url: string | undefined): url is string {
 export class GalleryComponent {
   private readonly dataService = inject(DataService);
   private readonly languageService = inject(LanguageService);
+  private readonly campaignLocale = inject(CampaignLocaleService);
 
   /** Current display language for page copy and section labels. */
   readonly lang = this.languageService.currentLanguage;
@@ -156,10 +154,9 @@ export class GalleryComponent {
    * @param index - The index of the clicked image.
    */
   openLightbox(items: ReadonlyArray<GalleryItem>, index: number): void {
-    const lang = this.languageService.currentLanguage();
     const refs: ReadonlyArray<ImageRef> = items.map((item) => ({
       url: item.url,
-      alt: localizeText(item.alt, lang),
+      alt: this.campaignLocale.resolve(item.alt),
       caption: item.label,
     }));
     this.lightboxImages.set(refs);
@@ -250,11 +247,10 @@ export class GalleryComponent {
       return [];
     }
 
-    const lang = this.languageService.currentLanguage();
     const buckets = new Map<string, Array<Npc>>();
 
     for (const npc of npcs) {
-      const locationLabel = this.resolveNpcLocation(npc, lang);
+      const locationLabel = this.resolveNpcLocation(npc);
       const existing = buckets.get(locationLabel);
       if (existing !== undefined) {
         existing.push(npc);
@@ -269,7 +265,17 @@ export class GalleryComponent {
         title: locationLabel,
         items: this.buildItemsForNpcs(
           [...locationNpcs].sort((a, b) =>
-            getNpcDisplayName(a).localeCompare(getNpcDisplayName(b)),
+            getNpcDisplayName(
+              a,
+              this.campaignLocale.currentLocale(),
+              this.campaignLocale.registry(),
+            ).localeCompare(
+              getNpcDisplayName(
+                b,
+                this.campaignLocale.currentLocale(),
+                this.campaignLocale.registry(),
+              ),
+            ),
           ),
         ),
       }))
@@ -282,12 +288,12 @@ export class GalleryComponent {
    * @param lang - Active language code.
    * @returns The localized location string, or a fallback when missing.
    */
-  private resolveNpcLocation(npc: Npc, lang: SupportedLanguage): string {
+  private resolveNpcLocation(npc: Npc): string {
     const location = npc.profile.location;
     if (location === undefined) {
       return UNKNOWN_LOCATION_LABEL;
     }
-    const localized = localizeText(location, lang);
+    const localized = this.campaignLocale.resolve(location);
     const trimmed = localized.trim();
     return trimmed.length > 0 ? trimmed : UNKNOWN_LOCATION_LABEL;
   }
@@ -301,7 +307,11 @@ export class GalleryComponent {
     const items: Array<GalleryItem> = [];
 
     for (const npc of npcs) {
-      const name = getNpcDisplayName(npc);
+      const name = getNpcDisplayName(
+        npc,
+        this.campaignLocale.currentLocale(),
+        this.campaignLocale.registry(),
+      );
 
       if (isGalleryImage(npc.profileImageUrl)) {
         items.push({

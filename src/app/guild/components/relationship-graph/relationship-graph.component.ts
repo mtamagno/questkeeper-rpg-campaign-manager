@@ -29,7 +29,7 @@ import {
 } from '@guild/models/relationship.model';
 import { BilingualTextPipe } from '@guild/components/bilingual-text/bilingual-text.pipe';
 import { LanguageService } from '@guild/services/language.service';
-import { localizeText } from '@guild/models/language.model';
+import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
 
 /** Layout position for a graph node. */
 interface NodePosition {
@@ -83,6 +83,7 @@ const GRAPH_PADDING = 80;
 })
 export class RelationshipGraphComponent {
   private readonly languageService = inject(LanguageService);
+  private readonly campaignLocale = inject(CampaignLocaleService);
 
   /** Current language for graph controls, labels, and empty states. */
   readonly lang = this.languageService.currentLanguage;
@@ -358,7 +359,7 @@ export class RelationshipGraphComponent {
    */
   formatRelationshipType(type: RelationshipType): string {
     const label = RELATIONSHIP_TYPE_LABELS[type];
-    return localizeText(label, this.languageService.currentLanguage());
+    return this.campaignLocale.resolve(label);
   }
 
   /**

@@ -42,6 +42,27 @@
       </div>
     </div>
 
+    <div class="settings-card__field">
+      <label for="interface-language">{{
+        isItalian() ? 'Lingua dell’interfaccia' : 'Interface language'
+      }}</label>
+      <select
+        id="interface-language"
+        [value]="interfaceLanguage()"
+        (change)="selectInterfaceLanguage($event)"
+      >
+        <option value="en">English</option>
+        <option value="it">Italiano</option>
+      </select>
+      <p class="settings-card__help">
+        {{
+          isItalian()
+            ? 'Cambia menu e comandi. La lingua dei contenuti si sceglie dentro ogni campagna.'
+            : 'Changes menus and commands. Campaign content language is selected inside each campaign.'
+        }}
+      </p>
+    </div>
+
     <div class="settings-card__control-row">
       <div>
         <label for="sound-muted">{{ isItalian() ? 'Disattiva suoni' : 'Mute sounds' }}</label>

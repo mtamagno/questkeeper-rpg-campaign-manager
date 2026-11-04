@@ -13,6 +13,7 @@ import { LanguageToggleComponent } from '@guild/components/language-toggle/langu
 import { DataService } from '@guild/services/data.service';
 import { CampaignService } from '@guild/services/campaign.service';
 import { LanguageService } from '@guild/services/language.service';
+import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
 import { OfflinePackService } from '@guild/services/offlinePack.service';
 
 type PreparationState = 'idle' | 'preparing' | 'ready' | 'error' | 'removed';
@@ -30,6 +31,7 @@ export class OfflinePackComponent {
   private readonly data = inject(DataService);
   private readonly campaigns = inject(CampaignService);
   private readonly language = inject(LanguageService);
+  private readonly campaignLocale = inject(CampaignLocaleService);
   private readonly offline = inject(OfflinePackService);
   private initializedCampaignId: string | undefined;
 
@@ -100,6 +102,8 @@ export class OfflinePackComponent {
       characters: this.characters(),
       sessions: this.data.sortedSessions(),
       selectedCharacterIds: this.selectedCharacterIds(),
+      contentLocale: this.campaignLocale.currentLocale(),
+      localeRegistry: this.campaignLocale.registry(),
     });
     this.cachedImageCount.set(result.cachedImageCount);
     this.preparationState.set(result.ok ? 'ready' : 'error');

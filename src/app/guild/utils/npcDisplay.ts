@@ -8,6 +8,7 @@ import { type Npc } from '@guild/models/npc.model';
 import {
   localizeText,
   type BilingualText,
+  type CampaignLocaleRegistry,
   type SupportedLanguage,
 } from '@guild/models/language.model';
 
@@ -30,13 +31,17 @@ function isLocalizedText(value: unknown): value is BilingualText {
  * @param npc - The NPC whose name should be normalized.
  * @returns A plain string suitable for display or for `localeCompare`.
  */
-export function getNpcDisplayName(npc: Npc, language: SupportedLanguage = 'en'): string {
+export function getNpcDisplayName(
+  npc: Npc,
+  language: SupportedLanguage = 'en',
+  registry?: CampaignLocaleRegistry,
+): string {
   const rawName: unknown = npc.name;
   if (typeof rawName === 'string') {
     return rawName;
   }
   if (isLocalizedText(rawName)) {
-    return localizeText(rawName, language);
+    return localizeText(rawName, language, registry);
   }
   return '';
 }

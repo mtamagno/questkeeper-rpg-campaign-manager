@@ -24,10 +24,11 @@ import {
   type Character,
   type CharacterStoryReference,
 } from '@guild/models/character.model';
-import { localizeText, type BilingualText } from '@guild/models/language.model';
+import { type BilingualText } from '@guild/models/language.model';
 import { RELATIONSHIP_TYPE_LABELS } from '@guild/models/relationship.model';
 import { toDisplayUrl } from '@guild/services/imageUrl.service';
 import { LanguageService } from '@guild/services/language.service';
+import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
 import { CharacterReadingPositionService } from '@guild/services/characterReadingPosition.service';
 import { BilingualTextPipe } from '@guild/components/bilingual-text/bilingual-text.pipe';
 import { LanguageToggleComponent } from '@guild/components/language-toggle/language-toggle.component';
@@ -86,6 +87,7 @@ export class CharacterDetailComponent {
   private readonly dataService = inject(DataService);
   private readonly campaignService = inject(CampaignService);
   private readonly languageService = inject(LanguageService);
+  private readonly campaignLocale = inject(CampaignLocaleService);
   private readonly document = inject(DOCUMENT);
   private readonly readingPosition = inject(CharacterReadingPositionService);
 
@@ -268,7 +270,6 @@ export class CharacterDetailComponent {
       (relationship) =>
         relationship.sourceId === character.id || relationship.targetId === character.id,
     );
-    const language = this.lang();
     const previews: ProfileBondPreview[] = [];
 
     for (const relationship of relationships) {
@@ -282,8 +283,8 @@ export class CharacterDetailComponent {
         entityPath: entity.entityPath,
         name: entity.name,
         avatarUrl: toDisplayUrl(entity.avatarUrl),
-        typeLabel: localizeText(RELATIONSHIP_TYPE_LABELS[relationship.type], language),
-        description: localizeText(relationship.description, language),
+        typeLabel: this.campaignLocale.resolve(RELATIONSHIP_TYPE_LABELS[relationship.type]),
+        description: this.campaignLocale.resolve(relationship.description),
         sourceId: relationship.sourceId,
         targetId: relationship.targetId,
         sharedMemoryCount: relationship.sharedEvents?.length ?? 0,
@@ -291,9 +292,9 @@ export class CharacterDetailComponent {
           (relationship.perspectives ?? [])
             .find((perspective) => perspective.entityId === character.id)
             ?.feelings.map((feeling) => ({
-              label: localizeText(feeling.label, language),
+              label: this.campaignLocale.resolve(feeling.label),
               intensity: this.normalizeFeelingIntensity(feeling.intensity),
-              reason: localizeText(feeling.reason, language),
+              reason: this.campaignLocale.resolve(feeling.reason),
             })) ?? [],
       });
     }
@@ -315,7 +316,7 @@ export class CharacterDetailComponent {
 
   /** Returns a compact, word-safe preview while preserving the full source elsewhere. */
   profileExcerpt(value: BilingualText, maxLength = 210): string {
-    const text = localizeText(value, this.lang()).trim();
+    const text = this.campaignLocale.resolve(value).trim();
     if (text.length <= maxLength) return text;
     const boundary = text.lastIndexOf(' ', maxLength);
     return `${text.slice(0, boundary > maxLength / 2 ? boundary : maxLength).trim()}…`;

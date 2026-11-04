@@ -9,13 +9,14 @@ import { RouterLink } from '@angular/router';
 import { DataService } from '@guild/services/data.service';
 import { CampaignService } from '@guild/services/campaign.service';
 import { LanguageService } from '@guild/services/language.service';
+import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
 import { type Npc, type NpcAllegiance } from '@guild/models/npc.model';
 import { AccordionComponent } from '@guild/components/accordion/accordion.component';
 import { SfxHoverDirective } from '@guild/directives/sfxHover.directive';
 import { DiceLoaderComponent } from '@guild/components/dice-loader/dice-loader.component';
 import { toThumbUrl } from '@guild/services/imageUrl.service';
 import { getNpcDisplayName } from '@guild/utils/npcDisplay';
-import { type SupportedLanguage } from '@guild/models/language.model';
+import { type CampaignLocaleRegistry, type SupportedLanguage } from '@guild/models/language.model';
 
 /** Placeholder portrait shown when an NPC has no profile image. */
 const PLACEHOLDER_PORTRAIT_URL = 'assets/images/placeholders/placeholder-portrait.svg';
@@ -53,6 +54,7 @@ const ALLEGIANCE_ORDER: ReadonlyArray<{
 function groupNpcsByAllegianceAndCategory(
   npcs: ReadonlyArray<Npc>,
   lang: SupportedLanguage,
+  registry: CampaignLocaleRegistry,
 ): ReadonlyArray<NpcAllegianceGroup> {
   return ALLEGIANCE_ORDER.map(({ allegiance, label, icon }) => {
     const matching = npcs.filter((npc) => npc.allegiance === allegiance);
@@ -73,7 +75,7 @@ function groupNpcsByAllegianceAndCategory(
       .map(([category, categoryNpcs]) => ({
         category,
         npcs: categoryNpcs.sort((a, b) =>
-          getNpcDisplayName(a, lang).localeCompare(getNpcDisplayName(b, lang)),
+          getNpcDisplayName(a, lang, registry).localeCompare(getNpcDisplayName(b, lang, registry)),
         ),
       }));
 
@@ -97,6 +99,7 @@ export class NpcListComponent {
   private readonly dataService = inject(DataService);
   private readonly campaignService = inject(CampaignService);
   private readonly languageService = inject(LanguageService);
+  private readonly campaignLocale = inject(CampaignLocaleService);
 
   /** Current display language for page labels. */
   readonly lang = this.languageService.currentLanguage;
@@ -109,7 +112,11 @@ export class NpcListComponent {
 
   /** NPCs grouped by allegiance → category. */
   readonly allegianceGroups: Signal<ReadonlyArray<NpcAllegianceGroup>> = computed(() =>
-    groupNpcsByAllegianceAndCategory(this.dataService.npcs(), this.lang()),
+    groupNpcsByAllegianceAndCategory(
+      this.dataService.npcs(),
+      this.campaignLocale.currentLocale(),
+      this.campaignLocale.registry(),
+    ),
   );
 
   /**

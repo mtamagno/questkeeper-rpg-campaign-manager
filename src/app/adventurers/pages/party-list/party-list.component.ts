@@ -10,11 +10,16 @@ import { RouterLink } from '@angular/router';
 import { DataService } from '@guild/services/data.service';
 import { CampaignService } from '@guild/services/campaign.service';
 import { LanguageService } from '@guild/services/language.service';
+import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
 import { type Character, type CharacterQuote } from '@guild/models/character.model';
 import { LanguageToggleComponent } from '@guild/components/language-toggle/language-toggle.component';
 import { DiceLoaderComponent } from '@guild/components/dice-loader/dice-loader.component';
 import { SfxHoverDirective } from '@guild/directives/sfxHover.directive';
-import { localizeText, type SupportedLanguage } from '@guild/models/language.model';
+import {
+  localizeText,
+  type CampaignLocaleRegistry,
+  type SupportedLanguage,
+} from '@guild/models/language.model';
 import { MyCharacterService } from '@guild/services/myCharacter.service';
 
 /** Character card display data with a pre-picked random quote. */
@@ -51,14 +56,15 @@ function pickRandom<T>(items: ReadonlyArray<T>): T | undefined {
 function buildShowcases(
   characters: ReadonlyArray<Character>,
   lang: SupportedLanguage,
+  registry: CampaignLocaleRegistry,
 ): ReadonlyArray<CharacterShowcase> {
   return characters.map((character): CharacterShowcase => {
     const rawQuote: CharacterQuote | undefined = pickRandom(character.quotes);
     const quote: ResolvedQuote | undefined =
       rawQuote !== undefined
         ? {
-            text: localizeText(rawQuote.text, lang),
-            context: localizeText(rawQuote.context, lang),
+            text: localizeText(rawQuote.text, lang, registry),
+            context: localizeText(rawQuote.context, lang, registry),
           }
         : undefined;
 
@@ -90,6 +96,7 @@ export class PartyListComponent {
   private readonly dataService = inject(DataService);
   private readonly campaignService = inject(CampaignService);
   private readonly languageService = inject(LanguageService);
+  private readonly campaignLocale = inject(CampaignLocaleService);
   private readonly myCharacter = inject(MyCharacterService);
 
   /** Current display language for interface copy. */
@@ -116,13 +123,13 @@ export class PartyListComponent {
   /** Localized campaign title used by the fallback hero. */
   readonly campaignTitle: Signal<string> = computed(() => {
     const campaign = this.dataService.campaign();
-    return localizeText(campaign?.name, this.lang());
+    return this.campaignLocale.resolve(campaign?.name);
   });
 
   /** Character showcase cards with pre-resolved quotes. */
   readonly showcases: Signal<ReadonlyArray<CharacterShowcase>> = computed(() => {
     const characters = this.dataService.characters();
-    const lang = this.languageService.currentLanguage();
-    return buildShowcases(characters, lang);
+    const lang = this.campaignLocale.currentLocale();
+    return buildShowcases(characters, lang, this.campaignLocale.registry());
   });
 }

@@ -12,12 +12,12 @@ import { map } from 'rxjs';
 import { DataService } from '@guild/services/data.service';
 import { CampaignService } from '@guild/services/campaign.service';
 import { LanguageService } from '@guild/services/language.service';
+import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
 import { toDisplayUrl } from '@guild/services/imageUrl.service';
 import { LanguageToggleComponent } from '@guild/components/language-toggle/language-toggle.component';
 import { DiceLoaderComponent } from '@guild/components/dice-loader/dice-loader.component';
 import { BilingualTextPipe } from '@guild/components/bilingual-text/bilingual-text.pipe';
 import { type Session, type SessionImage } from '@guild/models/session.model';
-import { localizeText } from '@guild/models/language.model';
 import { resolveNarrativeMood } from '@guild/models/narrativeMood.model';
 
 /** Regex to split prose HTML at &lt;hr&gt; scene breaks. */
@@ -80,6 +80,7 @@ export class StoryChapterComponent {
   private readonly dataService = inject(DataService);
   private readonly campaignService = inject(CampaignService);
   private readonly languageService = inject(LanguageService);
+  private readonly campaignLocale = inject(CampaignLocaleService);
 
   /** Active campaign ID for building route links. */
   readonly campaignId: Signal<string | undefined> = this.campaignService.activeCampaignId;
@@ -133,8 +134,7 @@ export class StoryChapterComponent {
     if (session?.prose === undefined) {
       return [];
     }
-    const lang = this.languageService.currentLanguage();
-    const sections = localizeText(session.prose, lang).split(PROSE_SECTION_SEPARATOR);
+    const sections = this.campaignLocale.resolve(session.prose).split(PROSE_SECTION_SEPARATOR);
     const displayImages = (session.images ?? []).map(toDisplaySessionImage);
     const imagesBySection = groupImagesBySection(displayImages);
 

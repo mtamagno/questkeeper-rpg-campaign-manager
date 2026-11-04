@@ -2,9 +2,9 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { RouterLink } from '@angular/router';
 
 import { SFX } from '@guild/constants/sfx.constant';
-import { localizeText } from '@guild/models/language.model';
 import { AudioService } from '@guild/services/audio.service';
 import { CampaignService } from '@guild/services/campaign.service';
+import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
 import { DataService } from '@guild/services/data.service';
 import { LanguageService } from '@guild/services/language.service';
 import { MyCharacterService } from '@guild/services/myCharacter.service';
@@ -28,12 +28,14 @@ export class UserSettingsComponent {
   private readonly preferences = inject(UserPreferencesService);
   private readonly audio = inject(AudioService);
   private readonly campaigns = inject(CampaignService);
+  private readonly campaignLocale = inject(CampaignLocaleService);
   private readonly data = inject(DataService);
   private readonly language = inject(LanguageService);
   private readonly myCharacter = inject(MyCharacterService);
   private readonly rulePreferences = inject(CharacterRulePreferencesService);
 
   readonly isItalian = this.language.isItalian;
+  readonly interfaceLanguage = this.language.currentLanguage;
   readonly activeCampaignId = this.campaigns.activeCampaignId;
   readonly campaignEntries = this.campaigns.manifest;
   readonly characters = this.data.characters;
@@ -72,19 +74,25 @@ export class UserSettingsComponent {
     return entries;
   });
 
+  selectInterfaceLanguage(event: Event): void {
+    if (event.target instanceof HTMLSelectElement) {
+      this.language.setLanguage(event.target.value);
+    }
+  }
+
   readonly activeCampaignName = computed((): string | undefined => {
     const campaignId = this.activeCampaignId();
     const campaign = this.campaignEntries().find((entry) => entry.id === campaignId);
     return campaign === undefined
       ? undefined
-      : localizeText(campaign.name, this.language.currentLanguage());
+      : this.campaignLocale.resolveForCampaign(campaign, campaign.name);
   });
 
   campaignName(campaignId: string): string {
     const campaign = this.campaignEntries().find((entry) => entry.id === campaignId);
     return campaign === undefined
       ? campaignId
-      : localizeText(campaign.name, this.language.currentLanguage());
+      : this.campaignLocale.resolveForCampaign(campaign, campaign.name);
   }
 
   setMuted(event: Event): void {

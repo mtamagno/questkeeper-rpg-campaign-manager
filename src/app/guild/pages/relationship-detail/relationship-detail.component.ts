@@ -12,6 +12,7 @@ import { map } from 'rxjs';
 import { DataService } from '@guild/services/data.service';
 import { LanguageService } from '@guild/services/language.service';
 import { CampaignService } from '@guild/services/campaign.service';
+import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
 import {
   type Relationship,
   type SharedEvent,
@@ -27,7 +28,6 @@ import { getNpcDisplayName } from '@guild/utils/npcDisplay';
 import { BilingualTextPipe } from '@guild/components/bilingual-text/bilingual-text.pipe';
 import { LanguageToggleComponent } from '@guild/components/language-toggle/language-toggle.component';
 import { DiceLoaderComponent } from '@guild/components/dice-loader/dice-loader.component';
-import { localizeText } from '@guild/models/language.model';
 
 /** Resolved entity info for display in the header. */
 interface EntityInfo {
@@ -59,6 +59,7 @@ export class RelationshipDetailComponent {
   private readonly dataService = inject(DataService);
   private readonly languageService = inject(LanguageService);
   private readonly campaignService = inject(CampaignService);
+  private readonly campaignLocale = inject(CampaignLocaleService);
 
   /** Current display language for headings and relationship labels. */
   readonly lang = this.languageService.currentLanguage;
@@ -96,7 +97,7 @@ export class RelationshipDetailComponent {
       return '';
     }
     const label = RELATIONSHIP_TYPE_LABELS[rel.type];
-    return localizeText(label, this.languageService.currentLanguage());
+    return this.campaignLocale.resolve(label);
   });
 
   /** Localized evidence level for the party's public reading of the relationship. */
@@ -104,7 +105,7 @@ export class RelationshipDetailComponent {
     const perception = this.relationship()?.partyPerception;
     return perception === undefined
       ? ''
-      : PARTY_PERCEPTION_LABELS[perception.certainty][this.languageService.currentLanguage()];
+      : this.campaignLocale.resolve(PARTY_PERCEPTION_LABELS[perception.certainty]);
   });
 
   /** Source entity info (character or NPC). */
@@ -173,7 +174,7 @@ export class RelationshipDetailComponent {
     if (label === undefined) {
       return type;
     }
-    return localizeText(label, this.languageService.currentLanguage());
+    return this.campaignLocale.resolve(label);
   }
 
   /** Keeps author-provided feeling ratings inside the documented five-step scale. */
@@ -202,7 +203,11 @@ export class RelationshipDetailComponent {
     if (npc !== undefined) {
       return {
         id: npc.id,
-        name: getNpcDisplayName(npc, this.languageService.currentLanguage()),
+        name: getNpcDisplayName(
+          npc,
+          this.campaignLocale.currentLocale(),
+          this.campaignLocale.registry(),
+        ),
         avatar: npc.avatar,
         profileImageUrl: npc.profileImageUrl,
       };

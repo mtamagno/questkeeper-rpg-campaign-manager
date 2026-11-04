@@ -9,11 +9,12 @@ import { Component, ChangeDetectionStrategy, inject, computed, type Signal } fro
 
 import { DataService } from '@guild/services/data.service';
 import { LanguageService } from '@guild/services/language.service';
+import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
 import { LanguageToggleComponent } from '@guild/components/language-toggle/language-toggle.component';
 import { DiceLoaderComponent } from '@guild/components/dice-loader/dice-loader.component';
 import { BilingualTextPipe } from '@guild/components/bilingual-text/bilingual-text.pipe';
 import { AccordionComponent } from '@guild/components/accordion/accordion.component';
-import { localizeText, type BilingualText } from '@guild/models/language.model';
+import { type BilingualText } from '@guild/models/language.model';
 import { type Session } from '@guild/models/session.model';
 import { type Campaign } from '@guild/models/campaign.model';
 import { resolveNarrativeMood, type NarrativeMood } from '@guild/models/narrativeMood.model';
@@ -65,6 +66,7 @@ function selectRecapEntries(
 export class StorySoFarComponent {
   private readonly dataService = inject(DataService);
   private readonly languageService = inject(LanguageService);
+  private readonly campaignLocale = inject(CampaignLocaleService);
 
   /** Current display language for page copy. */
   readonly lang = this.languageService.currentLanguage;
@@ -97,7 +99,7 @@ export class StorySoFarComponent {
   readonly entryAccordionTitle = (entry: StorySoFarEntry): string => {
     const lang = this.languageService.currentLanguage();
     const sessionLabel = lang === 'it' ? 'Sessione' : 'Session';
-    const localizedTitle = localizeText(entry.title, lang);
+    const localizedTitle = this.campaignLocale.resolve(entry.title);
     return `${sessionLabel} ${entry.sessionNumber} — ${localizedTitle}`;
   };
 }

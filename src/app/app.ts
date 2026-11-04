@@ -23,8 +23,8 @@ import { GuidedTourComponent } from '@guild/components/guided-tour/guided-tour.c
 import { SFX } from '@guild/constants/sfx.constant';
 import { AudioService } from '@guild/services/audio.service';
 import { CampaignService } from '@guild/services/campaign.service';
+import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
 import { LanguageService } from '@guild/services/language.service';
-import { localizeText } from '@guild/models/language.model';
 import { JourneyMemoryService } from '@guild/services/journeyMemory.service';
 
 /**
@@ -101,6 +101,7 @@ export class App implements OnInit {
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly campaignService = inject(CampaignService);
+  private readonly campaignLocale = inject(CampaignLocaleService);
   private readonly languageService = inject(LanguageService);
   private readonly documentTitle = inject(Title);
   private readonly journeyMemory = inject(JourneyMemoryService);
@@ -138,9 +139,11 @@ export class App implements OnInit {
     });
     effect((): void => {
       const campaignId = this.activeCampaignId();
-      const language = this.languageService.currentLanguage();
       const campaign = this.campaignService.manifest().find(({ id }) => id === campaignId);
-      const campaignName = localizeText(campaign?.name, language);
+      const campaignName =
+        campaign === undefined
+          ? ''
+          : this.campaignLocale.resolveForCampaign(campaign, campaign.name);
       this.documentTitle.setTitle(
         campaignName.length === 0
           ? 'QuestKeeper · D&D Party Companion'
