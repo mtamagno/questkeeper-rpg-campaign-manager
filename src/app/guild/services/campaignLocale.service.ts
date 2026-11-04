@@ -6,25 +6,12 @@ import {
   type CampaignLocaleRegistry,
   type LocalizedText,
   type ResolvedLocalizedText,
+  campaignLocaleRegistryFromManifest,
   resolveLocalizedText,
 } from '@guild/models/language.model';
 import { CampaignService } from '@guild/services/campaign.service';
 
 const STORAGE_PREFIX = 'questkeeper:campaign-content-locale:v1:';
-
-function legacyRegistry(entry: CampaignManifestEntry | undefined): CampaignLocaleRegistry {
-  if (entry?.localeRegistry !== undefined) return entry.localeRegistry;
-  const locales = entry?.languages?.length ? entry.languages : [entry?.defaultLanguage ?? 'en'];
-  const defaultLocale = locales.includes(entry?.defaultLanguage ?? '')
-    ? (entry?.defaultLanguage ?? locales[0])
-    : locales[0];
-  return {
-    version: 1,
-    locales: [...new Set(locales)].map((tag) => ({ tag, direction: 'auto' as const })),
-    defaultLocale,
-    sourceLocale: defaultLocale,
-  };
-}
 
 function configured(registry: CampaignLocaleRegistry, locale: string | null): locale is string {
   return locale !== null && registry.locales.some(({ tag }) => tag === locale);
@@ -43,7 +30,7 @@ export class CampaignLocaleService {
   });
 
   readonly registry: Signal<CampaignLocaleRegistry> = computed(() =>
-    legacyRegistry(this.activeCampaign()),
+    campaignLocaleRegistryFromManifest(this.activeCampaign()),
   );
 
   readonly locales = computed(() => this.registry().locales);
@@ -96,7 +83,7 @@ export class CampaignLocaleService {
   }
 
   registryForCampaign(campaign: CampaignManifestEntry): CampaignLocaleRegistry {
-    return legacyRegistry(campaign);
+    return campaignLocaleRegistryFromManifest(campaign);
   }
 
   localeForCampaign(campaign: CampaignManifestEntry): string {
