@@ -2,7 +2,14 @@
  * Language selector for every locale configured by the active campaign.
  */
 
-import { Component, ChangeDetectionStrategy, computed, inject, type Signal } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  computed,
+  effect,
+  inject,
+  type Signal,
+} from '@angular/core';
 
 import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
 import { LanguageService } from '@guild/services/language.service';
@@ -20,22 +27,45 @@ export class LanguageToggleComponent {
   private readonly campaignLocale = inject(CampaignLocaleService);
   private readonly interfaceLanguage = inject(LanguageService);
 
-  /** The currently active language. */
-  readonly currentLanguage: Signal<SupportedLanguage> = this.campaignLocale.currentLocale;
   readonly hasCampaign = computed(() => this.campaignLocale.activeCampaign() !== undefined);
+  /** Campaign content locale when reading a campaign; interface locale everywhere else. */
+  readonly currentLanguage: Signal<SupportedLanguage> = computed(() =>
+    this.hasCampaign()
+      ? this.campaignLocale.currentLocale()
+      : this.interfaceLanguage.currentLanguage(),
+  );
   readonly label = computed(() =>
-    this.interfaceLanguage.isItalian() ? 'Lingua dei contenuti' : 'Content language',
+    this.hasCampaign()
+      ? this.interfaceLanguage.isItalian()
+        ? 'Lingua dei contenuti'
+        : 'Content language'
+      : this.interfaceLanguage.isItalian()
+        ? 'Lingua dell’interfaccia'
+        : 'Interface language',
   );
 
   /** Languages configured by the active campaign, with sensible legacy fallbacks. */
   readonly languages = computed<ReadonlyArray<string>>(() =>
-    this.campaignLocale.locales().map(({ tag }) => tag),
+    this.hasCampaign() ? this.campaignLocale.locales().map(({ tag }) => tag) : ['en', 'it'],
   );
+
+  constructor() {
+    effect(() => {
+      if (this.hasCampaign()) {
+        this.interfaceLanguage.followContentLanguage(this.campaignLocale.currentLocale());
+      }
+    });
+  }
 
   /** Selects any language code configured by the campaign. */
   selectLanguage(event: Event): void {
     const select = event.target as HTMLSelectElement;
-    this.campaignLocale.setLocale(select.value);
+    if (this.hasCampaign()) {
+      this.campaignLocale.setLocale(select.value);
+      this.interfaceLanguage.followContentLanguage(select.value);
+    } else {
+      this.interfaceLanguage.setLanguage(select.value);
+    }
   }
 
   /** Human-readable native language name, falling back to the code. */

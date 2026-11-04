@@ -130,6 +130,18 @@ export class CampaignSelectorComponent {
     return rulesetDisplayIdentity(campaign.gameSystem, campaign.edition, this.lang()).label;
   }
 
+  campaignName(campaign: CampaignManifestEntry): string {
+    return this.campaignLocale.resolveForCampaign(campaign, campaign.name);
+  }
+
+  campaignDescription(campaign: CampaignManifestEntry): string {
+    return this.campaignLocale.resolveForCampaign(campaign, campaign.description);
+  }
+
+  campaignStatus(campaign: CampaignManifestEntry): string {
+    return this.campaignLocale.resolveForCampaign(campaign, campaign.status);
+  }
+
   /** Remembers an orientation path on this device without changing access. */
   selectAudience(audience: QuestKeeperAudience): void {
     this.audiencePreference.select(audience);

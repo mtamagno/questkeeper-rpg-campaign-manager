@@ -36,6 +36,7 @@ export class UserSettingsComponent {
 
   readonly isItalian = this.language.isItalian;
   readonly interfaceLanguage = this.language.currentLanguage;
+  readonly followsContentLanguage = this.language.followsContentLanguage;
   readonly activeCampaignId = this.campaigns.activeCampaignId;
   readonly campaignEntries = this.campaigns.manifest;
   readonly characters = this.data.characters;
@@ -77,6 +78,14 @@ export class UserSettingsComponent {
   selectInterfaceLanguage(event: Event): void {
     if (event.target instanceof HTMLSelectElement) {
       this.language.setLanguage(event.target.value);
+    }
+  }
+
+  toggleLanguageSync(event: Event): void {
+    if (!(event.target instanceof HTMLInputElement)) return;
+    this.language.setFollowsContentLanguage(event.target.checked);
+    if (event.target.checked && this.activeCampaignId() !== undefined) {
+      this.language.followContentLanguage(this.campaignLocale.currentLocale());
     }
   }
 

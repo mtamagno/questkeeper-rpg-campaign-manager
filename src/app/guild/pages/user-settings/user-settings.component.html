@@ -42,6 +42,29 @@
       </div>
     </div>
 
+    <div class="settings-card__control-row">
+      <div>
+        <label for="follow-content-language">{{
+          isItalian() ? 'Allinea menu e contenuti' : 'Match menus to campaign content'
+        }}</label>
+        <p>
+          {{
+            isItalian()
+              ? 'Quando scegli Italiano o English nella campagna, aggiorna anche menu e comandi.'
+              : 'When you choose Italiano or English in a campaign, update menus and commands too.'
+          }}
+        </p>
+      </div>
+      <input
+        id="follow-content-language"
+        class="settings-switch"
+        type="checkbox"
+        role="switch"
+        [checked]="followsContentLanguage()"
+        (change)="toggleLanguageSync($event)"
+      />
+    </div>
+
     <div class="settings-card__field">
       <label for="interface-language">{{
         isItalian() ? 'Lingua dell’interfaccia' : 'Interface language'
@@ -49,6 +72,7 @@
       <select
         id="interface-language"
         [value]="interfaceLanguage()"
+        [disabled]="followsContentLanguage()"
         (change)="selectInterfaceLanguage($event)"
       >
         <option value="en">English</option>
@@ -57,8 +81,12 @@
       <p class="settings-card__help">
         {{
           isItalian()
-            ? 'Cambia menu e comandi. La lingua dei contenuti si sceglie dentro ogni campagna.'
-            : 'Changes menus and commands. Campaign content language is selected inside each campaign.'
+            ? followsContentLanguage()
+              ? 'Segue automaticamente la lingua dei contenuti della campagna, quando supportata.'
+              : 'Cambia solo menu e comandi; la lingua dei contenuti resta indipendente.'
+            : followsContentLanguage()
+              ? 'Automatically follows the campaign content language when supported.'
+              : 'Changes menus and commands only; campaign content remains independent.'
         }}
       </p>
     </div>

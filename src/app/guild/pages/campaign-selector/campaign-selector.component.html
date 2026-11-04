@@ -206,7 +206,7 @@
           class="campaign-selector__card"
           [attr.data-qk-palette]="campaignPalette(campaign)"
           [attr.aria-label]="
-            (lang() === 'it' ? 'Entra nella campagna ' : 'Enter campaign ') + campaign.name[lang()]
+            (lang() === 'it' ? 'Entra nella campagna ' : 'Enter campaign ') + campaignName(campaign)
           "
           (click)="selectCampaign(campaign)"
           appSfxHover
@@ -216,7 +216,7 @@
               <img
                 class="campaign-selector__card-image"
                 [src]="campaign.thumbnail"
-                [alt]="campaign.name[lang()]"
+                [alt]="campaignName(campaign)"
                 loading="eager"
                 decoding="async"
               />
@@ -224,7 +224,7 @@
               <div
                 class="campaign-selector__card-fallback"
                 role="img"
-                [attr.aria-label]="campaign.name[lang()]"
+                [attr.aria-label]="campaignName(campaign)"
               >
                 <span class="campaign-selector__mist" aria-hidden="true"></span>
                 <span class="campaign-selector__sigil" aria-hidden="true">✦</span>
@@ -232,13 +232,13 @@
               </div>
             }
             @if (campaign.status; as status) {
-              <span class="campaign-selector__status">{{ status[lang()] }}</span>
+              <span class="campaign-selector__status">{{ campaignStatus(campaign) }}</span>
             }
           </div>
           <div class="campaign-selector__card-body">
             <span class="campaign-selector__ruleset">{{ campaignRuleset(campaign) }}</span>
-            <h2 class="campaign-selector__card-title">{{ campaign.name[lang()] }}</h2>
-            <p class="campaign-selector__card-description">{{ campaign.description[lang()] }}</p>
+            <h2 class="campaign-selector__card-title">{{ campaignName(campaign) }}</h2>
+            <p class="campaign-selector__card-description">{{ campaignDescription(campaign) }}</p>
             <span class="campaign-selector__card-cta">
               {{ lang() === 'it' ? 'Apri la cronaca' : 'Open the chronicle' }}
               <span aria-hidden="true">&rarr;</span>

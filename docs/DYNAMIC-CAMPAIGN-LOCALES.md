@@ -83,6 +83,14 @@ QuestKeeper must not reuse one setting for unrelated purposes.
    can process. It is capability metadata, never a reason to remove a campaign
    locale or silently choose another model.
 
+These concerns remain separate in storage and resolution, but the reader links
+the first two by default as a usability preference. Selecting campaign content
+in Italian or English also selects the matching supported interface language,
+including for regional tags such as `it-IT` or `en-GB`. The link can be disabled
+from User Settings for bilingual reading or other advanced workflows. Content
+locales unsupported by the current interface remain selectable and do not
+silently replace the interface language.
+
 ## Registry contract
 
 The first persisted representation will be versioned and duplicated in the
