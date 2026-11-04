@@ -38,6 +38,7 @@ export class UserSettingsComponent {
 
   readonly isItalian = this.language.isItalian;
   readonly interfaceLanguage = this.language.currentLanguage;
+  readonly interfaceLanguages = this.language.availableLanguages;
   readonly followsContentLanguage = this.language.followsContentLanguage;
   readonly activeCampaignId = this.campaigns.activeCampaignId;
   readonly campaignEntries = this.campaigns.manifest;
