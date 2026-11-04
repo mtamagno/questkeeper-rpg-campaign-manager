@@ -65,8 +65,9 @@
         [disabled]="followsContentLanguage()"
         (change)="selectInterfaceLanguage($event)"
       >
-        <option value="en">English</option>
-        <option value="it">Italiano</option>
+        @for (locale of interfaceLanguages; track locale.tag) {
+          <option [value]="locale.tag">{{ locale.label }}</option>
+        }
       </select>
       <p class="settings-card__help">
         {{

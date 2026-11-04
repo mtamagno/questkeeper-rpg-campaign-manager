@@ -1,6 +1,6 @@
 # Product interface text catalogs
 
-**Status:** version 1 foundation; complete migration tracked by public epic #137
+**Status:** version 2 locale registry; complete copy migration tracked by public epic #137
 
 QuestKeeper keeps two kinds of language data separate:
 
@@ -11,36 +11,54 @@ QuestKeeper keeps two kinds of language data separate:
 
 ## Editing copy
 
-The shipped interface catalogs are:
+Every shipped interface language lives in the single registry:
 
-- `src/app/guild/i18n/ui.en.json`;
-- `src/app/guild/i18n/ui.it.json`.
+- `src/app/guild/i18n/ui.json`.
 
-Change the value in the relevant JSON file and run:
+Change an existing value or add a locale under `locales`, then run:
 
 ```console
 npm run test:ui-texts
 npm run typecheck
 ```
 
-No Angular or TypeScript edit is required for an existing key. The resolver in
-`uiText.service.ts` selects the current interface catalog, falls back to
-English and replaces named placeholders such as `{name}`.
+No Angular or TypeScript edit is required. The language selectors, persisted
+preference and resolver discover their options from this registry, follow the
+configured fallback chain and replace named placeholders such as `{name}`.
+
+```json
+{
+  "meta": { "version": 2, "defaultLocale": "en" },
+  "locales": {
+    "en": {
+      "label": "English",
+      "direction": "ltr",
+      "fallbacks": [],
+      "texts": {}
+    }
+  }
+}
+```
 
 ## Catalog contract
 
-Every catalog contains:
+The registry declares `meta.version`, a data-defined `meta.defaultLocale`, and
+one entry per canonical BCP-47 tag. Each locale supplies its native `label`,
+text direction, ordered fallbacks and a nested `texts` object whose leaves are
+strings.
 
-- `meta.version`, currently `1`;
-- its canonical `meta.locale`;
-- an explicit `meta.fallbackLocale`;
-- a nested `texts` object whose leaves are strings.
+The default locale defines the reference key set for each repository. Every
+shipped locale must have exactly the same keys and named placeholders. The
+`test:ui-texts` gate rejects invalid tags, missing or extra keys, unknown or
+cyclic fallbacks and placeholder drift. Missing runtime keys emit one
+development warning and show an explicit diagnostic instead of silently
+rendering a raw key.
 
-English is the reference key set for each repository. All shipped locales must
-have exactly the same keys and exactly the same named placeholders. The
-`test:ui-texts` gate rejects missing, extra or incompatible entries. Missing
-runtime keys emit one development warning and show an explicit diagnostic
-instead of silently rendering a raw key.
+To add another interface language, copy the default locale entry inside
+`locales`, change its tag, native label, direction, fallbacks and translated
+values. It then appears automatically in the interface-language selectors.
+Campaign content languages remain independent and continue to come from each
+campaign's locale registry.
 
 The public and production catalogs share reusable keys. Production may add keys
 for local-only routes such as Table Rules, Gazette, DM tools or the extended

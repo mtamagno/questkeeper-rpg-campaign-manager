@@ -42,7 +42,9 @@ export class LanguageToggleComponent {
 
   /** Languages configured by the active campaign, with sensible legacy fallbacks. */
   readonly languages = computed<ReadonlyArray<string>>(() =>
-    this.hasCampaign() ? this.campaignLocale.locales().map(({ tag }) => tag) : ['en', 'it'],
+    this.hasCampaign()
+      ? this.campaignLocale.locales().map(({ tag }) => tag)
+      : this.interfaceLanguage.availableLanguages.map(({ tag }) => tag),
   );
 
   constructor() {
@@ -66,6 +68,7 @@ export class LanguageToggleComponent {
 
   /** Human-readable native language name, falling back to the code. */
   languageName(code: string): string {
+    if (!this.hasCampaign()) return this.interfaceLanguage.languageLabel(code);
     try {
       return new Intl.DisplayNames([code], { type: 'language' }).of(code) ?? code.toUpperCase();
     } catch {

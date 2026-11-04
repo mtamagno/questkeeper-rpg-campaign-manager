@@ -1,29 +1,14 @@
 import { Injectable, inject } from '@angular/core';
 
-import englishCatalog from '@guild/i18n/ui.en.json';
-import italianCatalog from '@guild/i18n/ui.it.json';
+import {
+  DEFAULT_INTERFACE_LOCALE,
+  UI_TEXT_CATALOG,
+  resolveInterfaceLocale,
+  type UiTextTree,
+} from '@guild/i18n/uiCatalog';
 import { LanguageService } from '@guild/services/language.service';
 
 type UiTextParameters = Readonly<Record<string, string | number>>;
-type UiTextTree = Readonly<Record<string, unknown>>;
-
-interface UiTextCatalog {
-  readonly meta: {
-    readonly version: number;
-    readonly locale: string;
-    readonly fallbackLocale: string;
-  };
-  readonly texts: UiTextTree;
-}
-
-const CATALOGS: Readonly<Record<string, UiTextCatalog>> = {
-  en: englishCatalog,
-  it: italianCatalog,
-};
-
-function baseLocale(locale: string): string {
-  return locale.trim().toLowerCase().split('-')[0] || 'en';
-}
 
 function readPath(root: UiTextTree, path: string): string | undefined {
   let current: unknown = root;
@@ -47,9 +32,26 @@ export class UiTextService {
   private readonly warnedKeys = new Set<string>();
 
   text(key: string, parameters: UiTextParameters = {}): string {
-    const locale = baseLocale(this.language.currentLanguage());
-    const catalog = CATALOGS[locale] ?? CATALOGS['en'];
-    const resolved = readPath(catalog.texts, key) ?? readPath(CATALOGS['en'].texts, key);
+    const requestedLocale =
+      resolveInterfaceLocale(this.language.currentLanguage()) ?? DEFAULT_INTERFACE_LOCALE;
+    const searchOrder: string[] = [];
+    const visited = new Set<string>();
+    const appendLocale = (locale: string | undefined): void => {
+      if (locale === undefined || visited.has(locale)) return;
+      const catalog = UI_TEXT_CATALOG.locales[locale];
+      if (catalog === undefined) return;
+      visited.add(locale);
+      searchOrder.push(locale);
+      for (const fallback of catalog.fallbacks) {
+        appendLocale(resolveInterfaceLocale(fallback));
+      }
+    };
+    appendLocale(requestedLocale);
+    appendLocale(DEFAULT_INTERFACE_LOCALE);
+
+    const resolved = searchOrder
+      .map((locale) => readPath(UI_TEXT_CATALOG.locales[locale].texts, key))
+      .find((value) => value !== undefined);
     if (resolved !== undefined) return interpolate(resolved, parameters);
 
     if (!this.warnedKeys.has(key)) {

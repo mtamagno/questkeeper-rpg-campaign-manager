@@ -5,16 +5,20 @@
 
 import { Injectable, computed, signal, type Signal, type WritableSignal } from '@angular/core';
 
+import {
+  DEFAULT_INTERFACE_LOCALE,
+  INTERFACE_LOCALES,
+  interfaceLocaleDefinition,
+  resolveInterfaceLocale,
+} from '@guild/i18n/uiCatalog';
 import { type SupportedLanguage } from '@guild/models/language.model';
 
 const STORAGE_KEY = 'campaign_companion_language';
 const FOLLOW_CONTENT_STORAGE_KEY = 'questkeeper:interface-follows-content:v1';
-const DEFAULT_LANGUAGE: SupportedLanguage = 'en';
-const LANGUAGE_PATTERN = /^[a-z]{2,3}(?:-[A-Z]{2})?$/;
+const DEFAULT_LANGUAGE: SupportedLanguage = DEFAULT_INTERFACE_LOCALE;
 
 function interfaceLanguageForContent(locale: string): SupportedLanguage | undefined {
-  const base = locale.trim().toLowerCase().split('-')[0];
-  return base === 'en' || base === 'it' ? base : undefined;
+  return resolveInterfaceLocale(locale);
 }
 
 /**
@@ -35,6 +39,8 @@ export class LanguageService {
   /** The currently active display language. */
   readonly currentLanguage: Signal<SupportedLanguage>;
   readonly followsContentLanguage: Signal<boolean>;
+  /** Every interface locale declared by the JSON catalog registry. */
+  readonly availableLanguages = INTERFACE_LOCALES;
 
   /**
    * Convenience derived signal: `true` when the active language is Italian.
@@ -52,10 +58,14 @@ export class LanguageService {
   }
 
   /**
-   * Legacy convenience toggle between English and Italian.
+   * Convenience toggle through every configured interface language.
    */
   toggle(): void {
-    const next: SupportedLanguage = this._currentLanguage() === 'en' ? 'it' : 'en';
+    const currentIndex = this.availableLanguages.findIndex(
+      ({ tag }) => tag === this._currentLanguage(),
+    );
+    const next = this.availableLanguages[(currentIndex + 1) % this.availableLanguages.length]?.tag;
+    if (next === undefined) return;
     this.setLanguage(next);
   }
 
@@ -64,10 +74,15 @@ export class LanguageService {
    * @param language - The language to activate.
    */
   setLanguage(language: SupportedLanguage): void {
-    const normalized = this.normalize(language);
-    if (normalized === undefined) return;
-    this._currentLanguage.set(normalized);
-    this.saveToStorage(normalized);
+    const supported = resolveInterfaceLocale(language);
+    if (supported === undefined) return;
+    this._currentLanguage.set(supported);
+    this.saveToStorage(supported);
+  }
+
+  /** Native label declared alongside the locale's copy. */
+  languageLabel(language: string): string {
+    return interfaceLocaleDefinition(language)?.label ?? language.toUpperCase();
   }
 
   /** Keeps the interface aligned when the reader chooses a supported content locale. */
@@ -94,9 +109,9 @@ export class LanguageService {
   private loadFromStorage(): SupportedLanguage {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
-      const normalized = stored === null ? undefined : this.normalize(stored);
-      if (normalized !== undefined) return normalized;
-      return DEFAULT_LANGUAGE;
+      return stored === null
+        ? DEFAULT_LANGUAGE
+        : (resolveInterfaceLocale(stored) ?? DEFAULT_LANGUAGE);
     } catch {
       return DEFAULT_LANGUAGE;
     }
@@ -120,14 +135,5 @@ export class LanguageService {
     } catch {
       // localStorage may be unavailable — fail silently
     }
-  }
-
-  /** Normalizes a user-provided language code without limiting the language list. */
-  private normalize(language: string): SupportedLanguage | undefined {
-    const [base = '', region] = language.trim().replace('_', '-').split('-');
-    const normalized = region
-      ? `${base.toLowerCase()}-${region.toUpperCase()}`
-      : base.toLowerCase();
-    return LANGUAGE_PATTERN.test(normalized) ? normalized : undefined;
   }
 }

@@ -45,7 +45,9 @@ assert.doesNotMatch(selector, /=== 'en' \? 'it' : 'en'/);
 const interfaceLanguage = read('src/app/guild/services/language.service.ts');
 assert.match(interfaceLanguage, /followsContentLanguage/);
 assert.match(interfaceLanguage, /followContentLanguage/);
-assert.match(interfaceLanguage, /base === 'en' \|\| base === 'it'/);
+assert.match(interfaceLanguage, /resolveInterfaceLocale/);
+assert.match(interfaceLanguage, /availableLanguages = INTERFACE_LOCALES/);
+assert.doesNotMatch(interfaceLanguage, /base === 'en' \|\| base === 'it'/);
 
 const campaignSelectorTs = read('src/app/guild/pages/campaign-selector/campaign-selector.component.ts');
 const campaignSelectorHtml = read(
@@ -77,6 +79,7 @@ assert.deepEqual(
 const settings = read('src/app/guild/pages/user-settings/user-settings.component.html');
 assert.match(settings, /language\.interfaceLabel/);
 assert.match(settings, /follow-content-language/);
+assert.match(settings, /@for \(locale of interfaceLanguages/);
 
 const pdf = read('src/app/adventurers/services/campaignCharacterSheetPdf.service.ts');
 assert.match(pdf, /CampaignPdfLanguage = string/);
