@@ -1903,3 +1903,34 @@ campaign-scoped, and fallback content is marked with its actual language.
 **Revisit when:** A real campaign needs structured variant negotiation beyond
 the explicit fallback graph, or migration evidence shows that locale-keyed maps
 cannot round-trip safely across supported QuestKeeper versions.
+
+### QK-071 — Global commands follow frequency, context and persistence
+
+**Date:** 4 November 2026
+
+**Status:** Active
+
+**Decision:** The sticky command bar has one responsive hierarchy. Continue
+reading, My Character and quick navigation are conditional primary actions.
+Campaign switching, current-page favourites, local Manager access,
+installation and guided-tour recovery live in one ordered overflow at every
+width. Durable preference editing stays in User Settings; artifact-specific
+actions stay on the page that owns them.
+
+**Why:** Flattening every available action across a wide desktop made rare
+setup and authoring controls compete with recovery and wayfinding. A
+mobile-only overflow also encoded a breakpoint instead of stable action
+ownership and left dismissal behavior incomplete.
+
+**Consequences:** New global controls must declare frequency, context,
+persistence and compact placement before entering the bar. The overflow closes
+on action, route change, outside pointer and Escape; Escape restores its trigger
+and opening the command palette closes the overflow. Breadcrumbs remain
+wide-screen orientation, while compact layouts use the sidebar and quick
+navigation without deleting destinations.
+
+**Source:** [4 November global shell and command-bar audit](reviews/2026-11-04-global-shell-command-bar-audit.md).
+
+**Revisit when:** Player evidence shows a primary action is consistently missed,
+native applications require a different shell, or account synchronization
+changes preference ownership.
