@@ -15,6 +15,11 @@ test('campaign language picker exposes searchable, custom and accessible control
     'data-language-search',
     'data-language-add-custom',
     'data-language-remove',
+    'data-language-move',
+    'data-locale-direction',
+    'data-locale-fallback',
+    'name="sourceLanguage"',
+    'localeRemovalResolutions',
     'aria-live="polite"',
     "event.key !== 'Enter'",
     'currentCampaignLocalizedValues',
@@ -24,6 +29,7 @@ test('campaign language picker exposes searchable, custom and accessible control
   }
   assert.match(styles, /@media \(max-width: 620px\)[\s\S]+\.language-picker__add/);
   assert.match(styles, /\.language-picker__selected/);
+  assert.match(styles, /\.language-picker__fallbacks/);
 });
 
 test('legacy locale migration is explicit, previewed and recoverable', async () => {

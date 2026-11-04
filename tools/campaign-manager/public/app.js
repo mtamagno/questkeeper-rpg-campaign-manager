@@ -1325,17 +1325,46 @@ function languageName(code) {
   }
 }
 
-function campaignLanguagePicker(languages, defaultLanguage) {
+function campaignLanguagePicker(languages, defaultLanguage, registry = null) {
   const catalog = state.project.languageCatalog ?? [];
   const locale = window.managerI18n?.language === 'it' ? 'it' : 'en';
   const datalistId = `campaign-language-catalog-${state.editor?.editing ? 'edit' : 'create'}`;
+  const current = registry ?? state.campaign?.localeContract?.registry;
+  const currentByTag = new Map((current?.locales ?? []).map((entry) => [entry.tag, entry]));
+  const sourceLanguage = languages.includes(current?.sourceLocale)
+    ? current.sourceLocale
+    : defaultLanguage;
   const selected = languages
-    .map(
-      (code) =>
-        `<li><span><strong>${escapeHtml(languageName(code))}</strong><small>${escapeHtml(code)}</small></span><button type="button" class="icon-button" data-language-remove="${escapeHtml(code)}" aria-label="Remove ${escapeHtml(languageName(code))}">×</button></li>`,
-    )
+    .map((code, index) => {
+      const configured = currentByTag.get(code) ?? { tag: code, direction: 'auto', fallbacks: [] };
+      const fallbacks = configured.fallbacks ?? [];
+      const completeness = campaignLocaleCompleteness(code);
+      return `<li data-language-row="${escapeHtml(code)}"><div class="language-picker__identity"><span><strong>${escapeHtml(languageName(code))}</strong><small>${escapeHtml(code)}</small></span><span class="translation-status translation-status--${completeness.status}">${completeness.label}</span></div><div class="language-picker__row-actions"><button type="button" class="icon-button" data-language-move="up" data-language-code="${escapeHtml(code)}" ${index === 0 ? 'disabled' : ''} aria-label="Move ${escapeHtml(languageName(code))} earlier">↑</button><button type="button" class="icon-button" data-language-move="down" data-language-code="${escapeHtml(code)}" ${index === languages.length - 1 ? 'disabled' : ''} aria-label="Move ${escapeHtml(languageName(code))} later">↓</button><button type="button" class="icon-button" data-language-remove="${escapeHtml(code)}" aria-label="Remove ${escapeHtml(languageName(code))}">×</button></div><label class="field"><span>Text direction</span><select data-locale-direction="${escapeHtml(code)}"><option value="auto" ${configured.direction === 'auto' ? 'selected' : ''}>Automatic</option><option value="ltr" ${configured.direction === 'ltr' ? 'selected' : ''}>Left to right</option><option value="rtl" ${configured.direction === 'rtl' ? 'selected' : ''}>Right to left</option></select></label><fieldset class="language-picker__fallbacks"><legend>Fallbacks, in order</legend>${
+        languages
+          .filter((fallback) => fallback !== code)
+          .map(
+            (fallback) =>
+              `<label><input type="checkbox" data-locale-fallback="${escapeHtml(code)}" value="${escapeHtml(fallback)}" ${fallbacks.includes(fallback) ? 'checked' : ''} /> ${escapeHtml(languageName(fallback))}</label>`,
+          )
+          .join('') || '<small>No other configured language.</small>'
+      }</fieldset></li>`;
+    })
     .join('');
-  return `<fieldset class="field field--wide language-picker" data-language-picker><legend>Campaign content languages</legend><p>Search common languages by name or code. Regional variants remain separate.</p><div class="language-picker__add"><label class="field"><span>Find a language</span><input data-language-search list="${datalistId}" autocomplete="off" placeholder="English, Italiano, pt-BR…" /></label><button type="button" class="secondary-button" data-language-add>Add language</button></div><datalist id="${datalistId}">${catalog.map((item) => `<option value="${escapeHtml(item.code)}">${escapeHtml(item.names?.[locale] || item.names?.en || item.code)}</option>`).join('')}</datalist><ul class="language-picker__selected" data-language-selected>${selected}</ul><input type="hidden" name="languages" value="${escapeHtml(languages.join(','))}" /><label class="field"><span>Default language</span><select name="defaultLanguage">${languages.map((code) => `<option value="${escapeHtml(code)}" ${code === defaultLanguage ? 'selected' : ''}>${escapeHtml(languageName(code))} (${escapeHtml(code)})</option>`).join('')}</select></label><details><summary>Add a custom BCP-47 tag</summary><div class="language-picker__add"><label class="field"><span>Custom language tag</span><input data-language-custom autocomplete="off" placeholder="sr-Latn or en-GB" /></label><button type="button" class="secondary-button" data-language-add-custom>Add custom language</button></div><small>Use this for a valid language or regional variant not listed above.</small></details><p class="language-picker__message" data-language-message role="status" aria-live="polite"></p></fieldset>`;
+  return `<fieldset class="field field--wide language-picker" data-language-picker><legend>Campaign content languages</legend><p>Order controls selectors and exports. Default and original-writing languages are independent; fallbacks are used only when a translation is missing.</p><div class="language-picker__add"><label class="field"><span>Find a language</span><input data-language-search list="${datalistId}" autocomplete="off" placeholder="English, Italiano, pt-BR…" /></label><button type="button" class="secondary-button" data-language-add>Add language</button></div><datalist id="${datalistId}">${catalog.map((item) => `<option value="${escapeHtml(item.code)}">${escapeHtml(item.names?.[locale] || item.names?.en || item.code)}</option>`).join('')}</datalist><ul class="language-picker__selected" data-language-selected>${selected}</ul><input type="hidden" name="languages" value="${escapeHtml(languages.join(','))}" /><div class="language-picker__roles"><label class="field"><span>Default reading language</span><select name="defaultLanguage">${languages.map((code) => `<option value="${escapeHtml(code)}" ${code === defaultLanguage ? 'selected' : ''}>${escapeHtml(languageName(code))} (${escapeHtml(code)})</option>`).join('')}</select></label><label class="field"><span>Original writing language</span><select name="sourceLanguage">${languages.map((code) => `<option value="${escapeHtml(code)}" ${code === sourceLanguage ? 'selected' : ''}>${escapeHtml(languageName(code))} (${escapeHtml(code)})</option>`).join('')}</select></label></div><details><summary>Add a custom BCP-47 tag</summary><div class="language-picker__add"><label class="field"><span>Custom language tag</span><input data-language-custom autocomplete="off" placeholder="sr-Latn or en-GB" /></label><button type="button" class="secondary-button" data-language-add-custom>Add custom language</button></div><small>Use this for a valid language or regional variant not listed above.</small></details><p class="language-picker__message" data-language-message role="status" aria-live="polite"></p></fieldset>`;
+}
+
+function campaignLocaleCompleteness(code) {
+  const values = state.editor?.campaignDraftValues ?? {
+    name: state.campaign?.manifestEntry?.name ?? {},
+    description: state.campaign?.manifestEntry?.description ?? {},
+    status: state.campaign?.manifestEntry?.status ?? {},
+    story: state.campaign?.campaign?.storySoFar ?? {},
+  };
+  const entries = Object.values(values);
+  const present = entries.filter((entry) => String(entry?.[code] ?? '').trim()).length;
+  if (present === entries.length) return { status: 'reviewed', label: 'Complete' };
+  if (present > 0) return { status: 'manual', label: `${present}/${entries.length} fields` };
+  return { status: 'missing', label: 'Missing' };
 }
 
 function campaignLocalizedBlock(values, languages, defaultLanguage, includeStory = true) {
@@ -1697,7 +1726,31 @@ function openDialog({ title, eyebrow, html, editor }) {
   fields.querySelector('input, textarea, select')?.focus();
 }
 
+function localeRegistryFromPicker() {
+  const picker = fields.querySelector('[data-language-picker]');
+  if (!picker) return null;
+  const languages = normalizeLanguageCodes(picker.querySelector('[name="languages"]').value);
+  return {
+    version: 1,
+    locales: languages.map((tag) => {
+      const fallbacks = [
+        ...picker.querySelectorAll(`[data-locale-fallback="${CSS.escape(tag)}"]:checked`),
+      ].map((input) => input.value);
+      return {
+        tag,
+        direction:
+          picker.querySelector(`[data-locale-direction="${CSS.escape(tag)}"]`)?.value ?? 'auto',
+        ...(fallbacks.length ? { fallbacks } : {}),
+      };
+    }),
+    defaultLocale: picker.querySelector('[name="defaultLanguage"]').value,
+    sourceLocale: picker.querySelector('[name="sourceLanguage"]').value,
+  };
+}
+
 function localeRegistryForEditor(languages, defaultLanguage) {
+  const pickerRegistry = localeRegistryFromPicker();
+  if (pickerRegistry) return pickerRegistry;
   const current = state.campaign?.localeContract?.registry;
   const currentByTag = new Map((current?.locales ?? []).map((locale) => [locale.tag, locale]));
   const configured = new Set(languages);
@@ -1749,7 +1802,12 @@ function campaignForm(campaign) {
         : '',
       field('startDate', 'Start date', new Date().toISOString().slice(0, 10), { type: 'date' }),
       section('Languages'),
-      campaignLanguagePicker(languages, 'en'),
+      campaignLanguagePicker(languages, 'en', {
+        version: 1,
+        locales: [{ tag: 'en', direction: 'auto' }],
+        defaultLocale: 'en',
+        sourceLocale: 'en',
+      }),
       campaignLocalizedBlock(
         { name: {}, description: {}, status: { en: 'In progress' }, story: {} },
         languages,
@@ -1780,7 +1838,11 @@ function campaignForm(campaign) {
     }),
     campaignLocaleMigrationPanel(campaign),
     section('Languages'),
-    campaignLanguagePicker(languages, entry.defaultLanguage ?? languages[0]),
+    campaignLanguagePicker(
+      languages,
+      entry.defaultLanguage ?? languages[0],
+      campaign.localeContract?.registry,
+    ),
     campaignLocalizedBlock(
       {
         name: entry.name,
@@ -1886,10 +1948,29 @@ function languagePickerMessage(message, error = false) {
 
 function refreshCampaignLanguages(languages, defaultLanguage) {
   const values = currentCampaignLocalizedValues();
+  const registry = localeRegistryFromPicker() ?? state.editor.localeRegistryDraft;
   state.editor.campaignDraftValues = values;
+  state.editor.localeRegistryDraft = {
+    version: 1,
+    locales: languages.map(
+      (tag) =>
+        registry?.locales?.find((locale) => locale.tag === tag) ?? {
+          tag,
+          direction: 'auto',
+        },
+    ),
+    defaultLocale: defaultLanguage,
+    sourceLocale: languages.includes(registry?.sourceLocale)
+      ? registry.sourceLocale
+      : defaultLanguage,
+  };
   const picker = fields.querySelector('[data-language-picker]');
   const localizedBlock = fields.querySelector('[data-campaign-localized-fields]');
-  picker.outerHTML = campaignLanguagePicker(languages, defaultLanguage);
+  picker.outerHTML = campaignLanguagePicker(
+    languages,
+    defaultLanguage,
+    state.editor.localeRegistryDraft,
+  );
   localizedBlock.outerHTML = campaignLocalizedBlock(
     values,
     languages,
@@ -1955,11 +2036,15 @@ function removeCampaignLanguage(code) {
     hasContent &&
     !confirm(
       translate(
-        'This language already contains campaign text. It will be hidden from the campaign but preserved in the data. Continue?',
+        'This language is referenced by campaign content. Remove it from the active registry and archive its existing values without deleting them?',
       ),
     )
   ) {
     return;
+  }
+  if (hasContent) {
+    state.editor.localeRemovalResolutions ??= {};
+    state.editor.localeRemovalResolutions[code] = 'archive';
   }
   const next = languages.filter((language) => language !== code);
   const currentDefault = picker.querySelector('[name="defaultLanguage"]').value;
@@ -1969,6 +2054,17 @@ function removeCampaignLanguage(code) {
       ? 'Language removed from the campaign list; its existing text is preserved.'
       : 'Language removed.',
   );
+}
+
+function moveCampaignLanguage(code, direction) {
+  const picker = fields.querySelector('[data-language-picker]');
+  const languages = normalizeLanguageCodes(picker.querySelector('[name="languages"]').value);
+  const index = languages.indexOf(code);
+  const target = direction === 'up' ? index - 1 : index + 1;
+  if (index < 0 || target < 0 || target >= languages.length) return;
+  [languages[index], languages[target]] = [languages[target], languages[index]];
+  refreshCampaignLanguages(languages, picker.querySelector('[name="defaultLanguage"]').value);
+  languagePickerMessage('Language order updated.');
 }
 
 function campaignContainsLocalizedContent(value, language, visited = new Set()) {
@@ -2346,6 +2442,7 @@ async function saveCampaign(form) {
       ),
     },
     campaign: { narrativeMood },
+    localeRemovalResolutions: state.editor?.localeRemovalResolutions ?? {},
   };
   if (creating || !state.campaign?.localeContract?.migration?.required) {
     data.localeRegistry = localeRegistryForEditor(languages, defaultLanguage);
@@ -4137,6 +4234,11 @@ fields.addEventListener('click', (event) => {
     removeCampaignLanguage(removeLanguage.dataset.languageRemove);
     return;
   }
+  const moveLanguage = event.target.closest('[data-language-move]');
+  if (moveLanguage) {
+    moveCampaignLanguage(moveLanguage.dataset.languageCode, moveLanguage.dataset.languageMove);
+    return;
+  }
   const entityButton = event.target.closest('[data-ai-entity]');
   if (entityButton) {
     processEntityImport(entityButton.dataset.aiEntity).catch((error) => toast(error.message, true));
@@ -4202,6 +4304,16 @@ fields.addEventListener('change', (event) => {
     );
     refreshCampaignLanguages(languages, event.target.value);
     languagePickerMessage('Default language updated. Required fields changed below.');
+    return;
+  }
+  if (
+    event.target.matches(
+      '[data-locale-direction], [data-locale-fallback], [name="sourceLanguage"]',
+    ) &&
+    event.target.closest('[data-language-picker]')
+  ) {
+    state.editor.localeRegistryDraft = localeRegistryFromPicker();
+    languagePickerMessage('Locale registry draft updated.');
     return;
   }
   if (event.target.name === 'gameSystemId') {

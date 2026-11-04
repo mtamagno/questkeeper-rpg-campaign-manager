@@ -418,13 +418,32 @@ test('supports arbitrary BCP-47 campaign languages and regional codes', async (t
   assert.equal(campaign.manifestEntry.defaultLanguage, 'es');
   assert.equal(campaign.manifestEntry.name.ja, '海の年代記');
 
+  await assert.rejects(
+    updateCampaign(root, campaign.manifestEntry.id, {
+      languages: ['de', 'fr-CA'],
+      defaultLanguage: 'fr-CA',
+      name: { de: '', 'fr-CA': 'Chroniques de la mer' },
+    }),
+    /explicit archive option/,
+  );
+
   const updated = await updateCampaign(root, campaign.manifestEntry.id, {
-    languages: ['de', 'fr-CA'],
-    defaultLanguage: 'fr-CA',
+    localeRegistry: {
+      version: 1,
+      locales: [
+        { tag: 'de', direction: 'ltr' },
+        { tag: 'fr-CA', direction: 'auto', fallbacks: ['de'] },
+      ],
+      defaultLocale: 'fr-CA',
+      sourceLocale: 'de',
+    },
     name: { de: '', 'fr-CA': 'Chroniques de la mer' },
+    localeRemovalResolutions: { es: 'archive', ja: 'archive', 'pt-BR': 'archive' },
   });
   assert.deepEqual(updated.campaign.languages, ['de', 'fr-CA']);
   assert.equal(updated.campaign.defaultLanguage, 'fr-CA');
+  assert.equal(updated.campaign.localeRegistry.sourceLocale, 'de');
+  assert.deepEqual(updated.campaign.localeRegistry.locales[1].fallbacks, ['de']);
 
   await assert.rejects(
     updateCampaign(root, campaign.manifestEntry.id, { languages: ['not a language'] }),

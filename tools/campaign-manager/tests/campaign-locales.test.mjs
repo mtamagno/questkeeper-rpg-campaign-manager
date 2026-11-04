@@ -2,11 +2,21 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  findLocaleReferences,
   inspectCampaignLocales,
   localeRegistryFromLanguages,
   normalizeLocaleRegistry,
   resolveLocalizedText,
 } from '../campaign-locales.mjs';
+
+test('finds populated locale references without treating empty drafts as content', () => {
+  const bundle = {
+    name: { en: 'Road', fr: '' },
+    characters: [{ bio: { en: 'A traveller', fr: 'Voyageuse' } }],
+  };
+  assert.deepEqual(findLocaleReferences(bundle, 'fr'), ['$.characters[0].bio.fr']);
+  assert.deepEqual(findLocaleReferences(bundle, 'de'), []);
+});
 
 test('normalizes one, two and N campaign locales without requiring English or Italian', () => {
   assert.deepEqual(localeRegistryFromLanguages(['es'], 'es'), {
