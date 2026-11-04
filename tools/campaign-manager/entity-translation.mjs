@@ -89,7 +89,7 @@ export function buildTranslationPlan({
         const key = `${type}:${id}:${field.path}`;
         const sourceHash = hash(field.source);
         const targetHash = hash(field.target);
-        const previous = applied[key];
+        const previous = applied[`${targetLanguage}:${key}`] ?? applied[key];
         const status = !field.target.trim()
           ? 'missing'
           : previous?.sourceHash === sourceHash && previous?.targetHash === targetHash
@@ -111,6 +111,76 @@ export function buildTranslationPlan({
     }
   }
   return { sourceLanguage, targetLanguage, items };
+}
+
+/**
+ * Validates a source and an arbitrary target subset against the campaign registry.
+ * The returned order is stable and duplicate-free so repeated plans are idempotent.
+ */
+export function normalizeTranslationTargets({
+  availableLanguages,
+  sourceLanguage,
+  targetLanguages,
+}) {
+  const available = new Set((availableLanguages ?? []).map(String));
+  if (!available.has(sourceLanguage)) {
+    throw new Error('The source language is no longer configured for this campaign.');
+  }
+  const targets = [
+    ...new Set((targetLanguages ?? []).map(String).filter((language) => language.trim())),
+  ];
+  if (!targets.length) throw new Error('Choose at least one target campaign language.');
+  for (const target of targets) {
+    if (target === sourceLanguage)
+      throw new Error('Source and target languages must be different.');
+    if (!available.has(target)) {
+      throw new Error(`The target language ${target} is no longer configured for this campaign.`);
+    }
+  }
+  return targets;
+}
+
+/** Builds independent plans for one, two or N target locales. */
+export function buildTranslationPlans({ targetLanguages, availableLanguages, ...input }) {
+  const targets = normalizeTranslationTargets({
+    availableLanguages,
+    sourceLanguage: input.sourceLanguage,
+    targetLanguages,
+  });
+  return {
+    sourceLanguage: input.sourceLanguage,
+    targetLanguages: targets,
+    drafts: Object.fromEntries(
+      targets.map((targetLanguage) => [
+        targetLanguage,
+        buildTranslationPlan({ ...input, targetLanguage }),
+      ]),
+    ),
+  };
+}
+
+/** Runs independent target work while preserving completed results across partial failures. */
+export async function runTranslationTargetBatch({
+  targetLanguages,
+  completedTargets = [],
+  regenerate = false,
+  worker,
+}) {
+  const completed = new Set(completedTargets);
+  const results = {};
+  const failures = {};
+  for (const targetLanguage of targetLanguages) {
+    if (!regenerate && completed.has(targetLanguage)) {
+      results[targetLanguage] = { status: 'preserved' };
+      continue;
+    }
+    try {
+      results[targetLanguage] = await worker(targetLanguage);
+    } catch (error) {
+      failures[targetLanguage] = error instanceof Error ? error.message : String(error);
+    }
+  }
+  return { results, failures };
 }
 
 function setLocalizedPath(entity, path, language, value) {
@@ -157,14 +227,24 @@ export function applyTranslationDraft(campaign, draft, { overwrite = false } = {
     setLocalizedPath(entity, item.path, draft.targetLanguage, item.draft);
     applied.push({ key: item.key, sourceHash: item.sourceHash, targetHash: hash(item.draft) });
   }
-  return { campaign: updated, report: { applied, skipped, completed: true } };
+  return {
+    campaign: updated,
+    report: { applied, skipped, completed: true, targetLanguage: draft.targetLanguage },
+  };
 }
 
 export async function readTranslationWorkspace(root, campaignId) {
   try {
-    return JSON.parse(await readFile(join(root, `${campaignId}.json`), 'utf8'));
+    const workspace = JSON.parse(await readFile(join(root, `${campaignId}.json`), 'utf8'));
+    if (workspace.drafts || !workspace.draft?.targetLanguage) return workspace;
+    return {
+      ...workspace,
+      version: 2,
+      drafts: { [workspace.draft.targetLanguage]: workspace.draft },
+      activeTarget: workspace.draft.targetLanguage,
+    };
   } catch (error) {
-    if (error?.code === 'ENOENT') return { version: 1, applied: {} };
+    if (error?.code === 'ENOENT') return { version: 2, applied: {}, drafts: {} };
     throw error;
   }
 }
@@ -173,14 +253,17 @@ export async function writeTranslationWorkspace(root, campaignId, workspace) {
   const file = join(root, `${campaignId}.json`);
   await mkdir(dirname(file), { recursive: true });
   const temporary = `${file}.${process.pid}.tmp`;
-  await writeFile(temporary, `${JSON.stringify({ version: 1, ...workspace }, null, 2)}\n`, 'utf8');
+  await writeFile(temporary, `${JSON.stringify({ version: 2, ...workspace }, null, 2)}\n`, 'utf8');
   await rename(temporary, file);
 }
 
 export function mergeAppliedRecords(previous = {}, report = {}) {
   const next = { ...previous };
   const appliedAt = new Date().toISOString();
-  for (const item of report.applied ?? []) next[item.key] = { ...item, appliedAt };
+  for (const item of report.applied ?? []) {
+    const key = report.targetLanguage ? `${report.targetLanguage}:${item.key}` : item.key;
+    next[key] = { ...item, targetLanguage: report.targetLanguage, appliedAt };
+  }
   return next;
 }
 

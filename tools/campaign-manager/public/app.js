@@ -808,40 +808,70 @@ function renderEntityTranslations() {
     return '<section class="project-panel"><h2>Entity translations</h2><p>Add at least two campaign languages before opening a translation batch.</p></section>';
   }
   const workspace = state.entityTranslations;
-  const draft = workspace?.draft;
+  const drafts = workspace?.drafts ?? {};
   const source =
-    draft?.sourceLanguage ?? state.campaign.manifestEntry.defaultLanguage ?? languages[0];
-  const target = draft?.targetLanguage ?? languages.find((language) => language !== source);
+    workspace?.sourceLanguage ??
+    state.campaign.manifestEntry.localeRegistry?.sourceLocale ??
+    state.campaign.manifestEntry.defaultLanguage ??
+    languages[0];
+  const draftTargets = Object.keys(drafts).filter((language) => languages.includes(language));
+  const target = draftTargets.includes(state.entityTranslationTarget)
+    ? state.entityTranslationTarget
+    : (workspace?.activeTarget ?? draftTargets[0]);
+  state.entityTranslationTarget = target;
+  const draft = target ? drafts[target] : undefined;
   const entities = translationEntityOptions();
   const counts = (draft?.items ?? []).reduce(
     (result, item) => ({ ...result, [item.status]: (result[item.status] ?? 0) + 1 }),
     {},
   );
+  const targetChoices = languages
+    .filter((language) => language !== source)
+    .map(
+      (language) =>
+        `<label class="consent-check"><input type="checkbox" data-translation-target value="${escapeHtml(language)}" ${workspace?.targetLanguages?.includes(language) || !workspace ? 'checked' : ''} /> ${escapeHtml(languageName(language))} (${escapeHtml(language)})</label>`,
+    )
+    .join('');
+  const targetReview = draftTargets.length
+    ? `<label class="field"><span>Target under review</span><select data-translation-review-target>${draftTargets.map((language) => `<option value="${escapeHtml(language)}" ${language === target ? 'selected' : ''}>${escapeHtml(languageName(language))} · ${escapeHtml(drafts[language].status)}</option>`).join('')}</select></label>`
+    : '';
   return `<section class="section-heading"><div><span class="eyebrow">Reviewed localization</span><h2>Entity translations</h2><p>Scan one field, one entity, one type or a selected batch. Missing and stale fields are selected by default.</p></div></section>
     <section class="project-panel translation-batch" data-entity-translations>
       <div class="form-grid">
         <label class="field"><span>Source language</span><select data-translation-source>${languages.map((language) => `<option value="${escapeHtml(language)}" ${language === source ? 'selected' : ''}>${escapeHtml(languageName(language))}</option>`).join('')}</select></label>
-        <label class="field"><span>Target language</span><select data-translation-target>${languages.map((language) => `<option value="${escapeHtml(language)}" ${language === target ? 'selected' : ''}>${escapeHtml(languageName(language))}</option>`).join('')}</select></label>
         <label class="field"><span>Scope</span><select data-translation-scope><option value="all">All entity types</option><option value="characters">Characters</option><option value="npcs">NPCs</option><option value="sessions">Sessions</option><option value="maps">Locations</option><option value="party-relationships">Party relationships</option><option value="npc-relationships">NPC relationships</option><option value="entity">One entity</option></select></label>
         <label class="field"><span>Entity (optional)</span><select data-translation-entity><option value="">Choose after selecting “One entity”</option>${entities.map((item) => `<option value="${escapeHtml(`${item.type}:${item.id}`)}">${escapeHtml(item.label)}</option>`).join('')}</select></label>
+        ${targetReview}
       </div>
+      <fieldset class="field field--wide"><legend>Target languages to plan</legend><div class="translation-targets">${targetChoices}</div></fieldset>
       <div class="action-row"><button class="primary-button" data-translation-action="plan">Scan translatable fields</button></div>
       ${draft ? `<div class="translation-statuses"><span class="translation-status translation-status--missing">Missing ${counts.missing ?? 0}</span><span class="translation-status translation-status--stale">Stale ${counts.stale ?? 0}</span><span class="translation-status translation-status--current">Current ${counts.current ?? 0}</span><span class="tag">Draft: ${escapeHtml(draft.status)}</span></div>` : '<p>Your recoverable draft will appear here.</p>'}
       ${
         draft?.items?.length
           ? `<div class="translation-batch__items">${draft.items.map((item, index) => `<article class="translation-field"><label class="consent-check"><input type="checkbox" data-translation-selected="${index}" ${item.selected ? 'checked' : ''} /> <strong>${escapeHtml(item.entityType)} / ${escapeHtml(item.entityId)}</strong> · ${escapeHtml(item.path)} <span class="tag">${escapeHtml(item.status)}</span></label><p><strong>${escapeHtml(source)}:</strong> ${escapeHtml(item.source)}</p><label class="field"><span>${escapeHtml(target)} draft</span><textarea data-translation-value="${index}">${escapeHtml(item.draft ?? item.target ?? '')}</textarea></label></article>`).join('')}</div>
         <div class="ai-engine-grid">${engineSelect('entityTranslationEngine', 'Translation model', 'prose', 'Local engines stay on this computer; remote engines receive only checked fields.')}</div>
-        <label class="consent-check"><input type="checkbox" data-translation-consent /> I consent to sending the checked entity fields to the explicitly selected remote provider/model. Local models do not require cloud consent.</label>
+        <p class="notice">Exact AI scope: ${escapeHtml(defaultEngineValue('prose'))} · ${escapeHtml(source)} → ${escapeHtml(target)} · ${draft.items.filter((item) => item.selected).length} selected fields listed above.</p>
+        <label class="consent-check"><input type="checkbox" data-translation-consent /> I consent to sending the exact checked fields to the explicitly selected remote provider/model. Pricing and retention follow that provider's account.</label>
         <label class="consent-check"><input type="checkbox" data-translation-overwrite /> Allow reviewed drafts to replace non-empty target text.</label>
-        <div class="action-row"><button class="secondary-button" data-translation-action="ai">Create AI drafts</button><button class="secondary-button" data-translation-action="review">Save as reviewed</button><button class="primary-button" data-translation-action="apply" ${draft.status === 'reviewed' ? '' : 'disabled'}>Apply reviewed batch</button></div>`
+        <div class="action-row"><button class="secondary-button" data-translation-action="ai">Create AI draft for ${escapeHtml(target)}</button><button class="secondary-button" data-translation-action="ai-all">Create missing target drafts</button><button class="secondary-button" data-translation-action="review">Save ${escapeHtml(target)} as reviewed</button><button class="primary-button" data-translation-action="apply" ${draft.status === 'reviewed' ? '' : 'disabled'}>Apply reviewed ${escapeHtml(target)}</button></div>`
           : ''
       }
-      ${workspace?.lastReport ? `<p class="notice">Completed: ${workspace.lastReport.applied.length} fields applied; ${workspace.lastReport.skipped.length} skipped.</p>` : ''}
+      ${workspace?.lastReports?.[target] ? `<p class="notice">Completed for ${escapeHtml(target)}: ${workspace.lastReports[target].applied.length} fields applied; ${workspace.lastReports[target].skipped.length} skipped.</p>` : ''}
+      ${
+        workspace?.lastRun && Object.keys(workspace.lastRun.failures ?? {}).length
+          ? `<p class="notice notice--error">Retry needed: ${escapeHtml(
+              Object.entries(workspace.lastRun.failures)
+                .map(([language, message]) => `${language}: ${message}`)
+                .join(' · '),
+            )}</p>`
+          : ''
+      }
     </section>`;
 }
 
 function collectEntityTranslationDraft(status) {
-  const draft = structuredClone(state.entityTranslations?.draft);
+  const target = state.entityTranslationTarget;
+  const draft = structuredClone(state.entityTranslations?.drafts?.[target]);
   if (!draft) return null;
   for (const [index, item] of draft.items.entries()) {
     item.selected =
@@ -861,30 +891,44 @@ async function runEntityTranslationAction(action) {
     if (scope === 'entity' && !entityValue) throw new Error('Choose the entity to scan.');
     const [entityType, entityId] = entityValue.split(':');
     const entityTypes = scope === 'all' || scope === 'entity' ? undefined : [scope];
+    const targetLanguages = [...content.querySelectorAll('[data-translation-target]:checked')].map(
+      (input) => input.value,
+    );
     state.entityTranslations = await api(`${base}/translations/plan`, {
       method: 'POST',
       body: JSON.stringify({
         sourceLanguage: content.querySelector('[data-translation-source]').value,
-        targetLanguage: content.querySelector('[data-translation-target]').value,
+        targetLanguages,
         entityTypes: scope === 'entity' && entityType ? [entityType] : entityTypes,
         entityIds: scope === 'entity' && entityId ? [entityId] : [],
       }),
     });
+    state.entityTranslationTarget = state.entityTranslations.activeTarget;
     renderCampaign();
     return;
   }
   const reviewed = action === 'review' || action === 'apply';
   const draft = collectEntityTranslationDraft(reviewed ? 'reviewed' : 'draft');
-  state.entityTranslations = await api(`${base}/translations/draft`, {
-    method: 'PUT',
-    body: JSON.stringify({ draft }),
-  });
-  if (action === 'ai') {
+  if (draft && action !== 'ai-all') {
+    state.entityTranslations = await api(`${base}/translations/draft`, {
+      method: 'PUT',
+      body: JSON.stringify({ draft, targetLanguage: state.entityTranslationTarget }),
+    });
+  }
+  if (action === 'ai' || action === 'ai-all') {
     const engineValue = content.querySelector('[name="entityTranslationEngine"]')?.value;
+    const targetLanguages =
+      action === 'ai-all'
+        ? Object.entries(state.entityTranslations.drafts ?? {})
+            .filter(([, item]) => !['draft', 'reviewed', 'applied'].includes(item.status))
+            .map(([language]) => language)
+        : [state.entityTranslationTarget];
     state.entityTranslations = await api(`${base}/ai/translate-entities`, {
       method: 'POST',
       body: JSON.stringify({
-        draft,
+        sourceLanguage: state.entityTranslations.sourceLanguage,
+        targetLanguages,
+        ...(action === 'ai' ? { draft, regenerate: true } : {}),
         engine: parseEngineValue(engineValue),
         remoteConsent: content.querySelector('[data-translation-consent]')?.checked === true,
       }),
@@ -893,6 +937,8 @@ async function runEntityTranslationAction(action) {
     const result = await api(`${base}/translations/apply`, {
       method: 'POST',
       body: JSON.stringify({
+        sourceLanguage: draft.sourceLanguage,
+        targetLanguage: draft.targetLanguage,
         overwrite: content.querySelector('[data-translation-overwrite]')?.checked === true,
       }),
     });
@@ -1373,8 +1419,11 @@ function campaignLocalizedBlock(values, languages, defaultLanguage, includeStory
 
 function translationWorkspace(languages) {
   if (languages.length < 2) return '';
-  const source = state.campaign?.manifestEntry?.defaultLanguage ?? languages[0];
-  const target = languages.find((language) => language !== source) ?? languages[1];
+  const source =
+    state.campaign?.manifestEntry?.localeRegistry?.sourceLocale ??
+    state.campaign?.manifestEntry?.defaultLanguage ??
+    languages[0];
+  const drafts = state.editor?.translationDrafts ?? {};
   const translationState = state.campaign?.campaign?.translationState ?? {};
   const badges = languages
     .filter((language) => language !== source)
@@ -1390,7 +1439,35 @@ function translationWorkspace(languages) {
       return `<span class="translation-status translation-status--${status}">${escapeHtml(languageName(language))}: ${escapeHtml(status)}</span>`;
     })
     .join('');
-  return `<section class="translation-workspace field--wide"><div><strong>Translation workspace</strong><p>Write manually in the fields above, or create an editable AI draft. Existing text is never overwritten without confirmation.</p><div class="translation-statuses">${badges}</div></div><div class="ai-engine-grid"><label class="field"><span>Source language</span><select name="translationSource">${languages.map((language) => `<option value="${escapeHtml(language)}" ${language === source ? 'selected' : ''}>${escapeHtml(languageName(language))}</option>`).join('')}</select></label><label class="field"><span>Target language</span><select name="translationTarget">${languages.map((language) => `<option value="${escapeHtml(language)}" ${language === target ? 'selected' : ''}>${escapeHtml(languageName(language))}</option>`).join('')}</select></label>${engineSelect('translationEngine', 'Translation model', 'prose', 'Choose a configured local or remote structured-text model.')}</div><label class="consent-check"><input name="translationRemoteConsent" type="checkbox" /> I consent to sending only the four visible campaign fields to the selected engine when it is Remote.</label><div class="action-row"><button type="button" class="primary-button" data-translate-campaign>Create translation draft</button></div><div class="ai-review" data-translation-review hidden></div></section>`;
+  const targets = languages.filter((language) => language !== source);
+  const targetChoices = targets
+    .map(
+      (language) =>
+        `<label class="consent-check"><input name="translationTargets" type="checkbox" value="${escapeHtml(language)}" ${drafts[language] ? '' : 'checked'} /> ${escapeHtml(languageName(language))} (${escapeHtml(language)})</label>`,
+    )
+    .join('');
+  return `<section class="translation-workspace field--wide" data-campaign-translation>
+    <div><strong>Translation workspace</strong><p>Write manually above, or create editable drafts for any configured target subset. Existing text is never overwritten without confirmation.</p><div class="translation-statuses">${badges}</div></div>
+    <div class="ai-engine-grid">
+      <label class="field"><span>Source language</span><select name="translationSource">${languages.map((language) => `<option value="${escapeHtml(language)}" ${language === source ? 'selected' : ''}>${escapeHtml(languageName(language))}</option>`).join('')}</select></label>
+      ${engineSelect('translationEngine', 'Translation model', 'prose', 'Choose a configured local or remote structured-text model.')}
+    </div>
+    <fieldset class="field field--wide"><legend>Target languages</legend><div class="translation-targets">${targetChoices}</div></fieldset>
+    <label class="consent-check"><input name="translationRegenerate" type="checkbox" /> Regenerate targets that already have a recoverable draft.</label>
+    <label class="consent-check"><input name="translationRemoteConsent" type="checkbox" /> I consent to sending the exact previewed fields to the selected engine when it is Remote. Pricing and retention follow that provider's account.</label>
+    <details class="translation-execution-plan" open><summary>Exact execution plan</summary><output data-translation-plan></output><pre data-translation-content-preview></pre></details>
+    <div class="action-row"><button type="button" class="primary-button" data-translate-campaign>Create target drafts</button></div>
+    <div class="ai-review" data-translation-review ${Object.keys(drafts).length ? '' : 'hidden'}>${renderCampaignTranslationDrafts(drafts)}</div>
+  </section>`;
+}
+
+function renderCampaignTranslationDrafts(drafts = {}) {
+  return Object.entries(drafts)
+    .map(
+      ([targetLanguage, record]) =>
+        `<article class="translation-field" data-campaign-translation-draft="${escapeHtml(targetLanguage)}"><strong>${escapeHtml(languageName(targetLanguage))} · ${escapeHtml(record.status ?? 'draft')}</strong>${record.error ? `<p class="notice notice--error">${escapeHtml(record.error)}</p>` : ''}${record.draft ? `<p>Review every field. Applying fills the form; nothing is written until Save.</p>${['name', 'description', 'status', 'story'].map((key) => `<label class="field"><span>${escapeHtml(key)}</span><textarea data-translation-draft-field="${key}" data-translation-target="${escapeHtml(targetLanguage)}">${escapeHtml(record.draft[key] ?? '')}</textarea></label>`).join('')}<button type="button" class="secondary-button" data-apply-translation="${escapeHtml(targetLanguage)}">Apply reviewed ${escapeHtml(targetLanguage)} draft</button>` : ''}</article>`,
+    )
+    .join('');
 }
 
 function storedCampaignValuesForLanguage(language) {
@@ -1408,6 +1485,27 @@ function currentCampaignValuesForLanguage(language) {
   const values = currentCampaignLocalizedValues();
   return Object.fromEntries(
     ['name', 'description', 'status', 'story'].map((key) => [key, values[key]?.[language] ?? '']),
+  );
+}
+
+function refreshCampaignTranslationPlan() {
+  const workspace = fields.querySelector('[data-campaign-translation]');
+  if (!workspace || state.editor?.kind !== 'campaign') return;
+  const form = new FormData(editorForm);
+  const sourceLanguage = String(form.get('translationSource') || '');
+  const targetLanguages = form
+    .getAll('translationTargets')
+    .map(String)
+    .filter((language) => language !== sourceLanguage);
+  const engine = parseEngineValue(form.get('translationEngine'));
+  const source = currentCampaignValuesForLanguage(sourceLanguage);
+  workspace.querySelector('[data-translation-plan]').textContent = engine
+    ? `${engine.provider}/${engine.model} · ${sourceLanguage} → ${targetLanguages.join(', ') || 'no targets'} · fields: name, description, status, story`
+    : `No compatible model selected · ${sourceLanguage} → ${targetLanguages.join(', ') || 'no targets'}`;
+  workspace.querySelector('[data-translation-content-preview]').textContent = JSON.stringify(
+    source,
+    null,
+    2,
   );
 }
 
@@ -1883,6 +1981,7 @@ function openCampaignEditor(editing = false) {
       migrateCampaignLocales().catch((error) => toast(error.message, true)),
     );
   refreshPaletteStudio();
+  refreshCampaignTranslationPlan();
 }
 
 async function migrateCampaignLocales() {
@@ -2482,15 +2581,20 @@ async function saveCampaign(form) {
       defaultLanguage,
       storySoFar: localizedValues.story,
       narrativeMood,
-      translationState: state.editor.translationApplied
+      translationState: Object.keys(state.editor.translationApplied ?? {}).length
         ? {
             ...(state.campaign.campaign.translationState ?? {}),
-            [state.editor.translationApplied.language]: {
-              status: 'reviewed',
-              sourceLanguage: state.editor.translationApplied.sourceLanguage,
-              sourceSnapshot: state.editor.translationApplied.sourceSnapshot,
-              reviewedAt: new Date().toISOString(),
-            },
+            ...Object.fromEntries(
+              Object.entries(state.editor.translationApplied).map(([language, record]) => [
+                language,
+                {
+                  status: 'reviewed',
+                  sourceLanguage: record.sourceLanguage,
+                  sourceSnapshot: record.sourceSnapshot,
+                  reviewedAt: new Date().toISOString(),
+                },
+              ]),
+            ),
           }
         : state.campaign.campaign.translationState,
       heroImages: image
@@ -2961,13 +3065,16 @@ function modelNameOptions(items, selected) {
 
 function providerModelLines(models) {
   return (models ?? [])
-    .map((model) => `${model.id} | ${(model.capabilities ?? []).join(',')}`)
+    .map(
+      (model) =>
+        `${model.id} | ${(model.capabilities ?? []).join(',')} | ${(model.languages ?? []).join(',')} | ${(model.languagePairs ?? []).join(',')}`,
+    )
     .join('\n');
 }
 
 function remoteProviderCard(provider, saved) {
   const prefix = `provider__${provider.id}__`;
-  return `<section class="project-panel ai-provider-card"><span class="eyebrow">Remote provider · ${escapeHtml(provider.transport)}</span><h3>${escapeHtml(provider.label)}</h3><p>Register only models and capabilities verified for your account. Unknown capabilities remain unavailable to task selectors.</p><label class="field"><span>API base URL</span><input name="${prefix}baseUrl" type="url" value="${escapeHtml(saved.baseUrl)}" /></label><label class="field"><span>API key</span><input name="${prefix}apiKey" type="password" autocomplete="off" placeholder="${saved.keyConfigured ? 'Saved locally · leave blank to keep it' : 'Paste a provider key'}" /></label><label class="consent-check"><input name="${prefix}removeApiKey" type="checkbox" /> Remove the saved key</label><label class="field"><span>Model catalog and capabilities</span><textarea name="${prefix}models">${escapeHtml(providerModelLines(saved.models))}</textarea><small>One per line: <code>model-id | text,structured-output,vision,image-prompt,image-generation,web</code>.</small></label><div class="provider-help"><a href="${escapeHtml(provider.docsUrl)}" target="_blank" rel="noreferrer">API docs ↗</a><a href="${escapeHtml(provider.privacyUrl)}" target="_blank" rel="noreferrer">Privacy ↗</a><a href="${escapeHtml(provider.pricingUrl)}" target="_blank" rel="noreferrer">Pricing ↗</a></div><div class="action-row"><button class="secondary-button" type="button" data-ai-action="discover-provider" data-provider="${escapeHtml(provider.id)}">Discover models</button><button class="secondary-button" type="button" data-ai-action="test-provider" data-provider="${escapeHtml(provider.id)}">Test provider</button></div></section>`;
+  return `<section class="project-panel ai-provider-card"><span class="eyebrow">Remote provider · ${escapeHtml(provider.transport)}</span><h3>${escapeHtml(provider.label)}</h3><p>Register only models and capabilities verified for your account. Unknown capabilities remain unavailable to task selectors.</p><label class="field"><span>API base URL</span><input name="${prefix}baseUrl" type="url" value="${escapeHtml(saved.baseUrl)}" /></label><label class="field"><span>API key</span><input name="${prefix}apiKey" type="password" autocomplete="off" placeholder="${saved.keyConfigured ? 'Saved locally · leave blank to keep it' : 'Paste a provider key'}" /></label><label class="consent-check"><input name="${prefix}removeApiKey" type="checkbox" /> Remove the saved key</label><label class="field"><span>Model catalog, capabilities and optional language limits</span><textarea name="${prefix}models">${escapeHtml(providerModelLines(saved.models))}</textarea><small>One per line: <code>model-id | capabilities | languages | source&gt;target pairs</code>. Leave the last two columns empty when the provider declares no limit.</small></label><div class="provider-help"><a href="${escapeHtml(provider.docsUrl)}" target="_blank" rel="noreferrer">API docs ↗</a><a href="${escapeHtml(provider.privacyUrl)}" target="_blank" rel="noreferrer">Privacy ↗</a><a href="${escapeHtml(provider.pricingUrl)}" target="_blank" rel="noreferrer">Pricing ↗</a></div><div class="action-row"><button class="secondary-button" type="button" data-ai-action="discover-provider" data-provider="${escapeHtml(provider.id)}">Discover models</button><button class="secondary-button" type="button" data-ai-action="test-provider" data-provider="${escapeHtml(provider.id)}">Test provider</button></div></section>`;
 }
 
 function renderAiFirstRunChoice() {
@@ -3031,10 +3138,18 @@ function aiSetupPayload(form, setupState = 'complete') {
     String(form.get(name) || '')
       .split(/\r?\n/)
       .map((line) => {
-        const [id, capabilities = ''] = line.split('|', 2);
+        const [id, capabilities = '', languages = '', languagePairs = ''] = line.split('|', 4);
         return {
           id: id.trim(),
           capabilities: capabilities
+            .split(',')
+            .map((item) => item.trim())
+            .filter(Boolean),
+          languages: languages
+            .split(',')
+            .map((item) => item.trim())
+            .filter(Boolean),
+          languagePairs: languagePairs
             .split(',')
             .map((item) => item.trim())
             .filter(Boolean),
@@ -3481,45 +3596,83 @@ async function processCampaignTranslation() {
   if (state.editor?.kind !== 'campaign' || !state.editor.editing) return;
   const form = new FormData(editorForm);
   const sourceLanguage = form.get('translationSource')?.toString();
-  const targetLanguage = form.get('translationTarget')?.toString();
-  if (sourceLanguage === targetLanguage) {
-    languagePickerMessage('Choose two different campaign languages for translation.', true);
+  const targetLanguages = form
+    .getAll('translationTargets')
+    .map(String)
+    .filter((language) => language !== sourceLanguage);
+  if (!targetLanguages.length) {
+    languagePickerMessage('Choose at least one target campaign language.', true);
     return;
   }
   const button = fields.querySelector('[data-translate-campaign]');
   button.disabled = true;
   button.textContent = 'Translating…';
   try {
+    const existingDrafts = state.editor.translationDrafts ?? {};
+    const regenerate = form.get('translationRegenerate') === 'on';
     const result = await api(
       `/api/campaigns/${encodeURIComponent(state.selectedId)}/ai/translate`,
       {
         method: 'POST',
         body: JSON.stringify({
           sourceLanguage,
-          targetLanguage,
+          targetLanguages,
           content: currentCampaignValuesForLanguage(sourceLanguage),
           engine: parseEngineValue(form.get('translationEngine')),
           remoteConsent: form.get('translationRemoteConsent') === 'on',
+          regenerate,
+          completedTargets: regenerate
+            ? []
+            : Object.entries(existingDrafts)
+                .filter(([, record]) => record?.draft)
+                .map(([language]) => language),
         }),
       },
     );
-    state.editor.translationDraft = {
-      ...result.draft,
-      sourceLanguage,
-      targetLanguage,
-      sourceSnapshot: JSON.stringify(currentCampaignValuesForLanguage(sourceLanguage)),
-    };
+    const sourceSnapshot = JSON.stringify(currentCampaignValuesForLanguage(sourceLanguage));
+    const drafts = { ...existingDrafts };
+    for (const targetLanguage of targetLanguages) {
+      const translated = result.results?.[targetLanguage];
+      if (translated?.draft) {
+        drafts[targetLanguage] = {
+          ...translated,
+          status: 'draft',
+          sourceLanguage,
+          targetLanguage,
+          sourceSnapshot,
+          error: undefined,
+        };
+      } else if (result.failures?.[targetLanguage]) {
+        drafts[targetLanguage] = {
+          ...(drafts[targetLanguage] ?? {}),
+          status: 'error',
+          sourceLanguage,
+          targetLanguage,
+          sourceSnapshot,
+          error: result.failures[targetLanguage],
+        };
+      }
+    }
+    state.editor.translationDrafts = drafts;
     const review = fields.querySelector('[data-translation-review]');
     review.hidden = false;
-    review.innerHTML = `<strong>Editable translation draft</strong><p>Review every field. Applying fills the form; nothing is written until you press Save.</p>${['name', 'description', 'status', 'story'].map((key) => `<label class="field"><span>${escapeHtml(key)}</span><textarea data-translation-draft-field="${key}">${escapeHtml(result.draft[key])}</textarea></label>`).join('')}<button type="button" class="secondary-button" data-apply-translation>Apply reviewed draft</button>`;
+    review.innerHTML = renderCampaignTranslationDrafts(drafts);
+    window.managerI18n?.translateTree?.(review);
+    const failed = Object.keys(result.failures ?? {});
+    toast(
+      failed.length
+        ? `Drafts preserved. Retry needed for: ${failed.join(', ')}.`
+        : 'Editable target drafts created. Review each one before saving.',
+      failed.length > 0,
+    );
   } finally {
     button.disabled = false;
-    button.textContent = 'Create translation draft';
+    button.textContent = 'Create target drafts';
   }
 }
 
-function applyCampaignTranslation() {
-  const draft = state.editor?.translationDraft;
+function applyCampaignTranslation(targetLanguage) {
+  const draft = state.editor?.translationDrafts?.[targetLanguage];
   if (!draft) return;
   const existing = currentCampaignValuesForLanguage(draft.targetLanguage);
   if (
@@ -3531,14 +3684,19 @@ function applyCampaignTranslation() {
     return;
   }
   for (const key of ['name', 'description', 'status', 'story']) {
-    const reviewed = fields.querySelector(`[data-translation-draft-field="${key}"]`)?.value ?? '';
-    const input = fields.querySelector(`[name="loc__${key}__${draft.targetLanguage}"]`);
+    const reviewed =
+      fields.querySelector(
+        `[data-translation-draft-field="${key}"][data-translation-target="${CSS.escape(targetLanguage)}"]`,
+      )?.value ?? '';
+    const input = fields.querySelector(`[name="loc__${key}__${targetLanguage}"]`);
     if (input) input.value = reviewed;
   }
   state.editor.translationApplied = {
-    language: draft.targetLanguage,
-    sourceLanguage: draft.sourceLanguage,
-    sourceSnapshot: draft.sourceSnapshot,
+    ...(state.editor.translationApplied ?? {}),
+    [targetLanguage]: {
+      sourceLanguage: draft.sourceLanguage,
+      sourceSnapshot: draft.sourceSnapshot,
+    },
   };
   toast('Translation applied to the editable form. Press Save when ready.');
 }
@@ -4092,10 +4250,16 @@ content.addEventListener('click', async (event) => {
 });
 
 content.addEventListener('change', (event) => {
-  if (!event.target.matches('[data-advanced-mode]')) return;
-  state.advancedMode = event.target.checked;
-  localStorage.setItem('questkeeper-manager-advanced', String(state.advancedMode));
-  toast(state.advancedMode ? 'Advanced controls enabled.' : 'Advanced controls hidden.');
+  if (event.target.matches('[data-translation-review-target]')) {
+    state.entityTranslationTarget = event.target.value;
+    renderCampaign();
+    return;
+  }
+  if (event.target.matches('[data-advanced-mode]')) {
+    state.advancedMode = event.target.checked;
+    localStorage.setItem('questkeeper-manager-advanced', String(state.advancedMode));
+    toast(state.advancedMode ? 'Advanced controls enabled.' : 'Advanced controls hidden.');
+  }
 });
 
 let compendiumSearchTimer;
@@ -4216,7 +4380,7 @@ fields.addEventListener('click', (event) => {
   }
   const applyTranslation = event.target.closest('[data-apply-translation]');
   if (applyTranslation) {
-    applyCampaignTranslation();
+    applyCampaignTranslation(applyTranslation.dataset.applyTranslation);
     return;
   }
   const addLanguage = event.target.closest('[data-language-add]');
@@ -4252,6 +4416,14 @@ fields.addEventListener('click', (event) => {
 });
 
 fields.addEventListener('change', (event) => {
+  if (
+    event.target.matches(
+      '[name="translationSource"], [name="translationTargets"], [name="translationEngine"], [name="translationRegenerate"]',
+    )
+  ) {
+    refreshCampaignTranslationPlan();
+    return;
+  }
   if (event.target.name === 'palette') {
     refreshPaletteStudio();
     return;
@@ -4353,6 +4525,7 @@ fields.addEventListener('keydown', (event) => {
 
 fields.addEventListener('input', (event) => {
   if (event.target.matches('[name^="paletteRole__"]')) refreshPaletteStudio();
+  if (event.target.matches('[name^="loc__"]')) refreshCampaignTranslationPlan();
 });
 
 editorForm.addEventListener('submit', (event) => {

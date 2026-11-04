@@ -45,6 +45,7 @@ import {
 } from './ai-service.mjs';
 import {
   assertEngineCapability,
+  assertTranslationPairSupport,
   isRemoteProvider,
   publicProviderRegistry,
 } from './ai-providers.mjs';
@@ -69,9 +70,11 @@ import {
 import storagePaths from '../storage-paths.cjs';
 import {
   applyTranslationDraft,
-  buildTranslationPlan,
+  buildTranslationPlans,
   mergeAppliedRecords,
+  normalizeTranslationTargets,
   readTranslationWorkspace,
+  runTranslationTargetBatch,
   TRANSLATABLE_ENTITY_TYPES,
   writeTranslationWorkspace,
 } from './entity-translation.mjs';
@@ -308,6 +311,23 @@ function taskEngine(input, config, role) {
       throw new Error(`The selected ${role} model is not in the saved AI model catalog.`);
   }
   return assertEngineCapability(config, { provider, model }, role);
+}
+
+function campaignLocaleTags(campaign) {
+  const registryTags = campaign.manifestEntry?.localeRegistry?.locales?.map((locale) => locale.tag);
+  return registryTags?.length
+    ? registryTags
+    : (campaign.manifestEntry?.languages ?? [campaign.manifestEntry?.defaultLanguage]).filter(
+        Boolean,
+      );
+}
+
+function translationTargetsForCampaign(campaign, sourceLanguage, targetLanguages) {
+  return normalizeTranslationTargets({
+    availableLanguages: campaignLocaleTags(campaign),
+    sourceLanguage,
+    targetLanguages,
+  });
 }
 
 async function persistTranslatedEntities(campaignId, before, after, entityTypes) {
@@ -973,17 +993,35 @@ async function routeApi(request, response, url) {
       STORAGE_PATHS.translationDraftsRoot,
       campaignId,
     );
-    const plan = buildTranslationPlan({
+    const targetLanguages = translationTargetsForCampaign(
       campaign,
+      input.sourceLanguage,
+      input.targetLanguages ?? [input.targetLanguage],
+    );
+    const plan = buildTranslationPlans({
+      campaign,
+      availableLanguages: campaignLocaleTags(campaign),
       sourceLanguage: input.sourceLanguage,
-      targetLanguage: input.targetLanguage,
+      targetLanguages,
       entityTypes: input.entityTypes?.length ? input.entityTypes : TRANSLATABLE_ENTITY_TYPES,
       entityIds: input.entityIds,
       fieldPaths: input.fieldPaths,
       applied: workspace.applied,
     });
-    const draft = { ...plan, status: 'planned', createdAt: new Date().toISOString() };
-    const next = { ...workspace, draft };
+    const createdAt = new Date().toISOString();
+    const drafts = Object.fromEntries(
+      Object.entries(plan.drafts).map(([targetLanguage, draft]) => [
+        targetLanguage,
+        { ...draft, status: 'planned', createdAt },
+      ]),
+    );
+    const next = {
+      ...workspace,
+      sourceLanguage: plan.sourceLanguage,
+      targetLanguages,
+      activeTarget: targetLanguages[0],
+      drafts: { ...(workspace.drafts ?? {}), ...drafts },
+    };
     await writeTranslationWorkspace(STORAGE_PATHS.translationDraftsRoot, campaignId, next);
     sendJson(response, 200, next);
     return;
@@ -1003,7 +1041,19 @@ async function routeApi(request, response, url) {
     if (!draft || !['planned', 'draft', 'reviewed'].includes(draft.status)) {
       throw new Error('Translation draft has an invalid review status.');
     }
-    const next = { ...workspace, draft, updatedAt: new Date().toISOString() };
+    const campaign = await getCampaign(PROJECT_ROOT, campaignId);
+    const [targetLanguage] = translationTargetsForCampaign(campaign, draft.sourceLanguage, [
+      input.targetLanguage ?? draft.targetLanguage,
+    ]);
+    if (targetLanguage !== draft.targetLanguage) {
+      throw new Error('The saved translation target does not match this draft.');
+    }
+    const next = {
+      ...workspace,
+      activeTarget: targetLanguage,
+      drafts: { ...(workspace.drafts ?? {}), [targetLanguage]: draft },
+      updatedAt: new Date().toISOString(),
+    };
     await writeTranslationWorkspace(STORAGE_PATHS.translationDraftsRoot, campaignId, next);
     sendJson(response, 200, next);
     return;
@@ -1020,7 +1070,16 @@ async function routeApi(request, response, url) {
       campaignId,
     );
     const before = await getCampaign(PROJECT_ROOT, campaignId);
-    const result = applyTranslationDraft(before, workspace.draft, {
+    const requestedTarget = input.targetLanguage ?? workspace.activeTarget;
+    const candidateDraft = workspace.drafts?.[requestedTarget] ?? workspace.draft;
+    const [targetLanguage] = translationTargetsForCampaign(
+      before,
+      input.sourceLanguage ?? candidateDraft?.sourceLanguage,
+      [requestedTarget ?? candidateDraft?.targetLanguage],
+    );
+    const draft = workspace.drafts?.[targetLanguage];
+    if (!draft) throw new Error(`No recoverable translation draft exists for ${targetLanguage}.`);
+    const result = applyTranslationDraft(before, draft, {
       overwrite: input.overwrite === true,
     });
     const entityTypes = result.report.applied.map((item) => item.key.split(':')[0]);
@@ -1028,8 +1087,16 @@ async function routeApi(request, response, url) {
     const next = {
       ...workspace,
       applied: mergeAppliedRecords(workspace.applied, result.report),
-      draft: { ...workspace.draft, status: 'applied', completedAt: new Date().toISOString() },
-      lastReport: result.report,
+      activeTarget: targetLanguage,
+      drafts: {
+        ...(workspace.drafts ?? {}),
+        [targetLanguage]: {
+          ...draft,
+          status: 'applied',
+          completedAt: new Date().toISOString(),
+        },
+      },
+      lastReports: { ...(workspace.lastReports ?? {}), [targetLanguage]: result.report },
     };
     await writeTranslationWorkspace(STORAGE_PATHS.translationDraftsRoot, campaignId, next);
     sendJson(response, 200, {
@@ -1078,37 +1145,83 @@ async function routeApi(request, response, url) {
       STORAGE_PATHS.translationDraftsRoot,
       campaignId,
     );
-    const draft = input.draft ?? workspace.draft;
-    if (!draft?.items?.length) throw new Error('Create a translation plan first.');
-    const selected = draft.items.filter((item) => item.selected);
+    const campaign = await getCampaign(PROJECT_ROOT, campaignId);
+    const sourceLanguage = input.sourceLanguage ?? workspace.sourceLanguage;
+    const targetLanguages = translationTargetsForCampaign(
+      campaign,
+      sourceLanguage,
+      input.targetLanguages ?? [input.targetLanguage ?? input.draft?.targetLanguage],
+    );
+    const requestedDrafts = {
+      ...(workspace.drafts ?? {}),
+      ...(input.drafts ?? {}),
+      ...(input.draft?.targetLanguage ? { [input.draft.targetLanguage]: input.draft } : {}),
+    };
+    const selected = targetLanguages.flatMap((targetLanguage) =>
+      (requestedDrafts[targetLanguage]?.items ?? [])
+        .filter((item) => item.selected)
+        .map((item) => `${targetLanguage}:${item.key}`),
+    );
+    if (!selected.length) throw new Error('Create a translation plan and select fields first.');
     if (isRemoteProvider(engine.provider) && input.remoteConsent !== true) {
       throw new Error(
-        `Consent required: ${engine.provider}/${engine.model} would receive exactly ${selected.map((item) => item.key).join(', ')}.`,
+        `Consent required: ${engine.provider}/${engine.model} would receive exactly ${selected.join(', ')}.`,
       );
     }
-    const result = await translateEntityFields({
-      config,
-      fields: selected,
-      sourceLanguage: draft.sourceLanguage,
-      targetLanguage: draft.targetLanguage,
-      selection: engine,
-    });
-    const translations = new Map(result.translations.map((item) => [item.key, item.value]));
-    const translated = {
-      ...draft,
-      status: 'draft',
-      items: draft.items.map((item) => ({
-        ...item,
-        draft: translations.get(item.key) ?? item.draft ?? '',
-      })),
-      engine: result.engine,
-      updatedAt: new Date().toISOString(),
+    const drafts = { ...(workspace.drafts ?? {}) };
+    const results = {};
+    const failures = {};
+    for (const targetLanguage of targetLanguages) {
+      const draft = requestedDrafts[targetLanguage];
+      if (!draft?.items?.length) {
+        failures[targetLanguage] = 'Create a translation plan first.';
+        continue;
+      }
+      if (!input.regenerate && ['draft', 'reviewed', 'applied'].includes(draft.status)) {
+        results[targetLanguage] = { status: 'preserved', engine: draft.engine };
+        drafts[targetLanguage] = draft;
+        continue;
+      }
+      try {
+        assertTranslationPairSupport(config, engine, sourceLanguage, targetLanguage);
+        const result = await translateEntityFields({
+          config,
+          fields: draft.items.filter((item) => item.selected),
+          sourceLanguage,
+          targetLanguage,
+          selection: engine,
+        });
+        const translations = new Map(result.translations.map((item) => [item.key, item.value]));
+        drafts[targetLanguage] = {
+          ...draft,
+          status: 'draft',
+          items: draft.items.map((item) => ({
+            ...item,
+            draft: translations.get(item.key) ?? item.draft ?? '',
+          })),
+          engine: result.engine,
+          updatedAt: new Date().toISOString(),
+        };
+        results[targetLanguage] = { status: 'draft', engine: result.engine };
+      } catch (error) {
+        failures[targetLanguage] = error.message;
+      }
+    }
+    const next = {
+      ...workspace,
+      sourceLanguage,
+      targetLanguages: [...new Set([...(workspace.targetLanguages ?? []), ...targetLanguages])],
+      activeTarget: targetLanguages[0],
+      drafts,
+      lastRun: { results, failures, completedAt: new Date().toISOString() },
     };
-    const next = { ...workspace, draft: translated };
     await writeTranslationWorkspace(STORAGE_PATHS.translationDraftsRoot, campaignId, next);
     sendJson(response, 200, {
       ...next,
-      notice: 'Draft only. Review the selected fields before applying the batch.',
+      notice:
+        Object.keys(failures).length > 0
+          ? 'Some targets need attention. Successful drafts were preserved and failed targets can be retried.'
+          : 'Drafts only. Review every target independently before applying it.',
     });
     return;
   }
@@ -1121,19 +1234,41 @@ async function routeApi(request, response, url) {
     const input = await readBody(request);
     const config = await readAiConfig(PROJECT_ROOT);
     const engine = taskEngine(input.engine, config, 'prose');
+    const campaign = await getCampaign(PROJECT_ROOT, campaignId);
+    const targetLanguages = translationTargetsForCampaign(
+      campaign,
+      input.sourceLanguage,
+      input.targetLanguages ?? [input.targetLanguage],
+    );
     if (isRemoteProvider(engine.provider) && input.remoteConsent !== true) {
-      throw new Error('Confirm that this translation scope may be sent to the remote provider.');
+      throw new Error(
+        `Confirm that ${engine.provider}/${engine.model} may receive fields name, description, status and story for ${input.sourceLanguage}>${targetLanguages.join(', ')}.`,
+      );
     }
-    const result = await translateCampaignDraft({
-      config,
-      content: input.content,
-      sourceLanguage: input.sourceLanguage,
-      targetLanguage: input.targetLanguage,
-      selection: engine,
+    const { results, failures } = await runTranslationTargetBatch({
+      targetLanguages,
+      completedTargets: input.completedTargets,
+      regenerate: input.regenerate === true,
+      worker: async (targetLanguage) => {
+        assertTranslationPairSupport(config, engine, input.sourceLanguage, targetLanguage);
+        return translateCampaignDraft({
+          config,
+          content: input.content,
+          sourceLanguage: input.sourceLanguage,
+          targetLanguage,
+          selection: engine,
+        });
+      },
     });
     sendJson(response, 200, {
-      ...result,
-      notice: 'Draft only. Review and explicitly apply each translation before saving.',
+      sourceLanguage: input.sourceLanguage,
+      targetLanguages,
+      results,
+      failures,
+      notice:
+        Object.keys(failures).length > 0
+          ? 'Some targets failed. Successful drafts remain editable and retries skip them by default.'
+          : 'Drafts only. Review and explicitly apply each target before saving.',
     });
     return;
   }
