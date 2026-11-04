@@ -32,10 +32,17 @@ until all of the following are true:
 2. the fix is contained in a published, downloadable release;
 3. the released artifact—not only the source branch—has been smoke-tested.
 
+When the implementation and compatibility checks are complete but publication
+and released-artifact smoke testing are still pending, add
+`status:awaiting-release`. The issue deliberately remains open and keeps
+**Resolved in version: Not yet**. Remove the status if more implementation is
+needed or the change is reverted. An epic receives it only when every child is
+complete and release verification is its sole remaining gate.
+
 Then update the issue body to the first containing version, add the
-`resolved-in:x.y.z` label, link the release and verification evidence, and close
-the issue. If a fix is reverted, reopen the issue and remove the resolved label
-until a new containing release is verified.
+`resolved-in:x.y.z` label, remove `status:awaiting-release`, link the release and
+verification evidence, and close the issue. If a fix is reverted, reopen the
+issue and remove the resolved label until a new containing release is verified.
 
 ## Research readiness and epic promotion
 
@@ -71,6 +78,8 @@ not move it into the active roadmap.
 
 - `reported-in:x.y.z`: version in which the feedback was observed;
 - `resolved-in:x.y.z`: first verified published version containing the fix;
+- `status:awaiting-release`: implementation and compatibility checks are
+  complete, while publication and released-artifact smoke testing are pending;
 - `shared`, `public-only`, `campaign-only`: dual-repository delivery class;
 - `area:*`: primary product area;
 - `epic`: a user outcome intentionally split into linked issues;
