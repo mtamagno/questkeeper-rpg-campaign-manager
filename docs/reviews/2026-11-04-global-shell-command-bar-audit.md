@@ -86,3 +86,30 @@ The 5 November User Settings review owns language, audio and My Character
 editing. The 6 November accessibility pass inherits the overflow dismissal and
 focus contract. New global actions must declare frequency, context, placement
 and persistence before entering the command bar.
+
+## Task 2 implementation outcome
+
+The command row now has one hierarchy at every width. Continue reading, My
+Character and quick navigation remain conditional primary controls; a labelled
+More trigger owns one anchored overflow containing campaign switch first,
+favourite state and then local/application tools. Desktop no longer flattens all
+secondary actions into the sticky row.
+
+The overflow closes after an action, every route change, an outside pointer and
+Escape. Escape returns focus to the trigger. Opening the command palette closes
+the overflow, so the two global navigation surfaces cannot compete. Existing
+palette focus trapping, Ctrl/Cmd+K, breadcrumbs, conditional install/Manager
+visibility and page-owned Sheet/Journal actions are unchanged.
+
+## Verification status
+
+- command-palette and mobile-layout regression guards pass in both repositories;
+- strict TypeScript passes in both repositories;
+- source guards cover action order, conditional rendering, 40/48 px targets,
+  viewport-safe panel width, outside dismissal and Escape focus recovery;
+- production's measured initial path is 2,006,498 bytes, so its ceiling moves
+  by 1,000 bytes (about 0.05%) without changing request, deferred-script or
+  image limits; the public build remains inside its existing budget;
+- the public browser host was unavailable during the 4 November pass, so the
+  screenshot matrix at 360 px, 768 px, desktop and 200% zoom remains an explicit
+  closeout item rather than fabricated evidence.

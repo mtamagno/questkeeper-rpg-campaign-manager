@@ -73,16 +73,79 @@
     flex-shrink: 0;
   }
 
-  &__mobile-more {
-    display: contents;
+  &__overflow {
+    position: relative;
+    flex: 0 0 auto;
   }
 
-  &__mobile-toggle {
-    display: none;
+  &__overflow-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-xs;
+    min-height: 36px;
+    padding: $spacing-xs $spacing-sm;
+    border: $border-width-thin solid $color-border-default;
+    border-radius: $border-radius-md;
+    background: rgba($color-bg-surface, 0.72);
+    color: $color-text-secondary;
+    font: inherit;
+    font-size: $font-size-sm;
+    cursor: pointer;
+
+    &:hover,
+    &[aria-expanded='true'] {
+      color: $color-parchment-light;
+      border-color: var(--campaign-accent, #{$color-gold});
+      background: $color-bg-surface;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--qk-color-accent);
+      outline-offset: 2px;
+    }
   }
 
-  &__mobile-menu {
-    display: contents;
+  &__overflow-menu {
+    position: absolute;
+    top: calc(100% + #{$spacing-sm});
+    right: 0;
+    z-index: $z-index-header + 1;
+    display: grid;
+    width: min(20rem, calc(100vw - #{$spacing-xl}));
+    gap: $spacing-2xs;
+    padding: $spacing-xs;
+    border: $border-width-thin solid $color-border-strong;
+    border-radius: $border-radius-md;
+    background: rgba($color-bg-deep, 0.98);
+    box-shadow: $shadow-xl;
+
+    &[hidden] {
+      display: none;
+    }
+
+    button,
+    a {
+      width: 100%;
+      min-height: 48px;
+      justify-content: flex-start;
+      border-color: transparent;
+      background: transparent;
+      text-align: left;
+      white-space: normal;
+
+      &:hover {
+        background: var(--qk-color-accent-soft);
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--qk-color-accent);
+        outline-offset: -2px;
+      }
+
+      > span:first-child {
+        flex: 0 0 1.5rem;
+      }
+    }
   }
 
   &__campaign-switch,
@@ -192,67 +255,22 @@
       padding: 0;
     }
 
-    &__mobile-more {
-      position: relative;
-      display: block;
-      flex: 0 0 auto;
-
-      .command-bar__mobile-toggle {
-        display: grid;
-        width: 40px;
-        height: 40px;
-        place-items: center;
-        border: $border-width-thin solid $color-border-default;
-        border-radius: $border-radius-md;
-        background: rgba($color-bg-surface, 0.72);
-        color: $color-text-secondary;
-        cursor: pointer;
-
-        &:focus-visible {
-          outline: 2px solid var(--qk-color-accent);
-          outline-offset: 2px;
-        }
-      }
+    &__overflow-toggle {
+      display: grid;
+      width: 40px;
+      min-width: 40px;
+      height: 40px;
+      min-height: 40px;
+      place-items: center;
+      padding: 0;
     }
 
-    &__mobile-menu {
-      position: absolute;
-      top: calc(100% + #{$spacing-sm});
-      right: 0;
-      z-index: $z-index-header + 1;
+    &__overflow-label {
       display: none;
+    }
+
+    &__overflow-menu {
       width: min(19rem, calc(100vw - #{$spacing-lg}));
-      padding: $spacing-xs;
-      border: $border-width-thin solid $color-border-strong;
-      border-radius: $border-radius-md;
-      background: rgba($color-bg-deep, 0.98);
-      box-shadow: $shadow-xl;
-
-      button,
-      a {
-        width: 100%;
-        min-height: 48px;
-        border: 0;
-        background: transparent;
-        text-align: left;
-
-        &:hover {
-          background: var(--qk-color-accent-soft);
-        }
-
-        &:focus-visible {
-          outline: 2px solid var(--qk-color-accent);
-          outline-offset: -2px;
-        }
-
-        > span:first-child {
-          flex: 0 0 1.5rem;
-        }
-      }
-
-      .command-bar__mobile-more--open & {
-        display: grid;
-      }
     }
   }
 }
@@ -574,7 +592,8 @@ kbd {
 .command-bar__favorite,
 .command-bar__install,
 .command-bar__tour,
-.command-bar__search {
+.command-bar__search,
+.command-bar__overflow-toggle {
   border-color: var(--qk-color-border);
   background: var(--qk-color-surface);
   color: var(--qk-color-text-secondary);
@@ -584,4 +603,9 @@ kbd {
     background: var(--qk-color-surface-raised);
     color: var(--qk-color-text);
   }
+}
+
+.command-bar__overflow-menu {
+  border-color: var(--qk-color-border);
+  background: color-mix(in srgb, var(--qk-color-canvas-deep) 97%, transparent);
 }
