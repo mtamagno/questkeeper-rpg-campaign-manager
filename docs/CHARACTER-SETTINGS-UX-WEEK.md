@@ -53,7 +53,7 @@ but no action becomes harder to discover solely to make the bar shorter.
 | **2 Nov** | [x] **Refine Profile into a true at-a-glance start without deleting authored content**                                                  | [x] **Refine Story & bonds: chapter discovery, relationship density, known-history sources and quotes**                             | [x] Test short, empty and very long profiles                                                                          |
 | **3 Nov** | [x] **Review and refactor the heavy Sheet tab: inventory every value/action first, then make current play state immediately scannable** | [x] **Refine Journal hierarchy: notebook, gallery and diary with useful progressive disclosure**                                    | [x] Prove Sheet content/function parity, then check protected state, remembered positions and large media collections |
 | **4 Nov** | [x] Inventory the sticky command bar by frequency, context and screen size                                                              | [x] Simplify its responsive hierarchy and overflow while preserving campaign switch, recovery and quick navigation                  | [ ] Keyboard, 360 px, 200% zoom and long-label visual review (browser host unavailable)                               |
-| **5 Nov** | Rebuild User Settings around RPG-style stable categories and clear global/campaign scope                                                | Add save-state, descriptions, recovery and empty/error feedback without scattering editors                                          | Fresh user, returning player and two-campaign review                                                                  |
+| **5 Nov** | [x] Rebuild User Settings around RPG-style stable categories and clear global/campaign scope                                            | [x] Add save-state, descriptions, recovery and empty/error feedback without scattering editors                                      | [x] Fresh user, returning player and two-campaign review                                                              |
 | **6 Nov** | Cross-surface accessibility pass: tabs, headings, focus, names/states, contrast, reduced motion and touch                               | Performance and rendering pass so inactive areas and heavy media do not punish the first view                                       | Phone, tablet, desktop, wide screen and 200% zoom evidence                                                            |
 | **7 Nov** | Walk the complete player journey in the public demo, Phandelver and Curse of Strahd                                                     | Resolve regressions, reconcile docs/tests and rank only evidence-backed follow-ups                                                  | Weekly review, dependency/runtime health and downstream plan update                                                   |
 
@@ -213,6 +213,35 @@ copying a specific visual skin:
 
 Fantasy atmosphere may decorate the categories, but labels, contrast, focus and
 recovery remain more important than ornament.
+
+## 5 November tasks and closeout - one lightweight settings console
+
+User Settings is now a four-category console: **Interface**, **Audio**,
+**Campaign** and **Character**. Desktop uses a stable vertical rail; narrow
+screens use a two-by-two category grid. Only one panel participates in the
+reading flow, while `?section=` makes the current category shareable without
+turning navigation into a persisted preference. Arrow keys plus Home/End move
+and activate tabs. Legacy fragments still select the correct new category.
+
+Scope is visible before every edit. Interface and audio are global to the
+device, authored-content language belongs to the active campaign, and My
+Character plus the personal rule library belong to the current character. The
+rule library remains complete but is closed by default, preventing private
+notes and long rules lists from dominating the settings landing view.
+
+Every change now reports whether it was saved on this device or can survive
+only the current visit. Blocked/full browser storage, campaign loading, empty
+campaigns, load failures and deleted/renamed remembered characters all have an
+honest recovery state. No existing storage key changed. The full User Settings
+surface moved from inline English/Italian branches to the data-defined UI text
+registry as an atomic slice of #142.
+
+Static and compile-time gates cover the tab contract, URL state, storage probe,
+stale-character recovery and zero `isItalian()` branching in this surface.
+Headless Chrome reviewed global Settings, Strahd Character and Phandelver
+Campaign states at desktop and compact widths. The integrated browser host was
+unavailable; the 6 November cross-surface pass still owns its planned native
+360 px and 200% zoom matrix rather than borrowing that task today.
 
 ## Downstream effect
 

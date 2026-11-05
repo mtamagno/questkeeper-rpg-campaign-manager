@@ -21,6 +21,99 @@
           "followingHelp": "Automatically follows the campaign content language when supported.",
           "independentHelp": "Changes menus and commands only; campaign content remains independent."
         },
+        "settings": {
+          "eyebrow": "Player preferences",
+          "title": "User settings",
+          "intro": "One clear place for device, campaign and character preferences. Choose a category without losing your place.",
+          "sectionsLabel": "Settings categories",
+          "scopes": {
+            "global": "Global · this device",
+            "campaign": "Per campaign",
+            "character": "Per character"
+          },
+          "sections": {
+            "interface": { "title": "Interface", "scope": "Global" },
+            "audio": { "title": "Audio", "scope": "Global" },
+            "campaign": { "title": "Campaign", "scope": "Current chronicle" },
+            "character": { "title": "Character", "scope": "Personal" }
+          },
+          "interface": {
+            "title": "Language and interface",
+            "help": "Controls QuestKeeper menus on this device. Campaign prose remains an independent choice."
+          },
+          "audio": {
+            "title": "Interface sounds",
+            "help": "These choices apply to every campaign on this device.",
+            "muteLabel": "Mute sounds",
+            "muteHelp": "Silence effects without losing your chosen volume.",
+            "volumeLabel": "Effects volume"
+          },
+          "campaign": {
+            "title": "Campaign preferences",
+            "activeHelp": "Reading preferences for {campaign}.",
+            "chooseHelp": "Choose a campaign before changing its reading preferences.",
+            "languageHelp": "Changes authored campaign content only and is remembered separately for this campaign.",
+            "changeCampaign": "Choose another campaign",
+            "loading": "Opening the campaign ledger...",
+            "empty": "No campaigns are available yet."
+          },
+          "character": {
+            "title": "My character",
+            "activeHelp": "Choose your quick return and private play notes for {campaign}.",
+            "noCampaignHelp": "Open a campaign before choosing your character.",
+            "chooseCampaign": "Character preferences belong to one campaign and cannot be set globally.",
+            "openCampaignSettings": "Choose a campaign",
+            "loading": "Loading the party...",
+            "loadErrorTitle": "The party could not be loaded",
+            "loadErrorHelp": "Reload the page. Your existing device preferences have not been changed.",
+            "missingTitle": "The remembered character is no longer available",
+            "missingHelp": "The saved identifier “{character}” does not match the current party. Clear it, then choose again.",
+            "clearMissing": "Clear old selection",
+            "selectLabel": "Assigned character",
+            "none": "No character",
+            "privacyHelp": "Only public identifiers are saved. Personal notes below stay private on this device.",
+            "currentSelection": "Current selection",
+            "openProfile": "Open profile",
+            "empty": "This campaign does not contain any player characters yet."
+          },
+          "rules": {
+            "title": "Game library",
+            "help": "Prepared rules, favourites, notes and references for {character}. Campaign sheets and rules are never changed.",
+            "openLibrary": "Open character library",
+            "spell": "Spell",
+            "feature": "Feature",
+            "prepared": "Prepared",
+            "favourite": "Favourite",
+            "noteLabel": "Usage note",
+            "notePlaceholder": "When to use it, combinations, reminders...",
+            "personalReference": "Personal reference · unverified",
+            "remove": "Remove",
+            "referenceLabel": "Reference label",
+            "urlLabel": "URL",
+            "save": "Save",
+            "empty": "The sheet has no features or spells yet.",
+            "referenceSaved": "Reference saved on this device.",
+            "referenceInvalid": "Enter a label and a valid http or https URL."
+          },
+          "saveState": {
+            "ready": {
+              "title": "Automatic saving",
+              "help": "Changes are stored in this browser as soon as you make them."
+            },
+            "saved": {
+              "title": "Saved on this device",
+              "help": "Your latest change will be available when you return in this browser."
+            },
+            "session": {
+              "title": "Available for this visit only",
+              "help": "Browser storage is blocked or full. Allow site storage, then make the change again."
+            },
+            "invalid": {
+              "title": "This change was not saved",
+              "help": "Review the highlighted value and try again."
+            }
+          }
+        },
         "sidebar": {
           "closeNavigation": "Close navigation",
           "mainNavigation": "Main navigation",
@@ -127,6 +220,99 @@
           "matchMenusHelp": "Quando una lingua dei contenuti è disponibile anche per l’interfaccia, aggiorna anche menu e comandi.",
           "followingHelp": "Segue automaticamente la lingua dei contenuti della campagna, quando supportata.",
           "independentHelp": "Cambia solo menu e comandi; la lingua dei contenuti resta indipendente."
+        },
+        "settings": {
+          "eyebrow": "Preferenze del giocatore",
+          "title": "Impostazioni utente",
+          "intro": "Un solo luogo ordinato per le preferenze del dispositivo, della campagna e del personaggio. Scegli una categoria senza perdere il segno.",
+          "sectionsLabel": "Categorie delle impostazioni",
+          "scopes": {
+            "global": "Globali · questo dispositivo",
+            "campaign": "Per campagna",
+            "character": "Per personaggio"
+          },
+          "sections": {
+            "interface": { "title": "Interfaccia", "scope": "Globale" },
+            "audio": { "title": "Audio", "scope": "Globale" },
+            "campaign": { "title": "Campagna", "scope": "Cronaca attuale" },
+            "character": { "title": "Personaggio", "scope": "Personale" }
+          },
+          "interface": {
+            "title": "Lingua e interfaccia",
+            "help": "Controlla i menu di QuestKeeper su questo dispositivo. La prosa della campagna resta una scelta indipendente."
+          },
+          "audio": {
+            "title": "Suoni dell’interfaccia",
+            "help": "Queste scelte valgono per tutte le campagne su questo dispositivo.",
+            "muteLabel": "Disattiva suoni",
+            "muteHelp": "Silenzia gli effetti senza perdere il volume scelto.",
+            "volumeLabel": "Volume effetti"
+          },
+          "campaign": {
+            "title": "Preferenze della campagna",
+            "activeHelp": "Preferenze di lettura per {campaign}.",
+            "chooseHelp": "Scegli una campagna prima di cambiarne le preferenze di lettura.",
+            "languageHelp": "Cambia soltanto i contenuti scritti della campagna ed è ricordata separatamente per questa campagna.",
+            "changeCampaign": "Scegli un’altra campagna",
+            "loading": "Apro il registro delle campagne...",
+            "empty": "Non ci sono ancora campagne disponibili."
+          },
+          "character": {
+            "title": "Il mio personaggio",
+            "activeHelp": "Scegli il ritorno rapido e gli appunti di gioco privati per {campaign}.",
+            "noCampaignHelp": "Apri una campagna prima di scegliere il tuo personaggio.",
+            "chooseCampaign": "Le preferenze del personaggio appartengono a una campagna e non possono essere impostate globalmente.",
+            "openCampaignSettings": "Scegli una campagna",
+            "loading": "Carico il gruppo...",
+            "loadErrorTitle": "Non è stato possibile caricare il gruppo",
+            "loadErrorHelp": "Ricarica la pagina. Le preferenze già presenti sul dispositivo non sono state modificate.",
+            "missingTitle": "Il personaggio ricordato non è più disponibile",
+            "missingHelp": "L’identificativo salvato “{character}” non corrisponde al gruppo attuale. Cancellalo, poi scegli di nuovo.",
+            "clearMissing": "Cancella la vecchia scelta",
+            "selectLabel": "Personaggio associato",
+            "none": "Nessun personaggio",
+            "privacyHelp": "Vengono salvati soltanto identificativi pubblici. Gli appunti personali restano privati su questo dispositivo.",
+            "currentSelection": "Selezione attuale",
+            "openProfile": "Apri profilo",
+            "empty": "Questa campagna non contiene ancora personaggi giocanti."
+          },
+          "rules": {
+            "title": "Libreria di gioco",
+            "help": "Regole preparate, preferiti, note e riferimenti per {character}. Le schede e le regole della campagna non vengono modificate.",
+            "openLibrary": "Apri la libreria del personaggio",
+            "spell": "Incantesimo",
+            "feature": "Capacità",
+            "prepared": "Preparato",
+            "favourite": "Preferito",
+            "noteLabel": "Nota d’uso",
+            "notePlaceholder": "Quando usarlo, combinazioni, promemoria...",
+            "personalReference": "Riferimento personale · non verificato",
+            "remove": "Rimuovi",
+            "referenceLabel": "Etichetta riferimento",
+            "urlLabel": "URL",
+            "save": "Salva",
+            "empty": "La scheda non contiene ancora capacità o incantesimi.",
+            "referenceSaved": "Riferimento salvato sul dispositivo.",
+            "referenceInvalid": "Inserisci un’etichetta e un URL http o https valido."
+          },
+          "saveState": {
+            "ready": {
+              "title": "Salvataggio automatico",
+              "help": "Le modifiche vengono conservate in questo browser appena le effettui."
+            },
+            "saved": {
+              "title": "Salvato su questo dispositivo",
+              "help": "L’ultima modifica sarà disponibile quando tornerai con questo browser."
+            },
+            "session": {
+              "title": "Disponibile solo per questa visita",
+              "help": "Lo spazio del browser è bloccato o pieno. Consenti l’archiviazione del sito, poi ripeti la modifica."
+            },
+            "invalid": {
+              "title": "Modifica non salvata",
+              "help": "Controlla il valore indicato e riprova."
+            }
+          }
         },
         "sidebar": {
           "closeNavigation": "Chiudi navigazione",
