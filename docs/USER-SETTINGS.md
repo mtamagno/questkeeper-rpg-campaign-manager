@@ -21,6 +21,26 @@ Campaign settings are isolated by stable campaign ID. Opening global Settings
 offers campaign choices; entering from a campaign keeps that campaign's data
 and visual palette active.
 
+## Category model
+
+The page exposes four stable, task-oriented categories:
+
+| Category      | Owns                                                                |
+| ------------- | ------------------------------------------------------------------- |
+| **Interface** | Interface locale and menu/content alignment                         |
+| **Audio**     | Device-wide mute and effects volume                                 |
+| **Campaign**  | Active campaign context and that campaign's authored-content locale |
+| **Character** | My Character plus private prepared/favourite rules, notes and links |
+
+Only the active category is visible. `?section=interface|audio|campaign|character`
+is shareable navigation state and is never persisted. The tablist supports
+arrow keys, Home and End. Historical fragments (`#global-settings`,
+`#campaign-settings`, `#rule-library-settings`) remain compatibility aliases.
+
+The personal rule library is progressive disclosure inside Character. It stays
+complete and editable, but a long spell list no longer turns the entire page
+into an endless initial scroll.
+
 Menu/content alignment is enabled by default. Choosing a campaign content
 locale that the interface registry in `src/app/guild/i18n/ui.json` supports,
 including a configured base-language match for a regional variant, updates
@@ -65,3 +85,10 @@ introduced and tested. New campaign-scoped settings must handle deleted or
 renamed entities with an honest unset fallback. Account sync, cloud storage and
 native apps require a separate portability decision before changing this
 device-local contract.
+
+Every edit is automatic and exposes one of four visible outcomes: ready,
+persisted on this device, available for this visit only, or invalid. A small
+write/read/remove probe checks browser storage after edits so the interface does
+not claim persistence when private mode, permissions or quota prevent it. A
+remembered character ID that no longer resolves is shown explicitly and can be
+cleared before making a new selection.

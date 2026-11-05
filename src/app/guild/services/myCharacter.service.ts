@@ -44,11 +44,25 @@ export class MyCharacterService {
     isMyCharacterState,
   );
 
+  /** Stored ID for the active campaign, even when that character no longer exists. */
+  readonly storedCharacterId: Signal<string | undefined> = computed((): string | undefined => {
+    const campaignId = this.campaigns.activeCampaignId();
+    return campaignId === undefined ? undefined : this.state().selections[campaignId];
+  });
+
+  /** True after loading when a remembered selection can no longer be resolved. */
+  readonly selectionIsMissing: Signal<boolean> = computed((): boolean => {
+    const storedCharacterId = this.storedCharacterId();
+    return (
+      this.data.isLoaded() &&
+      storedCharacterId !== undefined &&
+      !this.data.characters().some((character): boolean => character.id === storedCharacterId)
+    );
+  });
+
   /** Selected ID for the active campaign, provided it still resolves publicly. */
   readonly characterId: Signal<string | undefined> = computed((): string | undefined => {
-    const campaignId = this.campaigns.activeCampaignId();
-    if (campaignId === undefined) return undefined;
-    const characterId = this.state().selections[campaignId];
+    const characterId = this.storedCharacterId();
     return characterId !== undefined &&
       this.data.characters().some((character): boolean => character.id === characterId)
       ? characterId

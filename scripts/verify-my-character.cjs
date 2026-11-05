@@ -16,6 +16,7 @@ const i18n = read('tools/campaign-manager/public/i18n.js');
 
 assert.match(service, /'my-character:v1'/, 'selection needs versioned local persistence');
 assert.match(service, /campaignId.*characterId/s, 'selection must be scoped per campaign');
+assert.match(service, /selectionIsMissing/, 'stale character choices need a recoverable state');
 assert.match(
   service,
   /interface MyCharacterState\s*{\s*readonly version: 1;\s*readonly selections:/,

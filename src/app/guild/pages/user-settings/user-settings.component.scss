@@ -1,14 +1,16 @@
 @use '../../../../styles/variables' as *;
 
 .user-settings {
-  width: min(100%, 72rem);
+  box-sizing: border-box;
+  width: min(100%, 76rem);
+  min-width: 0;
   margin: 0 auto;
   padding: clamp(1rem, 2.8vw, 2.5rem);
   color: var(--qk-color-text);
 }
 
 .user-settings__hero {
-  max-width: 48rem;
+  max-width: 50rem;
   margin-bottom: 1.5rem;
 
   h1 {
@@ -16,6 +18,7 @@
     color: var(--qk-color-accent-text);
     font-family: $font-family-heading;
     font-size: clamp(2rem, 5vw, 3.5rem);
+    overflow-wrap: anywhere;
   }
 
   > p:last-child {
@@ -36,23 +39,58 @@
   text-transform: uppercase;
 }
 
-.user-settings__scope-nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.65rem;
-  margin-bottom: 1rem;
+.settings-console {
+  display: grid;
+  grid-template-columns: minmax(12rem, 16rem) minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+  min-width: 0;
+}
 
-  a {
-    min-height: 2.75rem;
-    padding: 0.7rem 1rem;
-    border: 1px solid var(--qk-color-border-subtle);
-    border-radius: 999px;
+.settings-console__rail {
+  display: grid;
+  gap: 0.55rem;
+  position: sticky;
+  top: 6rem;
+  padding: 0.65rem;
+  border: 1px solid var(--qk-color-border-subtle);
+  border-radius: 1rem;
+  background: var(--qk-color-surface);
+  box-shadow: var(--qk-shadow-md);
+
+  button {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.75rem;
+    align-items: center;
+    min-height: 4.25rem;
+    padding: 0.75rem;
+    border: 1px solid transparent;
+    border-radius: 0.75rem;
+    background: transparent;
     color: var(--qk-color-text-secondary);
-    text-decoration: none;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    strong,
+    small {
+      display: block;
+    }
+
+    strong {
+      color: inherit;
+    }
+
+    small {
+      margin-top: 0.2rem;
+      color: var(--qk-color-text-muted);
+    }
 
     &:hover,
-    &:focus-visible {
+    &[aria-selected='true'] {
       border-color: var(--qk-color-accent);
+      background: var(--qk-color-accent-soft);
       color: var(--qk-color-accent-text);
     }
 
@@ -63,15 +101,45 @@
   }
 }
 
+.settings-console__icon {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  color: var(--qk-color-accent-text);
+  font-size: 1.1rem;
+}
+
+.settings-console__content {
+  min-width: 0;
+}
+
 .settings-card {
-  margin-top: 1rem;
+  box-sizing: border-box;
+  position: relative;
+  min-height: 25rem;
+  min-width: 0;
+  max-width: 100%;
   padding: clamp(1rem, 3vw, 2rem);
-  scroll-margin-top: 6rem;
   border: 1px solid var(--qk-color-border-subtle);
   border-radius: 1rem;
   background:
     linear-gradient(135deg, var(--qk-color-accent-soft), transparent 42%), var(--qk-color-surface);
   box-shadow: var(--qk-shadow-md);
+
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--qk-color-accent-soft);
+    outline-offset: 3px;
+  }
+}
+
+.settings-anchor {
+  position: absolute;
+  inset-block-start: -6rem;
 }
 
 .settings-card__heading {
@@ -80,6 +148,10 @@
   gap: 1rem;
   padding-bottom: 1.25rem;
   border-bottom: 1px solid var(--qk-color-border-subtle);
+
+  > div {
+    min-width: 0;
+  }
 
   h2 {
     margin: 0.15rem 0 0.35rem;
@@ -109,7 +181,8 @@
 }
 
 .settings-card__control-row,
-.settings-card__selection {
+.settings-card__selection,
+.settings-card__notice {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -133,6 +206,14 @@
     margin: 0.25rem 0 0;
     color: var(--qk-color-text-muted);
   }
+}
+
+.settings-card__notice--warning {
+  border-color: var(--qk-color-accent);
+}
+
+.settings-card__notice--error {
+  border-color: var(--qk-color-danger, #d66);
 }
 
 .settings-switch {
@@ -210,6 +291,39 @@
   }
 }
 
+.settings-card__state,
+.settings-card__empty {
+  margin: 1.25rem 0 0;
+  padding: 1rem;
+  border: 1px dashed var(--qk-color-border-subtle);
+  border-radius: 0.75rem;
+  color: var(--qk-color-text-secondary);
+}
+
+.settings-card__empty button,
+.settings-card__notice button,
+.rule-preferences button {
+  min-height: 2.75rem;
+  padding: 0.55rem 0.8rem;
+  border: 1px solid var(--qk-color-border);
+  border-radius: 0.55rem;
+  background: var(--qk-color-surface);
+  color: var(--qk-color-text);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.settings-card__change-campaign,
+.rule-preferences__open-library {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  margin-top: 1rem;
+  color: var(--qk-color-accent-text);
+  font-weight: 700;
+}
+
 .settings-card__campaign-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
@@ -236,35 +350,64 @@
   }
 }
 
-.user-settings__privacy {
-  margin: 1.25rem 0 0;
-  color: var(--qk-color-text-muted);
-  font-size: 0.88rem;
-  text-align: center;
+.settings-save-state {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-top: 0.75rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--qk-color-border-subtle);
+  border-radius: 0.75rem;
+  background: var(--qk-color-canvas-deep);
+  color: var(--qk-color-text-secondary);
+
+  strong,
+  small {
+    display: block;
+  }
+
+  small {
+    margin-top: 0.15rem;
+    color: var(--qk-color-text-muted);
+  }
+}
+
+.settings-save-state--warning {
+  border-color: var(--qk-color-accent);
+}
+
+.settings-save-state--error {
+  border-color: var(--qk-color-danger, #d66);
 }
 
 .rule-preferences {
   margin-top: 1.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--qk-color-border-subtle);
+  padding: 1rem;
+  border: 1px solid var(--qk-color-border-subtle);
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--qk-color-canvas) 78%, transparent);
 }
 
 .rule-preferences__heading {
   display: flex;
   justify-content: space-between;
   gap: 1rem;
-  align-items: flex-start;
+  min-height: 3rem;
+  cursor: pointer;
 
-  h3,
-  p {
-    margin: 0.25rem 0;
+  > span:first-child {
+    display: grid;
+    gap: 0.25rem;
   }
 
-  > a {
-    min-height: 2.75rem;
-    color: var(--qk-color-accent-text);
-    font-weight: 700;
+  small,
+  span span {
+    color: var(--qk-color-text-muted);
   }
+}
+
+.rule-preferences__body {
+  padding-top: 1rem;
 }
 
 .rule-preferences__list {
@@ -302,11 +445,11 @@
     width: 100%;
     min-height: 2.75rem;
     padding: 0.65rem;
-    color: var(--qk-color-text);
-    font: inherit;
-    background: var(--qk-color-canvas);
     border: 1px solid var(--qk-color-border);
     border-radius: 0.5rem;
+    background: var(--qk-color-canvas);
+    color: var(--qk-color-text);
+    font: inherit;
   }
 
   textarea {
@@ -324,21 +467,9 @@
   margin: 0.75rem 0;
 }
 
-.rule-preferences button {
-  min-height: 2.75rem;
-  padding: 0.55rem 0.8rem;
-  color: var(--qk-color-text);
-  font: inherit;
-  font-weight: 700;
-  background: var(--qk-color-surface);
-  border: 1px solid var(--qk-color-border);
-  border-radius: 0.55rem;
-  cursor: pointer;
-}
-
 .rule-preferences button[aria-pressed='true'] {
-  color: var(--qk-color-on-accent);
   background: var(--qk-color-accent);
+  color: var(--qk-color-on-accent);
 }
 
 .rule-preferences__reference-editor label {
@@ -363,18 +494,62 @@
   }
 }
 
+@media (max-width: 48rem) {
+  .settings-console {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-console__rail {
+    position: static;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    button {
+      min-height: 3.75rem;
+    }
+  }
+
+  .settings-card {
+    min-height: 0;
+  }
+}
+
 @media (max-width: 38rem) {
+  .user-settings {
+    padding-inline: 0.75rem;
+  }
+
+  .user-settings__hero h1 {
+    font-size: clamp(1.9rem, 10vw, 2.5rem);
+    line-height: 1.05;
+  }
+
+  .settings-console__rail {
+    padding: 0.4rem;
+
+    button {
+      grid-template-columns: 1fr;
+      gap: 0.2rem;
+      text-align: center;
+    }
+
+    small {
+      font-size: 0.7rem;
+    }
+  }
+
+  .settings-console__icon {
+    display: none;
+  }
+
   .settings-card__control-row,
-  .settings-card__selection {
+  .settings-card__selection,
+  .settings-card__notice {
     align-items: flex-start;
     flex-wrap: wrap;
   }
 
-  .settings-card__selection a {
+  .settings-card__selection a,
+  .settings-card__notice button {
     width: 100%;
-  }
-
-  .rule-preferences__heading {
-    flex-direction: column;
   }
 }
