@@ -11,7 +11,7 @@ development helps us move quickly, but everything generated from notes,
 transcripts or prompts remains reviewable by a human before publication.
 
 **Roadmap window:** October 2026–November 2027<br>
-**Current stable release:** QuestKeeper 1.1.5 · Storyforge LTS<br>
+**Current stable release:** QuestKeeper 1.2.0 · Echobloom LTS<br>
 **Next major release:** QuestKeeper 1.5 · Game Night Edition · January 2027<br>
 **Annual destination:** QuestKeeper 2.0 · November 2027
 

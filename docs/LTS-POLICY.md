@@ -13,8 +13,8 @@ It favors reliability and compatible fixes over rapid behavioral change.
 - Every LTS artifact still passes the normal verification, native packaging,
   checksum and smoke-test gates.
 
-QuestKeeper 1.1.5 · Storyforge is the active LTS release. It supersedes 1.1.4
-after integrating the complete 1.1.4 feedback milestone, recoverable user-owned
-storage and the character toolkit. The preceding `v1.1.3` packaging tag failed
-its Windows gate and was never published as a GitHub Release; it remains
-immutable.
+QuestKeeper 1.2.0 · Echobloom is the active LTS release. It supersedes 1.1.5
+after integrating dynamic campaign languages, data-defined interface copy,
+focused character reading, scoped user settings and the atlas/illustrated-memory
+quality pass. The preceding `v1.1.3` packaging tag failed its Windows gate and
+was never published as a GitHub Release; it remains immutable.
