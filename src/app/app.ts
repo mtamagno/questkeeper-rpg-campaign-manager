@@ -1,7 +1,6 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  computed,
   DestroyRef,
   effect,
   type ElementRef,
@@ -26,6 +25,7 @@ import { CampaignService } from '@guild/services/campaign.service';
 import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
 import { LanguageService } from '@guild/services/language.service';
 import { JourneyMemoryService } from '@guild/services/journeyMemory.service';
+import { UiTextService } from '@guild/services/uiText.service';
 
 /**
  * CSS selectors for elements that should automatically play the default
@@ -105,6 +105,7 @@ export class App implements OnInit {
   private readonly languageService = inject(LanguageService);
   private readonly documentTitle = inject(Title);
   private readonly journeyMemory = inject(JourneyMemoryService);
+  readonly uiText = inject(UiTextService);
   private readonly menuToggle = viewChild<ElementRef<HTMLButtonElement>>('menuToggle');
   private completedInitialNavigation = false;
 
@@ -120,8 +121,6 @@ export class App implements OnInit {
   readonly activePalette = this.campaignService.activePalette;
   readonly activePaletteStyles = this.campaignService.activePaletteStyles;
 
-  /** Current language, used by app-shell controls outside routed pages. */
-  readonly isItalian = computed((): boolean => this.languageService.currentLanguage() === 'it');
   readonly routeAnnouncement = signal('');
 
   /** Tracks the previous first-segment to detect major route changes. */
@@ -146,8 +145,8 @@ export class App implements OnInit {
           : this.campaignLocale.resolveForCampaign(campaign, campaign.name);
       this.documentTitle.setTitle(
         campaignName.length === 0
-          ? 'QuestKeeper · D&D Party Companion'
-          : `${campaignName} · QuestKeeper`,
+          ? this.uiText.text('app.defaultDocumentTitle')
+          : this.uiText.text('app.campaignDocumentTitle', { campaign: campaignName }),
       );
     });
   }
@@ -228,9 +227,7 @@ export class App implements OnInit {
           const heading = main?.querySelector<HTMLElement>('h1');
           const label =
             heading?.textContent?.replace(/\s+/g, ' ').trim() || this.documentTitle.getTitle();
-          this.routeAnnouncement.set(
-            this.isItalian() ? `Pagina caricata: ${label}` : `Page loaded: ${label}`,
-          );
+          this.routeAnnouncement.set(this.uiText.text('app.routeLoaded', { label }));
           if (!shouldMoveFocus) return;
           const target = heading ?? main;
           target?.setAttribute('tabindex', '-1');

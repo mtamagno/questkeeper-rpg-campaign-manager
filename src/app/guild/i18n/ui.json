@@ -13,6 +13,14 @@
           "productName": "QuestKeeper",
           "other": "Other"
         },
+        "app": {
+          "skipToMain": "Skip to main content",
+          "toggleNavigation": "Toggle navigation",
+          "campaignContent": "Campaign content",
+          "defaultDocumentTitle": "QuestKeeper · D&D Party Companion",
+          "campaignDocumentTitle": "{campaign} · QuestKeeper",
+          "routeLoaded": "Page loaded: {label}"
+        },
         "language": {
           "contentLabel": "Content language",
           "interfaceLabel": "Interface language",
@@ -201,6 +209,265 @@
           "kicker": "Session Zero · Table pact",
           "indexLabel": "Rules index",
           "emptyTitle": "The pact has yet to be written"
+        },
+        "npcList": {
+          "loading": "Gathering intelligence on known figures...",
+          "title": "Known Figures",
+          "subtitle": "Allies, enemies and ambiguous figures: the people who shaped the party's journey.",
+          "emptyTitle": "No known figures yet",
+          "emptyHelp": "Characters met during play will appear here with their role and allegiance.",
+          "alive": "Alive",
+          "dead": "Dead",
+          "allegiances": {
+            "ally": { "singular": "Ally", "plural": "Allies" },
+            "enemy": { "singular": "Enemy", "plural": "Enemies" },
+            "neutral": { "singular": "Neutral", "plural": "Neutral" }
+          },
+          "discovery": {
+            "title": "Find a known figure",
+            "help": "Search names, titles, roles, locations and descriptions without losing the allegiance groups.",
+            "label": "Search known figures",
+            "placeholder": "Name, title, role or place...",
+            "clear": "Clear search",
+            "results": "Showing {visible} of {total} known figures",
+            "emptyTitle": "No figure matches this search",
+            "emptyHelp": "Try a different name, title, role or place."
+          }
+        },
+        "npcDetail": {
+          "loading": "Loading known figure...",
+          "fullBodyAlt": "Full-body portrait of {name}",
+          "profile": {
+            "title": "Profile",
+            "description": "Description",
+            "role": "Role",
+            "personality": "Personality",
+            "location": "Location",
+            "knownHistory": "Known history"
+          },
+          "relationships": {
+            "title": "Known relationships",
+            "eyebrow": "The party's point of view",
+            "help": "Only what the party has observed, been told or can reasonably infer appears here.",
+            "listLabel": "Known NPC relationships",
+            "seemsToFeel": "What {name} seems to feel",
+            "feels": "What {name} feels",
+            "intensity": "Intensity {value} out of 5",
+            "unknownFeeling": "The party does not yet know how they feel.",
+            "unrecordedViewpoint": "This point of view has not been recorded yet.",
+            "open": "Open relationship",
+            "memory": "memory",
+            "memories": "memories",
+            "empty": "The party has not recorded any public relationship for this NPC yet.",
+            "openNetwork": "Open the complete NPC network"
+          },
+          "gallery": "Gallery",
+          "notFound": "Known figure not found."
+        },
+        "chronicle": {
+          "common": {
+            "prologue": "Prologue",
+            "prologueTitle": "Prologue — {title}",
+            "sessionNumber": "Session {number}",
+            "sessionTitle": "Session {number} — {title}"
+          },
+          "overview": {
+            "loading": "Unrolling the session chronicle...",
+            "title": "Session Chronicles",
+            "subtitle": "A living record of the party's choices, discoveries and victories.",
+            "emptyTitle": "The first page has yet to be written",
+            "emptyHelp": "After the first session, its chapter, key events and party memories will appear here."
+          },
+          "storySoFar": {
+            "loading": "Gathering the threads of the tale...",
+            "title": "The Story So Far",
+            "subtitle": "Everything that has happened so far, in a few lines per session.",
+            "campaignRecap": "Campaign Recap",
+            "emptyTitle": "The story has yet to begin",
+            "emptyHelp": "The campaign thread will be gathered here, one session at a time.",
+            "sessionBySession": "Session by Session"
+          },
+          "chapter": {
+            "loading": "The chronicler prepares the manuscript...",
+            "heading": "Chapter {number}",
+            "emptyProse": "Still writing... The chronicler's quill is hard at work.",
+            "gallery": "Chapter Gallery",
+            "back": "Back to Session Chronicles",
+            "notFound": "Chapter not found. The scroll has been lost to time."
+          },
+          "sessionSummary": {
+            "readStory": "Read the Story",
+            "keyEvents": "Key Events"
+          },
+          "brief": {
+            "eyebrow": "Before the session",
+            "title": "Four things to remember",
+            "help": "A quick path through shared facts. Every step opens the full page that supports it.",
+            "changed": "What changed",
+            "openChapter": "Open the chapter",
+            "location": "Where you are",
+            "locationHelp": "Return to known places, discoveries and routes.",
+            "openPlaces": "Explore places",
+            "personalThread": "A personal thread",
+            "openCharacter": "Open the character",
+            "mattersNow": "What matters now",
+            "storySoFar": "The story so far",
+            "readRecap": "Read the recap"
+          },
+          "tableMoments": {
+            "loading": "Gathering the laughter...",
+            "title": "Around the Table",
+            "subtitle": "The jokes, comments and little disasters that happened around the story—not inside it.",
+            "editorialLabel": "Editorial note",
+            "editorialNote": "These are out-of-character memories: they are not campaign canon and include only table-approved quotations.",
+            "emptyTitle": "The laughter has yet to be recorded",
+            "emptyHelp": "When an out-of-character joke deserves to be remembered, it will live here without entering the canonical chronicle.",
+            "sessionZero": "Session Zero",
+            "carouselLabel": "Around-the-table moments from {session}, {position}",
+            "momentButton": "Show moment {number} from {session}",
+            "previous": "Previous moment",
+            "next": "Next moment",
+            "choose": "Choose a moment",
+            "returnToStory": "Return to the session story"
+          }
+        },
+        "mapsOverview": {
+          "loading": "Charting the known lands...",
+          "eyebrow": "Campaign atlas",
+          "title": "Explored Locations",
+          "subtitle": "Every trail walked, ruin explored and refuge found, gathered in one readable atlas.",
+          "emptyTitle": "The map is still veiled in mist",
+          "emptyHelp": "Locations discovered during the adventure will appear here after each session.",
+          "discovery": {
+            "title": "Find a place",
+            "help": "Search names, regions and descriptions, or narrow the atlas by exploration progress.",
+            "searchLabel": "Search locations",
+            "searchPlaceholder": "Name, region or description...",
+            "filterLabel": "Filter locations by exploration status",
+            "filters": {
+              "all": "All",
+              "completed": "Explored",
+              "in-progress": "In progress",
+              "unexplored": "Unexplored"
+            },
+            "results": "Showing {visible} of {total} locations",
+            "emptyTitle": "No place matches these clues",
+            "emptyHelp": "Try a different term or restore the complete atlas.",
+            "clear": "Clear filters"
+          }
+        },
+        "mapCard": {
+          "imageAlt": "Map or illustration of {name}",
+          "status": {
+            "completed": "Explored",
+            "in-progress": "In progress",
+            "unexplored": "Unexplored"
+          },
+          "discovery": "{count} discovery",
+          "discoveries": "{count} discoveries"
+        },
+        "mapDetail": {
+          "loading": "Opening the campaign atlas...",
+          "navigationLabel": "Location navigation",
+          "back": "Back to all locations",
+          "eyebrow": "Known location",
+          "status": {
+            "completed": "Fully explored",
+            "in-progress": "Exploration in progress",
+            "unexplored": "Unexplored"
+          },
+          "description": "What the party knows",
+          "gallery": "Maps and illustrations",
+          "discoveries": "Discoveries",
+          "discoveriesHelp": "{count} findings recorded at this location.",
+          "pagerLabel": "Browse nearby entries in the atlas",
+          "previous": "Previous location",
+          "next": "Next location",
+          "notFoundTitle": "Location not found",
+          "notFoundHelp": "This page is not present in the party's atlas."
+        },
+        "gallery": {
+          "loading": "Gathering illustrated memories...",
+          "eyebrow": "Campaign archive",
+          "title": "Gallery",
+          "subtitle": "Portraits, scenes and memories from the campaign, grouped so the archive stays easy to browse.",
+          "summary": "{images} images across {sections} collections",
+          "emptyTitle": "No illustrated memories yet",
+          "emptyHelp": "Portraits and session scenes will appear here as the story takes shape.",
+          "openImage": "Open {label} in the image viewer",
+          "unknownLocation": "Unknown location",
+          "sessionLabel": "Session {number}",
+          "sections": {
+            "party": "Party",
+            "npcs": "NPCs",
+            "group": "Group",
+            "sessions": "Sessions",
+            "minorNpcs": "Minor NPCs"
+          },
+          "alt": {
+            "profile": "Profile image of {name}",
+            "portrait": "Portrait of {name}",
+            "group": "Party group image"
+          }
+        },
+        "imageGallery": { "openImage": "Open {label} in the image viewer" },
+        "lightbox": {
+          "viewerLabel": "Image viewer",
+          "close": "Close image viewer",
+          "loading": "Loading image {position}",
+          "loaded": "Image {position} loaded",
+          "loadError": "Could not load image {position}",
+          "unavailable": "Image unavailable",
+          "retry": "Retry",
+          "previous": "Previous image",
+          "next": "Next image"
+        },
+        "relationshipGraph": {
+          "empty": "No relationships to display.",
+          "instructions": "Select a portrait to focus on its connections, or open the relationship list below.",
+          "mapLabel": "Interactive relationship map",
+          "viewProfile": "View profile",
+          "closeDetails": "Close details",
+          "partyReading": "Party's reading",
+          "legend": "Legend",
+          "listSummary": "Open the accessible relationship list",
+          "listHelp": "The same connections in a non-spatial format, suitable for keyboard, touch and screen readers."
+        },
+        "partyRelationships": {
+          "loading": "Weaving party bonds...",
+          "eyebrow": "Adventuring party",
+          "title": "Party Bonds",
+          "subtitle": "The bonds between adventurers, forged in danger and tested by fate.",
+          "emptyTitle": "The bonds are yet to be forged",
+          "emptyHelp": "Friendships, rivalries and promises will appear here as the adventure leaves its mark on the party."
+        },
+        "npcRelationships": {
+          "loading": "Tracing the web of connections...",
+          "eyebrow": "Known faces",
+          "title": "Connections and Alliances",
+          "subtitle": "A web of alliances, enmities and unexpected encounters that changes with every session.",
+          "knowledgeTitle": "What the party believes",
+          "knowledgeHelp": "This web includes bonds between NPCs and with the party, but shows only what the characters observed, were told or inferred from events.",
+          "playerCharacters": "Player characters",
+          "npcs": "NPCs",
+          "emptyTitle": "The web of connections is still hidden",
+          "emptyHelp": "As the party meets new people, alliances and conflicts will take shape here."
+        },
+        "relationshipDetail": {
+          "loading": "Consulting the chronicles...",
+          "mutual": "Mutual",
+          "partyReading": "Party's reading",
+          "partyReadingHelp": "This is the relationship the party believes it understands.",
+          "feelingsTitle": "How they experience this bond",
+          "feelingsHelp": "The bond has one type, but each person can hold several feelings at the same time.",
+          "pointOfView": "From the point of view of",
+          "intensity": "Intensity {value} out of 5",
+          "sharedEvents": "Shared Events",
+          "memorableWords": "Memorable Words",
+          "evolution": "Relationship Evolution",
+          "back": "Back to Relationships",
+          "notFoundTitle": "Relationship not found",
+          "notFoundHelp": "The threads of fate between these two remain unseen."
         }
       }
     },
@@ -212,6 +479,14 @@
         "common": {
           "productName": "QuestKeeper",
           "other": "Altro"
+        },
+        "app": {
+          "skipToMain": "Vai al contenuto principale",
+          "toggleNavigation": "Apri o chiudi la navigazione",
+          "campaignContent": "Contenuto della campagna",
+          "defaultDocumentTitle": "QuestKeeper · Companion per gruppi D&D",
+          "campaignDocumentTitle": "{campaign} · QuestKeeper",
+          "routeLoaded": "Pagina caricata: {label}"
         },
         "language": {
           "contentLabel": "Lingua dei contenuti",
@@ -401,6 +676,265 @@
           "kicker": "Sessione Zero · Patto del tavolo",
           "indexLabel": "Indice del regolamento",
           "emptyTitle": "Il patto deve ancora essere scritto"
+        },
+        "npcList": {
+          "loading": "Raccolgo informazioni sui volti noti...",
+          "title": "Volti conosciuti",
+          "subtitle": "Alleati, nemici e figure ambigue: le persone che hanno segnato il viaggio della compagnia.",
+          "emptyTitle": "Nessun volto conosciuto, per ora",
+          "emptyHelp": "I personaggi incontrati durante le sessioni appariranno qui, insieme a ruolo e alleanza.",
+          "alive": "Vivo",
+          "dead": "Morto",
+          "allegiances": {
+            "ally": { "singular": "Alleato", "plural": "Alleati" },
+            "enemy": { "singular": "Nemico", "plural": "Nemici" },
+            "neutral": { "singular": "Neutrale", "plural": "Neutrali" }
+          },
+          "discovery": {
+            "title": "Trova un volto conosciuto",
+            "help": "Cerca nomi, titoli, ruoli, luoghi e descrizioni senza perdere i raggruppamenti per alleanza.",
+            "label": "Cerca tra i PNG",
+            "placeholder": "Nome, titolo, ruolo o luogo...",
+            "clear": "Cancella ricerca",
+            "results": "Mostro {visible} di {total} volti conosciuti",
+            "emptyTitle": "Nessun volto corrisponde alla ricerca",
+            "emptyHelp": "Prova con un nome, un titolo, un ruolo o un luogo diverso."
+          }
+        },
+        "npcDetail": {
+          "loading": "Carico il volto conosciuto...",
+          "fullBodyAlt": "Ritratto a figura intera di {name}",
+          "profile": {
+            "title": "Profilo",
+            "description": "Descrizione",
+            "role": "Ruolo",
+            "personality": "Personalità",
+            "location": "Luogo",
+            "knownHistory": "Storia conosciuta"
+          },
+          "relationships": {
+            "title": "Legami conosciuti",
+            "eyebrow": "Il punto di vista del gruppo",
+            "help": "Qui appare soltanto ciò che il gruppo ha osservato, gli è stato riferito o può ragionevolmente dedurre.",
+            "listLabel": "Relazioni conosciute del PNG",
+            "seemsToFeel": "Cosa sembra provare {name}",
+            "feels": "Cosa prova {name}",
+            "intensity": "Intensità {value} su 5",
+            "unknownFeeling": "Il gruppo non sa ancora cosa provi.",
+            "unrecordedViewpoint": "Questo punto di vista non è ancora stato registrato.",
+            "open": "Apri la relazione",
+            "memory": "memoria",
+            "memories": "memorie",
+            "empty": "Il gruppo non ha ancora registrato alcun legame pubblico per questo PNG.",
+            "openNetwork": "Apri la rete completa dei PNG"
+          },
+          "gallery": "Galleria",
+          "notFound": "Volto conosciuto non trovato."
+        },
+        "chronicle": {
+          "common": {
+            "prologue": "Prologo",
+            "prologueTitle": "Prologo — {title}",
+            "sessionNumber": "Sessione {number}",
+            "sessionTitle": "Sessione {number} — {title}"
+          },
+          "overview": {
+            "loading": "Apro le cronache delle sessioni...",
+            "title": "Cronache delle sessioni",
+            "subtitle": "Un resoconto vivo delle scelte, delle scoperte e delle vittorie della compagnia.",
+            "emptyTitle": "La prima pagina deve ancora essere scritta",
+            "emptyHelp": "Dopo la prima sessione, qui troverai il capitolo, gli eventi chiave e i ricordi del gruppo."
+          },
+          "storySoFar": {
+            "loading": "Raccolgo i fili della storia...",
+            "title": "La storia fin qui",
+            "subtitle": "Tutto quello che è successo finora, in poche righe per sessione.",
+            "campaignRecap": "Riassunto della campagna",
+            "emptyTitle": "La storia deve ancora cominciare",
+            "emptyHelp": "Qui verrà raccolto il filo della campagna, sessione dopo sessione.",
+            "sessionBySession": "Sessione per sessione"
+          },
+          "chapter": {
+            "loading": "Il cronista prepara il manoscritto...",
+            "heading": "Capitolo {number}",
+            "emptyProse": "Ancora in scrittura... La penna del cronista è al lavoro.",
+            "gallery": "Galleria del capitolo",
+            "back": "Torna alle cronache",
+            "notFound": "Capitolo non trovato. La pergamena si è perduta nel tempo."
+          },
+          "sessionSummary": {
+            "readStory": "Leggi il racconto",
+            "keyEvents": "Eventi chiave"
+          },
+          "brief": {
+            "eyebrow": "Brief prima della sessione",
+            "title": "Quattro cose da ricordare",
+            "help": "Un percorso rapido tra fatti condivisi. Ogni tappa apre la pagina completa che la sostiene.",
+            "changed": "Cosa è cambiato",
+            "openChapter": "Apri il capitolo",
+            "location": "Dove siete",
+            "locationHelp": "Riapri luoghi, scoperte e percorsi conosciuti.",
+            "openPlaces": "Esplora i luoghi",
+            "personalThread": "Un filo personale",
+            "openCharacter": "Apri il personaggio",
+            "mattersNow": "Cosa conta adesso",
+            "storySoFar": "La storia finora",
+            "readRecap": "Leggi il riepilogo"
+          },
+          "tableMoments": {
+            "loading": "Raccolgo le risate...",
+            "title": "Momenti al tavolo",
+            "subtitle": "Le battute, i commenti e i piccoli disastri successi attorno alla storia, non dentro di essa.",
+            "editorialLabel": "Nota editoriale",
+            "editorialNote": "Questi sono ricordi fuori personaggio: non fanno parte del canone della campagna e raccolgono soltanto battute approvate dal tavolo.",
+            "emptyTitle": "Le risate devono ancora essere annotate",
+            "emptyHelp": "Quando una battuta fuori personaggio meriterà di essere ricordata, troverà posto qui senza entrare nella cronaca canonica.",
+            "sessionZero": "Sessione Zero",
+            "carouselLabel": "Momenti al tavolo della {session}, {position}",
+            "momentButton": "Mostra il momento {number} della {session}",
+            "previous": "Momento precedente",
+            "next": "Momento successivo",
+            "choose": "Scegli un momento",
+            "returnToStory": "Torna al racconto della sessione"
+          }
+        },
+        "mapsOverview": {
+          "loading": "Traccio le terre conosciute...",
+          "eyebrow": "Atlante della campagna",
+          "title": "Luoghi esplorati",
+          "subtitle": "Ogni sentiero percorso, rovina esplorata e rifugio trovato, raccolti in un atlante leggibile.",
+          "emptyTitle": "La mappa è ancora avvolta dalla nebbia",
+          "emptyHelp": "I luoghi scoperti durante l'avventura compariranno qui dopo ogni sessione.",
+          "discovery": {
+            "title": "Trova un luogo",
+            "help": "Cerca nomi, regioni e descrizioni oppure restringi l'atlante in base all'esplorazione.",
+            "searchLabel": "Cerca luoghi",
+            "searchPlaceholder": "Nome, regione o descrizione...",
+            "filterLabel": "Filtra i luoghi per stato di esplorazione",
+            "filters": {
+              "all": "Tutti",
+              "completed": "Esplorati",
+              "in-progress": "In corso",
+              "unexplored": "Inesplorati"
+            },
+            "results": "Mostrati {visible} luoghi su {total}",
+            "emptyTitle": "Nessun luogo corrisponde a questi indizi",
+            "emptyHelp": "Prova un termine diverso o ripristina l'atlante completo.",
+            "clear": "Azzera filtri"
+          }
+        },
+        "mapCard": {
+          "imageAlt": "Mappa o illustrazione di {name}",
+          "status": {
+            "completed": "Esplorato",
+            "in-progress": "In corso",
+            "unexplored": "Inesplorato"
+          },
+          "discovery": "{count} scoperta",
+          "discoveries": "{count} scoperte"
+        },
+        "mapDetail": {
+          "loading": "Apro l'atlante della campagna...",
+          "navigationLabel": "Navigazione dei luoghi",
+          "back": "Torna a tutti i luoghi",
+          "eyebrow": "Luogo conosciuto",
+          "status": {
+            "completed": "Esplorato completamente",
+            "in-progress": "Esplorazione in corso",
+            "unexplored": "Inesplorato"
+          },
+          "description": "Ciò che il gruppo sa",
+          "gallery": "Mappe e illustrazioni",
+          "discoveries": "Scoperte",
+          "discoveriesHelp": "{count} ritrovamenti registrati in questo luogo.",
+          "pagerLabel": "Sfoglia le voci vicine dell'atlante",
+          "previous": "Luogo precedente",
+          "next": "Luogo successivo",
+          "notFoundTitle": "Luogo non trovato",
+          "notFoundHelp": "Questa pagina non è presente nell'atlante del gruppo."
+        },
+        "gallery": {
+          "loading": "Raccolgo i ricordi illustrati...",
+          "eyebrow": "Archivio della campagna",
+          "title": "Galleria",
+          "subtitle": "Ritratti, scene e ricordi della campagna, raggruppati per mantenere l'archivio facile da sfogliare.",
+          "summary": "{images} immagini in {sections} raccolte",
+          "emptyTitle": "Nessun ricordo illustrato, per ora",
+          "emptyHelp": "Ritratti e scene delle sessioni appariranno qui mentre la storia prende forma.",
+          "openImage": "Apri {label} nel visualizzatore immagini",
+          "unknownLocation": "Luogo sconosciuto",
+          "sessionLabel": "Sessione {number}",
+          "sections": {
+            "party": "Compagnia",
+            "npcs": "PNG",
+            "group": "Gruppo",
+            "sessions": "Sessioni",
+            "minorNpcs": "PNG minori"
+          },
+          "alt": {
+            "profile": "Immagine profilo di {name}",
+            "portrait": "Ritratto di {name}",
+            "group": "Immagine di gruppo della compagnia"
+          }
+        },
+        "imageGallery": { "openImage": "Apri {label} nel visualizzatore immagini" },
+        "lightbox": {
+          "viewerLabel": "Visualizzatore immagini",
+          "close": "Chiudi il visualizzatore immagini",
+          "loading": "Caricamento immagine {position}",
+          "loaded": "Immagine {position} caricata",
+          "loadError": "Impossibile caricare l'immagine {position}",
+          "unavailable": "Immagine non disponibile",
+          "retry": "Riprova",
+          "previous": "Immagine precedente",
+          "next": "Immagine successiva"
+        },
+        "relationshipGraph": {
+          "empty": "Nessuna relazione da mostrare.",
+          "instructions": "Seleziona un ritratto per mettere a fuoco i suoi legami, oppure apri la lista delle relazioni qui sotto.",
+          "mapLabel": "Mappa interattiva delle relazioni",
+          "viewProfile": "Vedi profilo",
+          "closeDetails": "Chiudi dettaglio",
+          "partyReading": "Lettura del gruppo",
+          "legend": "Legenda",
+          "listSummary": "Apri la lista accessibile delle relazioni",
+          "listHelp": "Gli stessi legami in un formato non spaziale, adatto a tastiera, touch e screen reader."
+        },
+        "partyRelationships": {
+          "loading": "Sto intrecciando i legami...",
+          "eyebrow": "Compagnia",
+          "title": "Legami del gruppo",
+          "subtitle": "I legami tra avventurieri, forgiati nel pericolo e messi alla prova dal destino.",
+          "emptyTitle": "I legami devono ancora nascere",
+          "emptyHelp": "Amicizie, rivalità e promesse appariranno qui quando l’avventura avrà lasciato il segno sulla compagnia."
+        },
+        "npcRelationships": {
+          "loading": "Sto ricostruendo la rete di conoscenze...",
+          "eyebrow": "Volti conosciuti",
+          "title": "Intrecci e alleanze",
+          "subtitle": "Una rete di alleanze, inimicizie e incontri inattesi che cambia con ogni sessione.",
+          "knowledgeTitle": "Ciò che il gruppo crede",
+          "knowledgeHelp": "Questa rete include rapporti tra PNG e con il party, ma mostra soltanto ciò che i personaggi hanno osservato, sentito raccontare o dedotto dagli eventi.",
+          "playerCharacters": "Personaggi giocanti",
+          "npcs": "PNG",
+          "emptyTitle": "La rete di conoscenze è ancora nascosta",
+          "emptyHelp": "Quando la compagnia incontrerà nuovi personaggi, alleanze e conflitti prenderanno forma qui."
+        },
+        "relationshipDetail": {
+          "loading": "Consulto le cronache...",
+          "mutual": "Reciproco",
+          "partyReading": "Lettura del gruppo",
+          "partyReadingHelp": "Questa è la relazione che il gruppo crede di aver compreso.",
+          "feelingsTitle": "Come vivono questo legame",
+          "feelingsHelp": "Il rapporto ha un solo tipo, ma ogni persona può provare più sentimenti contemporaneamente.",
+          "pointOfView": "Punto di vista di",
+          "intensity": "Intensità {value} su 5",
+          "sharedEvents": "Momenti condivisi",
+          "memorableWords": "Parole memorabili",
+          "evolution": "Evoluzione del legame",
+          "back": "Torna alle relazioni",
+          "notFoundTitle": "Relazione non trovata",
+          "notFoundHelp": "I fili del destino tra queste due persone restano invisibili."
         }
       }
     }

@@ -19,6 +19,15 @@
     text-align: center;
   }
 
+  &__eyebrow {
+    margin: 0 0 $spacing-xs;
+    color: $color-text-muted;
+    font-family: $font-family-heading;
+    font-size: $font-size-xs;
+    letter-spacing: $letter-spacing-wide;
+    text-transform: uppercase;
+  }
+
   &__title {
     font-family: $font-family-heading;
     font-size: $font-size-3xl;
@@ -46,6 +55,85 @@
     gap: $spacing-xl;
   }
 
+  &__discovery {
+    @include surface-card;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(230px, 0.8fr);
+    gap: $spacing-md $spacing-xl;
+    align-items: end;
+    padding: $spacing-lg;
+
+    h2,
+    p {
+      margin: 0;
+    }
+
+    h2 {
+      color: $color-gold-light;
+      font-family: $font-family-heading;
+      font-size: $font-size-lg;
+    }
+
+    p {
+      color: $color-text-secondary;
+      line-height: $line-height-relaxed;
+    }
+  }
+
+  &__search {
+    display: grid;
+    gap: $spacing-xs;
+    color: $color-text-secondary;
+    font-size: $font-size-sm;
+
+    input {
+      min-height: 44px;
+      padding: $spacing-sm $spacing-md;
+      color: $color-text-primary;
+      background: color-mix(in srgb, var(--qk-color-canvas-deep) 88%, black);
+      border: $border-width-thin solid $color-border-default;
+      border-radius: $border-radius-md;
+    }
+  }
+
+  &__filters {
+    display: flex;
+    gap: $spacing-xs;
+    flex-wrap: wrap;
+
+    button {
+      min-height: 44px;
+      padding: $spacing-xs $spacing-md;
+      color: $color-text-secondary;
+      background: transparent;
+      border: $border-width-thin solid $color-border-default;
+      border-radius: $border-radius-pill;
+      cursor: pointer;
+
+      &.is-active {
+        color: $color-gold-light;
+        background: rgba($color-gold, 0.12);
+        border-color: $color-gold-dark;
+      }
+    }
+  }
+
+  &__results {
+    justify-self: end;
+    font-size: $font-size-sm;
+  }
+
+  &__clear {
+    min-height: 44px;
+    margin-top: $spacing-md;
+    padding: $spacing-sm $spacing-lg;
+    color: $color-gold-light;
+    background: transparent;
+    border: $border-width-thin solid $color-gold-dark;
+    border-radius: $border-radius-pill;
+    cursor: pointer;
+  }
+
   &__empty {
     width: 100%;
   }
@@ -54,5 +142,19 @@
     @include flex-center;
     min-height: 300px;
     color: $color-text-muted;
+  }
+}
+
+@media (max-width: 700px) {
+  .maps-overview {
+    &__discovery {
+      grid-template-columns: 1fr;
+    }
+    &__results {
+      justify-self: start;
+    }
+    &__grid {
+      grid-template-columns: 1fr;
+    }
   }
 }

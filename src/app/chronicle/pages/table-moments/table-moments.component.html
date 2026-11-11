@@ -1,33 +1,24 @@
 @if (isLoading()) {
   <div class="table-moments__loading">
-    <app-dice-loader
-      [label]="lang() === 'it' ? 'Raccolgo le risate...' : 'Gathering the laughter...'"
-      [playSound]="false"
-    />
+    <app-dice-loader [label]="uiText.text('chronicle.tableMoments.loading')" [playSound]="false" />
   </div>
 } @else {
   <article class="table-moments">
     <header class="table-moments__header">
       <div class="table-moments__heading-row">
-        <h1 class="table-moments__title">
-          🎭 {{ lang() === 'it' ? 'Momenti al tavolo' : 'Around the Table' }}
-        </h1>
+        <h1 class="table-moments__title">🎭 {{ uiText.text('chronicle.tableMoments.title') }}</h1>
         <app-language-toggle />
       </div>
-      <p class="table-moments__subtitle">{{ subtitle | bilingual }}</p>
+      <p class="table-moments__subtitle">{{ uiText.text('chronicle.tableMoments.subtitle') }}</p>
     </header>
 
     <aside
       class="table-moments__boundary"
-      [attr.aria-label]="lang() === 'it' ? 'Nota editoriale' : 'Editorial note'"
+      [attr.aria-label]="uiText.text('chronicle.tableMoments.editorialLabel')"
     >
       <span aria-hidden="true">✦</span>
       <p>
-        {{
-          lang() === 'it'
-            ? 'Questi sono ricordi fuori personaggio: non fanno parte del canone della campagna e raccolgono soltanto battute approvate dal tavolo.'
-            : 'These are out-of-character memories: they are not campaign canon and include only table-approved quotations.'
-        }}
+        {{ uiText.text('chronicle.tableMoments.editorialNote') }}
       </p>
     </aside>
 
@@ -35,18 +26,10 @@
       <div class="empty-state table-moments__empty">
         <span class="empty-state__icon" aria-hidden="true">☺</span>
         <h2 class="empty-state__title">
-          {{
-            lang() === 'it'
-              ? 'Le risate devono ancora essere annotate'
-              : 'The laughter has yet to be recorded'
-          }}
+          {{ uiText.text('chronicle.tableMoments.emptyTitle') }}
         </h2>
         <p class="empty-state__text">
-          {{
-            lang() === 'it'
-              ? 'Quando una battuta fuori personaggio meriterà di essere ricordata, troverà posto qui senza entrare nella cronaca canonica.'
-              : 'When an out-of-character joke deserves to be remembered, it will live here without entering the canonical chronicle.'
-          }}
+          {{ uiText.text('chronicle.tableMoments.emptyHelp') }}
         </p>
       </div>
     } @else {
@@ -75,7 +58,7 @@
                 class="table-moments__arrow table-moments__arrow--previous"
                 type="button"
                 [disabled]="group.moments.length < 2"
-                [attr.aria-label]="lang() === 'it' ? 'Momento precedente' : 'Previous moment'"
+                [attr.aria-label]="uiText.text('chronicle.tableMoments.previous')"
                 (click)="previousMoment(group)"
               >
                 <span aria-hidden="true">←</span>
@@ -100,7 +83,7 @@
                 class="table-moments__arrow table-moments__arrow--next"
                 type="button"
                 [disabled]="group.moments.length < 2"
-                [attr.aria-label]="lang() === 'it' ? 'Momento successivo' : 'Next moment'"
+                [attr.aria-label]="uiText.text('chronicle.tableMoments.next')"
                 (click)="nextMoment(group)"
               >
                 <span aria-hidden="true">→</span>
@@ -108,7 +91,7 @@
 
               <nav
                 class="table-moments__pagination"
-                [attr.aria-label]="lang() === 'it' ? 'Scegli un momento' : 'Choose a moment'"
+                [attr.aria-label]="uiText.text('chronicle.tableMoments.choose')"
               >
                 <span class="table-moments__counter" aria-hidden="true">
                   {{ activeMomentIndex(group) + 1 }} / {{ group.moments.length }}
@@ -134,11 +117,7 @@
                 [routerLink]="['/', cId, 'campaign', 'story', group.sessionId]"
               >
                 📖
-                {{
-                  lang() === 'it'
-                    ? 'Torna al racconto della sessione'
-                    : 'Return to the session story'
-                }}
+                {{ uiText.text('chronicle.tableMoments.returnToStory') }}
               </a>
             }
           </li>

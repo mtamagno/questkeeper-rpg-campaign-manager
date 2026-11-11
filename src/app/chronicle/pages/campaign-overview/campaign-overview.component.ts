@@ -6,11 +6,10 @@
 import { Component, ChangeDetectionStrategy, inject, computed, type Signal } from '@angular/core';
 
 import { DataService } from '@guild/services/data.service';
-import { LanguageService } from '@guild/services/language.service';
+import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
+import { UiTextService } from '@guild/services/uiText.service';
 import { LanguageToggleComponent } from '@guild/components/language-toggle/language-toggle.component';
-import { BilingualTextPipe } from '@guild/components/bilingual-text/bilingual-text.pipe';
 import { AccordionComponent } from '@guild/components/accordion/accordion.component';
-import { type BilingualText } from '@guild/models/language.model';
 import { type Session } from '@guild/models/session.model';
 import { SessionSummaryComponent } from '../../components/session-summary/session-summary.component';
 import { GameNightBriefComponent } from '../../components/game-night-brief/game-night-brief.component';
@@ -25,7 +24,6 @@ import { GameNightBriefComponent } from '../../components/game-night-brief/game-
   imports: [
     SessionSummaryComponent,
     LanguageToggleComponent,
-    BilingualTextPipe,
     AccordionComponent,
     GameNightBriefComponent,
   ],
@@ -35,16 +33,8 @@ import { GameNightBriefComponent } from '../../components/game-night-brief/game-
 })
 export class CampaignOverviewComponent {
   private readonly dataService = inject(DataService);
-  private readonly languageService = inject(LanguageService);
-
-  /** Current display language for page copy. */
-  readonly lang = this.languageService.currentLanguage;
-
-  /** Bilingual subtitle for the page header. */
-  readonly subtitle: BilingualText = {
-    en: "A living record of the party's choices, discoveries, and victories.",
-    it: 'Un resoconto vivo delle scelte, delle scoperte e delle vittorie della compagnia.',
-  };
+  private readonly campaignLocale = inject(CampaignLocaleService);
+  readonly uiText = inject(UiTextService);
 
   /** Whether data is still loading. */
   readonly isLoading: Signal<boolean> = this.dataService.isLoading;
@@ -56,4 +46,16 @@ export class CampaignOverviewComponent {
   readonly lastSessionIndex: Signal<number> = computed(() =>
     Math.max(0, this.sessions().length - 1),
   );
+
+  /** Localized timeline title; session zero is the pre-campaign prologue. */
+  entryTitle(session: Session): string {
+    const title = this.campaignLocale.resolve(session.title);
+    if (session.sessionNumber === 0) {
+      return this.uiText.text('chronicle.common.prologueTitle', { title });
+    }
+    return this.uiText.text('chronicle.common.sessionTitle', {
+      number: session.sessionNumber,
+      title,
+    });
+  }
 }

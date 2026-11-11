@@ -102,6 +102,29 @@ own sake. Existing patterns are retained when they already satisfy the rubric.
 Shared fixes ship in both repositories in the same delivery cycle; campaign-only
 surfaces receive local adaptations and feed reusable discoveries upstream.
 
+## Progress through 11 November
+
+- **6 November:** shared tab, touch-target and reduced-motion contracts plus
+  import-graph-based first-view budgets are implemented.
+- **7 November:** relationship maps retain their visual graph and gain an
+  equivalent linear reading and navigation path.
+- **8 November:** the completed 1-5 November character preservation evidence is
+  reused as the continuity gate; no duplicate refactor was introduced.
+- **9 November:** NPC discovery now supports localized search, result counts,
+  clear recovery and explicit empty states; NPC detail labels use the UI catalog.
+- **10 November:** overview, story, chapter, session, game-night and table-memory
+  interface copy uses the data-defined catalog while authored prose remains in
+  campaign data.
+- **11 November:** atlas search and exploration filters, adjacent-location
+  navigation, collapsible gallery collections and the complete lightbox
+  lifecycle are shared, localized and covered by a focused regression gate.
+
+The paired implementation and regression boundary are recorded in the
+[6-10 November quality catch-up](reviews/2026-11-06-10-quality-catchup.md).
+The [11 November maps and gallery closeout](reviews/2026-11-11-maps-gallery-closeout.md)
+completes the runtime scope of issue #140; tracker closure remains tied to the
+next verified release under the awaiting-release policy.
+
 ## Exit gate on 17 November
 
 - Every listed route and workspace has an owner, result and evidence entry.

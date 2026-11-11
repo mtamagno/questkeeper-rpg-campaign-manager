@@ -1,65 +1,44 @@
-<!-- Gallery — All campaign images organized by category -->
 @if (isLoading()) {
   <div class="gallery__loading">
-    <app-dice-loader
-      [label]="lang() === 'it' ? 'Raccolgo i ricordi...' : 'Gathering memories...'"
-      [playSound]="false"
-    />
+    <app-dice-loader [label]="uiText.text('gallery.loading')" [playSound]="false" />
   </div>
 } @else {
-  <div class="gallery">
+  <article class="gallery">
     <header class="gallery__header">
       <div class="gallery__heading-row">
-        <h1 class="gallery__title">🖼️ {{ lang() === 'it' ? 'Galleria' : 'Gallery' }}</h1>
+        <div>
+          <p class="gallery__eyebrow">{{ uiText.text('gallery.eyebrow') }}</p>
+          <h1 class="gallery__title">🖼️ {{ uiText.text('gallery.title') }}</h1>
+        </div>
         <app-language-toggle />
       </div>
-      <p class="gallery__subtitle">
-        {{
-          lang() === 'it'
-            ? 'Ritratti, scene e ricordi raccolti durante la campagna.'
-            : 'A collection of portraits, scenes, and memories from the campaign.'
-        }}
-      </p>
-    </header>
-
-    @for (section of sections(); track section.title) {
-      @if (section.collapsible) {
-        <section class="gallery__section gallery__section--collapsible">
-          <app-accordion
-            [title]="section.icon + ' ' + section.title"
-            [startOpen]="section.startOpen ?? false"
-          >
-            <ng-container *ngTemplateOutlet="sectionBody; context: { $implicit: section }" />
-          </app-accordion>
-        </section>
-      } @else {
-        <section class="gallery__section">
-          <h2 class="gallery__section-title">{{ section.icon }} {{ section.title }}</h2>
-          <ng-container *ngTemplateOutlet="sectionBody; context: { $implicit: section }" />
-        </section>
+      <p class="gallery__subtitle">{{ uiText.text('gallery.subtitle') }}</p>
+      @if (imageCount() > 0) {
+        <p class="gallery__summary">
+          {{
+            uiText.text('gallery.summary', { images: imageCount(), sections: sections().length })
+          }}
+        </p>
       }
+    </header>
+    @for (section of sections(); track section.id) {
+      <section class="gallery__section">
+        <app-accordion
+          [title]="section.icon + ' ' + section.title + ' · ' + sectionItemCount(section)"
+          [startOpen]="section.startOpen"
+        >
+          <ng-container *ngTemplateOutlet="sectionBody; context: { $implicit: section }" />
+        </app-accordion>
+      </section>
     }
-
     @if (sections().length === 0) {
       <div class="empty-state gallery__empty">
         <span class="empty-state__icon" aria-hidden="true">◇</span>
-        <h2 class="empty-state__title">
-          {{
-            lang() === 'it' ? 'Nessun ricordo illustrato, per ora' : 'No illustrated memories yet'
-          }}
-        </h2>
-        <p class="empty-state__text">
-          {{
-            lang() === 'it'
-              ? 'Ritratti e scene delle sessioni appariranno qui mentre la storia prende forma.'
-              : 'Portraits and session scenes will appear here as the story takes shape.'
-          }}
-        </p>
+        <h2 class="empty-state__title">{{ uiText.text('gallery.emptyTitle') }}</h2>
+        <p class="empty-state__text">{{ uiText.text('gallery.emptyHelp') }}</p>
       </div>
     }
-  </div>
-
-  <!-- Lightbox overlay -->
+  </article>
   @if (isLightboxOpen()) {
     <app-image-lightbox
       [images]="lightboxImages()"
@@ -70,57 +49,52 @@
   }
 }
 
-<!-- Reusable body template: renders flat items or grouped subgroups. -->
 <ng-template #sectionBody let-section>
   @if (section.subgroups; as subgroups) {
     @for (subgroup of subgroups; track subgroup.title) {
       <h3 class="gallery__subgroup-title">{{ subgroup.title }}</h3>
       <div class="gallery__grid">
         @for (item of subgroup.items; track item.url; let idx = $index) {
-          <figure
+          <button
             class="gallery__item"
+            type="button"
             (click)="openLightbox(subgroup.items, idx)"
-            (keydown.enter)="openLightbox(subgroup.items, idx)"
-            tabindex="0"
-            role="button"
-            [attr.aria-label]="(lang() === 'it' ? 'Apri ' : 'View ') + item.label"
+            [attr.aria-label]="uiText.text('gallery.openImage', { label: item.label })"
           >
             <img
               class="gallery__image"
               [src]="item.thumbUrl"
-              [alt]="item.alt | bilingual"
+              [alt]="item.alt"
               loading="lazy"
               (load)="$event.target.classList.add('is-loaded')"
               (error)="onImageError($event)"
               decoding="async"
             />
-            <figcaption class="gallery__label">{{ item.label }}</figcaption>
-          </figure>
+            <span class="gallery__label">{{ item.label }}</span>
+          </button>
         }
       </div>
     }
   } @else if (section.items; as items) {
     <div class="gallery__grid">
       @for (item of items; track item.url; let idx = $index) {
-        <figure
+        <button
           class="gallery__item"
+          type="button"
           (click)="openLightbox(items, idx)"
-          (keydown.enter)="openLightbox(items, idx)"
-          tabindex="0"
-          role="button"
-          [attr.aria-label]="(lang() === 'it' ? 'Apri ' : 'View ') + item.label"
+          [attr.aria-label]="uiText.text('gallery.openImage', { label: item.label })"
         >
           <img
             class="gallery__image"
             [src]="item.thumbUrl"
-            [alt]="item.alt | bilingual"
+            [alt]="item.alt"
             loading="lazy"
             (load)="$event.target.classList.add('is-loaded')"
             (error)="onImageError($event)"
             decoding="async"
           />
-          <figcaption class="gallery__label">{{ item.label }}</figcaption>
-        </figure>
+          <span class="gallery__label">{{ item.label }}</span>
+        </button>
       }
     </div>
   }

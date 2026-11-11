@@ -43,18 +43,47 @@ assert.ok(
 const builtIndex = fs.readFileSync(builtIndexPath, 'utf8');
 assert.match(builtIndex, /font-display:swap/);
 
-const initialRefs = [
-  ...new Set(
-    [...builtIndex.matchAll(/(?:src|href)="([^"?#]+\.(?:js|css))"/g)]
-      .map((match) => match[1])
-      .filter((reference) => !/^https?:\/\//.test(reference)),
-  ),
-];
+const statsPath = path.join(path.dirname(dist), 'stats.json');
+assert.ok(fs.existsSync(statsPath), 'Build statistics are missing; build with --stats-json.');
+const buildStats = JSON.parse(fs.readFileSync(statsPath, 'utf8'));
+const outputs = buildStats.outputs ?? {};
+const mainOutput = Object.entries(outputs).find(
+  ([, output]) => output.entryPoint === 'src/main.ts',
+);
+assert.ok(mainOutput, 'Build statistics do not identify the application entry point.');
+
+const initialNames = new Set();
+const visitStaticImports = (reference) => {
+  if (initialNames.has(reference)) return;
+  const output = outputs[reference];
+  assert.ok(output, `Build statistics reference a missing output: ${reference}`);
+  initialNames.add(reference);
+  for (const dependency of output.imports ?? []) {
+    if (dependency.kind === 'import-statement') visitStaticImports(dependency.path);
+  }
+};
+visitStaticImports(mainOutput[0]);
+for (const [reference, output] of Object.entries(outputs)) {
+  if (output.entryPoint === 'angular:styles/global:styles') initialNames.add(reference);
+}
+
+const initialRefs = [...initialNames].sort();
 const initialAssets = initialRefs.map((reference) => {
   const absolute = path.join(dist, reference);
   assert.ok(fs.existsSync(absolute), `Initial asset does not exist: ${reference}`);
   return { reference, bytes: fs.statSync(absolute).size };
 });
+const initialInputs = new Set(
+  initialRefs.flatMap((reference) => Object.keys(outputs[reference].inputs ?? {})),
+);
+for (const marker of config.forbiddenInitialInputMarkers ?? []) {
+  const leakedInput = [...initialInputs].find((input) => input.includes(marker));
+  assert.equal(
+    leakedInput,
+    undefined,
+    `Initial graph eagerly includes route-owned data: ${leakedInput}`,
+  );
+}
 const initialBytes =
   fs.statSync(builtIndexPath).size + initialAssets.reduce((sum, asset) => sum + asset.bytes, 0);
 const largestInitial = initialAssets.reduce(
@@ -75,7 +104,6 @@ assert.ok(
   `${largestInitial.reference} is ${largestInitial.bytes} bytes; initial-asset budget is ${config.largestInitialAssetBytes}.`,
 );
 
-const initialNames = new Set(initialRefs.map((reference) => reference.replace(/^\.\//, '')));
 const deferredScripts = fs
   .readdirSync(dist, { withFileTypes: true })
   .filter((entry) => entry.isFile() && entry.name.endsWith('.js') && !initialNames.has(entry.name))
@@ -112,5 +140,5 @@ for (const absolute of governedImages) {
 }
 
 console.log(
-  `Performance budgets passed: ${initialBytes} initial bytes across ${initialAssets.length} assets; largest deferred script ${largestDeferred.bytes} bytes; ${governedImages.length} optimized images checked.`,
+  `Performance budgets passed: ${initialBytes} initial bytes across ${initialAssets.length} assets and ${initialInputs.size} source inputs; largest deferred script ${largestDeferred.bytes} bytes; ${governedImages.length} optimized images checked.`,
 );

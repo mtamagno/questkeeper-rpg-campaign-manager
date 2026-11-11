@@ -322,6 +322,65 @@
   }
 }
 
+.relationship-graph__linear {
+  margin-top: $spacing-lg;
+  border: $border-width-thin solid $color-border-subtle;
+  border-radius: $border-radius-md;
+  background: color-mix(in srgb, var(--qk-color-canvas-deep) 38%, transparent);
+
+  summary {
+    min-height: 44px;
+    padding: $spacing-md $spacing-lg;
+    color: $color-text-accent;
+    cursor: pointer;
+    font-family: $font-family-heading;
+    font-weight: $font-weight-semibold;
+  }
+
+  > p {
+    margin: 0;
+    padding: 0 $spacing-lg $spacing-md;
+    color: $color-text-secondary;
+  }
+
+  ul {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    gap: $spacing-sm;
+    margin: 0;
+    padding: 0 $spacing-lg $spacing-lg;
+    list-style: none;
+  }
+
+  button {
+    display: grid;
+    width: 100%;
+    min-height: 44px;
+    gap: $spacing-2xs;
+    padding: $spacing-md;
+    border: $border-width-thin solid $color-border-subtle;
+    border-radius: $border-radius-md;
+    background: $color-bg-deep;
+    color: $color-text-primary;
+    cursor: pointer;
+    text-align: left;
+
+    &:hover {
+      border-color: $color-border-accent;
+    }
+
+    span {
+      color: $color-text-accent;
+      font-family: $font-family-heading;
+    }
+
+    small {
+      color: $color-text-secondary;
+      line-height: $line-height-relaxed;
+    }
+  }
+}
+
 @include respond-below(md) {
   .relationship-graph {
     &__container {

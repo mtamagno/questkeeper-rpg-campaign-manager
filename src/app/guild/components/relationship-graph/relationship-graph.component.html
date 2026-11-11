@@ -6,25 +6,19 @@
 
   @if (nodes().length === 0 || relationships().length === 0) {
     <p class="relationship-graph__empty">
-      {{ lang() === 'it' ? 'Nessuna relazione da mostrare.' : 'No relationships to display.' }}
+      {{ uiText.text('relationshipGraph.empty') }}
     </p>
   } @else {
     <p class="relationship-graph__instructions">
-      {{
-        lang() === 'it'
-          ? 'Seleziona un ritratto per mettere a fuoco i suoi legami.'
-          : 'Select a portrait to focus on its connections.'
-      }}
+      {{ uiText.text('relationshipGraph.instructions') }}
     </p>
 
     <div class="relationship-graph__container">
       <svg
         class="relationship-graph__svg"
         [attr.viewBox]="viewBox()"
-        [attr.aria-label]="
-          lang() === 'it' ? 'Mappa interattiva delle relazioni' : 'Interactive relationship map'
-        "
-        role="img"
+        [attr.aria-label]="uiText.text('relationshipGraph.mapLabel')"
+        role="group"
         xmlns="http://www.w3.org/2000/svg"
       >
         @for (
@@ -141,12 +135,12 @@
               type="button"
               (click)="handleProfileNavigate(focused)"
             >
-              {{ lang() === 'it' ? 'Vedi profilo' : 'View profile' }}
+              {{ uiText.text('relationshipGraph.viewProfile') }}
             </button>
             <button
               class="relationship-graph__focus-tooltip-close"
               type="button"
-              [attr.aria-label]="lang() === 'it' ? 'Chiudi dettaglio' : 'Close details'"
+              [attr.aria-label]="uiText.text('relationshipGraph.closeDetails')"
               (click)="dismissFocusTooltip()"
             >
               ×
@@ -167,7 +161,7 @@
           </p>
           @if (edge.relationship.partyPerception) {
             <span class="relationship-graph__tooltip-perception">
-              ◈ {{ lang() === 'it' ? 'Lettura del gruppo' : "Party's reading" }}
+              ◈ {{ uiText.text('relationshipGraph.partyReading') }}
             </span>
           }
         </div>
@@ -176,7 +170,7 @@
 
     <div class="relationship-graph__legend">
       <span class="relationship-graph__legend-title">
-        {{ lang() === 'it' ? 'Legenda' : 'Legend' }}
+        {{ uiText.text('relationshipGraph.legend') }}
       </span>
       @for (type of uniqueRelationshipTypes(); track type) {
         <span class="relationship-graph__legend-item" [style.color]="getEdgeColor(type)">
@@ -184,5 +178,24 @@
         </span>
       }
     </div>
+
+    <details class="relationship-graph__linear">
+      <summary>{{ uiText.text('relationshipGraph.listSummary') }}</summary>
+      <p>{{ uiText.text('relationshipGraph.listHelp') }}</p>
+      <ul>
+        @for (
+          relationship of relationships();
+          track relationship.sourceId + '-' + relationship.targetId
+        ) {
+          <li>
+            <button type="button" (click)="handleRelationshipClick(relationship)">
+              <strong>{{ relationshipParticipants(relationship) }}</strong>
+              <span>{{ formatRelationshipType(relationship.type) }}</span>
+              <small>{{ relationship.description | bilingual }}</small>
+            </button>
+          </li>
+        }
+      </ul>
+    </details>
   }
 </div>

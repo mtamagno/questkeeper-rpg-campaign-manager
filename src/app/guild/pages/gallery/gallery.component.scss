@@ -29,6 +29,15 @@
     flex-wrap: wrap;
   }
 
+  &__eyebrow {
+    margin: 0 0 $spacing-xs;
+    color: $color-text-muted;
+    font-family: $font-family-heading;
+    font-size: $font-size-xs;
+    letter-spacing: $letter-spacing-wide;
+    text-transform: uppercase;
+  }
+
   &__title {
     font-family: $font-family-heading;
     font-size: $font-size-3xl;
@@ -44,6 +53,16 @@
     color: $color-text-secondary;
     font-style: italic;
     margin: $spacing-sm 0 0;
+  }
+
+  &__summary {
+    display: inline-block;
+    margin: $spacing-md 0 0;
+    padding: $spacing-xs $spacing-md;
+    color: $color-text-secondary;
+    font-size: $font-size-sm;
+    border: $border-width-thin solid $color-border-subtle;
+    border-radius: $border-radius-pill;
   }
 
   // --- 📂 Category sections ---
@@ -94,8 +113,14 @@
   }
 
   &__item {
+    display: block;
+    width: 100%;
+    padding: 0;
     text-align: center;
     cursor: pointer;
+    color: inherit;
+    background: transparent;
+    border: 0;
     @include transition-colors;
     @include image-loading-container;
     border-radius: $border-radius-md;
@@ -135,6 +160,7 @@
   }
 
   &__label {
+    display: block;
     font-family: $font-family-heading;
     font-size: $font-size-sm;
     color: $color-text-secondary;

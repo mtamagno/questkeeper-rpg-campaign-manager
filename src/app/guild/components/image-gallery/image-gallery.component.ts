@@ -6,6 +6,7 @@
 import {
   Component,
   ChangeDetectionStrategy,
+  inject,
   input,
   signal,
   type WritableSignal,
@@ -14,6 +15,7 @@ import {
 import { type ImageRef } from '@guild/models/character.model';
 import { toThumbUrl } from '@guild/services/imageUrl.service';
 import { ImageLightboxComponent } from '../image-lightbox/image-lightbox.component';
+import { UiTextService } from '@guild/services/uiText.service';
 
 /**
  * Grid gallery that accepts an array of images and renders responsive thumbnails.
@@ -33,6 +35,7 @@ import { ImageLightboxComponent } from '../image-lightbox/image-lightbox.compone
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ImageGalleryComponent {
+  readonly uiText = inject(UiTextService);
   /** Array of images to display in the gallery grid. */
   readonly images = input.required<ReadonlyArray<ImageRef>>();
 

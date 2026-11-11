@@ -11,7 +11,7 @@
           class="gallery__item"
           type="button"
           (click)="openLightbox(i)"
-          [attr.aria-label]="'View ' + image.alt"
+          [attr.aria-label]="uiText.text('imageGallery.openImage', { label: image.alt })"
         >
           <img
             class="gallery__thumbnail"

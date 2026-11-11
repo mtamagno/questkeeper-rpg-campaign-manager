@@ -28,8 +28,8 @@ import {
   NODE_TYPES,
 } from '@guild/models/relationship.model';
 import { BilingualTextPipe } from '@guild/components/bilingual-text/bilingual-text.pipe';
-import { LanguageService } from '@guild/services/language.service';
 import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
+import { UiTextService } from '@guild/services/uiText.service';
 
 /** Layout position for a graph node. */
 interface NodePosition {
@@ -82,11 +82,8 @@ const GRAPH_PADDING = 80;
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RelationshipGraphComponent {
-  private readonly languageService = inject(LanguageService);
   private readonly campaignLocale = inject(CampaignLocaleService);
-
-  /** Current language for graph controls, labels, and empty states. */
-  readonly lang = this.languageService.currentLanguage;
+  readonly uiText = inject(UiTextService);
 
   /** Graph nodes (characters/NPCs). */
   readonly nodes: InputSignal<ReadonlyArray<RelationshipNode>> =
@@ -381,6 +378,18 @@ export class RelationshipGraphComponent {
    */
   handleEdgeClick(edge: EdgeLayout): void {
     this.edgeClick.emit(edge.relationship);
+  }
+
+  /** Activates a relationship from the non-spatial accessible list. */
+  handleRelationshipClick(relationship: Relationship): void {
+    this.edgeClick.emit(relationship);
+  }
+
+  /** Resolves both participants for text-only relationship navigation. */
+  relationshipParticipants(relationship: Relationship): string {
+    const source = this.nodes().find((node) => node.id === relationship.sourceId)?.name;
+    const target = this.nodes().find((node) => node.id === relationship.targetId)?.name;
+    return [source, target].filter((name): name is string => name !== undefined).join(' — ');
   }
 
   /**

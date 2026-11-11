@@ -18,6 +18,7 @@ import { type GameMap } from '@guild/models/map.model';
 import { BilingualTextPipe } from '@guild/components/bilingual-text/bilingual-text.pipe';
 import { SfxHoverDirective } from '@guild/directives/sfxHover.directive';
 import { CampaignService } from '@guild/services/campaign.service';
+import { UiTextService } from '@guild/services/uiText.service';
 
 /**
  * Displays a map location card with preview image, name, region, and exploration status.
@@ -32,6 +33,7 @@ import { CampaignService } from '@guild/services/campaign.service';
 })
 export class MapCardComponent {
   private readonly campaignService = inject(CampaignService);
+  readonly uiText = inject(UiTextService);
 
   /** Active campaign ID for building route links. */
   readonly campaignId: Signal<string | undefined> = this.campaignService.activeCampaignId;

@@ -14,24 +14,22 @@ import {
 import { NgTemplateOutlet } from '@angular/common';
 
 import { DataService } from '@guild/services/data.service';
-import { LanguageService } from '@guild/services/language.service';
 import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
 import { LanguageToggleComponent } from '@guild/components/language-toggle/language-toggle.component';
 import { DiceLoaderComponent } from '@guild/components/dice-loader/dice-loader.component';
 import { ImageLightboxComponent } from '@guild/components/image-lightbox/image-lightbox.component';
 import { AccordionComponent } from '@guild/components/accordion/accordion.component';
-import { BilingualTextPipe } from '@guild/components/bilingual-text/bilingual-text.pipe';
-import { type BilingualText } from '@guild/models/language.model';
 import { type ImageRef } from '@guild/models/character.model';
 import { type Npc } from '@guild/models/npc.model';
 import { getNpcDisplayName } from '@guild/utils/npcDisplay';
 import { toThumbUrl } from '@guild/services/imageUrl.service';
+import { UiTextService } from '@guild/services/uiText.service';
 
 /** A single image entry in the gallery. */
 interface GalleryItem {
   readonly url: string;
   readonly thumbUrl: string;
-  readonly alt: BilingualText;
+  readonly alt: string;
   readonly label: string;
 }
 
@@ -46,18 +44,13 @@ interface GallerySubgroup {
  * Either `items` (flat list) or `subgroups` (grouped list) is populated, never both.
  */
 interface GallerySection {
+  readonly id: string;
   readonly title: string;
   readonly icon: string;
   readonly items?: ReadonlyArray<GalleryItem>;
   readonly subgroups?: ReadonlyArray<GallerySubgroup>;
-  /** When true, the section is rendered inside a collapsible accordion. */
-  readonly collapsible?: boolean;
-  /** When the section is collapsible, whether it starts open. */
-  readonly startOpen?: boolean;
+  readonly startOpen: boolean;
 }
-
-/** Fallback location label when an NPC has no location defined. */
-const UNKNOWN_LOCATION_LABEL = 'Unknown';
 
 /** Placeholder image shown when a gallery thumbnail fails to load. */
 const PLACEHOLDER_IMAGE_URL = 'assets/images/placeholders/placeholder-portrait.svg';
@@ -77,7 +70,6 @@ function isGalleryImage(url: string | undefined): url is string {
   standalone: true,
   imports: [
     LanguageToggleComponent,
-    BilingualTextPipe,
     ImageLightboxComponent,
     AccordionComponent,
     NgTemplateOutlet,
@@ -89,11 +81,8 @@ function isGalleryImage(url: string | undefined): url is string {
 })
 export class GalleryComponent {
   private readonly dataService = inject(DataService);
-  private readonly languageService = inject(LanguageService);
   private readonly campaignLocale = inject(CampaignLocaleService);
-
-  /** Current display language for page copy and section labels. */
-  readonly lang = this.languageService.currentLanguage;
+  readonly uiText = inject(UiTextService);
 
   /** Whether the lightbox is open. */
   readonly isLightboxOpen = signal<boolean>(false);
@@ -107,26 +96,48 @@ export class GalleryComponent {
   /** All gallery sections with their images. */
   readonly sections: Signal<ReadonlyArray<GallerySection>> = computed(() => {
     const result: Array<GallerySection> = [];
-    const italian = this.lang() === 'it';
-
     const partyItems = this.buildPartySection();
     if (partyItems.length > 0) {
-      result.push({ title: italian ? 'Compagnia' : 'Party', icon: '🎭', items: partyItems });
+      result.push({
+        id: 'party',
+        title: this.uiText.text('gallery.sections.party'),
+        icon: '🎭',
+        items: partyItems,
+        startOpen: true,
+      });
     }
 
     const mainNpcSubgroups = this.buildNpcSubgroupsByLocation((npc) => npc.isMinor !== true);
     if (mainNpcSubgroups.length > 0) {
-      result.push({ title: 'NPCs', icon: '📜', subgroups: mainNpcSubgroups });
+      result.push({
+        id: 'npcs',
+        title: this.uiText.text('gallery.sections.npcs'),
+        icon: '📜',
+        subgroups: mainNpcSubgroups,
+        startOpen: false,
+      });
     }
 
     const groupItems = this.buildGroupSection();
     if (groupItems.length > 0) {
-      result.push({ title: italian ? 'Gruppo' : 'Group', icon: '👥', items: groupItems });
+      result.push({
+        id: 'group',
+        title: this.uiText.text('gallery.sections.group'),
+        icon: '👥',
+        items: groupItems,
+        startOpen: true,
+      });
     }
 
     const sessionItems = this.buildSessionSection();
     if (sessionItems.length > 0) {
-      result.push({ title: italian ? 'Sessioni' : 'Sessions', icon: '📖', items: sessionItems });
+      result.push({
+        id: 'sessions',
+        title: this.uiText.text('gallery.sections.sessions'),
+        icon: '📖',
+        items: sessionItems,
+        startOpen: false,
+      });
     }
 
     // Minor NPCs go last and are collapsed by default to keep the focus
@@ -134,16 +145,20 @@ export class GalleryComponent {
     const minorNpcSubgroups = this.buildNpcSubgroupsByLocation((npc) => npc.isMinor === true);
     if (minorNpcSubgroups.length > 0) {
       result.push({
-        title: italian ? 'NPC minori' : 'Minor NPCs',
+        id: 'minor-npcs',
+        title: this.uiText.text('gallery.sections.minorNpcs'),
         icon: '👤',
         subgroups: minorNpcSubgroups,
-        collapsible: true,
         startOpen: false,
       });
     }
 
     return result;
   });
+
+  readonly imageCount = computed(() =>
+    this.sections().reduce((total, section) => total + this.sectionItemCount(section), 0),
+  );
 
   /** Whether data is still loading. */
   readonly isLoading: Signal<boolean> = this.dataService.isLoading;
@@ -156,7 +171,7 @@ export class GalleryComponent {
   openLightbox(items: ReadonlyArray<GalleryItem>, index: number): void {
     const refs: ReadonlyArray<ImageRef> = items.map((item) => ({
       url: item.url,
-      alt: this.campaignLocale.resolve(item.alt),
+      alt: item.alt,
       caption: item.label,
     }));
     this.lightboxImages.set(refs);
@@ -196,6 +211,14 @@ export class GalleryComponent {
     img.classList.add('is-loaded', 'gallery__image--placeholder');
   }
 
+  sectionItemCount(section: GallerySection): number {
+    return (
+      section.items?.length ??
+      section.subgroups?.reduce((total, subgroup) => total + subgroup.items.length, 0) ??
+      0
+    );
+  }
+
   /**
    * Builds gallery items from PC profile and portrait images.
    * @returns Gallery items for all party members.
@@ -211,7 +234,7 @@ export class GalleryComponent {
         items.push({
           url: character.profileImageUrl,
           thumbUrl: toThumbUrl(character.profileImageUrl),
-          alt: { en: `${name} — profile`, it: `${name} — profilo` },
+          alt: this.uiText.text('gallery.alt.profile', { name }),
           label: name,
         });
       }
@@ -223,7 +246,7 @@ export class GalleryComponent {
         items.push({
           url: character.portraitImageUrl,
           thumbUrl: toThumbUrl(character.portraitImageUrl),
-          alt: { en: `${name} — portrait`, it: `${name} — ritratto` },
+          alt: this.uiText.text('gallery.alt.portrait', { name }),
           label: name,
         });
       }
@@ -291,11 +314,11 @@ export class GalleryComponent {
   private resolveNpcLocation(npc: Npc): string {
     const location = npc.profile.location;
     if (location === undefined) {
-      return UNKNOWN_LOCATION_LABEL;
+      return this.uiText.text('gallery.unknownLocation');
     }
     const localized = this.campaignLocale.resolve(location);
     const trimmed = localized.trim();
-    return trimmed.length > 0 ? trimmed : UNKNOWN_LOCATION_LABEL;
+    return trimmed.length > 0 ? trimmed : this.uiText.text('gallery.unknownLocation');
   }
 
   /**
@@ -317,7 +340,7 @@ export class GalleryComponent {
         items.push({
           url: npc.profileImageUrl,
           thumbUrl: toThumbUrl(npc.profileImageUrl),
-          alt: { en: `${name} — profile`, it: `${name} — profilo` },
+          alt: this.uiText.text('gallery.alt.profile', { name }),
           label: name,
         });
       }
@@ -326,7 +349,7 @@ export class GalleryComponent {
         items.push({
           url: npc.portraitImageUrl,
           thumbUrl: toThumbUrl(npc.portraitImageUrl),
-          alt: { en: `${name} — portrait`, it: `${name} — ritratto` },
+          alt: this.uiText.text('gallery.alt.portrait', { name }),
           label: name,
         });
       }
@@ -345,8 +368,8 @@ export class GalleryComponent {
     return heroImages.map((url: string) => ({
       url,
       thumbUrl: toThumbUrl(url),
-      alt: { en: 'Party group photo', it: 'Foto di gruppo' },
-      label: 'SKYV',
+      alt: this.uiText.text('gallery.alt.group'),
+      label: campaign?.partyName || this.uiText.text('gallery.sections.group'),
     }));
   }
 
@@ -366,8 +389,8 @@ export class GalleryComponent {
         items.push({
           url: image.url,
           thumbUrl: toThumbUrl(image.url),
-          alt: image.alt,
-          label: `Session ${String(session.sessionNumber)}`,
+          alt: this.campaignLocale.resolve(image.alt),
+          label: this.uiText.text('gallery.sessionLabel', { number: session.sessionNumber }),
         });
       }
     }

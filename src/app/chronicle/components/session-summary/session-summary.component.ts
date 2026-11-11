@@ -19,6 +19,7 @@ import { type Session } from '@guild/models/session.model';
 import { BilingualTextPipe } from '@guild/components/bilingual-text/bilingual-text.pipe';
 import { CampaignService } from '@guild/services/campaign.service';
 import { DataService } from '@guild/services/data.service';
+import { UiTextService } from '@guild/services/uiText.service';
 import { resolveNarrativeMood } from '@guild/models/narrativeMood.model';
 
 /**
@@ -36,6 +37,7 @@ import { resolveNarrativeMood } from '@guild/models/narrativeMood.model';
 export class SessionSummaryComponent {
   private readonly campaignService = inject(CampaignService);
   private readonly dataService = inject(DataService);
+  readonly uiText = inject(UiTextService);
 
   /** Active campaign ID for building route links. */
   readonly campaignId: Signal<string | undefined> = this.campaignService.activeCampaignId;
@@ -57,4 +59,15 @@ export class SessionSummaryComponent {
       'summary',
     ),
   );
+
+  /** Session zero is presented as a prologue instead of as a numbered play session. */
+  readonly entryLabel: Signal<string> = computed(() => {
+    const session = this.session();
+    if (session.sessionNumber === 0) {
+      return this.uiText.text('chronicle.common.prologue');
+    }
+    return this.uiText.text('chronicle.common.sessionNumber', {
+      number: session.sessionNumber,
+    });
+  });
 }

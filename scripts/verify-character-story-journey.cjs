@@ -142,10 +142,10 @@ assert(
 );
 const quotesIndex = detail.indexOf('id="quotes"');
 const historyIndex = detail.indexOf('id="profile-memories"');
-const diaryIndex = detail.indexOf('id="diary"');
+const journalIndex = detail.indexOf('<app-character-journal');
 assert(
-  quotesIndex < historyIndex && historyIndex < diaryIndex,
-  'Known history and sources must conclude Story before the session diary.',
+  quotesIndex >= 0 && quotesIndex < historyIndex && historyIndex < journalIndex,
+  'Known history and sources must conclude Story before the separate Journal workspace.',
 );
 assert(
   detail.includes('character-detail__history-links') &&

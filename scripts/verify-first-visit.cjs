@@ -7,6 +7,9 @@ const service = read('src/app/guild/services/audiencePreference.service.ts');
 const component = read('src/app/guild/pages/campaign-selector/campaign-selector.component.ts');
 const template = read('src/app/guild/pages/campaign-selector/campaign-selector.component.html');
 const styles = read('src/app/guild/pages/campaign-selector/campaign-selector.component.scss');
+const catalog = JSON.parse(read('src/app/guild/i18n/ui.json'));
+const englishSelector = catalog.locales.en.texts.campaignSelector;
+const italianSelector = catalog.locales.it.texts.campaignSelector;
 
 const checks = [
   ['a versioned local preference key', service.includes("'first-visit-audience'")],
@@ -17,9 +20,17 @@ const checks = [
   ['the GM journey marker', template.includes('data-journey="gm"')],
   ['a campaign-list destination', template.includes('href="#campaigns"')],
   ['a Manager destination', template.includes('[href]="managerDemoUrl"')],
-  ['a local-only privacy explanation', template.includes('stays only in this browser')],
-  ['a permissions disclaimer', template.includes('never changes campaign permissions')],
-  ['a bilingual Italian prompt', template.includes('Come userai QuestKeeper?')],
+  ['catalog-backed privacy copy', template.includes("uiText.text('campaignSelector.privacy')")],
+  ['a local-only privacy explanation', englishSelector.privacy.includes('only in this browser')],
+  [
+    'a permissions disclaimer',
+    englishSelector.privacy.includes('never changes campaign permissions'),
+  ],
+  [
+    'a catalog-backed usage prompt',
+    template.includes("uiText.text('campaignSelector.usageQuestion')"),
+  ],
+  ['a bilingual Italian prompt', italianSelector.usageQuestion === 'Come userai QuestKeeper?'],
   ['a semantic focus treatment', styles.includes('outline: 2px solid var(--qk-color-focus)')],
   ['a responsive single-column path layout', styles.includes('&__audience-grid,')],
   ['the orientation service wiring', component.includes('AudiencePreferenceService')],

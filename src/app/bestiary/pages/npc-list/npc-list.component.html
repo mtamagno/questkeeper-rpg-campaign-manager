@@ -1,47 +1,63 @@
 <!-- NPC List — Grouped by Allegiance + Category -->
 @if (isLoading()) {
   <div class="npc-list__loading">
-    <app-dice-loader
-      [label]="
-        lang() === 'it'
-          ? 'Raccolgo informazioni sui volti noti...'
-          : 'Gathering intelligence on known figures...'
-      "
-      [playSound]="false"
-    />
+    <app-dice-loader [label]="uiText.text('npcList.loading')" [playSound]="false" />
   </div>
 } @else {
   <article class="npc-list">
     <header class="npc-list__header">
-      <h1 class="npc-list__title">
-        👥 {{ lang() === 'it' ? 'Volti conosciuti' : 'Known Figures' }}
-      </h1>
-      <p class="npc-list__subtitle">
-        {{
-          lang() === 'it'
-            ? 'Alleati, nemici e figure ambigue: le persone che hanno segnato il viaggio della compagnia.'
-            : "Allies, enemies, and everyone in between — the people who shaped the party's journey."
-        }}
-      </p>
+      <h1 class="npc-list__title">👥 {{ uiText.text('npcList.title') }}</h1>
+      <p class="npc-list__subtitle">{{ uiText.text('npcList.subtitle') }}</p>
     </header>
 
-    @if (allegianceGroups().length === 0) {
-      <div class="empty-state npc-list__empty">
-        <span class="empty-state__icon" aria-hidden="true">✦</span>
-        <h2 class="empty-state__title">
+    @if (totalCount() > 0) {
+      <section class="npc-list__discovery" aria-labelledby="npc-discovery-title">
+        <div class="npc-list__discovery-copy">
+          <h2 id="npc-discovery-title">{{ uiText.text('npcList.discovery.title') }}</h2>
+          <p>{{ uiText.text('npcList.discovery.help') }}</p>
+        </div>
+        <label class="npc-list__search">
+          <span>{{ uiText.text('npcList.discovery.label') }}</span>
+          <span class="npc-list__search-control">
+            <span aria-hidden="true">⌕</span>
+            <input
+              type="search"
+              [value]="query()"
+              [placeholder]="uiText.text('npcList.discovery.placeholder')"
+              (input)="updateQuery($event)"
+            />
+            @if (query().length > 0) {
+              <button type="button" (click)="clearQuery()">
+                {{ uiText.text('npcList.discovery.clear') }}
+              </button>
+            }
+          </span>
+        </label>
+        <p class="npc-list__result-count" role="status" aria-live="polite">
           {{
-            lang() === 'it'
-              ? 'Le nebbie non hanno ancora rivelato nessuno'
-              : 'The mists have revealed no one yet'
-          }}
-        </h2>
-        <p class="empty-state__text">
-          {{
-            lang() === 'it'
-              ? 'I personaggi incontrati durante le sessioni appariranno qui, insieme a ruolo e alleanza.'
-              : 'Characters met during play will appear here with their role and allegiance.'
+            uiText.text('npcList.discovery.results', {
+              visible: visibleCount(),
+              total: totalCount(),
+            })
           }}
         </p>
+      </section>
+    }
+
+    @if (totalCount() === 0) {
+      <div class="empty-state npc-list__empty">
+        <span class="empty-state__icon" aria-hidden="true">✦</span>
+        <h2 class="empty-state__title">{{ uiText.text('npcList.emptyTitle') }}</h2>
+        <p class="empty-state__text">{{ uiText.text('npcList.emptyHelp') }}</p>
+      </div>
+    } @else if (visibleCount() === 0) {
+      <div class="empty-state npc-list__empty">
+        <span class="empty-state__icon" aria-hidden="true">⌕</span>
+        <h2 class="empty-state__title">{{ uiText.text('npcList.discovery.emptyTitle') }}</h2>
+        <p class="empty-state__text">{{ uiText.text('npcList.discovery.emptyHelp') }}</p>
+        <button class="npc-list__clear-results" type="button" (click)="clearQuery()">
+          {{ uiText.text('npcList.discovery.clear') }}
+        </button>
       </div>
     } @else {
       @for (group of allegianceGroups(); track group.allegiance) {
@@ -83,13 +99,13 @@
                         >
                           @switch (npc.allegiance) {
                             @case ('ally') {
-                              {{ lang() === 'it' ? 'Alleato' : 'Ally' }}
+                              {{ uiText.text('npcList.allegiances.ally.singular') }}
                             }
                             @case ('enemy') {
-                              {{ lang() === 'it' ? 'Nemico' : 'Enemy' }}
+                              {{ uiText.text('npcList.allegiances.enemy.singular') }}
                             }
                             @case ('neutral') {
-                              {{ lang() === 'it' ? 'Neutrale' : 'Neutral' }}
+                              {{ uiText.text('npcList.allegiances.neutral.singular') }}
                             }
                           }
                         </span>
@@ -98,15 +114,7 @@
                           [class.npc-card__badge--alive]="npc.isAlive"
                           [class.npc-card__badge--dead]="!npc.isAlive"
                         >
-                          {{
-                            npc.isAlive
-                              ? lang() === 'it'
-                                ? 'Vivo'
-                                : 'Alive'
-                              : lang() === 'it'
-                                ? 'Morto'
-                                : 'Dead'
-                          }}
+                          {{ uiText.text(npc.isAlive ? 'npcList.alive' : 'npcList.dead') }}
                         </span>
                       </div>
                     </div>

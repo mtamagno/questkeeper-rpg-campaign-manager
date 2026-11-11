@@ -26,14 +26,7 @@ const overview = {
     'campaign-overview.component.html',
   ),
 };
-const sidebar = read(
-  'src',
-  'app',
-  'guild',
-  'components',
-  'sidebar',
-  'sidebar.component.html',
-);
+const sidebar = read('src', 'app', 'guild', 'components', 'sidebar', 'sidebar.component.html');
 const commandBar = read(
   'src',
   'app',
@@ -48,6 +41,7 @@ const brief = {
   html: read(...briefRoot, 'game-night-brief.component.html'),
   scss: read(...briefRoot, 'game-night-brief.component.scss'),
 };
+const catalog = JSON.parse(read('src', 'app', 'guild', 'i18n', 'ui.json'));
 
 function assert(condition, message) {
   if (!condition) {
@@ -72,8 +66,8 @@ for (const contract of [
   "'/', cId, 'maps'",
   "'/', cId, 'party', item.characterId",
   "'campaign', 'story-so-far'",
-  'Before the session',
-  'Brief prima della sessione',
+  "uiText.text('chronicle.brief.eyebrow')",
+  "uiText.text('chronicle.brief.title')",
 ]) {
   assert(brief.html.includes(contract), `missing accessible brief contract: ${contract}`);
 }
@@ -84,8 +78,15 @@ assert(
   'the campaign chronicle must own the game-night brief',
 );
 assert(
-  sidebar.includes('Cronache delle sessioni') && sidebar.includes('Session Chronicles'),
+  sidebar.includes("uiText.text('sidebar.sessionChronicles')") &&
+    catalog.locales.en.texts.sidebar.sessionChronicles === 'Session Chronicles' &&
+    catalog.locales.it.texts.sidebar.sessionChronicles === 'Cronache delle sessioni',
   'the sidebar must expose the chronicle under the same name as its page',
+);
+assert(
+  catalog.locales.en.texts.chronicle.brief.eyebrow === 'Before the session' &&
+    catalog.locales.it.texts.chronicle.brief.eyebrow === 'Brief prima della sessione',
+  'the brief must retain both catalog-backed locale labels',
 );
 assert(
   commandBar.includes('Briefing ed eventi chiave') &&

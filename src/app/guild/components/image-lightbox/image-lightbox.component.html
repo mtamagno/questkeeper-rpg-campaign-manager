@@ -7,7 +7,7 @@
   (keydown.escape)="lightboxClose.emit()"
   role="dialog"
   aria-modal="true"
-  [attr.aria-label]="isItalian() ? 'Visualizzatore immagini' : 'Image viewer'"
+  [attr.aria-label]="uiText.text('lightbox.viewerLabel')"
 >
   <!-- Close button -->
   <button
@@ -15,7 +15,7 @@
     class="lightbox__close"
     type="button"
     (click)="lightboxClose.emit()"
-    [attr.aria-label]="isItalian() ? 'Chiudi immagine' : 'Close lightbox'"
+    [attr.aria-label]="uiText.text('lightbox.close')"
   >
     ✕
   </button>
@@ -29,10 +29,10 @@
 
         @if (loadState() === 'error') {
           <div class="lightbox__error">
-            <strong>{{ isItalian() ? 'Immagine non disponibile' : 'Image unavailable' }}</strong>
+            <strong>{{ uiText.text('lightbox.unavailable') }}</strong>
             <p>{{ safeFileName(request.image) }}</p>
             <button type="button" (click)="retryImage(); $event.stopPropagation()">
-              {{ isItalian() ? 'Riprova' : 'Retry' }}
+              {{ uiText.text('lightbox.retry') }}
             </button>
           </div>
         } @else {
@@ -66,7 +66,7 @@
       type="button"
       [disabled]="!hasPrevious()"
       (click)="goToPrevious(); $event.stopPropagation()"
-      [attr.aria-label]="isItalian() ? 'Immagine precedente' : 'Previous image'"
+      [attr.aria-label]="uiText.text('lightbox.previous')"
     >
       ‹
     </button>
@@ -76,7 +76,7 @@
       type="button"
       [disabled]="!hasNext()"
       (click)="goToNext(); $event.stopPropagation()"
-      [attr.aria-label]="isItalian() ? 'Immagine successiva' : 'Next image'"
+      [attr.aria-label]="uiText.text('lightbox.next')"
     >
       ›
     </button>

@@ -17,6 +17,13 @@
   scroll-margin-block-start: 6rem;
 }
 
+@media (pointer: coarse) {
+  :where(button, select, input:not([type='hidden']), [role='button'], [role='tab']) {
+    min-block-size: 44px;
+    touch-action: manipulation;
+  }
+}
+
 @media (prefers-contrast: more) {
   :where(a, button, input, select, textarea, [role='button'], [tabindex]):focus-visible {
     outline-width: 3px;
@@ -42,5 +49,16 @@
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-delay: 0s !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-delay: 0s !important;
+    transition-duration: 0.01ms !important;
   }
 }

@@ -22,6 +22,7 @@ const page = {
   scss: read(...pageRoot, 'table-moments.component.scss'),
 };
 const guide = read('docs', 'TABLE-MOMENTS.md');
+const catalog = JSON.parse(read('src', 'app', 'guild', 'i18n', 'ui.json'));
 
 function assert(condition, message) {
   if (!condition) throw new Error(`Table moments verification failed: ${message}`);
@@ -40,7 +41,9 @@ for (const contract of [
 assert(routes.includes("path: 'campaign/table-moments'"), 'dedicated campaign route is missing');
 assert(sidebar.includes("'campaign', 'table-moments'"), 'sidebar route is missing');
 assert(
-  sidebar.includes('Momenti al tavolo') && sidebar.includes('Around the Table'),
+  sidebar.includes("uiText.text('sidebar.tableMoments')") &&
+    catalog.locales.en.texts.sidebar.tableMoments === 'Around the Table' &&
+    catalog.locales.it.texts.sidebar.tableMoments === 'Momenti al tavolo',
   'sidebar labels are missing',
 );
 assert(commandBar.includes('current-table-moments'), 'global command is missing');
@@ -73,12 +76,18 @@ for (const contract of [
   'aria-live="polite"',
   'table-moments__pagination',
   'aria-current',
-  'non fanno parte del canone',
-  'not campaign canon',
+  "uiText.text('chronicle.tableMoments.editorialNote')",
   'empty-state',
 ]) {
   assert(page.html.includes(contract), `missing semantic or editorial UI: ${contract}`);
 }
+assert(
+  catalog.locales.en.texts.chronicle.tableMoments.editorialNote.includes('not campaign canon') &&
+    catalog.locales.it.texts.chronicle.tableMoments.editorialNote.includes(
+      'non fanno parte del canone',
+    ),
+  'the catalog must preserve the bilingual non-canon boundary',
+);
 
 assert(
   /grid-template-areas:[\s\S]*?'previous slide next'/.test(page.scss),
