@@ -17,15 +17,15 @@ setting or visual identity from a commercial game.
 <table>
   <tr>
     <td width="38%" align="center" valign="middle">
-      <img src="docs/images/releases/v1.2.0-echobloom-morrow.png" alt="Morrow Bellroot, a plantfolk memory gardener tending a luminous tree of people, places and stories" width="330">
+      <img src="docs/images/releases/v1.2.1-rootmend-talli.png" alt="Talli Rootmark, a seedling-folk path-mender checking a newly repaired living gate" width="330">
     </td>
     <td width="62%" valign="middle">
-      <p><strong>QuestKeeper 1.2.0 · Echobloom — LTS</strong></p>
-      <h3>Stories With Roots</h3>
-      <p><strong>Morrow Bellroot</strong> · plantfolk memory gardener</p>
-      <blockquote>“Let every memory take root where the whole party can find it.”</blockquote>
-      <p>Morrow tends characters, relationships, languages, maps and illustrated memories as connected parts of one calm, readable campaign home.</p>
-      <p><a href="docs/releases/v1.2.0.md"><strong>Read the release notes →</strong></a> · <a href="https://github.com/mtamagno/questkeeper-rpg-campaign-manager/releases/tag/v1.2.0"><strong>Download 1.2.0 LTS →</strong></a></p>
+      <p><strong>QuestKeeper 1.2.1 · Rootmend — LTS</strong></p>
+      <h3>The Clean Branch</h3>
+      <p><strong>Talli Rootmark</strong> · seedling-folk path-mender</p>
+      <blockquote>“A true path holds even when no private trail is there to guide it.”</blockquote>
+      <p>Talli closes the clean-checkout gap that stopped Echobloom packaging, then verifies the same rooted character, locale, settings, atlas and illustrated-memory journey on every supported platform.</p>
+      <p><a href="docs/releases/v1.2.1.md"><strong>Read the release notes →</strong></a> · <a href="https://github.com/mtamagno/questkeeper-rpg-campaign-manager/releases/tag/v1.2.1"><strong>Download 1.2.1 LTS →</strong></a></p>
     </td>
   </tr>
 </table>
@@ -35,9 +35,10 @@ setting or visual identity from a commercial game.
 > supersedes it without rewriting the tag. Read the
 > [LTS policy](docs/LTS-POLICY.md) for the maintenance promise.
 
-> QuestKeeper 1.2.0 Echobloom succeeds Storyforge as the active LTS after its
-> character, locale, settings, atlas and illustrated-memory journeys passed the
-> same public-example and production-campaign quality gates.
+> QuestKeeper 1.2.1 Rootmend succeeds Storyforge as the active LTS. The immutable
+> `v1.2.0` Echobloom tag stopped at its clean-checkout gate before any GitHub
+> Release or native archive was published; Rootmend carries the same product
+> milestone with the public/private test boundary corrected.
 
 ---
 
@@ -56,7 +57,8 @@ milestone; after publication, its identity is permanent.
 | **1.1.3** | **Wayhold**       | The Steady Chronicle    | **Tarn Evermark**, archive warden              | Feedback fixes, memory, access and speed become a dependable base.   | Tag only · superseded |
 | **1.1.4** | **Seamkeep**      | The Portable Thread     | **Mira Seamspell**, path-binder                | Native setup holds across every supported operating-system path.     | Released              |
 | **1.1.5** | **Storyforge**    | The Living Character    | **Nym Emberquill**, storysmith                 | Character growth becomes visible, useful and safely portable.        | Released              |
-| **1.2.0** | **Echobloom**     | Stories With Roots      | **Morrow Bellroot**, memory gardener           | Campaign memories become connected, readable and truly multilingual. | Released · LTS        |
+| **1.2.0** | **Echobloom**     | Stories With Roots      | **Morrow Bellroot**, memory gardener           | Campaign memories become connected, readable and truly multilingual. | Tag only · superseded |
+| **1.2.1** | **Rootmend**      | The Clean Branch        | **Talli Rootmark**, path-mender                | Clean release checkouts enforce the public/private content boundary. | Released · LTS        |
 | **1.3.0** | **Moonmoot**      | Gather at the Table     | **Pip Hearthroll**, goblin table scout         | The party can prepare and catch up together.                         | Planned               |
 | **1.4.0** | **Waywhisper**    | The Living Atlas        | **Orra Mosscompass**, centaur mapmaker         | People, places, clues and roads become connected.                    | Planned               |
 | **1.5.0** | **Dragonbell**    | Game Night Edition      | **Vaela Emberchime**, drakekin herald          | QuestKeeper becomes the page opened during play.                     | Planned               |

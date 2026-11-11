@@ -13,8 +13,9 @@ It favors reliability and compatible fixes over rapid behavioral change.
 - Every LTS artifact still passes the normal verification, native packaging,
   checksum and smoke-test gates.
 
-QuestKeeper 1.2.0 · Echobloom is the active LTS release. It supersedes 1.1.5
+QuestKeeper 1.2.1 · Rootmend is the active LTS release. It supersedes 1.1.5
 after integrating dynamic campaign languages, data-defined interface copy,
 focused character reading, scoped user settings and the atlas/illustrated-memory
-quality pass. The preceding `v1.1.3` packaging tag failed its Windows gate and
-was never published as a GitHub Release; it remains immutable.
+quality pass. The immutable `v1.2.0` tag stopped at its clean-checkout gate
+before a GitHub Release was published; Rootmend carries the corrected release.
+The earlier `v1.1.3` packaging tag likewise failed before publication.
