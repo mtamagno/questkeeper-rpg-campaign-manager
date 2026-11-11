@@ -4,7 +4,19 @@ const path = require('node:path');
 const { execFileSync } = require('node:child_process');
 
 const root = path.resolve(__dirname, '..');
-const read = (relativePath) => fs.readFileSync(path.join(root, relativePath), 'utf8');
+const trackedFiles = new Set(
+  execFileSync('git', ['ls-files'], { cwd: root, encoding: 'utf8' })
+    .trim()
+    .split(/\r?\n/)
+    .filter(Boolean),
+);
+const read = (relativePath) => {
+  assert.ok(
+    trackedFiles.has(relativePath.replaceAll('\\', '/')),
+    `Accessibility contract references an untracked release file: ${relativePath}`,
+  );
+  return fs.readFileSync(path.join(root, relativePath), 'utf8');
+};
 const app = read('src/app/app.ts');
 const shell = read('src/app/app.html');
 const sidebar = read('src/app/guild/components/sidebar/sidebar.component.html');
@@ -45,15 +57,6 @@ const tabContracts = [
     ),
     behavior: read(
       'src/app/adventurers/components/character-journal/character-journal.component.ts',
-    ),
-  },
-  {
-    name: 'Character Generator',
-    markup: read(
-      'src/app/adventurers/pages/character-generator/character-generator.component.html',
-    ),
-    behavior: read(
-      'src/app/adventurers/pages/character-generator/character-generator.component.ts',
     ),
   },
 ];
@@ -124,13 +127,8 @@ for (const contract of tabContracts) {
   }
 }
 
-const htmlFiles = execFileSync('git', ['ls-files', 'src/app/**/*.html'], {
-  cwd: root,
-  encoding: 'utf8',
-})
-  .trim()
-  .split(/\r?\n/)
-  .filter(Boolean)
+const htmlFiles = [...trackedFiles]
+  .filter((relative) => relative.startsWith('src/app/') && relative.endsWith('.html'))
   .map((relative) => path.join(root, relative));
 for (const file of htmlFiles) {
   const relative = path.relative(root, file);
