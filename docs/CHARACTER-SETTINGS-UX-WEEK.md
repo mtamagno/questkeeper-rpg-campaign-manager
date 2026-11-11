@@ -54,8 +54,8 @@ but no action becomes harder to discover solely to make the bar shorter.
 | **3 Nov** | [x] **Review and refactor the heavy Sheet tab: inventory every value/action first, then make current play state immediately scannable** | [x] **Refine Journal hierarchy: notebook, gallery and diary with useful progressive disclosure**                                    | [x] Prove Sheet content/function parity, then check protected state, remembered positions and large media collections |
 | **4 Nov** | [x] Inventory the sticky command bar by frequency, context and screen size                                                              | [x] Simplify its responsive hierarchy and overflow while preserving campaign switch, recovery and quick navigation                  | [ ] Keyboard, 360 px, 200% zoom and long-label visual review (browser host unavailable)                               |
 | **5 Nov** | [x] Rebuild User Settings around RPG-style stable categories and clear global/campaign scope                                            | [x] Add save-state, descriptions, recovery and empty/error feedback without scattering editors                                      | [x] Fresh user, returning player and two-campaign review                                                              |
-| **6 Nov** | Cross-surface accessibility pass: tabs, headings, focus, names/states, contrast, reduced motion and touch                               | Performance and rendering pass so inactive areas and heavy media do not punish the first view                                       | Phone, tablet, desktop, wide screen and 200% zoom evidence                                                            |
-| **7 Nov** | Walk the complete player journey in the public demo, Phandelver and Curse of Strahd                                                     | Resolve regressions, reconcile docs/tests and rank only evidence-backed follow-ups                                                  | Weekly review, dependency/runtime health and downstream plan update                                                   |
+| **6 Nov** | [x] Cross-surface accessibility pass: tabs, headings, focus, names/states, contrast, reduced motion and touch                           | [x] Performance and rendering pass so inactive areas and heavy media do not punish the first view                                   | [x] Integrated evidence in the 6-10 November catch-up                                                                 |
+| **7 Nov** | [x] Walk the complete player journey in the public demo, Phandelver and Curse of Strahd                                                 | [x] Resolve regressions, reconcile docs/tests and rank only evidence-backed follow-ups                                              | [x] Weekly review, runtime health and downstream plan update in the integrated gate                                   |
 
 ### Sheet tab review and refactoring — 3 November
 
@@ -201,6 +201,20 @@ performance gates pass. Visual review covered Shyra and Vulf at 390 x 844 plus
 Shyra at 1440 x 1000, including direct links to bonds and quotes. Extracting the
 new components also removed the character-detail style-budget warning and
 reduced its production lazy chunk by roughly 6.4 kB.
+
+## 6-7 November closeout - accessible, measured cross-surface journey
+
+The final focus-week work is delivered with the 6-10 November quality catch-up.
+Tabs now share keyboard, focus, coarse-pointer and reduced-motion contracts;
+initial-load budgets use the real static import graph; and production keeps the
+full Compendium outside the bootstrap path. The complete public-demo,
+Phandelver and Curse of Strahd journey then continues through a non-visual
+relationship list, searchable NPC discovery and the catalog-backed chronicle.
+
+The 8 November character audit deliberately reuses the lossless evidence from
+1-5 November instead of refactoring the same surface twice. Maps and gallery
+remain scheduled for 11 November. Full scope and final-gate evidence are
+recorded in the [quality catch-up review](reviews/2026-11-06-10-quality-catchup.md).
 
 ## Design references
 

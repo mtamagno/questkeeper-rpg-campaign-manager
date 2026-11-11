@@ -1,7 +1,7 @@
 <!-- Story Chapter — Literary prose narrative for a single session -->
 @if (isLoading()) {
   <div class="story-chapter__loading">
-    <app-dice-loader label="The chronicler prepares the manuscript..." [playSound]="false" />
+    <app-dice-loader [label]="uiText.text('chronicle.chapter.loading')" [playSound]="false" />
   </div>
 } @else if (session(); as session) {
   <article
@@ -10,7 +10,7 @@
   >
     <header class="story-chapter__header">
       <app-language-toggle />
-      <p class="story-chapter__chapter-label">Chapter {{ chapterLabel() }}</p>
+      <p class="story-chapter__chapter-label">{{ chapterHeading() }}</p>
       <h1 class="story-chapter__title">{{ session.title | bilingual }}</h1>
       <div class="story-chapter__ornament">⚜</div>
     </header>
@@ -52,16 +52,14 @@
       </section>
     } @else {
       <section class="story-chapter__body">
-        <p class="story-chapter__no-prose">
-          ✍️ Still writing... The chronicler's quill is hard at work.
-        </p>
+        <p class="story-chapter__no-prose">✍️ {{ uiText.text('chronicle.chapter.emptyProse') }}</p>
       </section>
     }
 
     @if (galleryImages().length > 0) {
       <hr class="story-chapter__divider" aria-hidden="true" />
       <section class="story-chapter__gallery">
-        <h2 class="story-chapter__gallery-title">Session Gallery</h2>
+        <h2 class="story-chapter__gallery-title">{{ uiText.text('chronicle.chapter.gallery') }}</h2>
         <div class="story-chapter__gallery-grid">
           @for (image of galleryImages(); track image.url) {
             <figure class="story-chapter__gallery-item">
@@ -84,12 +82,12 @@
 
     <footer class="story-chapter__footer">
       <a class="story-chapter__back-link" [routerLink]="['/', campaignId() ?? '', 'campaign']">
-        ← Back to Session Chronicles
+        ← {{ uiText.text('chronicle.chapter.back') }}
       </a>
     </footer>
   </article>
 } @else {
   <div class="story-chapter__not-found">
-    <p>Chapter not found. The scroll has been lost to time.</p>
+    <p>{{ uiText.text('chronicle.chapter.notFound') }}</p>
   </div>
 }

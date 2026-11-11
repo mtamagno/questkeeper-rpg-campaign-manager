@@ -5,8 +5,8 @@ import { SfxHoverDirective } from '@guild/directives/sfxHover.directive';
 import { type Session } from '@guild/models/session.model';
 import { CampaignService } from '@guild/services/campaign.service';
 import { DataService } from '@guild/services/data.service';
-import { LanguageService } from '@guild/services/language.service';
 import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
+import { UiTextService } from '@guild/services/uiText.service';
 
 interface GameNightBrief {
   readonly latestSessionId: string;
@@ -31,10 +31,8 @@ interface GameNightBrief {
 export class GameNightBriefComponent {
   private readonly dataService = inject(DataService);
   private readonly campaignService = inject(CampaignService);
-  private readonly languageService = inject(LanguageService);
   private readonly campaignLocale = inject(CampaignLocaleService);
-
-  readonly lang = this.languageService.currentLanguage;
+  readonly uiText = inject(UiTextService);
   readonly campaignId = this.campaignService.activeCampaignId;
 
   private readonly latestSession: Signal<Session | undefined> = computed(() => {

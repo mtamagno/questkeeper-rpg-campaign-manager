@@ -21,7 +21,7 @@ import {
 } from '@angular/core';
 
 import { type ImageRef } from '@guild/models/character.model';
-import { LanguageService } from '@guild/services/language.service';
+import { UiTextService } from '@guild/services/uiText.service';
 import { activeElement, restoreFocus, trapTabKey } from '@guild/utils/focusTrap';
 
 /**
@@ -46,12 +46,11 @@ import { activeElement, restoreFocus, trapTabKey } from '@guild/utils/focusTrap'
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ImageLightboxComponent implements AfterViewInit, OnDestroy {
-  private readonly language = inject(LanguageService);
+  readonly uiText = inject(UiTextService);
   private readonly dialog = viewChild.required<ElementRef<HTMLElement>>('lightboxDialog');
   private readonly closeButton = viewChild.required<ElementRef<HTMLButtonElement>>('closeButton');
   private readonly previouslyFocused = activeElement();
   private requestVersion = 0;
-  readonly isItalian = this.language.isItalian;
   /** All images in the gallery. */
   readonly images = input.required<ReadonlyArray<ImageRef>>();
 
@@ -90,14 +89,12 @@ export class ImageLightboxComponent implements AfterViewInit, OnDestroy {
   readonly loadingMessage = computed(() => {
     const position = this.positionLabel();
     if (this.loadState() === 'loaded') {
-      return this.isItalian() ? `Immagine ${position} caricata` : `Image ${position} loaded`;
+      return this.uiText.text('lightbox.loaded', { position });
     }
     if (this.loadState() === 'error') {
-      return this.isItalian()
-        ? `Impossibile caricare l'immagine ${position}`
-        : `Could not load image ${position}`;
+      return this.uiText.text('lightbox.loadError', { position });
     }
-    return this.isItalian() ? `Caricamento immagine ${position}` : `Loading image ${position}`;
+    return this.uiText.text('lightbox.loading', { position });
   });
 
   /** Whether there is a previous image to navigate to. */

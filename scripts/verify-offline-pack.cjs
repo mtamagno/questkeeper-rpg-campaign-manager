@@ -51,8 +51,10 @@ assert.match(commandBar, /Kit offline/);
 assert.match(commandBar, /\/offline/);
 
 const sidebar = read('src/app/guild/components/sidebar/sidebar.component.html');
-assert.match(sidebar, /Offline Pack/);
-assert.match(sidebar, /Kit offline/);
+const uiCatalog = readJson('src/app/guild/i18n/ui.json');
+assert.match(sidebar, /uiText\.text\('sidebar\.offlinePack'\)/);
+assert.equal(uiCatalog.locales.en.texts.sidebar.offlinePack, 'Offline Pack');
+assert.equal(uiCatalog.locales.it.texts.sidebar.offlinePack, 'Kit offline');
 
 const workerConfig = readJson('ngsw-config.json');
 const dataGroups = JSON.stringify(workerConfig.dataGroups);

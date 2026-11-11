@@ -6,7 +6,7 @@
       <img
         class="map-card__image"
         [src]="previewUrl()"
-        [alt]="(map().name | bilingual) + ' map'"
+        [alt]="uiText.text('mapCard.imageAlt', { name: (map().name | bilingual) })"
         loading="lazy"
         decoding="async"
       />
@@ -27,19 +27,23 @@
       >
         @switch (map().explorationStatus) {
           @case ('completed') {
-            Explored
+            {{ uiText.text('mapCard.status.completed') }}
           }
           @case ('in-progress') {
-            In progress
+            {{ uiText.text('mapCard.status.in-progress') }}
           }
           @case ('unexplored') {
-            Unexplored
+            {{ uiText.text('mapCard.status.unexplored') }}
           }
         }
       </span>
       @if (discoveryCount() > 0) {
         <span class="map-card__discoveries">
-          {{ discoveryCount() }} {{ discoveryCount() === 1 ? 'discovery' : 'discoveries' }}
+          {{
+            uiText.text(discoveryCount() === 1 ? 'mapCard.discovery' : 'mapCard.discoveries', {
+              count: discoveryCount(),
+            })
+          }}
         </span>
       }
     </div>

@@ -8,8 +8,8 @@
 import { Component, ChangeDetectionStrategy, inject, computed, type Signal } from '@angular/core';
 
 import { DataService } from '@guild/services/data.service';
-import { LanguageService } from '@guild/services/language.service';
 import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
+import { UiTextService } from '@guild/services/uiText.service';
 import { LanguageToggleComponent } from '@guild/components/language-toggle/language-toggle.component';
 import { DiceLoaderComponent } from '@guild/components/dice-loader/dice-loader.component';
 import { BilingualTextPipe } from '@guild/components/bilingual-text/bilingual-text.pipe';
@@ -65,16 +65,8 @@ function selectRecapEntries(
 })
 export class StorySoFarComponent {
   private readonly dataService = inject(DataService);
-  private readonly languageService = inject(LanguageService);
   private readonly campaignLocale = inject(CampaignLocaleService);
-
-  /** Current display language for page copy. */
-  readonly lang = this.languageService.currentLanguage;
-
-  readonly subtitle: BilingualText = {
-    en: 'Everything that has happened so far, in a few lines per session.',
-    it: 'Tutto quello che è successo finora, in poche righe per sessione.',
-  };
+  readonly uiText = inject(UiTextService);
 
   readonly isLoading: Signal<boolean> = this.dataService.isLoading;
 
@@ -97,9 +89,13 @@ export class StorySoFarComponent {
    * @returns A plain string usable as accordion title.
    */
   readonly entryAccordionTitle = (entry: StorySoFarEntry): string => {
-    const lang = this.languageService.currentLanguage();
-    const sessionLabel = lang === 'it' ? 'Sessione' : 'Session';
     const localizedTitle = this.campaignLocale.resolve(entry.title);
-    return `${sessionLabel} ${entry.sessionNumber} — ${localizedTitle}`;
+    if (entry.sessionNumber === 0) {
+      return this.uiText.text('chronicle.common.prologueTitle', { title: localizedTitle });
+    }
+    return this.uiText.text('chronicle.common.sessionTitle', {
+      number: entry.sessionNumber,
+      title: localizedTitle,
+    });
   };
 }

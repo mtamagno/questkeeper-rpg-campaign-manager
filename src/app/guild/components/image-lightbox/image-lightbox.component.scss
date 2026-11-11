@@ -110,6 +110,8 @@
   }
 
   &__image {
+    width: min(90vw, 1200px);
+    height: min(78vh, 800px);
     max-width: 90vw;
     max-height: 80vh;
     object-fit: contain;

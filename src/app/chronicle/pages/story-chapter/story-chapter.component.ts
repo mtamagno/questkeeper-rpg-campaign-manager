@@ -11,8 +11,8 @@ import { map } from 'rxjs';
 
 import { DataService } from '@guild/services/data.service';
 import { CampaignService } from '@guild/services/campaign.service';
-import { LanguageService } from '@guild/services/language.service';
 import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
+import { UiTextService } from '@guild/services/uiText.service';
 import { toDisplayUrl } from '@guild/services/imageUrl.service';
 import { LanguageToggleComponent } from '@guild/components/language-toggle/language-toggle.component';
 import { DiceLoaderComponent } from '@guild/components/dice-loader/dice-loader.component';
@@ -79,8 +79,8 @@ export class StoryChapterComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly dataService = inject(DataService);
   private readonly campaignService = inject(CampaignService);
-  private readonly languageService = inject(LanguageService);
   private readonly campaignLocale = inject(CampaignLocaleService);
+  readonly uiText = inject(UiTextService);
 
   /** Active campaign ID for building route links. */
   readonly campaignId: Signal<string | undefined> = this.campaignService.activeCampaignId;
@@ -119,13 +119,18 @@ export class StoryChapterComponent {
     ),
   );
 
-  /** Chapter number derived from session number. */
-  readonly chapterLabel: Signal<string> = computed(() => {
+  /** Full localized chapter label; session zero is the prologue. */
+  readonly chapterHeading: Signal<string> = computed(() => {
     const session = this.session();
     if (session === undefined) {
       return '';
     }
-    return toRomanNumeral(session.sessionNumber);
+    if (session.sessionNumber === 0) {
+      return this.uiText.text('chronicle.common.prologue');
+    }
+    return this.uiText.text('chronicle.chapter.heading', {
+      number: toRomanNumeral(session.sessionNumber),
+    });
   });
 
   /** Prose split into sections at scene breaks, paired with inline images. */

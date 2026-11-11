@@ -15,6 +15,15 @@
   gap: $spacing-2xl;
   animation: fade-in-up $transition-base;
 
+  &__breadcrumbs a,
+  &__not-found a {
+    color: $color-text-secondary;
+    text-decoration: none;
+    &:hover {
+      color: $color-gold-light;
+    }
+  }
+
   // --- Header ---
   &__header {
     @include flex-column;
@@ -30,6 +39,15 @@
     letter-spacing: $letter-spacing-wide;
     margin: 0;
     @include text-gold-glow;
+  }
+
+  &__eyebrow {
+    margin: 0;
+    color: $color-text-muted;
+    font-family: $font-family-heading;
+    font-size: $font-size-xs;
+    letter-spacing: $letter-spacing-wide;
+    text-transform: uppercase;
   }
 
   &__region {
@@ -94,6 +112,12 @@
     margin: 0;
   }
 
+  &__section-help {
+    margin: (-$spacing-sm) 0 $spacing-lg;
+    color: $color-text-secondary;
+    font-size: $font-size-sm;
+  }
+
   // --- Discoveries ---
   &__discoveries {
     @include flex-column;
@@ -124,6 +148,34 @@
     margin: 0;
   }
 
+  &__pager {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $spacing-md;
+
+    a {
+      @include surface-card;
+      display: grid;
+      gap: $spacing-xs;
+      min-height: 76px;
+      padding: $spacing-md $spacing-lg;
+      color: $color-text-secondary;
+      text-decoration: none;
+
+      strong {
+        color: $color-gold-light;
+        font-family: $font-family-heading;
+      }
+      &:hover {
+        border-color: $color-border-accent;
+      }
+    }
+  }
+
+  &__pager-next {
+    text-align: right;
+  }
+
   // --- Loading / not found ---
   &__loading,
   &__not-found {
@@ -132,5 +184,20 @@
     min-height: 300px;
     color: $color-text-muted;
     text-align: center;
+  }
+}
+
+@media (max-width: 620px) {
+  .map-detail {
+    gap: $spacing-lg;
+    &__section {
+      padding: $spacing-lg;
+    }
+    &__pager {
+      grid-template-columns: 1fr;
+      > span {
+        display: none;
+      }
+    }
   }
 }

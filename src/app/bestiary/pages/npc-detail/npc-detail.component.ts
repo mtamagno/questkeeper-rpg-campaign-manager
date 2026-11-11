@@ -18,8 +18,8 @@ import { map } from 'rxjs';
 
 import { DataService } from '@guild/services/data.service';
 import { CampaignService } from '@guild/services/campaign.service';
-import { LanguageService } from '@guild/services/language.service';
 import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
+import { UiTextService } from '@guild/services/uiText.service';
 import { type Npc } from '@guild/models/npc.model';
 import {
   PARTY_PERCEPTION_LABELS,
@@ -81,11 +81,8 @@ export class NpcDetailComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly dataService = inject(DataService);
   private readonly campaignService = inject(CampaignService);
-  private readonly languageService = inject(LanguageService);
   private readonly campaignLocale = inject(CampaignLocaleService);
-
-  /** Current display language for relationship labels and perspective copy. */
-  readonly lang = this.languageService.currentLanguage;
+  readonly uiText = inject(UiTextService);
 
   /** Active campaign ID for safe relationship and entity routes. */
   readonly campaignId: Signal<string | undefined> = this.campaignService.activeCampaignId;

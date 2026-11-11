@@ -2,7 +2,7 @@
 <article class="session-summary" [attr.data-narrative-mood]="mood() === 'default' ? null : mood()">
   <!-- Header: session number + date -->
   <div class="session-summary__header">
-    <h3 class="session-summary__number">Session {{ session().sessionNumber }}</h3>
+    <h3 class="session-summary__number">{{ entryLabel() }}</h3>
     <time class="session-summary__date">{{ session().date }}</time>
   </div>
 
@@ -25,13 +25,15 @@
     class="session-summary__story-link"
     [routerLink]="['/', campaignId() ?? '', 'campaign', 'story', session().id]"
   >
-    📖 Read the Story
+    📖 {{ uiText.text('chronicle.sessionSummary.readStory') }}
   </a>
 
   <!-- Key events -->
   @if (session().keyEvents.length > 0) {
     <div class="session-summary__events">
-      <h4 class="session-summary__events-title">Key Events</h4>
+      <h4 class="session-summary__events-title">
+        {{ uiText.text('chronicle.sessionSummary.keyEvents') }}
+      </h4>
       <ul class="session-summary__events-list">
         @for (event of session().keyEvents; track event.description.en) {
           <li>

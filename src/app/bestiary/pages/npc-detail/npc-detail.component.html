@@ -1,7 +1,7 @@
 <!-- NPC Detail Page -->
 @if (isLoading()) {
   <div class="npc-detail__loading">
-    <app-dice-loader label="Loading NPC data..." [playSound]="false" />
+    <app-dice-loader [label]="uiText.text('npcDetail.loading')" [playSound]="false" />
   </div>
 } @else if (npc(); as npc) {
   <article class="npc-detail">
@@ -35,13 +35,13 @@
             >
               @switch (npc.allegiance) {
                 @case ('ally') {
-                  Ally
+                  {{ uiText.text('npcList.allegiances.ally.singular') }}
                 }
                 @case ('enemy') {
-                  Enemy
+                  {{ uiText.text('npcList.allegiances.enemy.singular') }}
                 }
                 @case ('neutral') {
-                  Neutral
+                  {{ uiText.text('npcList.allegiances.neutral.singular') }}
                 }
               }
             </span>
@@ -50,7 +50,7 @@
               [class.npc-detail__badge--alive]="npc.isAlive"
               [class.npc-detail__badge--dead]="!npc.isAlive"
             >
-              {{ npc.isAlive ? 'Alive' : 'Dead' }}
+              {{ uiText.text(npc.isAlive ? 'npcList.alive' : 'npcList.dead') }}
             </span>
           </div>
         </div>
@@ -60,7 +60,7 @@
               class="npc-detail__fullbody"
               [class.is-loaded]="isPortraitLoaded()"
               [src]="displayPortraitUrl() ?? npc.portraitImageUrl"
-              [alt]="npc.name + ' full body'"
+              [alt]="uiText.text('npcDetail.fullBodyAlt', { name: npc.name })"
               (load)="isPortraitLoaded.set(true)"
               (error)="onPortraitImageError($event)"
               loading="lazy"
@@ -73,26 +73,26 @@
 
     <!-- Profile -->
     <section class="npc-detail__section">
-      <app-accordion title="Profile" icon="📜" [startOpen]="true">
+      <app-accordion [title]="uiText.text('npcDetail.profile.title')" icon="📜" [startOpen]="true">
         <div class="npc-detail__profile-grid">
           <div class="npc-detail__profile-item">
-            <h3>Description</h3>
+            <h3>{{ uiText.text('npcDetail.profile.description') }}</h3>
             <p>{{ npc.profile.description | bilingual }}</p>
           </div>
           <div class="npc-detail__profile-item">
-            <h3>Role</h3>
+            <h3>{{ uiText.text('npcDetail.profile.role') }}</h3>
             <p>{{ npc.profile.role | bilingual }}</p>
           </div>
           <div class="npc-detail__profile-item">
-            <h3>Personality</h3>
+            <h3>{{ uiText.text('npcDetail.profile.personality') }}</h3>
             <p>{{ npc.profile.personality | bilingual }}</p>
           </div>
           <div class="npc-detail__profile-item">
-            <h3>Location</h3>
+            <h3>{{ uiText.text('npcDetail.profile.location') }}</h3>
             <p>{{ npc.profile.location | bilingual }}</p>
           </div>
           <div class="npc-detail__profile-item npc-detail__profile-item--full">
-            <h3>Known History</h3>
+            <h3>{{ uiText.text('npcDetail.profile.knownHistory') }}</h3>
             <p>{{ npc.profile.knownHistory | bilingual }}</p>
           </div>
         </div>
@@ -102,29 +102,23 @@
     <!-- Relationships are derived from the canonical public graph, never copied into NPC data. -->
     <section id="npc-profile-relationships" class="npc-detail__section">
       <app-accordion
-        [title]="lang() === 'it' ? 'Legami conosciuti' : 'Known relationships'"
+        [title]="uiText.text('npcDetail.relationships.title')"
         icon="🔗"
         [startOpen]="true"
       >
         <div class="npc-detail__relationships-heading">
           <p class="npc-detail__relationships-eyebrow">
-            {{ lang() === 'it' ? 'Il punto di vista del gruppo' : "The party's point of view" }}
+            {{ uiText.text('npcDetail.relationships.eyebrow') }}
           </p>
           <p>
-            {{
-              lang() === 'it'
-                ? 'Qui appare soltanto ciò che il gruppo ha osservato, gli è stato riferito o può ragionevolmente dedurre.'
-                : 'Only what the party has observed, been told or can reasonably infer appears here.'
-            }}
+            {{ uiText.text('npcDetail.relationships.help') }}
           </p>
         </div>
 
         @if (relationshipCards().length > 0) {
           <ul
             class="npc-detail__relationship-grid"
-            [attr.aria-label]="
-              lang() === 'it' ? 'Relazioni conosciute del PNG' : 'Known NPC relationships'
-            "
+            [attr.aria-label]="uiText.text('npcDetail.relationships.listLabel')"
           >
             @for (bond of relationshipCards(); track bond.key) {
               <li class="npc-detail__relationship-card">
@@ -151,11 +145,7 @@
                 <div class="npc-detail__perspectives">
                   <section class="npc-detail__perspective">
                     <h3>
-                      {{
-                        lang() === 'it'
-                          ? 'Cosa sembra provare ' + npc.name
-                          : 'What ' + npc.name + ' seems to feel'
-                      }}
+                      {{ uiText.text('npcDetail.relationships.seemsToFeel', { name: npc.name }) }}
                     </h3>
                     @if (bond.npcFeelings.length > 0) {
                       @for (feeling of bond.npcFeelings; track feeling.label) {
@@ -166,9 +156,9 @@
                               class="npc-detail__feeling-meter"
                               role="img"
                               [attr.aria-label]="
-                                (lang() === 'it' ? 'Intensità ' : 'Intensity ') +
-                                feeling.intensity +
-                                (lang() === 'it' ? ' su 5' : ' out of 5')
+                                uiText.text('npcDetail.relationships.intensity', {
+                                  value: feeling.intensity,
+                                })
                               "
                             >
                               @for (step of feelingScale; track step) {
@@ -181,11 +171,7 @@
                       }
                     } @else {
                       <p class="npc-detail__perspective-empty">
-                        {{
-                          lang() === 'it'
-                            ? 'Il gruppo non sa ancora cosa provi.'
-                            : 'The party does not yet know how they feel.'
-                        }}
+                        {{ uiText.text('npcDetail.relationships.unknownFeeling') }}
                       </p>
                     }
                   </section>
@@ -193,13 +179,12 @@
                   <section class="npc-detail__perspective">
                     <h3>
                       {{
-                        bond.otherIsNpc
-                          ? lang() === 'it'
-                            ? 'Cosa sembra provare ' + bond.otherName
-                            : 'What ' + bond.otherName + ' seems to feel'
-                          : lang() === 'it'
-                            ? 'Cosa prova ' + bond.otherName
-                            : 'What ' + bond.otherName + ' feels'
+                        uiText.text(
+                          bond.otherIsNpc
+                            ? 'npcDetail.relationships.seemsToFeel'
+                            : 'npcDetail.relationships.feels',
+                          { name: bond.otherName }
+                        )
                       }}
                     </h3>
                     @if (bond.otherFeelings.length > 0) {
@@ -211,9 +196,9 @@
                               class="npc-detail__feeling-meter"
                               role="img"
                               [attr.aria-label]="
-                                (lang() === 'it' ? 'Intensità ' : 'Intensity ') +
-                                feeling.intensity +
-                                (lang() === 'it' ? ' su 5' : ' out of 5')
+                                uiText.text('npcDetail.relationships.intensity', {
+                                  value: feeling.intensity,
+                                })
                               "
                             >
                               @for (step of feelingScale; track step) {
@@ -226,11 +211,7 @@
                       }
                     } @else {
                       <p class="npc-detail__perspective-empty">
-                        {{
-                          lang() === 'it'
-                            ? 'Questo punto di vista non è ancora stato registrato.'
-                            : 'This point of view has not been recorded yet.'
-                        }}
+                        {{ uiText.text('npcDetail.relationships.unrecordedViewpoint') }}
                       </p>
                     }
                   </section>
@@ -246,18 +227,16 @@
                     bond.targetId,
                   ]"
                 >
-                  {{ lang() === 'it' ? 'Apri la relazione' : 'Open relationship' }}
+                  {{ uiText.text('npcDetail.relationships.open') }}
                   @if (bond.sharedMemoryCount > 0) {
                     <span>
                       · {{ bond.sharedMemoryCount }}
                       {{
-                        bond.sharedMemoryCount === 1
-                          ? lang() === 'it'
-                            ? 'memoria'
-                            : 'memory'
-                          : lang() === 'it'
-                            ? 'memorie'
-                            : 'memories'
+                        uiText.text(
+                          bond.sharedMemoryCount === 1
+                            ? 'npcDetail.relationships.memory'
+                            : 'npcDetail.relationships.memories'
+                        )
                       }}
                     </span>
                   }
@@ -270,11 +249,7 @@
           <div class="npc-detail__relationships-empty empty-state">
             <span aria-hidden="true">◇</span>
             <p>
-              {{
-                lang() === 'it'
-                  ? 'Il gruppo non ha ancora registrato alcun legame pubblico per questo PNG.'
-                  : 'The party has not recorded any public relationship for this NPC yet.'
-              }}
+              {{ uiText.text('npcDetail.relationships.empty') }}
             </p>
           </div>
         }
@@ -283,7 +258,7 @@
           class="npc-detail__network-link"
           [routerLink]="['/', campaignId() ?? '', 'npcs', 'relationships']"
         >
-          {{ lang() === 'it' ? 'Apri la rete completa dei PNG' : 'Open the complete NPC network' }}
+          {{ uiText.text('npcDetail.relationships.openNetwork') }}
           <span>· {{ relationshipCards().length }}</span>
           <span aria-hidden="true">→</span>
         </a>
@@ -293,7 +268,7 @@
     <!-- Gallery -->
     @if (npc.gallery.length > 0) {
       <section class="npc-detail__section">
-        <app-accordion title="Gallery" icon="🖼️" [startOpen]="true">
+        <app-accordion [title]="uiText.text('npcDetail.gallery')" icon="🖼️" [startOpen]="true">
           <app-image-gallery [images]="npc.gallery" galleryTitle="" />
         </app-accordion>
       </section>
@@ -301,6 +276,6 @@
   </article>
 } @else {
   <div class="npc-detail__not-found">
-    <p>NPC not found.</p>
+    <p>{{ uiText.text('npcDetail.notFound') }}</p>
   </div>
 }

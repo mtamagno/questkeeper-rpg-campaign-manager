@@ -10,7 +10,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 
 import { DataService } from '@guild/services/data.service';
-import { LanguageService } from '@guild/services/language.service';
+import { UiTextService } from '@guild/services/uiText.service';
 import { CampaignService } from '@guild/services/campaign.service';
 import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
 import {
@@ -57,12 +57,9 @@ interface ResolvedRelationshipPerspective {
 export class RelationshipDetailComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly dataService = inject(DataService);
-  private readonly languageService = inject(LanguageService);
+  readonly uiText = inject(UiTextService);
   private readonly campaignService = inject(CampaignService);
   private readonly campaignLocale = inject(CampaignLocaleService);
-
-  /** Current display language for headings and relationship labels. */
-  readonly lang = this.languageService.currentLanguage;
 
   /** Stable five-step scale shared by every feeling-strength meter. */
   readonly feelingScale = [1, 2, 3, 4, 5] as const;

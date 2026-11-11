@@ -1,6 +1,6 @@
 <!-- Main Application Layout — Sidebar + Content -->
 <a class="skip-link" href="#main-content">
-  {{ isItalian() ? 'Vai al contenuto principale' : 'Skip to main content' }}
+  {{ uiText.text('app.skipToMain') }}
 </a>
 
 <div
@@ -17,7 +17,7 @@
     (click)="toggleSidebar()"
     aria-controls="app-sidebar"
     [attr.aria-expanded]="isSidebarOpen()"
-    [attr.aria-label]="isItalian() ? 'Apri o chiudi la navigazione' : 'Toggle navigation'"
+    [attr.aria-label]="uiText.text('app.toggleNavigation')"
   >
     ☰
   </button>
@@ -35,7 +35,7 @@
     id="main-content"
     class="app-layout__content"
     tabindex="-1"
-    [attr.aria-label]="isItalian() ? 'Contenuto della campagna' : 'Campaign content'"
+    [attr.aria-label]="uiText.text('app.campaignContent')"
   >
     <app-site-command-bar />
     <div class="app-layout__route-wrapper">

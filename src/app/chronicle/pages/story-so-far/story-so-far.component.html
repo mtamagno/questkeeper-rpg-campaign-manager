@@ -1,24 +1,17 @@
 <!-- Story So Far — cumulative recap -->
 @if (isLoading()) {
   <div class="story-so-far__loading">
-    <app-dice-loader
-      [label]="
-        lang() === 'it' ? 'Raccolgo i fili della storia...' : 'Gathering the threads of the tale...'
-      "
-      [playSound]="false"
-    />
+    <app-dice-loader [label]="uiText.text('chronicle.storySoFar.loading')" [playSound]="false" />
   </div>
 } @else {
   <article class="story-so-far">
     <header class="story-so-far__header">
       <div class="story-so-far__heading-row">
-        <h1 class="story-so-far__title">
-          📚 {{ lang() === 'it' ? 'La storia fin qui' : 'The Story So Far' }}
-        </h1>
+        <h1 class="story-so-far__title">📚 {{ uiText.text('chronicle.storySoFar.title') }}</h1>
         <app-language-toggle />
       </div>
       <p class="story-so-far__subtitle">
-        {{ subtitle | bilingual }}
+        {{ uiText.text('chronicle.storySoFar.subtitle') }}
       </p>
     </header>
 
@@ -28,7 +21,7 @@
         [attr.data-narrative-mood]="campaignMood() === 'default' ? null : campaignMood()"
       >
         <h2 class="story-so-far__overview-title">
-          🗺️ {{ lang() === 'it' ? 'Riassunto della campagna' : 'Campaign Recap' }}
+          🗺️ {{ uiText.text('chronicle.storySoFar.campaignRecap') }}
         </h2>
         <p class="story-so-far__overview-text">{{ recap | bilingual }}</p>
       </section>
@@ -39,20 +32,16 @@
       <div class="empty-state story-so-far__empty">
         <span class="empty-state__icon" aria-hidden="true">☾</span>
         <h2 class="empty-state__title">
-          {{ lang() === 'it' ? 'La storia deve ancora cominciare' : 'The story has yet to begin' }}
+          {{ uiText.text('chronicle.storySoFar.emptyTitle') }}
         </h2>
         <p class="empty-state__text">
-          {{
-            lang() === 'it'
-              ? 'Qui verrà raccolto il filo della campagna, sessione dopo sessione.'
-              : 'The campaign thread will be gathered here, one session at a time.'
-          }}
+          {{ uiText.text('chronicle.storySoFar.emptyHelp') }}
         </p>
       </div>
     } @else {
       <section class="story-so-far__sessions">
         <h2 class="story-so-far__sessions-title">
-          📜 {{ lang() === 'it' ? 'Sessione per sessione' : 'Session by Session' }}
+          📜 {{ uiText.text('chronicle.storySoFar.sessionBySession') }}
         </h2>
         <ol class="story-so-far__list">
           @for (entry of entries(); track entry.id; let i = $index; let isLast = $last) {

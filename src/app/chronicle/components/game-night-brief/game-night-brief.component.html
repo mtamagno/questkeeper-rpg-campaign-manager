@@ -2,16 +2,12 @@
   @if (brief(); as item) {
     <section class="game-night-brief" aria-labelledby="game-night-brief-title">
       <header class="game-night-brief__heading">
-        <span>{{ lang() === 'it' ? 'Brief prima della sessione' : 'Before the session' }}</span>
+        <span>{{ uiText.text('chronicle.brief.eyebrow') }}</span>
         <h2 id="game-night-brief-title">
-          {{ lang() === 'it' ? 'Quattro cose da ricordare' : 'Four things to remember' }}
+          {{ uiText.text('chronicle.brief.title') }}
         </h2>
         <p>
-          {{
-            lang() === 'it'
-              ? 'Un percorso rapido tra fatti condivisi. Ogni tappa apre la pagina completa che la sostiene.'
-              : 'A quick path through shared facts. Every step opens the full page that supports it.'
-          }}
+          {{ uiText.text('chronicle.brief.help') }}
         </p>
       </header>
 
@@ -20,12 +16,12 @@
           <a [routerLink]="['/', cId, 'campaign', 'story', item.latestSessionId]" appSfxHover>
             <span class="game-night-brief__number" aria-hidden="true">1</span>
             <span class="game-night-brief__label">{{
-              lang() === 'it' ? 'Cosa è cambiato' : 'What changed'
+              uiText.text('chronicle.brief.changed')
             }}</span>
             <strong>{{ item.latestSessionTitle }}</strong>
             <small>{{ item.latestEvent }}</small>
             <span class="game-night-brief__link">{{
-              lang() === 'it' ? 'Apri il capitolo' : 'Open the chapter'
+              uiText.text('chronicle.brief.openChapter')
             }}</span>
           </a>
         </li>
@@ -33,16 +29,12 @@
           <a [routerLink]="['/', cId, 'maps']" appSfxHover>
             <span class="game-night-brief__number" aria-hidden="true">2</span>
             <span class="game-night-brief__label">{{
-              lang() === 'it' ? 'Dove siete' : 'Where you are'
+              uiText.text('chronicle.brief.location')
             }}</span>
             <strong>{{ item.currentLocation }}</strong>
-            <small>{{
-              lang() === 'it'
-                ? 'Riapri luoghi, scoperte e percorsi conosciuti.'
-                : 'Return to known places, discoveries and routes.'
-            }}</small>
+            <small>{{ uiText.text('chronicle.brief.locationHelp') }}</small>
             <span class="game-night-brief__link">{{
-              lang() === 'it' ? 'Esplora i luoghi' : 'Explore places'
+              uiText.text('chronicle.brief.openPlaces')
             }}</span>
           </a>
         </li>
@@ -51,12 +43,12 @@
             <a [routerLink]="['/', cId, 'party', item.characterId]" appSfxHover>
               <span class="game-night-brief__number" aria-hidden="true">3</span>
               <span class="game-night-brief__label">{{
-                lang() === 'it' ? 'Un filo personale' : 'A personal thread'
+                uiText.text('chronicle.brief.personalThread')
               }}</span>
               <strong>{{ item.characterName }}</strong>
               <small>{{ item.characterThread }}</small>
               <span class="game-night-brief__link">{{
-                lang() === 'it' ? 'Apri il personaggio' : 'Open the character'
+                uiText.text('chronicle.brief.openCharacter')
               }}</span>
             </a>
           </li>
@@ -65,12 +57,12 @@
           <a [routerLink]="['/', cId, 'campaign', 'story-so-far']" appSfxHover>
             <span class="game-night-brief__number" aria-hidden="true">4</span>
             <span class="game-night-brief__label">{{
-              lang() === 'it' ? 'Cosa conta adesso' : 'What matters now'
+              uiText.text('chronicle.brief.mattersNow')
             }}</span>
-            <strong>{{ lang() === 'it' ? 'La storia finora' : 'The story so far' }}</strong>
+            <strong>{{ uiText.text('chronicle.brief.storySoFar') }}</strong>
             <small>{{ item.storySoFar }}</small>
             <span class="game-night-brief__link">{{
-              lang() === 'it' ? 'Leggi il riepilogo' : 'Read the recap'
+              uiText.text('chronicle.brief.readRecap')
             }}</span>
           </a>
         </li>

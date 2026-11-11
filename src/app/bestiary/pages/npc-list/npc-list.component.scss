@@ -42,6 +42,95 @@
     line-height: $line-height-relaxed;
   }
 
+  &__discovery {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(16rem, 28rem);
+    align-items: end;
+    gap: $spacing-md $spacing-xl;
+    @include surface-card;
+    padding: $spacing-lg;
+  }
+
+  &__discovery-copy {
+    h2,
+    p {
+      margin: 0;
+    }
+
+    h2 {
+      color: $color-gold-light;
+      font-family: $font-family-heading;
+      font-size: $font-size-lg;
+    }
+
+    p {
+      margin-top: $spacing-xs;
+      color: $color-text-secondary;
+      line-height: $line-height-relaxed;
+    }
+  }
+
+  &__search {
+    display: grid;
+    gap: $spacing-xs;
+    color: $color-text-secondary;
+    font-family: $font-family-heading;
+    font-size: $font-size-sm;
+  }
+
+  &__search-control {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: $spacing-sm;
+    min-height: 48px;
+    padding-inline: $spacing-md;
+    border: $border-width-thin solid $color-border-subtle;
+    border-radius: $border-radius-md;
+    background: color-mix(in srgb, var(--qk-color-canvas-deep) 55%, transparent);
+
+    &:focus-within {
+      border-color: $color-border-accent;
+      box-shadow: 0 0 0 2px rgba($color-gold, 0.18);
+    }
+
+    input {
+      min-width: 0;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: $color-text-primary;
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      background: transparent;
+      color: $color-text-accent;
+      cursor: pointer;
+      font: inherit;
+    }
+  }
+
+  &__result-count {
+    grid-column: 1 / -1;
+    margin: 0;
+    color: $color-text-muted;
+    font-size: $font-size-sm;
+  }
+
+  &__clear-results {
+    min-height: 44px;
+    margin-top: $spacing-md;
+    padding-inline: $spacing-lg;
+    border: $border-width-thin solid $color-border-accent;
+    border-radius: $border-radius-md;
+    background: transparent;
+    color: $color-text-accent;
+    cursor: pointer;
+    font-family: $font-family-heading;
+  }
+
   // --- Category sub-group ---
   &__category {
     margin-bottom: $spacing-lg;
@@ -78,6 +167,12 @@
     @include flex-center;
     min-height: 300px;
     color: $color-text-muted;
+  }
+}
+
+@media (max-width: $breakpoint-md) {
+  .npc-list__discovery {
+    grid-template-columns: 1fr;
   }
 }
 
