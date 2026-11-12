@@ -102,7 +102,7 @@ own sake. Existing patterns are retained when they already satisfy the rubric.
 Shared fixes ship in both repositories in the same delivery cycle; campaign-only
 surfaces receive local adaptations and feed reusable discoveries upstream.
 
-## Progress through 11 November
+## Progress through 12 November
 
 - **6 November:** shared tab, touch-target and reduced-motion contracts plus
   import-graph-based first-view budgets are implemented.
@@ -118,12 +118,20 @@ surfaces receive local adaptations and feed reusable discoveries upstream.
 - **11 November:** atlas search and exploration filters, adjacent-location
   navigation, collapsible gallery collections and the complete lightbox
   lifecycle are shared, localized and covered by a focused regression gate.
+- **12 November:** the public baseline gains direct reference navigation and
+  entirely catalog-owned chrome; production category search, collapsible
+  filters, labelled mobile result cards, corrected breadcrumbs and the compact
+  City & Wild tool journey cover every rules-heavy route without redistributing
+  licensed content.
 
 The paired implementation and regression boundary are recorded in the
 [6-10 November quality catch-up](reviews/2026-11-06-10-quality-catchup.md).
 The [11 November maps and gallery closeout](reviews/2026-11-11-maps-gallery-closeout.md)
 completes the runtime scope of issue #140; tracker closure remains tied to the
 next verified release under the awaiting-release policy.
+The [12 November reference-navigation closeout](reviews/2026-11-12-reference-navigation-closeout.md)
+records the #141 compendium slice; generator, Gazette and GM-tool coverage stays
+assigned to 13 November.
 
 ## Exit gate on 17 November
 

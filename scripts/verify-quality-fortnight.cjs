@@ -22,6 +22,9 @@ const sessionSummary = read(
 const tableMoments = read('src/app/chronicle/pages/table-moments/table-moments.component.html');
 const tableMomentsCode = read('src/app/chronicle/pages/table-moments/table-moments.component.ts');
 const catalog = JSON.parse(read('src/app/guild/i18n/ui.json'));
+const baselineCompendium = read(
+  'src/app/arcana/pages/baseline-compendium/baseline-compendium.component.html',
+);
 
 assert.match(npcListMarkup, /type="search"/);
 assert.match(npcListMarkup, /npcList\.discovery\.clear/);
@@ -48,6 +51,10 @@ for (const [name, markup] of [
 }
 assert.match(sessionSummary, /entryLabel\(\)/);
 assert.match(tableMomentsCode, /chronicle\.tableMoments\.carouselLabel/);
+assert.match(baselineCompendium, /uiText\.text\('compendium\.title'/);
+assert.match(baselineCompendium, /class="baseline__index"/);
+assert.match(baselineCompendium, /\[id\]="'rule-' \+ entry\.id"/);
+assert.doesNotMatch(baselineCompendium, /isItalian\(\)\s*\?/);
 
 const requiredPaths = [
   'npcList.discovery.label',
@@ -60,6 +67,10 @@ const requiredPaths = [
   'chronicle.chapter.notFound',
   'chronicle.common.prologue',
   'chronicle.tableMoments.carouselLabel',
+  'compendium.title',
+  'compendium.indexLabel',
+  'compendium.searchLabel',
+  'compendium.empty',
 ];
 
 const atPath = (value, dottedPath) =>
@@ -79,5 +90,5 @@ for (const [locale, definition] of localeEntries) {
 }
 
 console.log(
-  `Quality-fortnight contract verified for NPC discovery, non-visual relationship navigation, chronicle hierarchy and ${localeEntries.length} UI locale(s).`,
+  `Quality-fortnight contract verified for NPC discovery, non-visual relationship navigation, chronicle hierarchy, baseline reference navigation and ${localeEntries.length} UI locale(s).`,
 );

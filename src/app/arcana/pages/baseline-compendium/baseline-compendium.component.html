@@ -1,75 +1,74 @@
 <main class="baseline" tabindex="-1">
   <header class="baseline__hero">
-    <span class="baseline__kicker">{{
-      isItalian() ? 'Riferimento verificato' : 'Verified reference'
-    }}</span>
-    <h1>{{ isItalian() ? 'Compendio essenziale' : 'Essential Compendium' }}</h1>
-    <p>
-      {{
-        isItalian()
-          ? 'Una baseline breve e legalmente redistribuibile. Ogni voce mostra fonte, edizione e stato della revisione.'
-          : 'A concise, legally redistributable baseline. Every entry shows its source, edition, and review state.'
-      }}
-    </p>
+    <div class="baseline__hero-topline">
+      <a class="baseline__back" routerLink="/">← {{ uiText.text('compendium.back') }}</a>
+      <span class="baseline__kicker">{{ uiText.text('compendium.eyebrow') }}</span>
+    </div>
+    <h1>{{ uiText.text('compendium.title') }}</h1>
+    <p>{{ uiText.text('compendium.intro') }}</p>
     <dl class="baseline__provenance">
       <div>
-        <dt>{{ isItalian() ? 'Fonte' : 'Source' }}</dt>
+        <dt>{{ uiText.text('compendium.provenance.source') }}</dt>
         <dd>{{ manifest.source.name }}</dd>
       </div>
       <div>
-        <dt>{{ isItalian() ? 'Edizione' : 'Edition' }}</dt>
+        <dt>{{ uiText.text('compendium.provenance.edition') }}</dt>
         <dd>{{ manifest.ruleset.edition }}</dd>
       </div>
       <div>
-        <dt>{{ isItalian() ? 'Verificato' : 'Reviewed' }}</dt>
+        <dt>{{ uiText.text('compendium.provenance.reviewed') }}</dt>
         <dd>{{ manifest.source.reviewedOn }}</dd>
       </div>
       <div>
-        <dt>{{ isItalian() ? 'Licenza' : 'License' }}</dt>
+        <dt>{{ uiText.text('compendium.provenance.license') }}</dt>
         <dd>{{ manifest.license.id }}</dd>
       </div>
     </dl>
   </header>
 
+  <nav class="baseline__index" [attr.aria-label]="uiText.text('compendium.indexLabel')">
+    <strong>{{ uiText.text('compendium.indexTitle') }}</strong>
+    <div class="baseline__index-links">
+      @for (entry of entries(); track entry.id) {
+        <a [href]="'#rule-' + entry.id">{{ entry.name[locale()] }}</a>
+      }
+    </div>
+  </nav>
+
   <label class="baseline__search">
-    <span>{{ isItalian() ? 'Cerca nelle regole essenziali' : 'Search essential rules' }}</span>
+    <span>{{ uiText.text('compendium.searchLabel') }}</span>
     <input
       type="search"
       [value]="query()"
       (input)="updateQuery($event)"
-      [placeholder]="isItalian() ? 'Es. tiro salvezza' : 'E.g. saving throw'"
+      [placeholder]="uiText.text('compendium.searchPlaceholder')"
     />
   </label>
   <p class="baseline__count" role="status" aria-live="polite">
-    {{ entries().length }} {{ isItalian() ? 'voci verificate' : 'reviewed entries' }}
+    {{ uiText.text('compendium.resultCount', { count: entries().length }) }}
   </p>
 
-  <section
-    class="baseline__grid"
-    [attr.aria-label]="isItalian() ? 'Regole essenziali' : 'Essential rules'"
-  >
+  <section class="baseline__grid" [attr.aria-label]="uiText.text('compendium.resultsLabel')">
     @for (entry of entries(); track entry.id) {
-      <article class="baseline__card">
+      <article class="baseline__card" [id]="'rule-' + entry.id">
         <div class="baseline__card-meta">
           <span>{{ entry.type }}</span
-          ><strong>✓ {{ isItalian() ? 'Fonte verificata' : 'Source reviewed' }}</strong>
+          ><strong>✓ {{ uiText.text('compendium.sourceReviewed') }}</strong>
         </div>
-        <h2>{{ entry.name[isItalian() ? 'it' : 'en'] }}</h2>
-        <p class="baseline__summary">{{ entry.summary?.[isItalian() ? 'it' : 'en'] }}</p>
-        <p>{{ entry.content?.[isItalian() ? 'it' : 'en'] }}</p>
+        <h2>{{ entry.name[locale()] }}</h2>
+        <p class="baseline__summary">{{ entry.summary?.[locale()] }}</p>
+        <p>{{ entry.content?.[locale()] }}</p>
         @for (citation of entry.citations; track citation.url + citation.section) {
           <a [href]="citation.url" target="_blank" rel="noopener noreferrer"
-            >{{ citation.label }} · {{ citation.section }} ↗</a
+            >{{ citation.label }} · {{ citation.section }}
+            <span class="baseline__external" aria-hidden="true">↗</span>
+            <span class="sr-only">{{ uiText.text('compendium.opensNewTab') }}</span></a
           >
         }
       </article>
     } @empty {
       <p class="baseline__empty">
-        {{
-          isItalian()
-            ? 'Nessuna voce corrisponde alla ricerca.'
-            : 'No reviewed entry matches this search.'
-        }}
+        {{ uiText.text('compendium.empty') }}
       </p>
     }
   </section>
@@ -77,7 +76,8 @@
   <footer class="baseline__license">
     <p>{{ manifest.license.attribution }}</p>
     <a [href]="manifest.license.url" target="_blank" rel="noopener noreferrer"
-      >{{ manifest.license.id }} ↗</a
+      >{{ manifest.license.id }} <span aria-hidden="true">↗</span>
+      <span class="sr-only">{{ uiText.text('compendium.opensNewTab') }}</span></a
     >
   </footer>
 </main>
