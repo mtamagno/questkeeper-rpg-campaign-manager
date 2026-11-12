@@ -122,6 +122,27 @@
             }
           }
         },
+        "compendium": {
+          "back": "Back to campaigns",
+          "eyebrow": "Verified reference",
+          "title": "Essential Compendium",
+          "intro": "A concise, legally redistributable baseline. Every entry shows its source, edition and review state.",
+          "provenance": {
+            "source": "Source",
+            "edition": "Edition",
+            "reviewed": "Reviewed",
+            "license": "License"
+          },
+          "indexLabel": "Essential rules index",
+          "indexTitle": "Jump to a rule",
+          "searchLabel": "Search essential rules",
+          "searchPlaceholder": "E.g. saving throw",
+          "resultCount": "{count} reviewed entries",
+          "resultsLabel": "Essential rules",
+          "sourceReviewed": "Source reviewed",
+          "opensNewTab": "Opens in a new tab",
+          "empty": "No reviewed entry matches this search."
+        },
         "sidebar": {
           "closeNavigation": "Close navigation",
           "mainNavigation": "Main navigation",
@@ -588,6 +609,27 @@
               "help": "Controlla il valore indicato e riprova."
             }
           }
+        },
+        "compendium": {
+          "back": "Torna alle campagne",
+          "eyebrow": "Riferimento verificato",
+          "title": "Compendio essenziale",
+          "intro": "Una baseline breve e legalmente redistribuibile. Ogni voce mostra fonte, edizione e stato della revisione.",
+          "provenance": {
+            "source": "Fonte",
+            "edition": "Edizione",
+            "reviewed": "Verificato",
+            "license": "Licenza"
+          },
+          "indexLabel": "Indice delle regole essenziali",
+          "indexTitle": "Vai a una regola",
+          "searchLabel": "Cerca nelle regole essenziali",
+          "searchPlaceholder": "Es. tiro salvezza",
+          "resultCount": "{count} voci verificate",
+          "resultsLabel": "Regole essenziali",
+          "sourceReviewed": "Fonte verificata",
+          "opensNewTab": "Si apre in una nuova scheda",
+          "empty": "Nessuna voce corrisponde alla ricerca."
         },
         "sidebar": {
           "closeNavigation": "Chiudi navigazione",
