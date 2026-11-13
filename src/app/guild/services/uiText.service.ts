@@ -9,6 +9,7 @@ import {
 import { LanguageService } from '@guild/services/language.service';
 
 type UiTextParameters = Readonly<Record<string, string | number>>;
+type LocalizedInterfaceText = Readonly<Record<string, string | undefined>>;
 
 function readPath(root: UiTextTree, path: string): string | undefined {
   let current: unknown = root;
@@ -59,5 +60,22 @@ export class UiTextService {
       console.warn(`[QuestKeeper] Missing UI text catalog key: ${key}`);
     }
     return `Missing text: ${key}`;
+  }
+
+  /** Resolves data-owned labels through the interface locale fallback chain. */
+  localized(value: LocalizedInterfaceText): string {
+    const requestedLocale =
+      resolveInterfaceLocale(this.language.currentLanguage()) ?? DEFAULT_INTERFACE_LOCALE;
+    const searchOrder = [
+      requestedLocale,
+      ...UI_TEXT_CATALOG.locales[requestedLocale].fallbacks,
+      DEFAULT_INTERFACE_LOCALE,
+      ...Object.keys(value),
+    ];
+    for (const locale of searchOrder) {
+      const candidate = value[locale];
+      if (typeof candidate === 'string' && candidate.trim().length > 0) return candidate;
+    }
+    return '';
   }
 }

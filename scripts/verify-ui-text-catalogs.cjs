@@ -146,10 +146,23 @@ for (const relative of migratedSurfaces) {
   if (/isItalian\(\)\s*\?|lang\(\)\s*===\s*['"]it['"]/.test(source)) {
     fail(`${relative} reintroduced embedded bilingual interface copy`);
   }
+  if (
+    relative.endsWith('.html') &&
+    /(?:^|\s)(?:aria-label|placeholder|title)="(?!\s*\{\{)[^"]*[A-Za-zÀ-ÿ][^"]*"/m.test(
+      source,
+    )
+  ) {
+    fail(`${relative} contains a literal user-facing attribute outside ui.json`);
+  }
 }
 
 const service = fs.readFileSync(path.join(root, 'src/app/guild/services/uiText.service.ts'), 'utf8');
-for (const required of ['UI_TEXT_CATALOG', 'Missing UI text catalog key', 'interpolate']) {
+for (const required of [
+  'UI_TEXT_CATALOG',
+  'Missing UI text catalog key',
+  'interpolate',
+  'localized',
+]) {
   if (!service.includes(required)) fail(`UI text resolver is missing ${required}`);
 }
 const catalogHelper = fs.readFileSync(path.join(catalogDirectory, 'uiCatalog.ts'), 'utf8');
