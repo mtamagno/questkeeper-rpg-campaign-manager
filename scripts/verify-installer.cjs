@@ -9,6 +9,7 @@ const read = (relativePath) => fs.readFileSync(path.join(root, relativePath), 'u
 const wizard = read('tools/setup-wizard/server.cjs');
 const interfaceHtml = read('tools/setup-wizard/public/index.html');
 const interfaceScript = read('tools/setup-wizard/public/setup.js');
+const interfaceStyles = read('tools/setup-wizard/public/setup.css');
 const builder = read('scripts/build-setup-binary.cjs');
 const workflow = read('.github/workflows/release.yml');
 const installationGuide = read('docs/INSTALLATION-GUIDE.md');
@@ -34,7 +35,9 @@ const checks = [
       interfaceHtml.includes('runtime-system') &&
       interfaceHtml.includes('system-runtime') &&
       interfaceHtml.includes('portable-data') &&
-      interfaceHtml.includes('storage-path'),
+      interfaceHtml.includes('storage-path') &&
+      interfaceHtml.includes('setup-plan') &&
+      interfaceHtml.includes('completion-summary'),
   ],
   [
     'a bilingual setup shutdown control',
@@ -42,9 +45,29 @@ const checks = [
       interfaceScript.includes("closeSetup: 'Close setup'") &&
       interfaceScript.includes("closeSetup: 'Chiudi setup'") &&
       interfaceScript.includes("api('shutdown'") &&
-      interfaceScript.includes('window.setTimeout(() => closeSetup(status), 450)') &&
+      interfaceScript.includes('scheduleAutomaticClose(status)') &&
+      interfaceScript.includes('setTimeout(() => closeSetup(status), 30_000)') &&
       wizard.includes("requestUrl.pathname === '/api/shutdown'") &&
       wizard.includes('setupServer.close'),
+  ],
+  [
+    'reviewable setup consequences and launch outcomes',
+    interfaceScript.includes('function renderPlan(status)') &&
+      interfaceScript.includes('function renderCompletion(status)') &&
+      interfaceScript.includes("checking: 'Controllo in corso…'") &&
+      interfaceScript.includes("launchFromResult('manager'") &&
+      interfaceScript.includes("launchFromResult('companion'") &&
+      wizard.includes('outcomes: null') &&
+      wizard.includes('storage.migration.preview?.destinationExists') &&
+      wizard.includes('rollbackAvailable') &&
+      wizard.includes('state.outcomes.launched[kind] = true'),
+  ],
+  [
+    'a narrow-screen setup without intrinsic fieldset overflow',
+    interfaceStyles.includes('min-inline-size: 0') &&
+      interfaceStyles.includes('width: calc(100% - 24px)') &&
+      interfaceStyles.includes('overflow-wrap: anywhere') &&
+      interfaceStyles.includes('flex-direction: column'),
   ],
   [
     'official Node.js 26 discovery and verification',

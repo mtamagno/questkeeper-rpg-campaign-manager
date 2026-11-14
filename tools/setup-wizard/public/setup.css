@@ -39,6 +39,9 @@ select {
   padding: 28px 0 30px;
   border-bottom: 1px solid #4e493e;
 }
+.hero > * {
+  min-width: 0;
+}
 .sigil {
   display: grid;
   place-items: center;
@@ -70,6 +73,7 @@ h2 {
 h1 {
   font-size: clamp(2rem, 5vw, 3.3rem);
   line-height: 1.02;
+  overflow-wrap: anywhere;
 }
 h2 {
   font-size: 1.35rem;
@@ -109,12 +113,14 @@ h2 {
 .runtime-options,
 .options,
 .trust {
+  min-width: 0;
   margin-top: 22px;
   border: 1px solid #464238;
   background: rgba(25, 27, 32, 0.92);
   border-radius: 14px;
 }
 .runtime-options {
+  min-inline-size: 0;
   padding: 22px;
 }
 .runtime-options legend {
@@ -246,6 +252,41 @@ h2 {
   border-radius: 14px;
   background: rgba(36, 77, 69, 0.22);
 }
+.setup-plan {
+  margin-top: 22px;
+  padding: 17px 20px;
+  border: 1px solid #464238;
+  border-radius: 14px;
+  background: rgba(25, 27, 32, 0.92);
+}
+.setup-plan > strong {
+  color: #f4cb82;
+}
+.setup-plan ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.setup-plan li {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #3b3933;
+  border-radius: 9px;
+  background: #111318;
+}
+.setup-plan li span {
+  color: #9f9a90;
+  font-size: 0.78rem;
+}
+.setup-plan li b {
+  overflow-wrap: anywhere;
+  font-size: 0.92rem;
+}
 .storage-preview strong {
   color: #a7ddca;
 }
@@ -328,6 +369,31 @@ h2 {
 #log:not(:empty) {
   display: block;
 }
+.completion-summary {
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+  padding: 18px;
+  border: 1px solid #3d655e;
+  border-radius: 14px;
+  background: rgba(36, 77, 69, 0.22);
+}
+.completion-summary[hidden] {
+  display: none;
+}
+.completion-summary p {
+  margin: 6px 0 0;
+  color: #cbc2b3;
+  line-height: 1.55;
+}
+.completion-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+.completion-summary small {
+  color: #9f9a90;
+}
 footer {
   display: flex;
   gap: 20px;
@@ -364,6 +430,7 @@ footer p {
 }
 @media (max-width: 680px) {
   .shell {
+    width: calc(100% - 24px);
     margin: 15px auto;
   }
   .hero {
@@ -374,6 +441,11 @@ footer p {
     justify-self: start;
     flex-wrap: wrap;
   }
+  .status-card {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
   footer {
     align-items: stretch;
     flex-direction: column;
@@ -381,6 +453,13 @@ footer p {
   .runtime-picker,
   .runtime-fallback {
     margin-left: 0;
+  }
+  .setup-plan ul {
+    grid-template-columns: 1fr;
+  }
+  .completion-actions {
+    align-items: stretch;
+    flex-direction: column;
   }
   .primary {
     width: 100%;

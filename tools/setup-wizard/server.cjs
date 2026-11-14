@@ -63,6 +63,7 @@ const state = {
   error: null,
   finishedAt: null,
   launchedManager: false,
+  outcomes: null,
 };
 
 function log(message) {
@@ -541,6 +542,7 @@ async function install(options) {
   state.error = null;
   state.finishedAt = null;
   state.launchedManager = false;
+  state.outcomes = null;
   state.logs = [];
   try {
     const runtime = await prepareRuntime(options);
@@ -575,6 +577,24 @@ async function install(options) {
       await launch('manager');
       state.launchedManager = true;
     }
+    state.outcomes = {
+      runtime: { source: runtime.source, version: runtime.version },
+      storage: {
+        campaigns: storage.paths.campaignsRoot,
+        migrated: storage.migration.migrated === true,
+        created:
+          storage.migration.migrated !== true &&
+          storage.migration.preview?.destinationExists !== true &&
+          storage.migration.preview?.required !== true,
+        rollbackAvailable: Boolean(storage.migration.rollbackRoot),
+      },
+      dependencies: options.dependencies !== false,
+      shortcuts: {
+        manager: options.managerShortcut === true,
+        companion: options.companionShortcut === true,
+      },
+      launched: { manager: state.launchedManager },
+    };
     state.phase = 'complete';
     log('QuestKeeper is ready. Your adventure can begin.');
     state.finishedAt = new Date().toISOString();
@@ -650,6 +670,8 @@ async function route(request, response) {
   if (request.method === 'POST' && requestUrl.pathname === '/api/launch') {
     const { kind } = await readJson(request);
     await launch(kind);
+    if (state.outcomes) state.outcomes.launched[kind] = true;
+    if (kind === 'manager') state.launchedManager = true;
     return json(response, 200, { launched: kind });
   }
   if (request.method === 'POST' && requestUrl.pathname === '/api/shutdown') {
