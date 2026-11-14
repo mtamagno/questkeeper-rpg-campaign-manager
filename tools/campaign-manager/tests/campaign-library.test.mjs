@@ -18,6 +18,8 @@ test('Campaign Library is a persistent, searchable home rather than an implicit 
   assert.match(app, /data-library-action="open"/);
   assert.match(app, /data-library-action="edit"/);
   assert.match(app, /data-library-action="backup"/);
+  assert.match(app, /async function editCampaignFromLibrary\(id\)/);
+  assert.match(app, /state\.editor\.returnToLibrary = true/);
   assert.match(app, /loadState\(\{ allowFirstRunPrompt: true \}\)/);
   assert.doesNotMatch(app, /loadState\(\{ selectFirst: true, allowFirstRunPrompt: true \}\)/);
   assert.match(styles, /repeat\(auto-fit, minmax\(min\(100%, 330px\), 1fr\)\)/);
