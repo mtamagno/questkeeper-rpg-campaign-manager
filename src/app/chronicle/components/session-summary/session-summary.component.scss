@@ -53,7 +53,7 @@
   // --- Location tag ---
   &__location {
     font-size: $font-size-sm;
-    color: $color-leather;
+    color: var(--narrative-muted, $color-text-muted);
     font-style: italic;
   }
 
@@ -94,14 +94,14 @@
   &__events {
     margin-top: $spacing-sm;
     padding-top: $spacing-sm;
-    border-top: $border-width-thin solid rgba($color-leather, 0.3);
+    border-top: $border-width-thin solid var(--narrative-border, $color-border-subtle);
   }
 
   &__events-title {
     font-family: $font-family-heading;
     font-size: $font-size-sm;
     font-weight: $font-weight-semibold;
-    color: $color-leather;
+    color: var(--narrative-accent, $color-gold-dark);
     letter-spacing: $letter-spacing-wide;
     text-transform: uppercase;
     margin: 0 0 $spacing-xs;
@@ -115,9 +115,12 @@
 
     li {
       font-size: $font-size-sm;
-      color: $color-text-inverse;
-      opacity: 0.8;
+      color: var(--narrative-text, $color-text-primary);
       line-height: $line-height-base;
+
+      &::marker {
+        color: var(--narrative-accent, $color-gold-dark);
+      }
     }
   }
 }
