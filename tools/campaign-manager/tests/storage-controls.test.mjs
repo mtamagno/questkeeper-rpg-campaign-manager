@@ -38,7 +38,7 @@ test('Campaign Manager exposes storage diagnostics and recovery controls', async
   assert.ok(translations.includes("'Storage & recovery': 'Archivio e recupero'"));
 });
 
-test('guided setup offers portable storage and shuts its loopback service down after success', async () => {
+test('guided setup explains storage outcomes and closes its loopback service after review', async () => {
   const [server, html, script] = await Promise.all([
     read('tools/setup-wizard/server.cjs'),
     read('tools/setup-wizard/public/index.html'),
@@ -47,10 +47,14 @@ test('guided setup offers portable storage and shuts its loopback service down a
 
   assert.ok(html.includes('id="portable-data"'));
   assert.ok(html.includes('id="storage-path"'));
+  assert.ok(html.includes('id="completion-summary"'));
   assert.ok(script.includes("portableData: $('portable-data').checked"));
-  assert.ok(script.includes('window.setTimeout(() => closeSetup(status), 450)'));
+  assert.ok(script.includes('function renderPlan(status)'));
+  assert.ok(script.includes('function renderCompletion(status)'));
+  assert.ok(script.includes('setTimeout(() => closeSetup(status), 30_000)'));
   assert.ok(script.includes("api('shutdown'"));
   assert.ok(server.includes('state.launchedManager = true'));
+  assert.ok(server.includes('state.outcomes ='));
   assert.ok(server.includes('storageChoices:'));
   assert.ok(server.includes("options.portableData === true ? 'portable' : 'user'"));
 });

@@ -101,6 +101,7 @@ const state = {
     storage: null,
   },
   editor: null,
+  editorDirty: false,
 };
 
 function selectedMyCharacter() {
@@ -1035,7 +1036,7 @@ function field(name, label, value = '', options = {}) {
 }
 
 function section(label) {
-  return `<div class="form-section">${escapeHtml(label)}</div>`;
+  return `<h3 class="form-section">${escapeHtml(label)}</h3>`;
 }
 
 const INVENTORY_CATEGORIES = new Set([
@@ -1820,8 +1821,57 @@ function openDialog({ title, eyebrow, html, editor }) {
   document.querySelector('#dialog-eyebrow').textContent = eyebrow;
   fields.innerHTML = `<div class="form-grid">${html}</div>`;
   state.editor = editor;
+  state.editorDirty = false;
+  syncEditorDraftState();
+  if (editor.kind === 'campaign') enhanceCampaignEditorNavigation();
   dialog.showModal();
   fields.querySelector('input, textarea, select')?.focus();
+}
+
+function enhanceCampaignEditorNavigation() {
+  const sections = [...fields.querySelectorAll('.form-section')];
+  if (sections.length < 2) return;
+  const navigation = document.createElement('nav');
+  navigation.className = 'dialog-section-nav';
+  navigation.setAttribute('aria-label', translate('Campaign form sections'));
+  const label = document.createElement('strong');
+  label.textContent = translate('Jump to');
+  navigation.append(label);
+  for (const [index, heading] of sections.entries()) {
+    heading.id = `campaign-form-section-${index + 1}`;
+    heading.tabIndex = -1;
+    const link = document.createElement('a');
+    link.href = `#${heading.id}`;
+    link.textContent = heading.textContent;
+    link.addEventListener('click', (event) => {
+      event.preventDefault();
+      heading.scrollIntoView({ block: 'start' });
+      heading.focus({ preventScroll: true });
+    });
+    navigation.append(link);
+  }
+  fields.prepend(navigation);
+}
+
+function syncEditorDraftState() {
+  const indicator = document.querySelector('#dialog-draft-state');
+  indicator.hidden = !state.editorDirty;
+}
+
+function closeEditorIfSafe() {
+  if (
+    state.editorDirty &&
+    !confirm(
+      translate('Discard unsaved changes? The information entered in this form will be lost.'),
+    )
+  ) {
+    return false;
+  }
+  state.editorDirty = false;
+  syncEditorDraftState();
+  clearDialogError();
+  dialog.close();
+  return true;
 }
 
 function localeRegistryFromPicker() {
@@ -1982,6 +2032,14 @@ function openCampaignEditor(editing = false) {
     );
   refreshPaletteStudio();
   refreshCampaignTranslationPlan();
+}
+
+async function editCampaignFromLibrary(id) {
+  state.selectedId = id;
+  state.campaign = await api(`/api/campaigns/${encodeURIComponent(id)}`);
+  renderSidebar();
+  openCampaignEditor(true);
+  state.editor.returnToLibrary = true;
 }
 
 async function migrateCampaignLocales() {
@@ -3702,6 +3760,7 @@ function applyCampaignTranslation(targetLanguage) {
 }
 
 async function saveEditor() {
+  const returnToLibrary = state.editor?.returnToLibrary === true;
   const form = new FormData(editorForm);
   let message = 'Saved. Your Companion is up to date.';
   if (state.editor.kind === 'campaign') {
@@ -3723,6 +3782,9 @@ async function saveEditor() {
     state.campaign = await api(`/api/campaigns/${encodeURIComponent(state.selectedId)}`);
   }
   await loadState();
+  if (returnToLibrary && !state.libraryMode) showLibrary();
+  state.editorDirty = false;
+  syncEditorDraftState();
   dialog.close();
   toast(message);
 }
@@ -4104,8 +4166,7 @@ content.addEventListener('click', async (event) => {
       const { id } = libraryAction.dataset;
       if (libraryAction.dataset.libraryAction === 'open') await selectCampaign(id);
       if (libraryAction.dataset.libraryAction === 'edit') {
-        await selectCampaign(id);
-        openCampaignEditor(true);
+        await editCampaignFromLibrary(id);
       }
       if (libraryAction.dataset.libraryAction === 'backup') {
         await exportCampaign(id);
@@ -4550,14 +4611,20 @@ editorForm.addEventListener('submit', (event) => {
       save.textContent = 'Save';
     });
 });
-editorForm.addEventListener('input', clearDialogError);
-document.querySelector('#dialog-close').addEventListener('click', () => {
+editorForm.addEventListener('input', () => {
+  state.editorDirty = true;
+  syncEditorDraftState();
   clearDialogError();
-  dialog.close();
+});
+document.querySelector('#dialog-close').addEventListener('click', () => {
+  closeEditorIfSafe();
 });
 document.querySelector('#dialog-cancel').addEventListener('click', () => {
-  clearDialogError();
-  dialog.close();
+  closeEditorIfSafe();
+});
+dialog.addEventListener('cancel', (event) => {
+  event.preventDefault();
+  closeEditorIfSafe();
 });
 
 document.querySelector('#show-manager-settings').addEventListener('click', () => {

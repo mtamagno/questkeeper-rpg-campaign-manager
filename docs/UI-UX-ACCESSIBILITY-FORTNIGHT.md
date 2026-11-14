@@ -102,7 +102,7 @@ own sake. Existing patterns are retained when they already satisfy the rubric.
 Shared fixes ship in both repositories in the same delivery cycle; campaign-only
 surfaces receive local adaptations and feed reusable discoveries upstream.
 
-## Progress through 13 November
+## Progress through 14 November
 
 - **6 November:** shared tab, touch-target and reduced-motion contracts plus
   import-graph-based first-view budgets are implemented.
@@ -127,6 +127,11 @@ surfaces receive local adaptations and feed reusable discoveries upstream.
   journeys; Gazette and DM tools gain catalog-owned chrome, recoverable states
   and campaign-registry-driven N-language authoring. The shared catalog resolver
   and regression guard are paired without exporting production routes or data.
+- **14 November:** graphical setup previews runtime, storage, shortcut and first
+  launch consequences, then reports verified outcomes before a safe timed
+  shutdown. The shared Campaign Library keeps edit context while the campaign
+  form gains keyboard section navigation, visible draft state and consistent
+  loss/error recovery. The clean and 1.1.4 migration paths remain covered.
 
 The paired implementation and regression boundary are recorded in the
 [6-10 November quality catch-up](reviews/2026-11-06-10-quality-catchup.md).
@@ -138,6 +143,9 @@ records the #141 compendium slice; generator, Gazette and GM-tool coverage stays
 assigned to 13 November.
 The [13 November production-utilities closeout](reviews/2026-11-13-production-utilities-closeout.md)
 records that completion and the first enforceable #142 zero-inline-copy slice.
+The [14 November setup and Manager closeout](reviews/2026-11-14-setup-manager-closeout.md)
+records the public-only installer boundary, the paired Manager changes and the
+choice/consequence/recovery constraint inherited by the 15 November editors.
 
 ## Exit gate on 17 November
 

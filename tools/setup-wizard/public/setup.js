@@ -5,6 +5,7 @@ const copy = {
     intro:
       'QuestKeeper prepares its private runtime, tools and launchers without asking you to use a terminal.',
     statusTitle: 'Your device',
+    checking: 'Checking…',
     runtimeTitle: 'Choose the Node.js runtime',
     runtimeHint:
       'Keep QuestKeeper isolated, or reuse a compatible Node.js 26 already on this device.',
@@ -27,14 +28,44 @@ const copy = {
     storageBody:
       'Campaigns, media, transcripts and backups are kept separate from replaceable app files.',
     managerShortcut: 'Create a Campaign Manager shortcut',
+    managerShortcutHint:
+      'Opens the private authoring studio for campaigns, sessions and publishing.',
     companionShortcut: 'Create a player Companion shortcut',
+    companionShortcutHint: 'Starts the reading site and opens it in the default browser.',
     launchManager: 'Open Campaign Manager when setup finishes',
+    planTitle: 'What will happen',
+    planRuntime: 'Runtime',
+    planStorage: 'Campaign storage',
+    planShortcuts: 'Desktop shortcuts',
+    planFirstLaunch: 'First launch',
+    planPrivateRuntime: 'Verified private Node.js 26',
+    planSystemRuntime: 'Validated system Node.js 26',
+    planUserStorage: 'Protected per-user folder',
+    planPortableStorage: 'Portable folder beside QuestKeeper',
+    planBothShortcuts: 'Manager and Companion',
+    planManagerShortcut: 'Campaign Manager only',
+    planCompanionShortcut: 'Companion only',
+    planNoShortcuts: 'No shortcuts',
+    planLaunchManager: 'Campaign Manager opens automatically',
+    planNoLaunch: 'Stay in setup until you choose what to open',
     trustTitle: 'A private, verified runtime',
     trustBody:
       'Node.js 26 is downloaded only from nodejs.org, verified against its published SHA-256 checksum and kept inside this QuestKeeper folder. No administrator access is required.',
     ready: 'Ready to begin.',
     footer: 'No AI model or remote provider is enabled by this setup.',
     prepare: 'Prepare QuestKeeper',
+    completionTitle: 'QuestKeeper is ready',
+    completionMigrated:
+      'Existing campaigns were copied and verified. A rollback copy remains available.',
+    completionCreated: 'A new protected campaign archive was created.',
+    completionReused: 'Protected campaign storage was reused without replacing your data.',
+    completionDetails: '{runtime}. Campaigns: {path}. {migration}',
+    openManager: 'Open Campaign Manager',
+    openCompanion: 'Open Companion',
+    finishSetup: 'Finish and close',
+    launched: 'Opened',
+    launchFailed: 'Could not open this QuestKeeper app. Read the log and try again.',
+    closeCountdown: 'Setup closes automatically in {seconds} seconds.',
     closeSetup: 'Close setup',
     closing: 'Closing QuestKeeper Setup and its local service…',
     closed: 'Setup is closed. You can close this tab; launched QuestKeeper apps keep running.',
@@ -61,6 +92,7 @@ const copy = {
     intro:
       'QuestKeeper prepara runtime privata, strumenti e collegamenti senza chiederti di usare il terminale.',
     statusTitle: 'Il tuo dispositivo',
+    checking: 'Controllo in corso…',
     runtimeTitle: 'Scegli il runtime Node.js',
     runtimeHint:
       'Mantieni QuestKeeper isolato oppure riutilizza un Node.js 26 compatibile già presente sul dispositivo.',
@@ -83,14 +115,44 @@ const copy = {
     storageBody:
       'Campagne, media, trascrizioni e backup restano separati dai file sostituibili dell applicazione.',
     managerShortcut: 'Crea un collegamento al Campaign Manager',
+    managerShortcutHint: 'Apre lo studio privato per gestire campagne, sessioni e pubblicazione.',
     companionShortcut: 'Crea un collegamento al Companion dei giocatori',
+    companionShortcutHint: 'Avvia il sito di lettura e lo apre nel browser predefinito.',
     launchManager: 'Apri Campaign Manager al termine del setup',
+    planTitle: 'Cosa succederà',
+    planRuntime: 'Runtime',
+    planStorage: 'Archivio campagne',
+    planShortcuts: 'Collegamenti sul desktop',
+    planFirstLaunch: 'Primo avvio',
+    planPrivateRuntime: 'Node.js 26 privato e verificato',
+    planSystemRuntime: 'Node.js 26 di sistema convalidato',
+    planUserStorage: 'Cartella utente protetta',
+    planPortableStorage: 'Cartella portabile accanto a QuestKeeper',
+    planBothShortcuts: 'Manager e Companion',
+    planManagerShortcut: 'Solo Campaign Manager',
+    planCompanionShortcut: 'Solo Companion',
+    planNoShortcuts: 'Nessun collegamento',
+    planLaunchManager: 'Campaign Manager si apre automaticamente',
+    planNoLaunch: 'Resta nel setup finché non scegli cosa aprire',
     trustTitle: 'Una runtime privata e verificata',
     trustBody:
       'Node.js 26 viene scaricato solo da nodejs.org, verificato con il checksum SHA-256 pubblicato e conservato dentro questa cartella QuestKeeper. Non servono privilegi di amministratore.',
     ready: 'Tutto pronto per iniziare.',
     footer: 'Questo setup non abilita modelli AI o provider remoti.',
     prepare: 'Prepara QuestKeeper',
+    completionTitle: 'QuestKeeper è pronto',
+    completionMigrated:
+      'Le campagne esistenti sono state copiate e verificate. Resta disponibile una copia di ripristino.',
+    completionCreated: 'È stato creato un nuovo archivio protetto per le campagne.',
+    completionReused: 'L archivio protetto è stato riutilizzato senza sostituire i tuoi dati.',
+    completionDetails: '{runtime}. Campagne: {path}. {migration}',
+    openManager: 'Apri Campaign Manager',
+    openCompanion: 'Apri Companion',
+    finishSetup: 'Termina e chiudi',
+    launched: 'Aperto',
+    launchFailed:
+      'Non è stato possibile aprire questa app QuestKeeper. Leggi il registro e riprova.',
+    closeCountdown: 'Il setup si chiuderà automaticamente tra {seconds} secondi.',
     closeSetup: 'Chiudi setup',
     closing: 'Chiusura del setup QuestKeeper e del suo servizio locale…',
     closed:
@@ -122,6 +184,8 @@ let language =
 let polling;
 let runtimeChoiceInitialized = false;
 let completionHandled = false;
+let automaticCloseTimer;
+let countdownTimer;
 let lastStatus;
 const $ = (id) => document.getElementById(id);
 const interpolate = (text, values) => text.replace(/\{(\w+)\}/g, (_, key) => values[key] ?? '');
@@ -132,6 +196,80 @@ function translate() {
     element.textContent = copy[language][element.dataset.copy];
   });
   $('language').textContent = copy[language].language;
+  if (lastStatus) {
+    renderPlan(lastStatus);
+    if (!$('completion-summary').hidden) renderCompletion(lastStatus);
+  } else renderPlan();
+}
+
+function shortcutPlanKey() {
+  const manager = $('manager-shortcut').checked;
+  const companion = $('companion-shortcut').checked;
+  if (manager && companion) return 'planBothShortcuts';
+  if (manager) return 'planManagerShortcut';
+  if (companion) return 'planCompanionShortcut';
+  return 'planNoShortcuts';
+}
+
+function renderPlan(status) {
+  $('plan-runtime').textContent =
+    copy[language][
+      $('runtime-system').checked && !$('runtime-system').disabled
+        ? 'planSystemRuntime'
+        : 'planPrivateRuntime'
+    ];
+  $('plan-storage').textContent =
+    copy[language][$('portable-data').checked ? 'planPortableStorage' : 'planUserStorage'];
+  $('plan-shortcuts').textContent = copy[language][shortcutPlanKey()];
+  $('plan-launch').textContent =
+    copy[language][$('launch-manager').checked ? 'planLaunchManager' : 'planNoLaunch'];
+  if (status) {
+    $('storage-path').textContent =
+      status.storageChoices[$('portable-data').checked ? 'portable' : 'user'].campaigns;
+  }
+}
+
+function clearAutomaticClose() {
+  clearTimeout(automaticCloseTimer);
+  clearInterval(countdownTimer);
+  automaticCloseTimer = null;
+  countdownTimer = null;
+}
+
+function renderCompletion(status) {
+  const outcomes = status.state.outcomes;
+  if (!outcomes) return;
+  const runtime = `${copy[language][outcomes.runtime.source === 'system' ? 'planSystemRuntime' : 'planPrivateRuntime']} (${outcomes.runtime.version})`;
+  $('completion-details').textContent = interpolate(copy[language].completionDetails, {
+    runtime,
+    path: outcomes.storage.campaigns,
+    migration:
+      copy[language][
+        outcomes.storage.migrated
+          ? 'completionMigrated'
+          : outcomes.storage.created
+            ? 'completionCreated'
+            : 'completionReused'
+      ],
+  });
+  $('launch-manager-result').textContent =
+    copy[language][outcomes.launched.manager ? 'launched' : 'openManager'];
+  $('launch-manager-result').disabled = outcomes.launched.manager === true;
+  $('launch-companion-result').textContent =
+    copy[language][outcomes.launched.companion ? 'launched' : 'openCompanion'];
+  $('launch-companion-result').disabled = outcomes.launched.companion === true;
+}
+
+function scheduleAutomaticClose(status) {
+  clearAutomaticClose();
+  const deadline = Date.now() + 30_000;
+  const update = () => {
+    const seconds = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+    $('close-countdown').textContent = interpolate(copy[language].closeCountdown, { seconds });
+  };
+  update();
+  countdownTimer = setInterval(update, 1000);
+  automaticCloseTimer = setTimeout(() => closeSetup(status), 30_000);
 }
 
 async function api(path, options) {
@@ -185,17 +323,20 @@ function render(status) {
     runtimeChoiceInitialized = true;
   }
   $('system-runtime').disabled = !detected || !$('runtime-system').checked;
+  renderPlan(status);
   $('log').textContent = status.state.logs.join('\n');
   const phase = status.state.phase;
   $('progress').className = phase;
-  $('prepare').disabled = phase === 'running';
+  $('prepare').disabled = phase === 'running' || phase === 'complete';
   $('close-setup').disabled = phase === 'running';
   if (phase === 'running') $('progress-message').textContent = status.state.message;
   else if (phase === 'complete') {
     $('progress-message').textContent = copy[language].complete;
+    $('completion-summary').hidden = false;
+    renderCompletion(status);
     if (!completionHandled) {
       completionHandled = true;
-      window.setTimeout(() => closeSetup(status), 450);
+      scheduleAutomaticClose(status);
     }
   } else if (phase === 'failed') $('progress-message').textContent = copy[language].failed;
 }
@@ -227,6 +368,9 @@ $('language').addEventListener('click', () => {
 });
 
 $('prepare').addEventListener('click', async () => {
+  clearAutomaticClose();
+  completionHandled = false;
+  $('completion-summary').hidden = true;
   $('prepare').disabled = true;
   $('progress-message').textContent = copy[language].starting;
   try {
@@ -251,6 +395,7 @@ $('prepare').addEventListener('click', async () => {
 });
 
 async function closeSetup(status = lastStatus) {
+  clearAutomaticClose();
   if (polling) {
     clearInterval(polling);
     polling = null;
@@ -284,6 +429,39 @@ async function closeSetup(status = lastStatus) {
 $('portable-data').addEventListener('change', () => {
   if (lastStatus) render(lastStatus);
 });
+
+for (const id of [
+  'runtime-private',
+  'runtime-system',
+  'system-runtime',
+  'manager-shortcut',
+  'companion-shortcut',
+  'launch-manager',
+]) {
+  $(id).addEventListener('change', () => renderPlan(lastStatus));
+}
+
+async function launchFromResult(kind, button) {
+  clearAutomaticClose();
+  button.disabled = true;
+  try {
+    await api('launch', { method: 'POST', body: JSON.stringify({ kind }) });
+    await refresh();
+    if (lastStatus?.state?.phase === 'complete') scheduleAutomaticClose(lastStatus);
+  } catch (error) {
+    button.disabled = false;
+    $('progress-message').textContent = `${copy[language].launchFailed} ${error.message}`;
+    if (lastStatus?.state?.phase === 'complete') scheduleAutomaticClose(lastStatus);
+  }
+}
+
+$('launch-manager-result').addEventListener('click', () =>
+  launchFromResult('manager', $('launch-manager-result')),
+);
+$('launch-companion-result').addEventListener('click', () =>
+  launchFromResult('companion', $('launch-companion-result')),
+);
+$('finish-setup').addEventListener('click', () => closeSetup());
 
 $('close-setup').addEventListener('click', async () => {
   completionHandled = true;

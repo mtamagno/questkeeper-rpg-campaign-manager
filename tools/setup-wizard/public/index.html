@@ -30,7 +30,7 @@
         <div>
           <p class="step">01</p>
           <h2 id="status-title" data-copy="statusTitle">Your device</h2>
-          <p id="device-status" class="muted">Checking…</p>
+          <p id="device-status" class="muted" data-copy="checking">Checking…</p>
         </div>
         <span id="status-badge" class="badge">…</span>
       </section>
@@ -93,15 +93,20 @@
             ></span
           ></label
         >
-        <label
-          ><input id="manager-shortcut" type="checkbox" checked /><span data-copy="managerShortcut"
-            >Create a Campaign Manager shortcut</span
+        <label class="option-with-help"
+          ><input id="manager-shortcut" type="checkbox" checked /><span
+            ><strong data-copy="managerShortcut">Create a Campaign Manager shortcut</strong
+            ><small data-copy="managerShortcutHint"
+              >Opens the private authoring studio for campaigns, sessions and publishing.</small
+            ></span
           ></label
         >
-        <label
+        <label class="option-with-help"
           ><input id="companion-shortcut" type="checkbox" checked /><span
-            data-copy="companionShortcut"
-            >Create a player Companion shortcut</span
+            ><strong data-copy="companionShortcut">Create a player Companion shortcut</strong
+            ><small data-copy="companionShortcutHint"
+              >Starts the reading site and opens it in the default browser.</small
+            ></span
           ></label
         >
         <label
@@ -119,6 +124,18 @@
         <code id="storage-path"></code>
       </aside>
 
+      <aside class="setup-plan" aria-labelledby="plan-title" aria-live="polite">
+        <strong id="plan-title" data-copy="planTitle">What will happen</strong>
+        <ul>
+          <li><span data-copy="planRuntime">Runtime</span><b id="plan-runtime"></b></li>
+          <li><span data-copy="planStorage">Campaign storage</span><b id="plan-storage"></b></li>
+          <li>
+            <span data-copy="planShortcuts">Desktop shortcuts</span><b id="plan-shortcuts"></b>
+          </li>
+          <li><span data-copy="planFirstLaunch">First launch</span><b id="plan-launch"></b></li>
+        </ul>
+      </aside>
+
       <aside class="trust">
         <strong data-copy="trustTitle">A private, verified runtime</strong>
         <p data-copy="trustBody">
@@ -131,6 +148,29 @@
         <div class="progress-track"><span id="progress"></span></div>
         <p id="progress-message" data-copy="ready">Ready to begin.</p>
         <pre id="log" tabindex="0"></pre>
+        <section id="completion-summary" class="completion-summary" hidden>
+          <div>
+            <strong data-copy="completionTitle">QuestKeeper is ready</strong>
+            <p id="completion-details"></p>
+          </div>
+          <div class="completion-actions">
+            <button id="launch-manager-result" class="quiet" type="button" data-copy="openManager">
+              Open Campaign Manager
+            </button>
+            <button
+              id="launch-companion-result"
+              class="quiet"
+              type="button"
+              data-copy="openCompanion"
+            >
+              Open Companion
+            </button>
+            <button id="finish-setup" class="primary" type="button" data-copy="finishSetup">
+              Finish and close
+            </button>
+          </div>
+          <small id="close-countdown"></small>
+        </section>
       </section>
 
       <footer>

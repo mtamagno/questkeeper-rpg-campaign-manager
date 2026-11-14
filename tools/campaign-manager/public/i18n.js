@@ -147,6 +147,11 @@
     'All your adventures': 'Tutte le tue avventure',
     'Choose your table': 'Scegli il tuo tavolo',
     'Your campaign library': 'La tua biblioteca di campagne',
+    'Campaign form sections': 'Sezioni del modulo campagna',
+    'Jump to': 'Vai a',
+    'Unsaved changes': 'Modifiche non salvate',
+    'Discard unsaved changes? The information entered in this form will be lost.':
+      'Vuoi annullare le modifiche non salvate? Le informazioni inserite in questo modulo andranno perse.',
     'Open a chronicle or manage it without losing your place in the archive.':
       'Apri una cronaca o gestiscila senza perdere il tuo posto nell’archivio.',
     'New campaign': 'Nuova campagna',
