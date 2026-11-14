@@ -19,6 +19,9 @@ const storyChapter = read('src/app/chronicle/pages/story-chapter/story-chapter.c
 const sessionSummary = read(
   'src/app/chronicle/components/session-summary/session-summary.component.html',
 );
+const sessionSummaryStyles = read(
+  'src/app/chronicle/components/session-summary/session-summary.component.scss',
+);
 const tableMoments = read('src/app/chronicle/pages/table-moments/table-moments.component.html');
 const tableMomentsCode = read('src/app/chronicle/pages/table-moments/table-moments.component.ts');
 const catalog = JSON.parse(read('src/app/guild/i18n/ui.json'));
@@ -50,6 +53,16 @@ for (const [name, markup] of [
   assert.match(markup, /uiText\.text\('chronicle\./, `${name} must use the shared UI catalog.`);
 }
 assert.match(sessionSummary, /entryLabel\(\)/);
+assert.match(
+  sessionSummaryStyles,
+  /&__events-title[\s\S]*?color: var\(--narrative-accent/,
+  'Key-event headings must follow the active narrative theme.',
+);
+assert.match(
+  sessionSummaryStyles,
+  /&__events-list[\s\S]*?li \{[\s\S]*?color: var\(--narrative-text/,
+  'Key-event copy must remain readable on light and dark narrative surfaces.',
+);
 assert.match(tableMomentsCode, /chronicle\.tableMoments\.carouselLabel/);
 assert.match(baselineCompendium, /uiText\.text\('compendium\.title'/);
 assert.match(baselineCompendium, /class="baseline__index"/);
