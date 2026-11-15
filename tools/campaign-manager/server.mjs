@@ -1461,6 +1461,20 @@ async function routeApi(request, response, url) {
     sendJson(response, 201, await saveImage(PROJECT_ROOT, campaignId, await readBody(request)));
     return;
   }
+  if (request.method === 'PUT' && parts[3] === 'relationships' && parts.length === 5) {
+    const relationshipCollections = {
+      party: 'partyRelationships',
+      npc: 'npcRelationships',
+    };
+    const collection = relationshipCollections[parts[4]];
+    if (!collection) throw new Error('Unsupported relationship collection.');
+    sendJson(
+      response,
+      200,
+      await saveRelationshipSet(PROJECT_ROOT, campaignId, collection, await readBody(request)),
+    );
+    return;
+  }
   const type = parts[3];
   if (request.method === 'POST' && parts.length === 4) {
     sendJson(

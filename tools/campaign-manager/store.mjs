@@ -599,6 +599,22 @@ export async function saveRelationshipSet(projectRoot, campaignId, type, entries
     throw new Error('Unsupported relationship collection.');
   }
   if (!Array.isArray(entries)) throw new Error('Relationship collection must be a list.');
+  const seen = new Set();
+  for (const [index, entry] of entries.entries()) {
+    const sourceId = String(entry?.sourceId ?? '').trim();
+    const targetId = String(entry?.targetId ?? '').trim();
+    if (!sourceId || !targetId) {
+      throw new Error(`Relationship ${index + 1} needs both a source and a target.`);
+    }
+    if (sourceId === targetId) {
+      throw new Error(`Relationship ${index + 1} cannot point an entity to itself.`);
+    }
+    const key = `${sourceId}\u0000${targetId}`;
+    if (seen.has(key)) {
+      throw new Error(`Duplicate relationship: ${sourceId} -> ${targetId}.`);
+    }
+    seen.add(key);
+  }
   const fileName =
     type === 'partyRelationships' ? 'party-relationships.json' : 'npc-relationships.json';
   return withCampaignWrite(campaignId, async () => {

@@ -1288,6 +1288,63 @@ button:disabled {
   border-radius: 12px;
   background: linear-gradient(135deg, rgba(214, 182, 111, 0.07), rgba(71, 104, 90, 0.08));
 }
+.ai-compose > summary {
+  display: flex;
+  gap: 0.4rem 1rem;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  list-style-position: outside;
+}
+.ai-compose > summary span {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 400;
+}
+.optional-workspace {
+  display: grid;
+  gap: 0.8rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--line);
+}
+.optional-workspace > p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+.relationship-collection + .relationship-collection {
+  margin-top: 2.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--line);
+}
+.relationship-card h3 {
+  overflow-wrap: anywhere;
+}
+.workflow-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.65rem;
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+}
+.workflow-strip li {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+.workflow-strip strong {
+  color: var(--gold-bright);
+  font-size: 0.82rem;
+}
+.workflow-strip span {
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
 .notebook-editor {
   overflow: hidden;
   border: 1px solid rgba(214, 182, 111, 0.32);
@@ -2281,6 +2338,13 @@ html[data-manager-theme='contrast'] button:disabled {
 }
 
 @media (max-width: 720px) {
+  .workflow-strip {
+    grid-template-columns: 1fr;
+  }
+  .ai-compose > summary {
+    align-items: flex-start;
+    flex-direction: column;
+  }
   .palette-studio__roles,
   .palette-preview {
     grid-template-columns: 1fr;

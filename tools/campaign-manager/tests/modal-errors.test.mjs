@@ -31,13 +31,10 @@ test('client validation is keyboard actionable and duplicate submits are ignored
   assert.match(app, /clearDialogError\(\)/);
 });
 
-test('long campaign forms expose section navigation and protect unsaved drafts', () => {
+test('long Manager forms expose section navigation and protect unsaved drafts', () => {
   assert.match(html, /id="dialog-draft-state"/);
-  assert.match(app, /function enhanceCampaignEditorNavigation\(\)/);
-  assert.match(
-    app,
-    /navigation\.setAttribute\('aria-label', translate\('Campaign form sections'\)\)/,
-  );
+  assert.match(app, /function enhanceDialogSectionNavigation\(\)/);
+  assert.match(app, /navigation\.setAttribute\('aria-label', translate\('Form sections'\)\)/);
   assert.match(app, /heading\.scrollIntoView/);
   assert.match(app, /function closeEditorIfSafe\(\)/);
   assert.match(app, /Discard unsaved changes\?/);
@@ -45,6 +42,6 @@ test('long campaign forms expose section navigation and protect unsaved drafts',
   assert.match(styles, /\.dialog-section-nav/);
   assert.match(styles, /position: sticky/);
   assert.match(styles, /\.dialog-draft-state/);
-  assert.match(i18n, /'Campaign form sections': 'Sezioni del modulo campagna'/);
+  assert.match(i18n, /'Form sections': 'Sezioni del modulo'/);
   assert.match(i18n, /'Unsaved changes': 'Modifiche non salvate'/);
 });

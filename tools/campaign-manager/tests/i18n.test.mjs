@@ -17,4 +17,6 @@ test('loads the persistent bilingual interface before the manager application', 
   assert.match(catalog, /Configurazione guidata/);
   assert.match(catalog, /Estrai bozza modificabile/);
   assert.match(catalog, /Crea e pubblica ora/);
+  assert.match(catalog, /Editor delle relazioni/);
+  assert.match(catalog, /Importazione AI opzionale/);
 });

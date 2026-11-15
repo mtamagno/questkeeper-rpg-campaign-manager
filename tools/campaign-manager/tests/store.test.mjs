@@ -18,6 +18,7 @@ import {
   migrateCampaignLocaleRegistry,
   previewCampaignLocaleMigration,
   saveEntity,
+  saveRelationshipSet,
   updateCampaign,
 } from '../store.mjs';
 
@@ -57,6 +58,35 @@ test('creates a complete campaign and reports its counts', async (t) => {
     sessions: 0,
     maps: 0,
   });
+});
+
+test('saves relationship collections and rejects ambiguous edges', async (t) => {
+  const root = await fixture(t);
+  await createCampaign(root, campaignInput);
+  const relationships = [
+    {
+      sourceId: 'aria',
+      targetId: 'mira',
+      type: 'friendship',
+      description: { en: 'Trusted companions.' },
+      isBidirectional: true,
+    },
+  ];
+  await saveRelationshipSet(root, campaignInput.id, 'partyRelationships', relationships);
+  assert.deepEqual((await getCampaign(root, campaignInput.id)).partyRelationships, relationships);
+  await assert.rejects(
+    saveRelationshipSet(root, campaignInput.id, 'partyRelationships', [
+      relationships[0],
+      { ...relationships[0] },
+    ]),
+    /Duplicate relationship/,
+  );
+  await assert.rejects(
+    saveRelationshipSet(root, campaignInput.id, 'npcRelationships', [
+      { ...relationships[0], targetId: 'aria' },
+    ]),
+    /cannot point an entity to itself/,
+  );
 });
 
 test('previews and applies a lossless, backed-up legacy locale migration', async (t) => {

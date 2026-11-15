@@ -102,7 +102,7 @@ own sake. Existing patterns are retained when they already satisfy the rubric.
 Shared fixes ship in both repositories in the same delivery cycle; campaign-only
 surfaces receive local adaptations and feed reusable discoveries upstream.
 
-## Progress through 14 November
+## Progress through 15 November
 
 - **6 November:** shared tab, touch-target and reduced-motion contracts plus
   import-graph-based first-view budgets are implemented.
@@ -132,6 +132,11 @@ surfaces receive local adaptations and feed reusable discoveries upstream.
   shutdown. The shared Campaign Library keeps edit context while the campaign
   form gains keyboard section navigation, visible draft state and consistent
   loss/error recovery. The clean and 1.1.4 migration paths remain covered.
+- **15 November:** all long Manager entity forms use bounded task sections and
+  shared keyboard navigation; AI import and notes processing are optional,
+  collapsed accelerators. Party and NPC relationships gain persistent authoring
+  for one type, multiple directional feelings, history and party-visible
+  evidence, while translation and compendium workspaces expose review gates.
 
 The paired implementation and regression boundary are recorded in the
 [6-10 November quality catch-up](reviews/2026-11-06-10-quality-catchup.md).
@@ -146,6 +151,10 @@ records that completion and the first enforceable #142 zero-inline-copy slice.
 The [14 November setup and Manager closeout](reviews/2026-11-14-setup-manager-closeout.md)
 records the public-only installer boundary, the paired Manager changes and the
 choice/consequence/recovery constraint inherited by the 15 November editors.
+The [15 November Manager authoring closeout](reviews/2026-11-15-manager-authoring-closeout.md)
+records the shared editor journey, relationship integrity boundary and the
+manual-record-first rule inherited by the 16 November storage and publishing
+pass.
 
 ## Exit gate on 17 November
 

@@ -685,6 +685,7 @@ function renderCompendia() {
   content.innerHTML = `
     <div class="compendium-workspace">
       <section class="project-panel compendium-hero"><div><span class="eyebrow">Private rules & table notes</span><h2>Your local compendia</h2><p>Create or import versioned packages without changing bundled rules. Local material stays on this device and sharing exports exclude it by default.</p></div><div class="action-row"><button class="primary-button" data-compendium-action="new">New package</button><button class="secondary-button" data-compendium-action="choose-import">Preview import</button></div></section>
+      <ol class="workflow-strip" aria-label="Compendium workflow"><li><strong>1 · Create or preview</strong><span>Start manually or inspect a package before writing.</span></li><li><strong>2 · Verify rights</strong><span>Review source, license and attribution.</span></li><li><strong>3 · Resolve</strong><span>Fix conflicts and invalid references before import.</span></li></ol>
       ${pending ? `<section class="project-panel compendium-import-review"><span class="eyebrow">Import preview · nothing written yet</span><h2>${escapeHtml(pending.preview.namespace || 'Invalid package')}</h2><dl class="compendium-preview-metrics"><div><dt>Entries</dt><dd>${pending.preview.entries}</dd></div><div><dt>Version</dt><dd>${escapeHtml(pending.preview.incomingVersion || '—')}</dd></div><div><dt>Conflicts</dt><dd>${pending.preview.conflicts.length}</dd></div><div><dt>Invalid links</dt><dd>${pending.preview.invalidLinks.length}</dd></div></dl>${pending.preview.errors.length ? `<div class="dialog__error"><strong>Validation errors</strong><ul>${pending.preview.errors.map((error) => `<li>${escapeHtml(error)}</li>`).join('')}</ul></div>` : ''}${pending.preview.invalidLinks.length ? `<div class="dialog__error"><strong>References to review</strong><ul>${pending.preview.invalidLinks.map((item) => `<li><code>${escapeHtml(item.entry)}</code> → <code>${escapeHtml(item.reference)}</code> (${escapeHtml(item.reason)})</li>`).join('')}</ul></div>` : ''}${pending.preview.overwriteRequired ? '<label class="consent-check"><input type="checkbox" data-compendium-overwrite /> Replace the installed namespace only after this preview.</label>' : ''}<div class="action-row"><button class="primary-button" data-compendium-action="confirm-import" ${pending.preview.valid ? '' : 'disabled'}>Import reviewed package</button><button class="secondary-button" data-compendium-action="cancel-import">Cancel</button></div></section>` : ''}
       <section class="project-panel"><div class="compendium-search-heading"><div><span class="eyebrow">Installed packages</span><h2>${data.packages.length} local package${data.packages.length === 1 ? '' : 's'}</h2></div><label class="search compendium-search"><span aria-hidden="true">⌕</span><input data-compendium-search type="search" value="${escapeHtml(state.compendiumSearch)}" placeholder="Search names, types or qualified IDs" /></label></div>${data.packages.length ? `<div class="compendium-package-grid">${data.packages.map((pkg) => `<article class="compendium-package-card"><div><span class="status-pill">${escapeHtml(pkg.visibility)}</span><span class="compendium-package-card__version">v${escapeHtml(pkg.version)}</span><h3>${escapeHtml(pkg.namespace)}</h3><p>${escapeHtml(pkg.source.name)} · ${escapeHtml(pkg.ruleset.edition)}</p></div><dl><div><dt>Entries</dt><dd>${pkg.entries}</dd></div><div><dt>Languages</dt><dd>${pkg.locales.map(escapeHtml).join(', ')}</dd></div><div><dt>License</dt><dd>${escapeHtml(pkg.license)}</dd></div></dl><footer><button class="secondary-button" data-compendium-action="edit" data-namespace="${escapeHtml(pkg.namespace)}">Edit</button><button class="secondary-button" data-compendium-action="export" data-namespace="${escapeHtml(pkg.namespace)}" data-private="${pkg.visibility === 'private'}">Export</button></footer></article>`).join('')}</div>` : '<div class="library-empty"><strong>No local packages yet</strong><p>Create personal rules or preview a package before importing it.</p></div>'}</section>
       <section class="project-panel"><span class="eyebrow">Resolved search</span><h2>${data.entries.length} matching entr${data.entries.length === 1 ? 'y' : 'ies'}</h2>${
@@ -761,6 +762,10 @@ function renderCampaign() {
     ['npcs', `NPCs · ${data.npcs.length}`],
     ['sessions', `Sessions · ${data.sessions.length}`],
     ['maps', `Locations · ${data.maps.length}`],
+    [
+      'relationships',
+      `Relationships · ${(data.partyRelationships?.length ?? 0) + (data.npcRelationships?.length ?? 0)}`,
+    ],
     ['translations', 'Translations'],
   ];
   content.innerHTML = `
@@ -784,6 +789,8 @@ function renderTab() {
       return renderEntities('sessions', 'Session chronicles', 'Add session');
     case 'maps':
       return renderEntities('maps', 'Locations and maps', 'Add location');
+    case 'relationships':
+      return renderRelationships();
     case 'translations':
       return renderEntityTranslations();
     default:
@@ -837,6 +844,7 @@ function renderEntityTranslations() {
     ? `<label class="field"><span>Target under review</span><select data-translation-review-target>${draftTargets.map((language) => `<option value="${escapeHtml(language)}" ${language === target ? 'selected' : ''}>${escapeHtml(languageName(language))} · ${escapeHtml(drafts[language].status)}</option>`).join('')}</select></label>`
     : '';
   return `<section class="section-heading"><div><span class="eyebrow">Reviewed localization</span><h2>Entity translations</h2><p>Scan one field, one entity, one type or a selected batch. Missing and stale fields are selected by default.</p></div></section>
+    <ol class="workflow-strip" aria-label="Translation workflow"><li><strong>1 · Scan</strong><span>Choose source, targets and scope.</span></li><li><strong>2 · Review</strong><span>Edit every draft; AI is optional.</span></li><li><strong>3 · Apply</strong><span>Publish only explicitly reviewed targets.</span></li></ol>
     <section class="project-panel translation-batch" data-entity-translations>
       <div class="form-grid">
         <label class="field"><span>Source language</span><select data-translation-source>${languages.map((language) => `<option value="${escapeHtml(language)}" ${language === source ? 'selected' : ''}>${escapeHtml(languageName(language))}</option>`).join('')}</select></label>
@@ -1017,6 +1025,58 @@ function renderEntities(type, title, addLabel) {
             .join('')}</div>`
         : `<div class="empty">Nothing here yet. Choose “${addLabel}” to begin.</div>`
     }`;
+}
+
+const RELATIONSHIP_TYPES = [
+  'friendship',
+  'rivalry',
+  'alliance',
+  'romance',
+  'family',
+  'mentor',
+  'enemy',
+  'neutral',
+  'distrust',
+  'respect',
+];
+
+function relationshipEntityChoices(kind = 'npc') {
+  const characters = (state.campaign?.characters ?? []).map((item) => [
+    item.id,
+    `Character · ${localized(item.name)}`,
+  ]);
+  if (kind === 'party') return characters;
+  return [
+    ...characters,
+    ...(state.campaign?.npcs ?? []).map((item) => [item.id, `NPC · ${localized(item.name)}`]),
+  ];
+}
+
+function relationshipEntityName(id) {
+  const entity = [...(state.campaign?.characters ?? []), ...(state.campaign?.npcs ?? [])].find(
+    (item) => item.id === id,
+  );
+  return localized(entity?.name) || id;
+}
+
+function renderRelationshipCollection(kind, title, description) {
+  const property = kind === 'party' ? 'partyRelationships' : 'npcRelationships';
+  const items = state.campaign?.[property] ?? [];
+  return `<section class="relationship-collection"><div class="section-heading"><div><span class="eyebrow">${kind === 'party' ? 'Party bonds' : 'Known network'}</span><h2>${escapeHtml(title)}</h2><p>${escapeHtml(description)}</p></div><button class="primary-button" data-action="add-relationship" data-kind="${kind}">Add relationship</button></div>
+    ${
+      items.length
+        ? `<div class="card-grid">${items
+            .map(
+              (item, index) =>
+                `<article class="card relationship-card"><div class="card__top"><span class="card__avatar" aria-hidden="true">→</span><div class="card__menu"><button data-action="edit-relationship" data-kind="${kind}" data-index="${index}">Edit</button><button data-action="delete-relationship" data-kind="${kind}" data-index="${index}">Remove</button></div></div><h3>${escapeHtml(relationshipEntityName(item.sourceId))} → ${escapeHtml(relationshipEntityName(item.targetId))}</h3><p>${escapeHtml(localized(item.description)).slice(0, 180)}</p><div class="card__meta"><span class="tag">${escapeHtml(item.type)}</span>${item.isBidirectional ? '<span class="tag">Bidirectional</span>' : ''}${item.partyPerception?.certainty ? `<span class="tag">${escapeHtml(item.partyPerception.certainty)}</span>` : ''}</div></article>`,
+            )
+            .join('')}</div>`
+        : '<div class="empty">No relationships in this collection yet.</div>'
+    }</section>`;
+}
+
+function renderRelationships() {
+  return `<section class="section-heading"><div><span class="eyebrow">Relationship editor</span><h2>Connections and changing feelings</h2><p>Record one relationship type, any number of directional feelings, and only evidence the party can know.</p></div></section>${renderRelationshipCollection('party', 'Party relationships', 'Bonds between player characters, including their current feelings and shared history.')}${renderRelationshipCollection('npc', 'NPC relationships', 'Party-to-NPC and perceived NPC-to-NPC connections. This is never hidden GM truth.')}`;
 }
 
 function field(name, label, value = '', options = {}) {
@@ -1811,8 +1871,7 @@ function storyHighlightsEditor(item = {}, languages = campaignLanguages()) {
 }
 
 function entityAiImportPanel(type, languages) {
-  const label = type === 'characters' ? 'player character' : 'NPC';
-  return `<div class="ai-compose entity-ai-import field--wide"><div><strong>Import this ${label} with AI</strong><small>Use photos or screenshots of a sheet, or a public/shared Roll20 print-view URL. Every extracted field stays editable.</small></div><div class="ai-source-grid">${engineSelect('entityEngine', 'Extraction model', 'extraction', 'Only configured models with structured output and vision appear here. Public URL access also requires web capability.')}<label class="field"><span>Draft language</span><select name="entityLanguage">${languages.map((language) => `<option value="${escapeHtml(language)}">${escapeHtml(languageName(language))} (${escapeHtml(language)})</option>`).join('')}</select></label><label class="field field--wide"><span>Sheet photos or screenshots</span><input name="aiSourceImages" type="file" accept="image/png,image/jpeg,image/webp" multiple /><small>Up to four images. Private/authenticated Roll20 sheets should be imported this way.</small></label><label class="field field--wide"><span>Public Roll20 print view or source URL</span><input name="aiSourceUrl" type="url" placeholder="https://app.roll20.net/…" /><small>Optional. Signed-in pages cannot be read remotely; use screenshots instead.</small></label></div><label class="consent-check"><input name="entityRemoteConsent" type="checkbox" /> I consent to sending these sources to the selected engine when it is labelled <strong>Remote</strong>.</label><div class="action-row"><button class="primary-button" type="button" data-ai-entity="${type}">Extract editable draft</button></div><div class="ai-review" data-ai-entity-review hidden></div></div>`;
+  return `<details class="ai-compose entity-ai-import field--wide"><summary><strong>Optional AI import</strong><span>Photos, screenshots or a shared print view</span></summary><div class="optional-workspace"><p>Use AI only when it saves time. The manual fields remain the source of truth and every extracted value stays editable.</p><div class="ai-source-grid">${engineSelect('entityEngine', 'Extraction model', 'extraction', 'Only configured models with structured output and vision appear here. Public URL access also requires web capability.')}<label class="field"><span>Draft language</span><select name="entityLanguage">${languages.map((language) => `<option value="${escapeHtml(language)}">${escapeHtml(languageName(language))} (${escapeHtml(language)})</option>`).join('')}</select></label><label class="field field--wide"><span>Sheet photos or screenshots</span><input name="aiSourceImages" type="file" accept="image/png,image/jpeg,image/webp" multiple /><small>Up to four images. Private/authenticated Roll20 sheets should be imported this way.</small></label><label class="field field--wide"><span>Public Roll20 print view or source URL</span><input name="aiSourceUrl" type="url" placeholder="https://app.roll20.net/…" /><small>Optional. Signed-in pages cannot be read remotely; use screenshots instead.</small></label></div><label class="consent-check"><input name="entityRemoteConsent" type="checkbox" /> I consent to sending these sources to the selected engine when it is labelled <strong>Remote</strong>.</label><div class="action-row"><button class="primary-button" type="button" data-ai-entity="${type}">Extract editable draft</button></div><div class="ai-review" data-ai-entity-review hidden></div></div></details>`;
 }
 
 function openDialog({ title, eyebrow, html, editor }) {
@@ -1823,22 +1882,22 @@ function openDialog({ title, eyebrow, html, editor }) {
   state.editor = editor;
   state.editorDirty = false;
   syncEditorDraftState();
-  if (editor.kind === 'campaign') enhanceCampaignEditorNavigation();
+  enhanceDialogSectionNavigation();
   dialog.showModal();
   fields.querySelector('input, textarea, select')?.focus();
 }
 
-function enhanceCampaignEditorNavigation() {
+function enhanceDialogSectionNavigation() {
   const sections = [...fields.querySelectorAll('.form-section')];
   if (sections.length < 2) return;
   const navigation = document.createElement('nav');
   navigation.className = 'dialog-section-nav';
-  navigation.setAttribute('aria-label', translate('Campaign form sections'));
+  navigation.setAttribute('aria-label', translate('Form sections'));
   const label = document.createElement('strong');
   label.textContent = translate('Jump to');
   navigation.append(label);
   for (const [index, heading] of sections.entries()) {
-    heading.id = `campaign-form-section-${index + 1}`;
+    heading.id = `dialog-form-section-${index + 1}`;
     heading.tabIndex = -1;
     const link = document.createElement('a');
     link.href = `#${heading.id}`;
@@ -2240,6 +2299,141 @@ function campaignContainsLocalizedContent(value, language, visited = new Set()) 
   );
 }
 
+function relationshipLines(item, kind, language) {
+  if (kind === 'perspectives') {
+    return (item.perspectives ?? []).flatMap((perspective) =>
+      (perspective.feelings ?? []).map((feeling) =>
+        [
+          perspective.entityId,
+          localized(feeling.label, language),
+          feeling.intensity ?? 1,
+          localized(feeling.reason, language),
+        ].join(' | '),
+      ),
+    );
+  }
+  if (kind === 'events') {
+    return (item.sharedEvents ?? []).map((entry) =>
+      [
+        entry.sessionId,
+        localized(entry.title, language),
+        localized(entry.description, language),
+      ].join(' | '),
+    );
+  }
+  if (kind === 'quotes') {
+    return (item.quotes ?? []).map((entry) =>
+      [entry.sessionId, entry.speakerId, localized(entry.text, language)].join(' | '),
+    );
+  }
+  return (item.evolution ?? []).map((entry) =>
+    [entry.sessionId, entry.fromType ?? '', entry.toType, localized(entry.note, language)].join(
+      ' | ',
+    ),
+  );
+}
+
+function relationshipForm(kind, item = {}) {
+  const languages = campaignLanguages();
+  const choices = relationshipEntityChoices(kind);
+  return [
+    section('People and relationship'),
+    field('relationshipSource', 'From', item.sourceId ?? choices[0]?.[0] ?? '', {
+      type: 'select',
+      values: choices,
+    }),
+    field('relationshipTarget', 'To', item.targetId ?? choices[1]?.[0] ?? choices[0]?.[0] ?? '', {
+      type: 'select',
+      values: choices,
+    }),
+    field('relationshipType', 'Relationship type', item.type ?? 'neutral', {
+      type: 'select',
+      values: RELATIONSHIP_TYPES.map((value) => [
+        value,
+        value.charAt(0).toUpperCase() + value.slice(1),
+      ]),
+    }),
+    `<label class="consent-check field--wide"><input name="relationshipBidirectional" type="checkbox" ${item.isBidirectional ? 'checked' : ''} /> This relationship is mutual or shared.</label>`,
+    section('Public meaning'),
+    ...localizedFields('relationshipDescription', 'Description', item.description, languages, {
+      type: 'textarea',
+      required: true,
+    }),
+    section('Directional feelings'),
+    `<p class="field field--wide form-hint">One feeling per line: entity ID | feeling | intensity 1-5 | evidence-based reason. Keep the same line order in every language.</p>`,
+    ...languages.map((language) =>
+      field(
+        `perspectives__${language}`,
+        `Feelings · ${languageName(language)} (${language})`,
+        relationshipLines(item, 'perspectives', language).join('\n'),
+        { type: 'textarea', wide: true },
+      ),
+    ),
+    section('Shared history'),
+    ...languages.flatMap((language) => [
+      field(
+        `relationshipEvents__${language}`,
+        `Shared events · ${languageName(language)} (${language})`,
+        relationshipLines(item, 'events', language).join('\n'),
+        { type: 'textarea', hint: 'One per line: session ID | title | description.', wide: true },
+      ),
+      field(
+        `relationshipQuotes__${language}`,
+        `Quotes · ${languageName(language)} (${language})`,
+        relationshipLines(item, 'quotes', language).join('\n'),
+        { type: 'textarea', hint: 'One per line: session ID | speaker ID | quote.', wide: true },
+      ),
+      field(
+        `relationshipEvolution__${language}`,
+        `Evolution · ${languageName(language)} (${language})`,
+        relationshipLines(item, 'evolution', language).join('\n'),
+        {
+          type: 'textarea',
+          hint: 'One per line: session ID | previous type (optional) | new type | note.',
+          wide: true,
+        },
+      ),
+    ]),
+    section('Party knowledge boundary'),
+    field('perceptionCertainty', 'How the party knows', item.partyPerception?.certainty ?? '', {
+      type: 'select',
+      values: [
+        ['', 'Not needed / direct participant bond'],
+        ['observed', 'Observed'],
+        ['reported', 'Reported'],
+        ['inferred', 'Inferred'],
+      ],
+      hint:
+        kind === 'npc'
+          ? 'Required for NPC-to-NPC claims. Record only what the party can reasonably know.'
+          : 'Optional for party relationships.',
+    }),
+    ...localizedFields(
+      'perceptionBasis',
+      'Evidence available to the party',
+      item.partyPerception?.basis,
+      languages,
+      { type: 'textarea', wide: true },
+    ),
+  ].join('');
+}
+
+function openRelationshipEditor(kind, index) {
+  const property = kind === 'party' ? 'partyRelationships' : 'npcRelationships';
+  const item = Number.isInteger(index) ? state.campaign?.[property]?.[index] : undefined;
+  openDialog({
+    title: `${item ? 'Edit' : 'New'} relationship`,
+    eyebrow: kind === 'party' ? 'Party relationship' : 'NPC relationship',
+    html: relationshipForm(kind, item),
+    editor: {
+      kind: 'relationship',
+      relationshipKind: kind,
+      relationshipIndex: index,
+      original: item,
+    },
+  });
+}
+
 function entityForm(type, item = {}) {
   const languages = campaignLanguages();
   const common = state.advancedMode
@@ -2252,7 +2446,7 @@ function entityForm(type, item = {}) {
     const presentationFields = activePresentationFields();
     return [
       ...common,
-      entityAiImportPanel(type, languages),
+      section('Identity and presentation'),
       field('name', 'Name', item.name, { required: true }),
       field('playerName', 'Player', item.playerName),
       ...presentationFields.flatMap((definition) =>
@@ -2268,6 +2462,8 @@ function entityForm(type, item = {}) {
         min: 1,
         hint: 'Optional. Used on the profile and as an artwork proportion reference.',
       }),
+      entityAiImportPanel(type, languages),
+      section('Character sheet'),
       field('level', 'Level', item.sheet?.level ?? 1, { type: 'number', min: 1 }),
       ...identityFields.map((definition) => rulesetIdentityField(definition, item.sheet)),
       field('alignment', 'Alignment / outlook', item.sheet?.alignment),
@@ -2314,6 +2510,7 @@ function entityForm(type, item = {}) {
         type: 'textarea',
         hint: 'One per line.',
       }),
+      section('Equipment and resources'),
       field('inventory', 'Inventory', inventoryEditorValue(item.sheet), {
         type: 'textarea',
         wide: true,
@@ -2333,6 +2530,7 @@ function entityForm(type, item = {}) {
         type: 'textarea',
         hint: 'One per line.',
       }),
+      section('Artwork and access'),
       field('password', 'Spoiler password', item.password ?? 'cambiami', {
         hint: 'Discourages casual spoilers; this is not encryption.',
       }),
@@ -2389,7 +2587,7 @@ function entityForm(type, item = {}) {
   if (type === 'npcs') {
     return [
       ...common,
-      entityAiImportPanel(type, languages),
+      section('Identity and role'),
       field('name', 'Name', item.name, { required: true }),
       field('title', 'Title', item.title),
       field('category', 'Group / location', item.category),
@@ -2402,6 +2600,7 @@ function entityForm(type, item = {}) {
         ],
       }),
       field('image', 'Profile image', '', { type: 'file', wide: true }),
+      entityAiImportPanel(type, languages),
       section('Profile'),
       ...localizedFields('description', 'Description', item.profile?.description, languages, {
         type: 'textarea',
@@ -2420,6 +2619,7 @@ function entityForm(type, item = {}) {
   if (type === 'sessions') {
     return [
       ...common,
+      section('Session details'),
       field(
         'sessionNumber',
         'Session number',
@@ -2427,7 +2627,8 @@ function entityForm(type, item = {}) {
         { type: 'number', min: 1 },
       ),
       field('date', 'Date', item.date ?? new Date().toISOString().slice(0, 10), { type: 'date' }),
-      section('Raw notes · private working material'),
+      section('Optional notes processing'),
+      `<details class="ai-compose session-ai-workspace field--wide"><summary><strong>Turn private notes into a draft</strong><span>Manual, local AI or an explicitly selected remote model</span></summary><div class="optional-workspace">`,
       field('rawNotes', 'Paste or write the session notes', '', {
         type: 'textarea',
         wide: true,
@@ -2447,7 +2648,8 @@ function entityForm(type, item = {}) {
         },
       ),
       `<div class="ai-compose field--wide"><div><strong>Turn notes into a reviewable draft</strong><small>Choose the engine for each job. Nothing is saved until you review and choose Save.</small></div><div class="ai-engine-grid">${engineSelect('proseEngine', 'Prose writer', 'prose', 'Turns raw notes into the editable chronicle.')}${engineSelect('imagePromptEngine', 'Visual prompt writer', 'imagePrompt', 'Plans what to illustrate and where it belongs.')}${engineSelect('imageEngine', 'Image renderer', 'image', 'Renders the approved visual prompts.')}</div><div class="action-row"><button class="secondary-button" type="button" data-ai-notes="text">Process notes</button><button class="primary-button" type="button" data-ai-notes="images">Process notes with images</button></div><label class="consent-check"><input name="remoteConsent" type="checkbox" /> I consent to sending these notes to any selected engine labelled <strong>Remote</strong>. Local-only tasks do not require this.</label><div class="ai-review" data-ai-review hidden></div></div>`,
-      section('Review and edit the draft'),
+      `</div></details>`,
+      section('Review and edit the chronicle'),
       section('Narrative presentation'),
       moodField(
         'sessionMood',
@@ -2496,6 +2698,7 @@ function entityForm(type, item = {}) {
   }
   return [
     ...common,
+    section('Location identity'),
     ...localizedFields('name', 'Name', item.name, languages, { required: true }),
     ...localizedFields('region', 'Region', item.region, languages),
     field('status', 'Exploration', item.explorationStatus ?? 'unexplored', {
@@ -2506,6 +2709,7 @@ function entityForm(type, item = {}) {
         ['completed', 'Completed'],
       ],
     }),
+    section('Artwork and description'),
     field('image', 'Image', '', { type: 'file' }),
     ...localizedFields('description', 'Description', item.description, languages, {
       type: 'textarea',
@@ -2868,6 +3072,89 @@ function buildStoryHighlights() {
     });
   }
   return result;
+}
+
+function relationshipRows(form, prefix, languages) {
+  return Object.fromEntries(
+    languages.map((language) => [
+      language,
+      String(form.get(`${prefix}__${language}`) ?? '')
+        .split(/\r?\n/)
+        .map((line) => line.split('|').map((part) => part.trim()))
+        .filter((parts) => parts.some(Boolean)),
+    ]),
+  );
+}
+
+function localizedRelationshipPart(rows, languages, index, part) {
+  return Object.fromEntries(
+    languages.map((language) => [language, rows[language]?.[index]?.[part] ?? '']),
+  );
+}
+
+function buildRelationship(form, original = {}, kind = 'party') {
+  const languages = campaignLanguages();
+  const sourceId = String(form.get('relationshipSource') ?? '').trim();
+  const targetId = String(form.get('relationshipTarget') ?? '').trim();
+  if (!sourceId || !targetId) throw new Error('Choose both people in the relationship.');
+  if (sourceId === targetId) throw new Error('A relationship cannot point a person to themselves.');
+  const perspectiveRows = relationshipRows(form, 'perspectives', languages);
+  const eventRows = relationshipRows(form, 'relationshipEvents', languages);
+  const quoteRows = relationshipRows(form, 'relationshipQuotes', languages);
+  const evolutionRows = relationshipRows(form, 'relationshipEvolution', languages);
+  const primary = state.campaign?.manifestEntry?.defaultLanguage ?? languages[0];
+  const perspectives = [];
+  for (const [index, row] of (perspectiveRows[primary] ?? []).entries()) {
+    const entityId = row[0];
+    const intensity = Math.min(5, Math.max(1, Number.parseInt(row[2], 10) || 1));
+    let perspective = perspectives.find((entry) => entry.entityId === entityId);
+    if (!perspective) {
+      perspective = { entityId, feelings: [] };
+      perspectives.push(perspective);
+    }
+    perspective.feelings.push({
+      label: localizedRelationshipPart(perspectiveRows, languages, index, 1),
+      intensity,
+      reason: localizedRelationshipPart(perspectiveRows, languages, index, 3),
+    });
+  }
+  const sharedEvents = (eventRows[primary] ?? []).map((row, index) => ({
+    sessionId: row[0],
+    title: localizedRelationshipPart(eventRows, languages, index, 1),
+    description: localizedRelationshipPart(eventRows, languages, index, 2),
+  }));
+  const quotes = (quoteRows[primary] ?? []).map((row, index) => ({
+    sessionId: row[0],
+    speakerId: row[1],
+    text: localizedRelationshipPart(quoteRows, languages, index, 2),
+  }));
+  const evolution = (evolutionRows[primary] ?? []).map((row, index) => ({
+    sessionId: row[0],
+    ...(row[1] ? { fromType: row[1] } : {}),
+    toType: row[2] || form.get('relationshipType'),
+    note: localizedRelationshipPart(evolutionRows, languages, index, 3),
+  }));
+  const certainty = String(form.get('perceptionCertainty') ?? '');
+  const basis = localizedFormValue(form, 'perceptionBasis', '', languages);
+  const npcIds = new Set((state.campaign?.npcs ?? []).map((item) => item.id));
+  if (kind === 'npc' && npcIds.has(sourceId) && npcIds.has(targetId) && !certainty) {
+    throw new Error(
+      'An NPC-to-NPC relationship needs observed, reported or inferred evidence available to the party.',
+    );
+  }
+  return {
+    ...original,
+    sourceId,
+    targetId,
+    type: String(form.get('relationshipType') ?? 'neutral'),
+    description: localizedFormValue(form, 'relationshipDescription', '', languages),
+    isBidirectional: form.get('relationshipBidirectional') === 'on',
+    ...(perspectives.length ? { perspectives } : { perspectives: [] }),
+    ...(sharedEvents.length ? { sharedEvents } : { sharedEvents: [] }),
+    ...(quotes.length ? { quotes } : { quotes: [] }),
+    ...(evolution.length ? { evolution } : { evolution: [] }),
+    ...(certainty ? { partyPerception: { certainty, basis } } : { partyPerception: undefined }),
+  };
 }
 
 async function buildEntity(type, form, original = {}) {
@@ -3769,6 +4056,26 @@ async function saveEditor() {
   } else if (state.editor.kind === 'compendium') {
     await saveCompendium(form);
     message = 'Local compendium saved in protected user data.';
+  } else if (state.editor.kind === 'relationship') {
+    const property =
+      state.editor.relationshipKind === 'party' ? 'partyRelationships' : 'npcRelationships';
+    const entries = [...(state.campaign?.[property] ?? [])];
+    const relationship = buildRelationship(
+      form,
+      state.editor.original,
+      state.editor.relationshipKind,
+    );
+    if (Number.isInteger(state.editor.relationshipIndex)) {
+      entries[state.editor.relationshipIndex] = relationship;
+    } else {
+      entries.push(relationship);
+    }
+    await api(
+      `/api/campaigns/${encodeURIComponent(state.selectedId)}/relationships/${state.editor.relationshipKind}`,
+      { method: 'PUT', body: JSON.stringify(entries) },
+    );
+    state.campaign = await api(`/api/campaigns/${encodeURIComponent(state.selectedId)}`);
+    message = 'Relationship saved. The Companion now reflects the reviewed connection.';
   } else {
     const entity = await buildEntity(state.editor.type, form, state.editor.original);
     const base = `/api/campaigns/${encodeURIComponent(state.selectedId)}/${state.editor.type}`;
@@ -4266,6 +4573,28 @@ content.addEventListener('click', async (event) => {
       }
       if (action.dataset.action === 'open-local-companion') await openLocalCompanion();
       if (action.dataset.action === 'stop-companion') await stopCompanion();
+      if (action.dataset.action === 'add-relationship') {
+        openRelationshipEditor(action.dataset.kind);
+      }
+      if (action.dataset.action === 'edit-relationship') {
+        openRelationshipEditor(action.dataset.kind, Number(action.dataset.index));
+      }
+      if (
+        action.dataset.action === 'delete-relationship' &&
+        confirm('Remove this relationship? The rest of the relationship history is unchanged.')
+      ) {
+        const property =
+          action.dataset.kind === 'party' ? 'partyRelationships' : 'npcRelationships';
+        const entries = [...(state.campaign?.[property] ?? [])];
+        entries.splice(Number(action.dataset.index), 1);
+        await api(
+          `/api/campaigns/${encodeURIComponent(state.selectedId)}/relationships/${action.dataset.kind}`,
+          { method: 'PUT', body: JSON.stringify(entries) },
+        );
+        state.campaign = await api(`/api/campaigns/${encodeURIComponent(state.selectedId)}`);
+        render();
+        toast('Relationship removed.');
+      }
       if (action.dataset.action === 'add-entity') openEntityEditor(action.dataset.type);
       if (action.dataset.action === 'edit-entity')
         openEntityEditor(
