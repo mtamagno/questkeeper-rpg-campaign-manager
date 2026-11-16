@@ -179,9 +179,25 @@ Read the [Discord Scribe guide](../discord-transcriber/README.md) before first u
 
 ## Preview, validate and recover
 
-The **Storage & recovery** panel shows the active Node.js executable and the
+Open **Preview & publish** to use four focused areas instead of one long
+technical page:
+
+- **Preview** prepares dependencies, starts the private Companion and validates
+  the production build without publishing;
+- **Recovery** checks storage, creates full backups and exports portable bundles;
+- **Publishing** keeps destination setup, connection testing and upload together;
+- **Appearance** separates this browser's Manager theme from the selected
+  campaign's published palette.
+
+The status row links directly to the area that needs attention. The tabs support
+Left/Right/Home/End keys and changing area does not discard unsaved publishing
+fields.
+
+The **Storage & recovery** area shows the active Node.js executable and the
 resolved application, runtime, campaign, configuration, transcript, backup,
-log and cache locations. Every path can be copied or opened directly. Use
+log and cache locations. **Run checks** verifies that the campaign tree is
+readable, required locations are writable and storage ownership is prepared;
+it also reports the latest complete backup. Every path can be copied or opened directly. Use
 **Back up now** for a complete local snapshot including media, or **Export all
 campaigns** for smaller portable JSON bundles without images. No diagnostic
 returns the contents of a saved secret.
@@ -200,6 +216,11 @@ safe command display and platform error code, then offers a setup/retry action.
 Environment variables, tokens and saved provider or publishing secrets are not
 included. Repeated preview clicks reuse the running job, and quitting the
 Manager stops the complete preview process tree.
+
+Failures remain visible beside the workflow after a toast disappears. The
+message states what stayed unchanged and links only to the smallest safe retry
+or review action. The log is limited to the latest relevant lines; full local
+logs remain available from Recovery.
 
 Use **Check and build site** before publishing. Errors identify malformed or
 missing content; automatic backups make edits recoverable. **Launch site** opens

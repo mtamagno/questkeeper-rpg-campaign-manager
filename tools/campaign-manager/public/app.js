@@ -10,7 +10,9 @@ const serviceDialog = document.querySelector('#service-dialog');
 const managerSettingsDialog = document.querySelector('#manager-settings-dialog');
 const MY_CHARACTERS_KEY = 'questkeeper-manager-my-characters:v1';
 const MANAGER_THEME_KEY = 'questkeeper-manager-theme:v1';
+const PROJECT_VIEW_KEY = 'questkeeper-manager-project-view:v1';
 const MANAGER_THEMES = ['system', 'light', 'dark', 'contrast'];
+const PROJECT_VIEWS = ['local', 'recovery', 'publishing', 'appearance'];
 const managerThemeMedia = window.matchMedia('(prefers-color-scheme: light)');
 const initialCampaignId = new URL(window.location.href).searchParams.get('campaign');
 
@@ -89,6 +91,10 @@ const state = {
   aiConfigureExpanded: false,
   firstRunEvaluated: false,
   advancedMode: localStorage.getItem('questkeeper-manager-advanced') === 'true',
+  projectView: PROJECT_VIEWS.includes(sessionStorage.getItem(PROJECT_VIEW_KEY))
+    ? sessionStorage.getItem(PROJECT_VIEW_KEY)
+    : 'local',
+  projectOutcome: null,
   myCharacters: readMyCharacters(),
   project: {
     dependenciesReady: false,
@@ -4096,6 +4102,70 @@ async function saveEditor() {
   toast(message);
 }
 
+function projectJobFailure(jobs = {}) {
+  return Object.entries(jobs)
+    .filter(([, job]) => job?.status === 'failed')
+    .sort(
+      ([, first], [, second]) =>
+        Date.parse(second.updatedAt ?? second.startedAt ?? 0) -
+        Date.parse(first.updatedAt ?? first.startedAt ?? 0),
+    )[0];
+}
+
+function projectFailureCard(failure) {
+  if (!failure) return '';
+  const [kind, job] = failure;
+  const guidance =
+    {
+      install: 'Check the connection and available storage, then retry preparation.',
+      preview:
+        'Your campaign data is unchanged. Review the last log lines, then retry the preview.',
+      build:
+        'Fix the reported validation error; your campaign draft and published site are unchanged.',
+      'ftp-publish':
+        'The published site is unchanged. Review the destination and test it before retrying.',
+      transcriber:
+        'Your existing transcript is unchanged. Check the bot configuration before restarting.',
+    }[kind] ?? 'Your saved campaign data is unchanged. Review the log before trying again.';
+  const action = ['install', 'preview', 'build'].includes(kind)
+    ? `<button class="secondary-button" type="button" data-retry-project-job="${escapeHtml(kind)}">Retry</button>`
+    : kind === 'ftp-publish'
+      ? '<button class="secondary-button" type="button" data-project-view="publishing">Review publishing</button>'
+      : '';
+  return `<aside class="operation-recovery" role="alert"><div><span class="eyebrow">Recoverable failure</span><h3>${escapeHtml(job.displayName || kind)}</h3><p>${escapeHtml(guidance)}</p></div>${action}</aside>`;
+}
+
+function projectJobLog(job) {
+  if (!job?.logs) return '';
+  const lines = String(job.logs).trim().split(/\r?\n/).slice(-14).join('\n');
+  return `<details class="operation-log" ${job.status === 'failed' ? 'open' : ''}><summary>Latest operation log · ${escapeHtml(job.status)}</summary><pre class="job-log">${escapeHtml(lines)}</pre></details>`;
+}
+
+function selectProjectView(view, { focus = false } = {}) {
+  const next = PROJECT_VIEWS.includes(view) ? view : 'local';
+  state.projectView = next;
+  sessionStorage.setItem(PROJECT_VIEW_KEY, next);
+  for (const tab of content.querySelectorAll('.operations-tabs [data-project-view]')) {
+    const selected = tab.dataset.projectView === next;
+    tab.setAttribute('aria-selected', String(selected));
+    tab.tabIndex = selected ? 0 : -1;
+    tab.classList.toggle('active', selected);
+    if (focus && selected) tab.focus();
+  }
+  for (const panel of content.querySelectorAll('[data-project-view-panel]')) {
+    panel.hidden = panel.dataset.projectViewPanel !== next;
+  }
+}
+
+function showProjectOutcome(title, message, error = false) {
+  const region = content.querySelector('#project-outcome');
+  if (!region) return;
+  region.className = `operation-outcome${error ? ' operation-outcome--error' : ''}`;
+  region.innerHTML = `<strong>${escapeHtml(title)}</strong><span>${escapeHtml(message)}</span>`;
+  region.hidden = false;
+  region.focus();
+}
+
 function renderProject() {
   document.querySelector('#page-title').textContent = 'Setup and publishing';
   const install = state.project.jobs.install;
@@ -4110,6 +4180,7 @@ function renderProject() {
   const ftpJob = state.project.jobs['ftp-publish'];
   const publishing = state.project.publishing ?? {};
   const storage = state.project.storage ?? {};
+  const storageHealth = storage.health ?? {};
   const storageLocations = [
     ['application', 'Application', 'Replaceable app files'],
     ['runtime', 'Node runtime', 'Replaceable private runtime'],
@@ -4120,32 +4191,66 @@ function renderProject() {
     ['logs', 'Logs', 'Diagnostic state'],
     ['cache', 'Cache', 'Replaceable generated files'],
   ];
+  const operationJobs = [ftpJob, preview, build, install].filter(Boolean);
   const activeLog =
-    [ftpJob, preview, build, install].find((job) => job?.status === 'running') ||
-    ftpJob ||
-    preview ||
-    build ||
-    install;
+    operationJobs.find((job) => ['running', 'stopping'].includes(job.status)) ||
+    operationJobs.sort(
+      (first, second) =>
+        Date.parse(second.updatedAt ?? second.startedAt ?? 0) -
+        Date.parse(first.updatedAt ?? first.startedAt ?? 0),
+    )[0];
+  const failedJob = projectJobFailure(state.project.jobs);
+  const companionReady = companion.action === 'open';
+  const publishStatus =
+    ftpJob?.status === 'failed'
+      ? 'Needs attention'
+      : publishing.host
+        ? 'Destination configured'
+        : 'Destination not configured';
+  const backupStatus = storageHealth.lastBackup?.createdAt
+    ? `Last backup · ${new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(storageHealth.lastBackup.createdAt))}`
+    : 'No complete backup found yet';
+  const healthStatus =
+    storageHealth.status === 'ready' ? 'Storage checks passed' : 'Storage needs attention';
   content.innerHTML = `
     <div class="project-stack">
-      <section class="project-panel"><span class="eyebrow">1 · Preparation</span><h2>Prepare the project</h2><p>${state.project.dependenciesReady ? 'Dependencies are installed. You can preview or validate your Companion.' : 'On first use, install everything the project needs. An internet connection is required.'}</p><div class="action-row"><button class="primary-button" data-project-action="install" ${install?.status === 'running' ? 'disabled' : ''}>${state.project.dependenciesReady ? 'Reinstall dependencies' : 'Prepare automatically'}</button><span class="job-status ${install?.status || ''}">${install ? escapeHtml(install.status) : state.project.dependenciesReady ? 'Ready' : 'Not prepared'}</span></div></section>
-      <section class="project-panel"><span class="eyebrow">2 · Preview</span><h2>Open your Companion</h2><p>Launch the local site with the campaign data you just entered.</p><div class="action-row">${companion.action === 'open' ? `<button class="primary-button" data-action="open-local-companion">Open now</button>${companion.canStop ? '<button class="secondary-button" data-action="stop-companion">Stop</button>' : ''}` : `<button class="primary-button" data-project-action="preview" ${['prepare', 'wait'].includes(companion.action) ? 'disabled' : ''}>${escapeHtml(companion.label)}</button>`}<span class="job-status ${escapeHtml(companion.action)}">${escapeHtml(companion.status)}</span></div></section>
-      <section class="project-panel"><span class="eyebrow">3 · Validation</span><h2>Check before publishing</h2><p>The production build catches invalid data or components before you push to GitHub.</p><div class="action-row"><button class="secondary-button" data-project-action="build" ${!state.project.dependenciesReady || build?.status === 'running' ? 'disabled' : ''}>Check and build site</button><span class="job-status ${build?.status || ''}">${build ? escapeHtml(build.status) : 'Not run'}</span></div></section>
-      <section class="project-panel"><span class="eyebrow">4 · Publishing</span><h2>Choose how the archive reaches the realm</h2><p>GitHub Pages remains available through the included workflow. If your hosting provides FTP, configure it once and publish directly from this computer without GitHub Actions.</p><a class="secondary-button" href="https://github.com/mtamagno/questkeeper-rpg-campaign-manager#publish" target="_blank" rel="noreferrer">Open the publishing guide</a></section>
-      <section class="project-panel"><span class="eyebrow">Authoring preferences</span><h2>Advanced controls</h2><p>Keep technical identifiers hidden during normal authoring, or reveal them when you need to integrate or troubleshoot campaign data.</p><label class="consent-check"><input type="checkbox" data-advanced-mode ${state.advancedMode ? 'checked' : ''} /> Show advanced identity controls in entity forms</label></section>
+      <section class="operations-hero" aria-labelledby="operations-title"><div><span class="eyebrow">Local operations console</span><h2 id="operations-title">Prepare, protect and publish without losing your work</h2><p>Each area explains what changes, what stays untouched and how to recover before an operation begins.</p></div><button class="secondary-button" type="button" data-action="open-service-controls">Manage local services</button></section>
+      <div id="project-outcome" class="operation-outcome" role="status" aria-live="polite" tabindex="-1" hidden></div>
+      <div class="operations-status"><button type="button" data-project-view="local"><span>Local Companion</span><strong>${escapeHtml(companionReady ? 'Ready to open' : companion.status)}</strong></button><button type="button" data-project-view="recovery"><span>Data safety</span><strong>${escapeHtml(backupStatus)}</strong></button><button type="button" data-project-view="publishing"><span>Publishing</span><strong>${escapeHtml(publishStatus)}</strong></button><button type="button" data-project-view="appearance"><span>Appearance</span><strong>Manager and campaign scopes</strong></button></div>
+      ${projectFailureCard(failedJob)}
+      <nav class="operations-tabs" role="tablist" aria-label="Setup and publishing areas"><button id="project-tab-local" type="button" role="tab" data-project-view="local" aria-controls="project-panel-local">Preview</button><button id="project-tab-recovery" type="button" role="tab" data-project-view="recovery" aria-controls="project-panel-recovery">Recovery</button><button id="project-tab-publishing" type="button" role="tab" data-project-view="publishing" aria-controls="project-panel-publishing">Publishing</button><button id="project-tab-appearance" type="button" role="tab" data-project-view="appearance" aria-controls="project-panel-appearance">Appearance</button></nav>
+      <div id="project-panel-local" class="operations-panel" role="tabpanel" aria-labelledby="project-tab-local" data-project-view-panel="local" tabindex="0">
+        <ol class="workflow-strip" aria-label="Local preview workflow"><li><strong>1 · Prepare</strong><span>Installs replaceable dependencies only.</span></li><li><strong>2 · Preview</strong><span>Starts a private site on this computer.</span></li><li><strong>3 · Validate</strong><span>Checks the production build without publishing.</span></li></ol>
+        <div class="operations-grid"><section class="project-panel"><span class="eyebrow">Preparation</span><h2>Prepare the project</h2><p>${state.project.dependenciesReady ? 'Dependencies are installed. You can preview or validate your Companion.' : 'On first use, install everything the project needs. An internet connection is required.'}</p><div class="action-row"><button class="primary-button" data-project-action="install" ${install?.status === 'running' ? 'disabled' : ''}>${state.project.dependenciesReady ? 'Reinstall dependencies' : 'Prepare automatically'}</button><span class="job-status ${install?.status || ''}">${install ? escapeHtml(install.status) : state.project.dependenciesReady ? 'Ready' : 'Not prepared'}</span></div></section>
+        <section class="project-panel"><span class="eyebrow">Private preview</span><h2>Open your Companion</h2><p>Launch the local site with the campaign data you just entered. Nothing is published.</p><div class="action-row">${companion.action === 'open' ? `<button class="primary-button" data-action="open-local-companion">Open now</button>${companion.canStop ? '<button class="secondary-button" data-action="stop-companion">Stop</button>' : ''}` : `<button class="primary-button" data-project-action="preview" ${['prepare', 'wait'].includes(companion.action) ? 'disabled' : ''}>${escapeHtml(companion.label)}</button>`}<span class="job-status ${escapeHtml(companion.action)}">${escapeHtml(companion.status)}</span></div></section>
+        <section class="project-panel"><span class="eyebrow">Validation</span><h2>Check before publishing</h2><p>The production build catches invalid data or components while the published site remains unchanged.</p><div class="action-row"><button class="secondary-button" data-project-action="build" ${!state.project.dependenciesReady || build?.status === 'running' ? 'disabled' : ''}>Check and build site</button><span class="job-status ${build?.status || ''}">${build ? escapeHtml(build.status) : 'Not run'}</span></div></section></div>
+        ${activeLog && activeLog !== ftpJob ? projectJobLog(activeLog) : ''}
+      </div>
+      <div id="project-panel-recovery" class="operations-panel" role="tabpanel" aria-labelledby="project-tab-recovery" data-project-view-panel="recovery" tabindex="0">
       <section class="project-panel storage-panel">
         <div class="storage-panel__heading"><div><span class="eyebrow">Your data · ${escapeHtml(storage.mode ?? 'legacy')}</span><h2>Storage & recovery</h2><p>Protected table memories stay separate from replaceable app and runtime files.</p></div><div class="action-row"><button class="primary-button" type="button" data-storage-action="backup">Back up now</button><button class="secondary-button" type="button" data-storage-action="export">Export all campaigns</button></div></div>
+        <div class="storage-health storage-health--${escapeHtml(storageHealth.status ?? 'attention')}" role="status"><div><strong>${escapeHtml(healthStatus)}</strong><span>${escapeHtml(backupStatus)}</span></div><button class="secondary-button storage-button" type="button" data-storage-action="diagnostics">Run checks</button></div>
         <div class="storage-runtime"><strong>Active Node.js</strong><code>${escapeHtml(storage.node?.version ?? '')} · ${escapeHtml(storage.node?.source ?? '')} · ${escapeHtml(storage.node?.executable ?? '')}</code></div>
         <dl class="storage-list">${storageLocations.map(([key, label, meaning]) => `<div><dt><strong>${label}</strong><span>${meaning}</span></dt><dd><code title="${escapeHtml(storage[key] ?? '')}">${escapeHtml(storage[key] ?? 'Not available')}</code><span class="storage-row__actions"><button class="secondary-button storage-button" type="button" data-storage-action="copy" data-storage-key="${key}">Copy path</button><button class="secondary-button storage-button" type="button" data-storage-action="open" data-storage-key="${key}">Open folder</button></span></dd></div>`).join('')}</dl>
         <small>Paths never contain or reveal saved API keys, Discord tokens or publishing passwords.</small>
       </section>
-      <form id="publishing-form" class="project-panel publishing-panel"><span class="eyebrow">Direct hosting · FTP / FTPS</span><h2>Publish from Campaign Manager</h2><div class="publishing-grid"><label class="field"><span>Protocol</span><select name="protocol"><option value="ftps" ${publishing.protocol !== 'ftp' ? 'selected' : ''}>FTPS · encrypted (recommended)</option><option value="ftp" ${publishing.protocol === 'ftp' ? 'selected' : ''}>FTP · unencrypted</option></select></label><label class="field"><span>Host</span><input name="host" value="${escapeHtml(publishing.host)}" placeholder="ftp.example.com" /></label><label class="field"><span>Port</span><input name="port" type="number" min="1" value="${publishing.port || 21}" /></label><label class="field"><span>Remote folder</span><input name="remotePath" value="${escapeHtml(publishing.remotePath || '/')}" placeholder="/public_html/questkeeper" /></label><label class="field"><span>Username</span><input name="username" autocomplete="username" value="${escapeHtml(publishing.username)}" /></label><label class="field"><span>Password</span><input name="password" type="password" autocomplete="new-password" placeholder="${publishing.passwordConfigured ? 'Saved locally · leave blank to keep it' : 'Hosting password'}" /></label></div><label class="consent-check"><input name="insecureConsent" type="checkbox" /> I understand that plain FTP sends credentials and files without encryption. This is required only when FTP is selected instead of FTPS.</label><div class="action-row"><button class="secondary-button" type="button" data-publish-action="save">Save destination</button><button class="secondary-button" type="button" data-publish-action="test">Test connection</button><button class="primary-button" type="button" data-publish-action="publish" ${!state.project.dependenciesReady || ftpJob?.status === 'running' ? 'disabled' : ''}>Build & publish now</button><span class="job-status ${ftpJob?.status || ''}">${ftpJob ? escapeHtml(ftpJob.status) : publishing.host ? 'Configured' : 'Not configured'}</span></div><small>Credentials stay in the Git-ignored <code>.campaign-manager/</code> folder and are never returned to the browser.</small></form>
-      ${activeLog ? `<pre class="job-log">${escapeHtml(activeLog.logs)}</pre>` : ''}
+      <section class="project-panel recovery-guide"><span class="eyebrow">Recovery order</span><h2>If an operation fails</h2><ol><li>Read the visible result and keep this page open.</li><li>Download or create a backup before changing storage.</li><li>Retry only the failed operation; saved campaigns and the published site stay untouched.</li></ol></section></div>
+      <div id="project-panel-publishing" class="operations-panel" role="tabpanel" aria-labelledby="project-tab-publishing" data-project-view-panel="publishing" tabindex="0">
+        <section class="project-panel"><span class="eyebrow">Publication boundary</span><h2>Choose how the archive reaches the realm</h2><p>GitHub Pages remains available through the included workflow. Direct hosting always builds and validates locally before upload.</p><a class="secondary-button" href="https://github.com/mtamagno/questkeeper-rpg-campaign-manager#publish" target="_blank" rel="noreferrer">Open the publishing guide</a></section>
+        <form id="publishing-form" class="project-panel publishing-panel"><span class="eyebrow">Direct hosting · FTP / FTPS</span><h2>Publish from Campaign Manager</h2><div class="publishing-grid"><label class="field"><span>Protocol</span><select name="protocol"><option value="ftps" ${publishing.protocol !== 'ftp' ? 'selected' : ''}>FTPS · encrypted (recommended)</option><option value="ftp" ${publishing.protocol === 'ftp' ? 'selected' : ''}>FTP · unencrypted</option></select></label><label class="field"><span>Host</span><input name="host" value="${escapeHtml(publishing.host)}" placeholder="ftp.example.com" /></label><label class="field"><span>Port</span><input name="port" type="number" min="1" value="${publishing.port || 21}" /></label><label class="field"><span>Remote folder</span><input name="remotePath" value="${escapeHtml(publishing.remotePath || '/')}" placeholder="/public_html/questkeeper" /></label><label class="field"><span>Username</span><input name="username" autocomplete="username" value="${escapeHtml(publishing.username)}" /></label><label class="field"><span>Password</span><input name="password" type="password" autocomplete="new-password" placeholder="${publishing.passwordConfigured ? 'Saved locally · leave blank to keep it' : 'Hosting password'}" /></label></div><label class="consent-check"><input name="insecureConsent" type="checkbox" /> I understand that plain FTP sends credentials and files without encryption. This is required only when FTP is selected instead of FTPS.</label><div class="action-row"><button class="secondary-button" type="button" data-publish-action="save">Save destination</button><button class="secondary-button" type="button" data-publish-action="test">Test connection</button><button class="primary-button" type="button" data-publish-action="publish" ${!state.project.dependenciesReady || ftpJob?.status === 'running' ? 'disabled' : ''}>Build & publish now</button><span class="job-status ${ftpJob?.status || ''}">${ftpJob ? escapeHtml(ftpJob.status) : publishing.host ? 'Configured' : 'Not configured'}</span></div><small>Credentials stay in the Git-ignored <code>.campaign-manager/</code> folder and are never returned to the browser.</small></form>
+        ${ftpJob ? projectJobLog(ftpJob) : ''}
+      </div>
+      <div id="project-panel-appearance" class="operations-panel" role="tabpanel" aria-labelledby="project-tab-appearance" data-project-view-panel="appearance" tabindex="0"><div class="operations-grid">
+        <section class="project-panel"><span class="eyebrow">This browser</span><h2>Manager appearance</h2><p>Theme and contrast affect only this authoring app on this device.</p><button class="secondary-button" type="button" data-action="open-manager-settings">Open Manager settings</button></section>
+        <section class="project-panel"><span class="eyebrow">Selected campaign</span><h2>Companion palette</h2><p>Campaign appearance travels with its published Companion and is checked for readable contrast.</p><button class="secondary-button" type="button" data-action="edit-campaign-appearance" ${state.campaign ? '' : 'disabled'}>Edit campaign appearance</button></section>
+        <section class="project-panel"><span class="eyebrow">Authoring preferences</span><h2>Advanced controls</h2><p>Keep technical identifiers hidden during normal authoring, or reveal them when you need to integrate or troubleshoot campaign data.</p><label class="consent-check"><input type="checkbox" data-advanced-mode ${state.advancedMode ? 'checked' : ''} /> Show advanced identity controls in entity forms</label></section>
+      </div></div>
     </div>`;
   const credentialNote = content.querySelector('.publishing-panel > small');
   if (credentialNote)
     credentialNote.textContent =
       'Credentials stay in the protected local configuration folder and are never returned to the browser.';
+  selectProjectView(state.projectView);
 }
 
 function publishingPayload(form) {
@@ -4278,7 +4383,22 @@ async function runStorageAction(action, key) {
   }
   if (action === 'backup') {
     const result = await api('/api/storage/backup', { method: 'POST', body: '{}' });
-    toast(`Full backup created in ${result.destination}`);
+    state.project.storage.health = await api('/api/storage/diagnostics');
+    renderProject();
+    showProjectOutcome('Backup completed', `Full recovery copy created in ${result.destination}`);
+    return;
+  }
+  if (action === 'diagnostics') {
+    state.project.storage.health = await api('/api/storage/diagnostics');
+    renderProject();
+    const ready = state.project.storage.health.status === 'ready';
+    showProjectOutcome(
+      ready ? 'Storage checks passed' : 'Storage needs attention',
+      ready
+        ? 'Campaigns, configuration and backup locations are available.'
+        : 'Review the unavailable location below before migrating or publishing.',
+      !ready,
+    );
     return;
   }
   if (action === 'export') {
@@ -4407,6 +4527,21 @@ document
   .addEventListener('click', () => quitManager('all').catch((error) => toast(error.message, true)));
 
 content.addEventListener('click', async (event) => {
+  const projectView = event.target.closest('[data-project-view]');
+  if (projectView) {
+    selectProjectView(projectView.dataset.projectView, {
+      focus: projectView.getAttribute('role') === 'tab',
+    });
+    return;
+  }
+  const retryProjectJob = event.target.closest('[data-retry-project-job]');
+  if (retryProjectJob) {
+    runProjectAction(retryProjectJob.dataset.retryProjectJob).catch((error) => {
+      showProjectOutcome('Operation could not restart', error.message, true);
+      toast(error.message, true);
+    });
+    return;
+  }
   const compendiumAction = event.target.closest('[data-compendium-action]');
   if (compendiumAction) {
     try {
@@ -4527,6 +4662,12 @@ content.addEventListener('click', async (event) => {
       if (action.dataset.action === 'new-campaign') openCampaignEditor(false);
       if (action.dataset.action === 'import') document.querySelector('#import-file').click();
       if (action.dataset.action === 'edit-campaign') openCampaignEditor(true);
+      if (action.dataset.action === 'edit-campaign-appearance') openCampaignEditor(true);
+      if (action.dataset.action === 'open-manager-settings') {
+        syncManagerThemeUi();
+        managerSettingsDialog.showModal();
+      }
+      if (action.dataset.action === 'open-service-controls') serviceDialog.showModal();
       if (action.dataset.action === 'export') await exportCurrent();
       if (action.dataset.action === 'delete-campaign') {
         const confirmation = prompt(`To delete this campaign, type exactly: ${state.selectedId}`);
@@ -4619,19 +4760,24 @@ content.addEventListener('click', async (event) => {
   }
   const projectAction = event.target.closest('[data-project-action]');
   if (projectAction)
-    runProjectAction(projectAction.dataset.projectAction).catch((error) =>
-      toast(error.message, true),
-    );
+    runProjectAction(projectAction.dataset.projectAction).catch((error) => {
+      showProjectOutcome('Operation could not start', error.message, true);
+      toast(error.message, true);
+    });
   const storageAction = event.target.closest('[data-storage-action]');
   if (storageAction)
     runStorageAction(storageAction.dataset.storageAction, storageAction.dataset.storageKey).catch(
-      (error) => toast(error.message, true),
+      (error) => {
+        showProjectOutcome('Recovery action failed', error.message, true);
+        toast(error.message, true);
+      },
     );
   const publishAction = event.target.closest('[data-publish-action]');
   if (publishAction)
-    runPublishingAction(publishAction.dataset.publishAction).catch((error) =>
-      toast(error.message, true),
-    );
+    runPublishingAction(publishAction.dataset.publishAction).catch((error) => {
+      showProjectOutcome('Publishing action failed', error.message, true);
+      toast(error.message, true);
+    });
   const scribeAction = event.target.closest('[data-scribe-action]');
   if (scribeAction) {
     const kind = scribeAction.dataset.scribeAction === 'stop' ? 'transcriber-stop' : 'transcriber';
@@ -4650,6 +4796,19 @@ content.addEventListener('change', (event) => {
     localStorage.setItem('questkeeper-manager-advanced', String(state.advancedMode));
     toast(state.advancedMode ? 'Advanced controls enabled.' : 'Advanced controls hidden.');
   }
+});
+
+content.addEventListener('keydown', (event) => {
+  const tab = event.target.closest('.operations-tabs [role="tab"]');
+  if (!tab || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+  const tabs = [...content.querySelectorAll('.operations-tabs [role="tab"]')];
+  let index = tabs.indexOf(tab);
+  if (event.key === 'Home') index = 0;
+  if (event.key === 'End') index = tabs.length - 1;
+  if (event.key === 'ArrowLeft') index = (index - 1 + tabs.length) % tabs.length;
+  if (event.key === 'ArrowRight') index = (index + 1) % tabs.length;
+  event.preventDefault();
+  selectProjectView(tabs[index].dataset.projectView, { focus: true });
 });
 
 let compendiumSearchTimer;

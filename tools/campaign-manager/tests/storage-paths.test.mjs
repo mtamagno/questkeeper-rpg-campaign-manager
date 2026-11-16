@@ -8,6 +8,7 @@ import storagePaths from '../../storage-paths.cjs';
 
 const {
   createCampaignBackup,
+  inspectStorageHealth,
   materializeCampaigns,
   prepareStorage,
   previewStorageMigration,
@@ -185,4 +186,10 @@ test('materializes only a replaceable build mirror and creates full local backup
     ),
     'original asset',
   );
+  const health = await inspectStorageHealth(paths);
+  assert.equal(health.status, 'ready');
+  assert.equal(health.campaignsReadable, true);
+  assert.equal(health.ownershipPrepared, true);
+  assert.ok(health.lastBackup?.createdAt);
+  assert.deepEqual(health.issues, []);
 });

@@ -137,6 +137,10 @@ surfaces receive local adaptations and feed reusable discoveries upstream.
   collapsed accelerators. Party and NPC relationships gain persistent authoring
   for one type, multiple directional feelings, history and party-visible
   evidence, while translation and compendium workspaces expose review gates.
+- **16 November:** Manager operations are divided into Preview, Recovery,
+  Publishing and Appearance workspaces with keyboard navigation, bounded logs
+  and recoverable failure guidance. Installed public builds additionally expose
+  storage health and latest-backup evidence without revealing secrets.
 
 The paired implementation and regression boundary are recorded in the
 [6-10 November quality catch-up](reviews/2026-11-06-10-quality-catchup.md).
@@ -155,6 +159,9 @@ The [15 November Manager authoring closeout](reviews/2026-11-15-manager-authorin
 records the shared editor journey, relationship integrity boundary and the
 manual-record-first rule inherited by the 16 November storage and publishing
 pass.
+The [16 November operations and publishing closeout](reviews/2026-11-16-operations-publishing-closeout.md)
+records the state, consequence and recovery rule inherited by the final
+cross-surface regression pass.
 
 ## Exit gate on 17 November
 

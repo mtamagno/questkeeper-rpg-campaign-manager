@@ -454,6 +454,61 @@ async function createCampaignBackup(projectRoot, options = {}) {
   return { destination, createdAt: stamp };
 }
 
+async function writableLocation(target) {
+  let current = path.resolve(target);
+  while (!(await exists(current))) {
+    const parent = path.dirname(current);
+    if (parent === current) return false;
+    current = parent;
+  }
+  try {
+    await fsp.access(current, fs.constants.R_OK | fs.constants.W_OK);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function latestBackup(paths) {
+  if (!(await exists(paths.backupsRoot))) return undefined;
+  const entries = await fsp.readdir(paths.backupsRoot, { withFileTypes: true });
+  const candidates = entries
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort()
+    .reverse();
+  for (const name of candidates) {
+    const metadata = readJsonSync(path.join(paths.backupsRoot, name, 'backup.json'));
+    if (metadata?.createdAt) return { createdAt: metadata.createdAt, name };
+  }
+  return undefined;
+}
+
+async function inspectStorageHealth(paths) {
+  const campaignsReadable = await exists(path.join(paths.campaignsRoot, 'campaigns.json'));
+  const campaignsWritable = await writableLocation(paths.campaignsRoot);
+  const configurationWritable = await writableLocation(paths.configRoot);
+  const backupsWritable = await writableLocation(paths.backupsRoot);
+  const ownershipPrepared = paths.mode === 'legacy' || (await exists(paths.ownershipFile));
+  const issues = [];
+  if (!campaignsReadable) issues.push('campaigns-unavailable');
+  if (!campaignsWritable) issues.push('campaigns-read-only');
+  if (!configurationWritable) issues.push('configuration-read-only');
+  if (!backupsWritable) issues.push('backups-read-only');
+  if (!ownershipPrepared) issues.push('storage-ownership-missing');
+  return {
+    status: issues.length ? 'attention' : 'ready',
+    checkedAt: new Date().toISOString(),
+    campaignsReadable,
+    campaignsWritable,
+    configurationWritable,
+    backupsWritable,
+    ownershipPrepared,
+    lastBackup: await latestBackup(paths),
+    issues,
+  };
+}
+
 function publicStorageSummary(paths) {
   return {
     mode: paths.mode,
@@ -473,6 +528,7 @@ function publicStorageSummary(paths) {
 module.exports = {
   STORAGE_VERSION,
   createCampaignBackup,
+  inspectStorageHealth,
   materializeCampaigns,
   prepareStorage,
   previewStorageMigration,

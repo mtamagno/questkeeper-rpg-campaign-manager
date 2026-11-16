@@ -111,6 +111,88 @@
     'Manager appearance now follows this device.':
       'L’aspetto del Gestore ora segue questo dispositivo.',
     'Storage & recovery': 'Archivio e recupero',
+    'Local operations console': 'Console delle operazioni locali',
+    'Prepare, protect and publish without losing your work':
+      'Prepara, proteggi e pubblica senza perdere il lavoro',
+    'Each area explains what changes, what stays untouched and how to recover before an operation begins.':
+      'Ogni area spiega cosa cambia, cosa resta intatto e come recuperare prima di iniziare.',
+    'Manage local services': 'Gestisci servizi locali',
+    'Local Companion': 'Companion locale',
+    'Ready to open': 'Pronto da aprire',
+    'Data safety': 'Sicurezza dei dati',
+    'No complete backup found yet': 'Nessun backup completo ancora disponibile',
+    Publishing: 'Pubblicazione',
+    'Destination configured': 'Destinazione configurata',
+    'Destination not configured': 'Destinazione non configurata',
+    Appearance: 'Aspetto',
+    'Manager and campaign scopes': 'Ambiti del Gestore e della campagna',
+    'Setup and publishing areas': 'Aree di configurazione e pubblicazione',
+    Preview: 'Anteprima',
+    Recovery: 'Recupero',
+    'Local preview workflow': 'Flusso dell anteprima locale',
+    '1 · Prepare': '1 · Prepara',
+    '2 · Preview': '2 · Anteprima',
+    '3 · Validate': '3 · Convalida',
+    Prepare: 'Prepara',
+    'Installs replaceable dependencies only.': 'Installa soltanto dipendenze sostituibili.',
+    'Starts a private site on this computer.': 'Avvia un sito privato su questo computer.',
+    Validate: 'Convalida',
+    'Checks the production build without publishing.':
+      'Controlla la build di produzione senza pubblicare.',
+    Preparation: 'Preparazione',
+    'Private preview': 'Anteprima privata',
+    'Launch the local site with the campaign data you just entered. Nothing is published.':
+      'Avvia il sito locale con i dati appena inseriti. Nulla viene pubblicato.',
+    Validation: 'Convalida',
+    'The production build catches invalid data or components while the published site remains unchanged.':
+      'La build di produzione rileva dati o componenti non validi mentre il sito pubblicato resta invariato.',
+    'Storage checks passed': 'Controlli dell archivio superati',
+    'Storage needs attention': 'L archivio richiede attenzione',
+    'Run checks': 'Esegui controlli',
+    'Recovery order': 'Ordine di recupero',
+    'If an operation fails': 'Se un operazione non riesce',
+    'Read the visible result and keep this page open.':
+      'Leggi il risultato visibile e mantieni aperta questa pagina.',
+    'Download or create a backup before changing storage.':
+      'Scarica o crea un backup prima di modificare l archivio.',
+    'Retry only the failed operation; saved campaigns and the published site stay untouched.':
+      'Riprova soltanto l operazione fallita; campagne salvate e sito pubblicato restano intatti.',
+    'Publication boundary': 'Confine di pubblicazione',
+    'GitHub Pages remains available through the included workflow. Direct hosting always builds and validates locally before upload.':
+      'GitHub Pages resta disponibile tramite il flusso incluso. La pubblicazione diretta crea e convalida sempre la build in locale prima del caricamento.',
+    'This browser': 'Questo browser',
+    'Theme and contrast affect only this authoring app on this device.':
+      'Tema e contrasto riguardano soltanto questa app di gestione su questo dispositivo.',
+    'Open Manager settings': 'Apri impostazioni del Gestore',
+    'Selected campaign': 'Campagna selezionata',
+    'Companion palette': 'Palette del Companion',
+    'Campaign appearance travels with its published Companion and is checked for readable contrast.':
+      'L aspetto della campagna accompagna il Companion pubblicato ed e controllato per un contrasto leggibile.',
+    'Edit campaign appearance': 'Modifica aspetto campagna',
+    'Recoverable failure': 'Errore recuperabile',
+    'Review publishing': 'Controlla pubblicazione',
+    'Latest operation log': 'Ultimo registro operazione',
+    'Check the connection and available storage, then retry preparation.':
+      'Controlla connessione e spazio disponibile, poi riprova la preparazione.',
+    'Your campaign data is unchanged. Review the last log lines, then retry the preview.':
+      'I dati della campagna non sono cambiati. Controlla le ultime righe del registro e riprova l anteprima.',
+    'Fix the reported validation error; your campaign draft and published site are unchanged.':
+      'Correggi l errore indicato; la bozza della campagna e il sito pubblicato non sono cambiati.',
+    'The published site is unchanged. Review the destination and test it before retrying.':
+      'Il sito pubblicato non e cambiato. Controlla la destinazione e provala prima di ripetere.',
+    'Your existing transcript is unchanged. Check the bot configuration before restarting.':
+      'La trascrizione esistente non e cambiata. Controlla la configurazione del bot prima di riavviarlo.',
+    'Your saved campaign data is unchanged. Review the log before trying again.':
+      'I dati salvati della campagna non sono cambiati. Controlla il registro prima di riprovare.',
+    'Operation could not restart': 'Impossibile riavviare l operazione',
+    'Operation could not start': 'Impossibile avviare l operazione',
+    'Recovery action failed': 'Azione di recupero non riuscita',
+    'Publishing action failed': 'Azione di pubblicazione non riuscita',
+    'Backup completed': 'Backup completato',
+    'Campaigns, configuration and backup locations are available.':
+      'Campagne, configurazione e percorsi di backup sono disponibili.',
+    'Review the unavailable location below before migrating or publishing.':
+      'Controlla il percorso non disponibile qui sotto prima di migrare o pubblicare.',
     'Protected table memories stay separate from replaceable app and runtime files.':
       'I ricordi protetti del tavolo restano separati dai file sostituibili dell app e del runtime.',
     'Back up now': 'Crea backup ora',
@@ -756,6 +838,10 @@
     if (match) return `Livello ${match[1]}`;
     match = source.match(/^Spread (\d+)$/);
     if (match) return `Apertura ${match[1]}`;
+    match = source.match(/^Last backup · (.+)$/);
+    if (match) return `Ultimo backup · ${match[1]}`;
+    match = source.match(/^Latest operation log · (.+)$/);
+    if (match) return `Ultimo registro operazione · ${it[match[1]] || match[1]}`;
     match = source.match(
       /^Saved\. The (heroic|gothic|neutral) palette will appear when the Companion reloads or regains focus\.$/,
     );

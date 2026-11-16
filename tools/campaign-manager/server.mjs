@@ -81,6 +81,7 @@ import {
 
 const {
   createCampaignBackup,
+  inspectStorageHealth,
   materializeCampaigns,
   prepareStorage,
   publicStorageSummary,
@@ -635,6 +636,7 @@ async function projectStatus() {
     publishing: publicPublishingConfig(publishingConfig),
     storage: {
       ...publicStorageSummary(STORAGE_PATHS),
+      health: await inspectStorageHealth(STORAGE_PATHS),
       node: {
         executable: process.execPath,
         version: process.version,
@@ -734,6 +736,10 @@ async function routeApi(request, response, url) {
   }
   if (request.method === 'GET' && url.pathname === '/api/jobs') {
     sendJson(response, 200, await projectStatus());
+    return;
+  }
+  if (request.method === 'GET' && url.pathname === '/api/storage/diagnostics') {
+    sendJson(response, 200, await inspectStorageHealth(STORAGE_PATHS));
     return;
   }
   if (request.method === 'POST') assertToken(request);

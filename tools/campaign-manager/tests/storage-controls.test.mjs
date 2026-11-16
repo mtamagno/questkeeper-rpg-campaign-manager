@@ -15,7 +15,12 @@ test('Campaign Manager exposes storage diagnostics and recovery controls', async
     read('tools/campaign-manager/public/i18n.js'),
   ]);
 
-  for (const endpoint of ['/api/storage/open', '/api/storage/backup', '/api/storage/export']) {
+  for (const endpoint of [
+    '/api/storage/open',
+    '/api/storage/backup',
+    '/api/storage/export',
+    '/api/storage/diagnostics',
+  ]) {
     assert.ok(server.includes(endpoint), `Missing ${endpoint}.`);
   }
   for (const key of [
@@ -34,6 +39,8 @@ test('Campaign Manager exposes storage diagnostics and recovery controls', async
   assert.ok(app.includes('data-storage-action="export"'));
   assert.ok(app.includes('data-storage-action="copy"'));
   assert.ok(app.includes('data-storage-action="open"'));
+  assert.ok(app.includes('data-storage-action="diagnostics"'));
+  assert.ok(app.includes('data-project-view-panel="recovery"'));
   assert.ok(styles.includes('.storage-list'));
   assert.ok(translations.includes("'Storage & recovery': 'Archivio e recupero'"));
 });
