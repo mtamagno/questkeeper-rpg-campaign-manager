@@ -6,6 +6,7 @@
 import {
   Component,
   ChangeDetectionStrategy,
+  inject,
   type AfterViewInit,
   type ElementRef,
   type OnDestroy,
@@ -16,6 +17,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { activeElement, restoreFocus, trapTabKey } from '@guild/utils/focusTrap';
+import { UiTextService } from '@guild/services/uiText.service';
 
 /**
  * Reusable password dialog with fantasy styling.
@@ -38,6 +40,7 @@ import { activeElement, restoreFocus, trapTabKey } from '@guild/utils/focusTrap'
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PasswordDialogComponent implements AfterViewInit, OnDestroy {
+  readonly uiText = inject(UiTextService);
   private readonly dialogPanel = viewChild.required<ElementRef<HTMLElement>>('dialogPanel');
   private readonly passwordInput =
     viewChild.required<ElementRef<HTMLInputElement>>('passwordInput');

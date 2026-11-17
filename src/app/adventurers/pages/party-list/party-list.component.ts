@@ -10,6 +10,7 @@ import { RouterLink } from '@angular/router';
 import { DataService } from '@guild/services/data.service';
 import { CampaignService } from '@guild/services/campaign.service';
 import { LanguageService } from '@guild/services/language.service';
+import { UiTextService } from '@guild/services/uiText.service';
 import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
 import { type Character, type CharacterQuote } from '@guild/models/character.model';
 import { LanguageToggleComponent } from '@guild/components/language-toggle/language-toggle.component';
@@ -93,6 +94,7 @@ function buildShowcases(
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PartyListComponent {
+  readonly uiText = inject(UiTextService);
   private readonly dataService = inject(DataService);
   private readonly campaignService = inject(CampaignService);
   private readonly languageService = inject(LanguageService);

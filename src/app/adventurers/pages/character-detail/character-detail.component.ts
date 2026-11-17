@@ -28,6 +28,7 @@ import { type BilingualText } from '@guild/models/language.model';
 import { RELATIONSHIP_TYPE_LABELS } from '@guild/models/relationship.model';
 import { toDisplayUrl } from '@guild/services/imageUrl.service';
 import { LanguageService } from '@guild/services/language.service';
+import { UiTextService } from '@guild/services/uiText.service';
 import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
 import { CharacterReadingPositionService } from '@guild/services/characterReadingPosition.service';
 import { BilingualTextPipe } from '@guild/components/bilingual-text/bilingual-text.pipe';
@@ -82,6 +83,7 @@ interface CharacterDetailTab {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CharacterDetailComponent {
+  readonly uiText = inject(UiTextService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly dataService = inject(DataService);

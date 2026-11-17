@@ -1,5 +1,6 @@
 const fs = require('node:fs');
 const path = require('node:path');
+const { execFileSync } = require('node:child_process');
 
 const root = path.resolve(__dirname, '..');
 const catalogDirectory = path.join(root, 'src', 'app', 'guild', 'i18n');
@@ -153,6 +154,62 @@ for (const relative of migratedSurfaces) {
     )
   ) {
     fail(`${relative} contains a literal user-facing attribute outside ui.json`);
+  }
+}
+
+const trackedTemplates = execFileSync('git', ['ls-files', 'src/app/**/*.html'], {
+  cwd: root,
+  encoding: 'utf8',
+})
+  .trim()
+  .split(/\r?\n/)
+  .filter(Boolean);
+const reviewedLiteralText = new Map([
+  ['A4', 'international paper format'],
+  ['C', 'compact concentration notation'],
+  ['R', 'compact ritual notation'],
+  ['Ctrl K', 'keyboard token'],
+  ['Esc', 'keyboard token'],
+  ['City and Wild', 'proper module name'],
+  ['🌲 City and Wild', 'proper module name'],
+  ['u/AeronDrake', 'credited creator name'],
+  ['u/Gambatte', 'credited creator name'],
+  ['The Homebrewery', 'credited tool name'],
+]);
+const reviewedLiteralAttributes = [
+  {
+    relative: 'src/app/guild/pages/user-settings/user-settings.component.html',
+    pattern: /^placeholder="https:\/\/[^\"]*"$/,
+    reason: 'URL syntax example rather than translatable interface prose',
+  },
+];
+for (const relative of trackedTemplates) {
+  const source = fs.readFileSync(path.join(root, relative), 'utf8');
+  for (const match of source.matchAll(
+    /(?:^|\s)(?:aria-label|placeholder|title)="(?!\s*\{\{)[^"]*\p{L}[^"]*"/gmu,
+  )) {
+    const literal = match[0].trim();
+    const reviewed = reviewedLiteralAttributes.some(
+      (exception) => exception.relative === relative && exception.pattern.test(literal),
+    );
+    if (!reviewed) {
+      fail(`${relative} contains unowned user-facing attribute copy: ${literal}`);
+    }
+  }
+  for (const match of source.matchAll(/>([^<>{}@]+)</g)) {
+    const literal = match[1].trim();
+    const openingStart = source.lastIndexOf('<', match.index);
+    const openingTag = source.slice(openingStart, match.index + 1);
+    if (
+      literal.length === 0 ||
+      !/\p{L}/u.test(literal) ||
+      /^(?:&[A-Za-z0-9#]+;|\s)+$/.test(literal) ||
+      /\baria-hidden="true"/.test(openingTag) ||
+      reviewedLiteralText.has(literal)
+    ) {
+      continue;
+    }
+    fail(`${relative} contains unowned visible copy: ${literal}`);
   }
 }
 

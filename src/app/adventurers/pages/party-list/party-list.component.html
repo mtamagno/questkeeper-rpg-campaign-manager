@@ -89,28 +89,43 @@
             <!-- Quick stats -->
             @if (showcase.isReady) {
               <div class="character-card__stats">
-                <span class="character-card__stat" title="Hit Points">
+                <span
+                  class="character-card__stat"
+                  [title]="uiText.text('interfaceLabels.hitPoints')"
+                >
                   <span class="character-card__stat-icon">❤️</span>
                   <span class="character-card__stat-value"
                     >{{ showcase.character.sheet.hitPoints }}/{{
                       showcase.character.sheet.maxHitPoints
                     }}</span
                   >
-                  <span class="character-card__stat-label">HP</span>
+                  <span class="character-card__stat-label">{{
+                    uiText.text('interfaceLabels.hpShort')
+                  }}</span>
                 </span>
-                <span class="character-card__stat" title="Armor Class">
+                <span
+                  class="character-card__stat"
+                  [title]="uiText.text('interfaceLabels.armorClass')"
+                >
                   <span class="character-card__stat-icon">🛡️</span>
                   <span class="character-card__stat-value">{{
                     showcase.character.sheet.armorClass
                   }}</span>
-                  <span class="character-card__stat-label">AC</span>
+                  <span class="character-card__stat-label">{{
+                    uiText.text('interfaceLabels.acShort')
+                  }}</span>
                 </span>
-                <span class="character-card__stat" title="Proficiency Bonus">
+                <span
+                  class="character-card__stat"
+                  [title]="uiText.text('interfaceLabels.proficiencyBonus')"
+                >
                   <span class="character-card__stat-icon">⭐</span>
                   <span class="character-card__stat-value"
                     >+{{ showcase.character.sheet.proficiencyBonus }}</span
                   >
-                  <span class="character-card__stat-label">Prof</span>
+                  <span class="character-card__stat-label">{{
+                    uiText.text('interfaceLabels.proficiencyShort')
+                  }}</span>
                 </span>
               </div>
             }

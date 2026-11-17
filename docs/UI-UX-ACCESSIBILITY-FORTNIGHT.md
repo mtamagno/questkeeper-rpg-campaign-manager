@@ -141,6 +141,10 @@ surfaces receive local adaptations and feed reusable discoveries upstream.
   Publishing and Appearance workspaces with keyboard navigation, bounded logs
   and recoverable failure guidance. Installed public builds additionally expose
   storage health and latest-backup evidence without revealing secrets.
+- **17 November:** the exit pass extends template-wide accessibility and JSON
+  ownership guards, resolves remaining literal labels in shared campaign and
+  character journeys, and publishes a ranked follow-up register without
+  misrepresenting the still-open dynamic-copy migration as complete.
 
 The paired implementation and regression boundary are recorded in the
 [6-10 November quality catch-up](reviews/2026-11-06-10-quality-catchup.md).
@@ -162,6 +166,9 @@ pass.
 The [16 November operations and publishing closeout](reviews/2026-11-16-operations-publishing-closeout.md)
 records the state, consequence and recovery rule inherited by the final
 cross-surface regression pass.
+The [17 November exit review](reviews/2026-11-17-quality-fortnight-exit.md)
+records the final cross-surface evidence, issue #142 boundary and the constraints
+inherited by resumed feature delivery.
 
 ## Exit gate on 17 November
 

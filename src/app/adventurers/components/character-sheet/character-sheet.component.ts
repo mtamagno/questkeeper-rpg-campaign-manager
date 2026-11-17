@@ -27,6 +27,7 @@ import {
   type CharacterSheetSnapshot,
 } from '@guild/models/character.model';
 import { LanguageService } from '@guild/services/language.service';
+import { UiTextService } from '@guild/services/uiText.service';
 import { type BilingualText } from '@guild/models/language.model';
 import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
 import { CampaignService } from '@guild/services/campaign.service';
@@ -78,6 +79,7 @@ interface InventoryStoryView extends CharacterInventoryView {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CharacterSheetComponent {
+  readonly uiText = inject(UiTextService);
   private readonly passwordService = inject(PasswordService);
   private readonly languageService = inject(LanguageService);
   private readonly campaignLocale = inject(CampaignLocaleService);

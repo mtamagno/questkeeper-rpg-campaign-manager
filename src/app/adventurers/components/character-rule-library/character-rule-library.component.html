@@ -92,7 +92,10 @@
 
   @if (sheet().spellcasting?.slots; as slots) {
     @if (slots.length > 0) {
-      <div class="rule-library__slots" aria-label="Spell slots">
+      <div
+        class="rule-library__slots"
+        [attr.aria-label]="uiText.text('interfaceLabels.spellSlots')"
+      >
         <span class="rule-library__slots-label">{{
           isItalian() ? 'Slot disponibili' : 'Available slots'
         }}</span>
@@ -216,10 +219,10 @@
     <span>{{ spell.school ?? (isItalian() ? 'Incantesimo' : 'Spell') }}</span>
     <span class="rule-library__badges">
       @if (spell.isConcentration) {
-        <span title="Concentration">C</span>
+        <span [title]="uiText.text('interfaceLabels.concentration')">C</span>
       }
       @if (spell.isRitual) {
-        <span title="Ritual">R</span>
+        <span [title]="uiText.text('interfaceLabels.ritual')">R</span>
       }
     </span>
   </div>

@@ -108,7 +108,7 @@
               class="character-sheet__identity"
               [id]="'character-sheet-overview-' + characterId()"
               [style.scroll-margin-top.px]="84"
-              aria-label="Character overview"
+              [attr.aria-label]="uiText.text('interfaceLabels.characterOverview')"
             >
               <div class="character-sheet__identity-copy">
                 <span class="character-sheet__level-seal">
@@ -128,22 +128,29 @@
                 </div>
               </div>
               <div class="character-sheet__xp">
-                <span>XP</span>
+                <span>{{ uiText.text('interfaceLabels.xpShort') }}</span>
                 <strong>{{ sheet().experiencePoints }}</strong>
               </div>
             </section>
 
-            <section class="character-sheet__dashboard" aria-label="Combat essentials">
+            <section
+              class="character-sheet__dashboard"
+              [attr.aria-label]="uiText.text('interfaceLabels.combatEssentials')"
+            >
               <div class="character-sheet__vital character-sheet__vital--hp">
                 <span class="character-sheet__vital-icon" aria-hidden="true">♥</span>
-                <span class="character-sheet__vital-label">HP</span>
+                <span class="character-sheet__vital-label">{{
+                  uiText.text('interfaceLabels.hpShort')
+                }}</span>
                 <strong
                   >{{ sheet().hitPoints }}<small>/{{ sheet().maxHitPoints }}</small></strong
                 >
               </div>
               <div class="character-sheet__vital">
                 <span class="character-sheet__vital-icon" aria-hidden="true">◇</span>
-                <span class="character-sheet__vital-label">AC</span>
+                <span class="character-sheet__vital-label">{{
+                  uiText.text('interfaceLabels.acShort')
+                }}</span>
                 <strong>{{ sheet().armorClass }}</strong>
               </div>
               <div class="character-sheet__vital">
@@ -151,7 +158,10 @@
                 <span class="character-sheet__vital-label">
                   {{ isItalian() ? 'Velocità' : 'Speed' }}
                 </span>
-                <strong>{{ sheet().speed }}<small>ft</small></strong>
+                <strong
+                  >{{ sheet().speed
+                  }}<small>{{ uiText.text('interfaceLabels.feetShort') }}</small></strong
+                >
               </div>
               <div class="character-sheet__vital">
                 <span class="character-sheet__vital-icon" aria-hidden="true">⚡</span>

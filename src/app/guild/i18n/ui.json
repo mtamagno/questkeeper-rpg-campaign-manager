@@ -13,6 +13,44 @@
           "productName": "QuestKeeper",
           "other": "Other"
         },
+        "interfaceLabels": {
+          "partyQuote": "Party quote",
+          "quickStats": "Key statistics",
+          "hitPoints": "Hit Points",
+          "armorClass": "Armor Class",
+          "proficiencyBonus": "Proficiency Bonus",
+          "spellSlots": "Spell slots",
+          "concentration": "Concentration",
+          "ritual": "Ritual",
+          "characterSheetLevels": "Character sheet levels",
+          "changesFromPreviousLevel": "Changes from previous level",
+          "characterOverview": "Character overview",
+          "combatEssentials": "Combat essentials",
+          "hpShort": "HP",
+          "acShort": "AC",
+          "proficiencyShort": "Prof",
+          "npcShort": "NPC",
+          "xpShort": "XP",
+          "feetShort": "ft",
+          "playedBy": "Played by",
+          "returnToParty": "Return to the Party"
+        },
+        "passwordDialog": {
+          "title": "Protected section",
+          "description": "Enter the password for {character}",
+          "passwordLabel": "Password",
+          "placeholder": "Speak, friend, and enter...",
+          "showPassword": "Show password",
+          "hidePassword": "Hide password",
+          "wrongPassword": "Wrong password. The lock remains sealed.",
+          "cancel": "Cancel",
+          "unlock": "Unlock"
+        },
+        "characterMissing": {
+          "title": "Lost in the Mists",
+          "description": "The adventurer you seek has wandered beyond the reach of divination magic.",
+          "hint": "Perhaps they never existed, or the scrying spell fizzled out."
+        },
         "app": {
           "skipToMain": "Skip to main content",
           "toggleNavigation": "Toggle navigation",
@@ -500,6 +538,44 @@
         "common": {
           "productName": "QuestKeeper",
           "other": "Altro"
+        },
+        "interfaceLabels": {
+          "partyQuote": "Citazione della compagnia",
+          "quickStats": "Statistiche principali",
+          "hitPoints": "Punti ferita",
+          "armorClass": "Classe Armatura",
+          "proficiencyBonus": "Bonus di competenza",
+          "spellSlots": "Slot incantesimo",
+          "concentration": "Concentrazione",
+          "ritual": "Rituale",
+          "characterSheetLevels": "Livelli della scheda del personaggio",
+          "changesFromPreviousLevel": "Cambiamenti dal livello precedente",
+          "characterOverview": "Panoramica del personaggio",
+          "combatEssentials": "Dati essenziali di combattimento",
+          "hpShort": "PF",
+          "acShort": "CA",
+          "proficiencyShort": "Comp",
+          "npcShort": "PNG",
+          "xpShort": "PE",
+          "feetShort": "ft",
+          "playedBy": "Giocato da",
+          "returnToParty": "Torna alla Compagnia"
+        },
+        "passwordDialog": {
+          "title": "Sezione protetta",
+          "description": "Inserisci la password per {character}",
+          "passwordLabel": "Password",
+          "placeholder": "Pronuncia la parola e varca la soglia...",
+          "showPassword": "Mostra password",
+          "hidePassword": "Nascondi password",
+          "wrongPassword": "Password errata. Il sigillo rimane chiuso.",
+          "cancel": "Annulla",
+          "unlock": "Sblocca"
+        },
+        "characterMissing": {
+          "title": "Smarrito nelle Nebbie",
+          "description": "L'avventuriero che cerchi si è allontanato oltre la portata della magia divinatoria.",
+          "hint": "Forse non è mai esistito, oppure l'incantesimo di scrutamento si è dissolto."
         },
         "app": {
           "skipToMain": "Vai al contenuto principale",

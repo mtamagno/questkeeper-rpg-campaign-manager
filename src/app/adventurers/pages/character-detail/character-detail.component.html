@@ -44,13 +44,16 @@
             · Level {{ char.sheet.level }}
           </p>
           @if (isCharacterReady()) {
-            <dl class="character-detail__quick-stats" aria-label="Statistiche principali">
+            <dl
+              class="character-detail__quick-stats"
+              [attr.aria-label]="uiText.text('interfaceLabels.quickStats')"
+            >
               <div class="character-detail__quick-stat">
-                <dt>HP</dt>
+                <dt>{{ uiText.text('interfaceLabels.hpShort') }}</dt>
                 <dd>{{ char.sheet.hitPoints }}/{{ char.sheet.maxHitPoints }}</dd>
               </div>
               <div class="character-detail__quick-stat">
-                <dt>AC</dt>
+                <dt>{{ uiText.text('interfaceLabels.acShort') }}</dt>
                 <dd>{{ char.sheet.armorClass }}</dd>
               </div>
               <div class="character-detail__quick-stat">
@@ -71,7 +74,7 @@
           }
           @if (char.playerName) {
             <p class="character-detail__player">
-              Played by <strong>{{ char.playerName }}</strong>
+              {{ uiText.text('interfaceLabels.playedBy') }} <strong>{{ char.playerName }}</strong>
             </p>
           }
         </div>
@@ -410,13 +413,13 @@
 } @else {
   <div class="character-detail__not-found">
     <div class="character-detail__not-found-icon">?</div>
-    <h2>Lost in the Mists</h2>
-    <p>The adventurer you seek has wandered beyond the reach of divination magic.</p>
+    <h2>{{ uiText.text('characterMissing.title') }}</h2>
+    <p>{{ uiText.text('characterMissing.description') }}</p>
     <p class="character-detail__not-found-hint">
-      Perhaps they never existed, or the scrying spell fizzled out.
+      {{ uiText.text('characterMissing.hint') }}
     </p>
     <a [routerLink]="['/', campaignId() ?? '', 'party']" class="character-detail__not-found-link">
-      ← Return to the Party
+      ← {{ uiText.text('interfaceLabels.returnToParty') }}
     </a>
   </div>
 }

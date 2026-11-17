@@ -25,6 +25,18 @@ const password = read('src/app/guild/components/password-dialog/password-dialog.
 const passwordCode = read('src/app/guild/components/password-dialog/password-dialog.component.ts');
 const lightbox = read('src/app/guild/components/image-lightbox/image-lightbox.component.html');
 const lightboxCode = read('src/app/guild/components/image-lightbox/image-lightbox.component.ts');
+const modalContracts = [
+  ['password dialog', password, passwordCode],
+  ['image lightbox', lightbox, lightboxCode],
+];
+const dmLoginTemplate = 'src/app/sanctum/components/dm-login-dialog/dm-login-dialog.component.html';
+const dmLoginCode = 'src/app/sanctum/components/dm-login-dialog/dm-login-dialog.component.ts';
+if (
+  fs.existsSync(path.join(root, dmLoginTemplate)) &&
+  fs.existsSync(path.join(root, dmLoginCode))
+) {
+  modalContracts.push(['DM login dialog', read(dmLoginTemplate), read(dmLoginCode)]);
+}
 const focusTrap = read('src/app/guild/utils/focusTrap.ts');
 const styles = read('src/styles/_accessibility.scss');
 const roadmap = read('docs/ROADMAP-60-DAYS.md');
@@ -89,10 +101,7 @@ assert.ok(!sidebar.includes('role="button"'), 'Sidebar toggles must use native b
 assert.match(sidebar, /<button\s+class="sidebar__category-title"/);
 assert.ok(command.includes('trapTabKey(dialog, event)'));
 
-for (const [name, template, code] of [
-  ['password dialog', password, passwordCode],
-  ['image lightbox', lightbox, lightboxCode],
-]) {
+for (const [name, template, code] of modalContracts) {
   assert.ok(template.includes('aria-modal="true"'), `${name} must be modal.`);
   assert.ok(template.includes('tabindex="-1"'), `${name} needs a programmatic focus target.`);
   assert.ok(code.includes('trapTabKey'), `${name} must contain Tab focus.`);
@@ -140,6 +149,23 @@ for (const file of htmlFiles) {
       `${relative} has an implicit button type.`,
     );
   }
+  for (const imageTag of html.match(/<img\b[\s\S]*?>/g) ?? []) {
+    assert.match(
+      imageTag,
+      /(?:\balt|\[alt\]|\[attr\.alt\])=/,
+      `${relative} has an image without an explicit text alternative decision.`,
+    );
+  }
+  assert.doesNotMatch(
+    html,
+    /\btabindex="[1-9][0-9]*"/,
+    `${relative} uses a positive tabindex and overrides the document reading order.`,
+  );
+  assert.doesNotMatch(
+    html,
+    /\sautofocus(?:\s|=|>)/,
+    `${relative} steals focus during rendering instead of following the route/modal contract.`,
+  );
 }
 
 assert.match(roadmap, /\[x\].*keyboard focus and landmark overhaul/);
@@ -147,5 +173,5 @@ assert.match(guide, /Focus follows navigation, not rendering accidents/);
 assert.match(guide, /360 CSS pixels/);
 
 console.log(
-  `Accessibility verified across ${htmlFiles.length} templates and ${tabContracts.length} tab systems: landmarks, route focus, keyboard tabs, coarse-pointer targets, reduced motion, live announcements, native controls, modal focus and high-contrast affordances.`,
+  `Accessibility verified across ${htmlFiles.length} templates and ${tabContracts.length} tab systems: landmarks, route focus, keyboard tabs, image alternatives, natural reading order, coarse-pointer targets, reduced motion, live announcements, native controls, modal focus and high-contrast affordances.`,
 );

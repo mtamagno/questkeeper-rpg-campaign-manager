@@ -6,6 +6,7 @@ import { SPELL_CATEGORIES } from '@arcana/constants/spells.constants';
 import { SPELL_SCHOOLS, isSpellEntry, type SpellEntry } from '@arcana/models/compendium.model';
 import { type CharacterSheet } from '@guild/models/character.model';
 import { CampaignService } from '@guild/services/campaign.service';
+import { UiTextService } from '@guild/services/uiText.service';
 import {
   CharacterRulePreferencesService,
   characterRuleEntryId,
@@ -54,6 +55,7 @@ interface SpellcastingSummary {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CharacterRuleLibraryComponent {
+  readonly uiText = inject(UiTextService);
   private readonly campaigns = inject(CampaignService);
   private readonly preferences = inject(CharacterRulePreferencesService);
 

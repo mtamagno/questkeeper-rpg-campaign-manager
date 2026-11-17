@@ -3,12 +3,14 @@ import {
   Component,
   computed,
   effect,
+  inject,
   input,
   output,
   signal,
 } from '@angular/core';
 
 import { type CharacterSheet, type CharacterSheetSnapshot } from '@guild/models/character.model';
+import { UiTextService } from '@guild/services/uiText.service';
 
 interface EvolutionChange {
   readonly label: string;
@@ -41,6 +43,7 @@ interface CollectionChange {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CharacterSheetHistoryComponent {
+  readonly uiText = inject(UiTextService);
   readonly snapshots = input.required<ReadonlyArray<CharacterSheetSnapshot>>();
   readonly selectedLevel = input.required<number>();
   readonly currentLevel = input.required<number>();

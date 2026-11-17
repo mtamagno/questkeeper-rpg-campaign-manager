@@ -35,7 +35,10 @@
   </section>
 
   @if (randomQuote(); as quote) {
-    <section class="homepage__quote-section" aria-label="Party quote">
+    <section
+      class="homepage__quote-section"
+      [attr.aria-label]="uiText.text('interfaceLabels.partyQuote')"
+    >
       <blockquote class="homepage__quote">
         <p class="homepage__quote-text">"{{ quote.text }}"</p>
         <footer class="homepage__quote-attribution">
@@ -95,7 +98,7 @@
           <strong>{{ partyCount() }}</strong>
         </a>
         <a class="homepage__metric" [routerLink]="['/', cId, 'npcs']" appSfxHover>
-          <span>NPC</span>
+          <span>{{ uiText.text('interfaceLabels.npcShort') }}</span>
           <strong>{{ npcCount() }}</strong>
         </a>
         <a class="homepage__metric" [routerLink]="['/', cId, 'campaign']" appSfxHover>

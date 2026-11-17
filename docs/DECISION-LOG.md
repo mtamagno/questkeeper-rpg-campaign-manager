@@ -1934,3 +1934,35 @@ navigation without deleting destinations.
 **Revisit when:** Player evidence shows a primary action is consistently missed,
 native applications require a different shell, or account synchronization
 changes preference ownership.
+
+### QK-072 — Accessible interface copy has one data owner
+
+**Date:** 17 November 2026
+
+**Status:** Active; remaining migration tracked by #142 and #139
+
+**Decision:** Product-owned visible copy, accessible names, titles,
+placeholders, status and recovery messages belong to the versioned `ui.json`
+registry. Campaign prose and licensed/data-owned localized fields stay outside
+that registry. Repository guards reject new literal template copy; only a
+small reviewed list of notation, keyboard tokens, document formats, proper
+module names and syntax examples may remain literal.
+
+**Why:** A page is not truly translated or customizable when its visual label
+uses the catalog but its screen-reader name, placeholder or failure state is
+fixed in component code. Treating those strings separately also lets new debt
+enter already-audited routes unnoticed.
+
+**Consequences:** New UI text is added to every declared interface locale with
+placeholder parity. Literal exceptions need an explicit reason in the guard.
+Existing dynamic EN/IT branches remain visible migration debt and are ranked
+by complete user journey rather than converted piecemeal. A rules module that
+selects localized data is classified before migration instead of being assumed
+to own interface chrome.
+
+**Source:** [17 November quality-fortnight exit review](reviews/2026-11-17-quality-fortnight-exit.md)
+and issue #142.
+
+**Revisit when:** The interface catalog is replaced by a generated localization
+pipeline, or a supported extension contract needs independently versioned UI
+namespaces with equivalent validation.
