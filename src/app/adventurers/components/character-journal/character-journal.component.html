@@ -2,23 +2,17 @@
   <header class="journal-hub__header">
     <div>
       <span class="journal-hub__eyebrow">
-        {{ isItalian() ? 'Archivio personale' : 'Personal archive' }}
+        {{ uiText.text('characterJournal.eyebrow') }}
       </span>
-      <h2>{{ isItalian() ? 'Memorie di' : 'Memories of' }} {{ characterName() }}</h2>
-      <p>
-        {{
-          isItalian()
-            ? 'Scegli una raccolta: solo quella aperta occupa la pagina, senza perdere il punto in cui eri arrivato.'
-            : 'Choose a collection: only the open one occupies the page, without losing your place.'
-        }}
-      </p>
+      <h2>{{ uiText.text('characterJournal.title', { name: characterName() }) }}</h2>
+      <p>{{ uiText.text('characterJournal.intro') }}</p>
     </div>
   </header>
 
   <nav
     class="journal-hub__tabs"
     role="tablist"
-    [attr.aria-label]="isItalian() ? 'Raccolte del diario' : 'Journal collections'"
+    [attr.aria-label]="uiText.text('characterJournal.collectionsLabel')"
   >
     @for (destination of destinations(); track destination.id) {
       <button
@@ -57,14 +51,8 @@
       <div class="journal-hub__index-heading">
         <span aria-hidden="true">✦</span>
         <div>
-          <h3>{{ isItalian() ? 'Scegli cosa ricordare' : 'Choose what to remember' }}</h3>
-          <p>
-            {{
-              isItalian()
-                ? 'Le raccolte restano separate per rendere leggibile anche un archivio molto grande.'
-                : 'Collections stay separate so even a large archive remains readable.'
-            }}
-          </p>
+          <h3>{{ uiText.text('characterJournal.chooseTitle') }}</h3>
+          <p>{{ uiText.text('characterJournal.chooseHelp') }}</p>
         </div>
       </div>
       <div class="journal-hub__index-grid">
@@ -79,12 +67,8 @@
               <small>
                 {{
                   hasNotebookReadingPosition()
-                    ? isItalian()
-                      ? 'Riprendi la lettura'
-                      : 'Continue reading'
-                    : isItalian()
-                      ? 'Taccuino protetto'
-                      : 'Protected notebook'
+                    ? uiText.text('characterJournal.continueReading')
+                    : uiText.text('characterJournal.protectedNotebook')
                 }}
               </small>
               <strong>{{ notebookData.title | bilingual }}</strong>
@@ -101,15 +85,9 @@
           >
             <span class="journal-hub__index-icon" aria-hidden="true">🖼️</span>
             <span>
-              <small>{{ isItalian() ? 'Archivio visivo' : 'Visual archive' }}</small>
-              <strong>{{ isItalian() ? 'Galleria' : 'Gallery' }}</strong>
-              <span>
-                {{
-                  isItalian()
-                    ? 'Ritratti e scene si caricano solo quando apri questa raccolta.'
-                    : 'Portraits and scenes load only when you open this collection.'
-                }}
-              </span>
+              <small>{{ uiText.text('characterJournal.visualArchive') }}</small>
+              <strong>{{ uiText.text('characterJournal.destinations.gallery.label') }}</strong>
+              <span>{{ uiText.text('characterJournal.galleryLazyHelp') }}</span>
             </span>
             <b>{{ gallery().length }}</b>
           </button>
@@ -129,16 +107,8 @@
     } @else {
       <div class="journal-hub__empty">
         <span aria-hidden="true">📖</span>
-        <strong>{{
-          isItalian() ? 'Nessuna memoria pubblicata' : 'No memories published yet'
-        }}</strong>
-        <p>
-          {{
-            isItalian()
-              ? 'Taccuino, immagini e diario compariranno qui quando verranno aggiunti.'
-              : 'A notebook, images and session diary will appear here when they are added.'
-          }}
-        </p>
+        <strong>{{ uiText.text('characterJournal.emptyTitle') }}</strong>
+        <p>{{ uiText.text('characterJournal.emptyHelp') }}</p>
       </div>
     }
   </section>
@@ -174,14 +144,8 @@
       <div class="journal-hub__workspace-heading">
         <span aria-hidden="true">🖼️</span>
         <div>
-          <h3>{{ isItalian() ? 'Galleria' : 'Gallery' }}</h3>
-          <p>
-            {{
-              isItalian()
-                ? gallery().length + ' immagini raccolte lungo il viaggio.'
-                : gallery().length + ' images gathered along the journey.'
-            }}
-          </p>
+          <h3>{{ uiText.text('characterJournal.destinations.gallery.label') }}</h3>
+          <p>{{ uiText.text('characterJournal.galleryCount', { count: gallery().length }) }}</p>
         </div>
       </div>
       <app-image-gallery [images]="gallery()" galleryTitle="" />
@@ -200,7 +164,7 @@
       <span id="diary" class="journal-hub__anchor" aria-hidden="true"></span>
       <app-session-diary
         [entries]="diary()"
-        [title]="isItalian() ? 'Diario delle sessioni' : 'Session Diary'"
+        [title]="uiText.text('characterJournal.diaryTitle')"
       />
     </section>
   }

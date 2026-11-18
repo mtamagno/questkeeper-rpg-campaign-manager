@@ -21,7 +21,7 @@ import {
 import { CampaignService } from '@guild/services/campaign.service';
 import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
 import { CharacterReadingPositionService } from '@guild/services/characterReadingPosition.service';
-import { LanguageService } from '@guild/services/language.service';
+import { UiTextService } from '@guild/services/uiText.service';
 import { BilingualTextPipe } from '@guild/components/bilingual-text/bilingual-text.pipe';
 import { ImageGalleryComponent } from '@guild/components/image-gallery/image-gallery.component';
 import { CharacterNotebookComponent } from '../character-notebook/character-notebook.component';
@@ -51,7 +51,7 @@ interface CharacterJournalDestination {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CharacterJournalComponent {
-  private readonly languageService = inject(LanguageService);
+  readonly uiText = inject(UiTextService);
   private readonly campaignService = inject(CampaignService);
   private readonly campaignLocale = inject(CampaignLocaleService);
   private readonly readingPosition = inject(CharacterReadingPositionService);
@@ -65,7 +65,6 @@ export class CharacterJournalComponent {
   readonly gallery = input.required<ReadonlyArray<ImageRef>>();
   readonly diary = input.required<ReadonlyArray<DiaryEntry>>();
 
-  readonly isItalian = computed(() => this.languageService.currentLanguage() === 'it');
   readonly activeWorkspace = signal<CharacterJournalWorkspace>('index');
   readonly visitedWorkspaces = signal<ReadonlySet<CharacterJournalWorkspace>>(new Set(['index']));
 
@@ -82,15 +81,12 @@ export class CharacterJournalComponent {
   );
 
   readonly destinations: Signal<ReadonlyArray<CharacterJournalDestination>> = computed(() => {
-    const italian = this.isItalian();
     const destinations: CharacterJournalDestination[] = [
       {
         id: 'index',
         icon: '✦',
-        label: italian ? 'Indice' : 'Index',
-        description: italian
-          ? 'Una mappa leggera di tutte le memorie disponibili.'
-          : 'A lightweight map of every available memory.',
+        label: this.uiText.text('characterJournal.destinations.index.label'),
+        description: this.uiText.text('characterJournal.destinations.index.description'),
       },
     ];
 
@@ -99,10 +95,8 @@ export class CharacterJournalComponent {
       destinations.push({
         id: 'notebook',
         icon: '📓',
-        label: italian ? 'Taccuino' : 'Notebook',
-        description: italian
-          ? 'Pagine illustrate e pensieri protetti.'
-          : 'Protected illustrated pages and private reflections.',
+        label: this.uiText.text('characterJournal.destinations.notebook.label'),
+        description: this.uiText.text('characterJournal.destinations.notebook.description'),
         count: notebook.pages.length,
       });
     }
@@ -110,10 +104,8 @@ export class CharacterJournalComponent {
       destinations.push({
         id: 'gallery',
         icon: '🖼️',
-        label: italian ? 'Galleria' : 'Gallery',
-        description: italian
-          ? 'Ritratti, scene e riferimenti visivi.'
-          : 'Portraits, scenes and visual references.',
+        label: this.uiText.text('characterJournal.destinations.gallery.label'),
+        description: this.uiText.text('characterJournal.destinations.gallery.description'),
         count: this.gallery().length,
       });
     }
@@ -121,10 +113,8 @@ export class CharacterJournalComponent {
       destinations.push({
         id: 'diary',
         icon: '📜',
-        label: italian ? 'Sessioni' : 'Sessions',
-        description: italian
-          ? 'La memoria pubblica, sessione dopo sessione.'
-          : 'The public record, one session at a time.',
+        label: this.uiText.text('characterJournal.destinations.diary.label'),
+        description: this.uiText.text('characterJournal.destinations.diary.description'),
         count: this.diary().length,
       });
     }

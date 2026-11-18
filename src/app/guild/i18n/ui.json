@@ -512,6 +512,41 @@
           "emptyTitle": "The web of connections is still hidden",
           "emptyHelp": "As the party meets new people, alliances and conflicts will take shape here."
         },
+        "characterJournal": {
+          "eyebrow": "Personal archive",
+          "title": "Memories of {name}",
+          "intro": "Choose a collection: only the open one occupies the page, without losing your place.",
+          "collectionsLabel": "Journal collections",
+          "chooseTitle": "Choose what to remember",
+          "chooseHelp": "Collections stay separate so even a large archive remains readable.",
+          "continueReading": "Continue reading",
+          "protectedNotebook": "Protected notebook",
+          "visualArchive": "Visual archive",
+          "galleryLazyHelp": "Portraits and scenes load only when you open this collection.",
+          "emptyTitle": "No memories published yet",
+          "emptyHelp": "A notebook, images and session diary will appear here when they are added.",
+          "galleryCount": "{count} images gathered along the journey.",
+          "diaryTitle": "Session diary",
+          "referencesLabel": "People, places and session connected to this memory",
+          "destinations": {
+            "index": {
+              "label": "Index",
+              "description": "A lightweight map of every available memory."
+            },
+            "notebook": {
+              "label": "Notebook",
+              "description": "Protected illustrated pages and private reflections."
+            },
+            "gallery": {
+              "label": "Gallery",
+              "description": "Portraits, scenes and visual references."
+            },
+            "diary": {
+              "label": "Sessions",
+              "description": "The public record, one session at a time."
+            }
+          }
+        },
         "relationshipDetail": {
           "loading": "Consulting the chronicles...",
           "mutual": "Mutual",
@@ -1037,6 +1072,41 @@
           "npcs": "PNG",
           "emptyTitle": "La rete di conoscenze è ancora nascosta",
           "emptyHelp": "Quando la compagnia incontrerà nuovi personaggi, alleanze e conflitti prenderanno forma qui."
+        },
+        "characterJournal": {
+          "eyebrow": "Archivio personale",
+          "title": "Memorie di {name}",
+          "intro": "Scegli una raccolta: solo quella aperta occupa la pagina, senza perdere il punto in cui eri arrivato.",
+          "collectionsLabel": "Raccolte del diario",
+          "chooseTitle": "Scegli cosa ricordare",
+          "chooseHelp": "Le raccolte restano separate per rendere leggibile anche un archivio molto grande.",
+          "continueReading": "Riprendi la lettura",
+          "protectedNotebook": "Taccuino protetto",
+          "visualArchive": "Archivio visivo",
+          "galleryLazyHelp": "Ritratti e scene si caricano solo quando apri questa raccolta.",
+          "emptyTitle": "Nessuna memoria pubblicata",
+          "emptyHelp": "Taccuino, immagini e diario compariranno qui quando verranno aggiunti.",
+          "galleryCount": "{count} immagini raccolte lungo il viaggio.",
+          "diaryTitle": "Diario delle sessioni",
+          "referencesLabel": "Persone, luoghi e sessione collegati a questo ricordo",
+          "destinations": {
+            "index": {
+              "label": "Indice",
+              "description": "Una mappa leggera di tutte le memorie disponibili."
+            },
+            "notebook": {
+              "label": "Taccuino",
+              "description": "Pagine illustrate e pensieri protetti."
+            },
+            "gallery": {
+              "label": "Galleria",
+              "description": "Ritratti, scene e riferimenti visivi."
+            },
+            "diary": {
+              "label": "Sessioni",
+              "description": "La memoria pubblica, sessione dopo sessione."
+            }
+          }
         },
         "relationshipDetail": {
           "loading": "Consulto le cronache...",

@@ -21,7 +21,7 @@ import { DiaryEntryComponent } from '../diary-entry/diary-entry.component';
 })
 export class SessionDiaryComponent {
   /** Localized heading supplied by the owning journal workspace. */
-  readonly title = input<string>('Session Diary');
+  readonly title = input.required<string>();
 
   /** Diary entries to display, sorted by date. */
   readonly entries = input.required<ReadonlyArray<DiaryEntry>>();
