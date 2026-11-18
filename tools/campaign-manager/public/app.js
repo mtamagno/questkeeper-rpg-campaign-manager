@@ -1824,6 +1824,42 @@ function storyLocalizedFields(prefix, label, value, languages, options = {}) {
     .join('');
 }
 
+function diaryMultiSelect(name, label, selectedIds = [], entries = [], labelForEntry = (item) => item.name) {
+  const selected = new Set(selectedIds);
+  return `<label class="field"><span>${escapeHtml(label)}</span><select name="${escapeHtml(name)}" multiple size="${Math.min(6, Math.max(3, entries.length))}">${entries.map((item) => `<option value="${escapeHtml(item.id)}" ${selected.has(item.id) ? 'selected' : ''}>${escapeHtml(labelForEntry(item))}</option>`).join('')}</select><small>Optional. Use Ctrl/Cmd to select more than one.</small></label>`;
+}
+
+function diaryEntryEditor(entry = {}, languages = campaignLanguages(), index = 0) {
+  const defaultLanguage = state.campaign?.manifestEntry?.defaultLanguage ?? languages[0];
+  const sessions = state.campaign?.sessions ?? [];
+  const characters = state.campaign?.characters ?? [];
+  const npcs = state.campaign?.npcs ?? [];
+  const maps = state.campaign?.maps ?? [];
+  const sessionOptions = sessions.map((session) => [
+    session.id,
+    `${session.sessionNumber ?? '—'} · ${localized(session.title, defaultLanguage) || session.id}`,
+  ]);
+  return `<article class="diary-editor__entry" data-diary-entry>
+    <div class="notebook-page-card__header"><strong>Memory ${index + 1}</strong><button class="quiet-button" type="button" data-diary-remove-entry>Remove memory</button></div>
+    <div class="form-grid">
+      ${field('diarySessionId', 'Session', entry.sessionId || sessionOptions[0]?.[0] || '', { type: 'select', values: sessionOptions })}
+      ${field('diaryDate', 'Date', entry.date || '', { type: 'date' })}
+      ${storyLocalizedFields('diaryTitle', 'Memory title', entry.title, languages)}
+      ${storyLocalizedFields('diaryContent', 'Reflection', entry.content, languages, { type: 'textarea', wide: true })}
+      ${diaryMultiSelect('diaryRelatedCharacters', 'Party members', entry.relatedCharacterIds, characters)}
+      ${diaryMultiSelect('diaryRelatedNpcs', 'Known NPCs', entry.relatedNpcIds, npcs)}
+      ${diaryMultiSelect('diaryRelatedMaps', 'Places', entry.relatedMapIds, maps, (map) => localized(map.name, defaultLanguage) || map.id)}
+    </div>
+  </article>`;
+}
+
+function diaryEditor(item = {}, languages = campaignLanguages()) {
+  return `<section class="diary-editor field--wide" data-diary-editor>
+    <div class="notebook-pages-heading"><div><strong>Session memories</strong><small>Connect each reflection to its session, people and places. Links appear beneath the published entry.</small></div><button class="secondary-button" type="button" data-diary-add-entry>Add memory</button></div>
+    <div class="diary-editor__list" data-diary-entries>${(item.diary ?? []).map((entry, index) => diaryEntryEditor(entry, languages, index)).join('')}</div>
+  </section>`;
+}
+
 function storyHighlightCard(kind, item = {}, languages = campaignLanguages(), index = 0) {
   const source = item.source ?? {};
   const definitions = {
@@ -2578,6 +2614,8 @@ function entityForm(type, item = {}) {
       ),
       section('Story highlights'),
       storyHighlightsEditor(item, languages),
+      section('Session diary'),
+      diaryEditor(item, languages),
       section('Personal notebook'),
       notebookEditor(item, languages),
       section('Private notes'),
@@ -3080,6 +3118,35 @@ function buildStoryHighlights() {
   return result;
 }
 
+function buildDiary() {
+  const languages = campaignLanguages();
+  const sessions = new Set((state.campaign?.sessions ?? []).map((item) => item.id));
+  const characters = new Set((state.campaign?.characters ?? []).map((item) => item.id));
+  const npcs = new Set((state.campaign?.npcs ?? []).map((item) => item.id));
+  const maps = new Set((state.campaign?.maps ?? []).map((item) => item.id));
+  const selectedValues = (card, name) =>
+    [...(card.querySelector(`[name="${name}"]`)?.selectedOptions ?? [])].map((option) => option.value);
+  return [...(fields.querySelectorAll('[data-diary-entry]') ?? [])].map((card, index) => {
+    const sessionId = card.querySelector('[name="diarySessionId"]')?.value.trim();
+    if (!sessions.has(sessionId)) throw new Error(`Memory ${index + 1} must link to an existing session.`);
+    const relatedCharacterIds = selectedValues(card, 'diaryRelatedCharacters');
+    const relatedNpcIds = selectedValues(card, 'diaryRelatedNpcs');
+    const relatedMapIds = selectedValues(card, 'diaryRelatedMaps');
+    if (relatedCharacterIds.some((id) => !characters.has(id))) throw new Error(`Memory ${index + 1} links an unknown party member.`);
+    if (relatedNpcIds.some((id) => !npcs.has(id))) throw new Error(`Memory ${index + 1} links an unknown NPC.`);
+    if (relatedMapIds.some((id) => !maps.has(id))) throw new Error(`Memory ${index + 1} links an unknown place.`);
+    return {
+      sessionId,
+      date: card.querySelector('[name="diaryDate"]')?.value || '',
+      title: storyLocalizedValue(card, 'diaryTitle', languages),
+      content: storyLocalizedValue(card, 'diaryContent', languages),
+      ...(relatedCharacterIds.length ? { relatedCharacterIds } : {}),
+      ...(relatedNpcIds.length ? { relatedNpcIds } : {}),
+      ...(relatedMapIds.length ? { relatedMapIds } : {}),
+    };
+  });
+}
+
 function relationshipRows(form, prefix, languages) {
   return Object.fromEntries(
     languages.map((language) => [
@@ -3214,6 +3281,7 @@ async function buildEntity(type, form, original = {}) {
       if (storyHighlights[key].length) item.publicProfile[key] = storyHighlights[key];
       else delete item.publicProfile[key];
     }
+    item.diary = buildDiary();
     item.privateProfile = {
       ...item.privateProfile,
       secretBackstory: localizedFormValue(form, 'secret', '', languages),
@@ -4901,6 +4969,20 @@ fields.addEventListener('click', (event) => {
   const removeStoryHighlight = event.target.closest('[data-story-remove]');
   if (removeStoryHighlight) {
     removeStoryHighlight.closest('[data-story-card]')?.remove();
+    return;
+  }
+  const addDiaryEntry = event.target.closest('[data-diary-add-entry]');
+  if (addDiaryEntry) {
+    const list = fields.querySelector('[data-diary-entries]');
+    const index = list.querySelectorAll('[data-diary-entry]').length;
+    list.insertAdjacentHTML('beforeend', diaryEntryEditor({}, campaignLanguages(), index));
+    window.managerI18n?.translateTree?.(list.lastElementChild);
+    list.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+  const removeDiaryEntry = event.target.closest('[data-diary-remove-entry]');
+  if (removeDiaryEntry) {
+    removeDiaryEntry.closest('[data-diary-entry]')?.remove();
     return;
   }
   const addNotebookPage = event.target.closest('[data-notebook-add-page]');

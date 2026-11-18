@@ -252,6 +252,10 @@ export interface DiaryEntry {
   readonly date: string;
   readonly title: BilingualText;
   readonly content: BilingualText;
+  /** Optional cross-links that reconnect this memory to the people and places involved. */
+  readonly relatedCharacterIds?: ReadonlyArray<string>;
+  readonly relatedNpcIds?: ReadonlyArray<string>;
+  readonly relatedMapIds?: ReadonlyArray<string>;
 }
 
 /**

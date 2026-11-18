@@ -113,7 +113,10 @@ Each character JSON contains:
 - sheet: level, archetype/class, ancestry, background, abilities, saves,
   skills, equipment, features, spells and currency;
 - optional `sheetHistory`: prior sheet snapshots for level progression;
-- diary, session knowledge and quotes;
+- diary, session knowledge and quotes. Each diary entry requires a valid
+  `sessionId` and may link `relatedCharacterIds`, `relatedNpcIds` and
+  `relatedMapIds`; use canonical entity IDs, keep every list unique and omit an
+  optional list when it is empty;
 - optional standing height in centimetres (`heightCm`), useful for consistent
   party-art proportions;
 - optional localized `pronouns`, kept separate from the legacy localized

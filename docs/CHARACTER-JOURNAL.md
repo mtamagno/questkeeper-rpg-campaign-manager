@@ -34,6 +34,18 @@ All collections are optional and remain data-driven:
 - `gallery` contains character-owned image references;
 - `diary` contains localized public session memories.
 
+Every diary entry has one required `sessionId` and may carry
+`relatedCharacterIds`, `relatedNpcIds` and `relatedMapIds`. The Companion turns
+resolved references into compact links beneath the reflection; unknown IDs are
+rejected by the journal validation gate instead of producing dead navigation.
+The session, people and places remain canonical entities: do not repeat their
+names or URLs inside the diary schema.
+
+Campaign Manager exposes the same contract as an editable **Session diary**
+workspace. Authors choose the session and optional related entities from the
+current campaign, while localized title and reflection fields follow the
+campaign's configured languages. Hand-authored JSON remains supported.
+
 Notebook passwords discourage casual spoilers; they are not encryption or an
 authorization boundary. Private campaign prose and protected media must never be
 copied into the public template. AI-assisted pages remain editable drafts and

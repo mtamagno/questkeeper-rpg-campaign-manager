@@ -14,6 +14,13 @@ const detailTemplate = read(
 const diaryComponent = read(
   'src/app/adventurers/components/session-diary/session-diary.component.ts',
 );
+const diaryEntryComponent = read(
+  'src/app/adventurers/components/diary-entry/diary-entry.component.ts',
+);
+const diaryEntryTemplate = read(
+  'src/app/adventurers/components/diary-entry/diary-entry.component.html',
+);
+const manager = read('tools/campaign-manager/public/app.js');
 
 for (const workspace of ['index', 'notebook', 'gallery', 'diary']) {
   assert.match(component, new RegExp(`'${workspace}'`), `${workspace} workspace is missing.`);
@@ -58,7 +65,18 @@ assert.match(detailTemplate, /app-character-journal/);
 assert.doesNotMatch(detailTemplate, /<app-character-notebook/);
 assert.doesNotMatch(detailTemplate, /<app-image-gallery/);
 assert.doesNotMatch(detailTemplate, /<app-session-diary/);
-assert.match(diaryComponent, /readonly title = input<string>\('Session Diary'\)/);
+assert.match(diaryComponent, /readonly title = input<string>/);
+assert.match(component, /UiTextService/);
+assert.doesNotMatch(component, /LanguageService/);
+assert.doesNotMatch(template, /isItalian\(/);
+assert.match(diaryEntryComponent, /relatedCharacterIds/);
+assert.match(diaryEntryComponent, /relatedNpcIds/);
+assert.match(diaryEntryComponent, /relatedMapIds/);
+assert.match(diaryEntryTemplate, /routerLink/);
+assert.match(diaryEntryTemplate, /referencesLabel/);
+assert.match(manager, /data-diary-editor/);
+assert.match(manager, /function buildDiary/);
+assert.match(manager, /data-diary-add-entry/);
 
 const campaignsRoot = path.join(projectRoot, 'src', 'campaigns');
 const campaigns = JSON.parse(fs.readFileSync(path.join(campaignsRoot, 'campaigns.json'), 'utf8'));
@@ -69,16 +87,57 @@ let diaryCount = 0;
 let emptyJournalCount = 0;
 
 for (const campaign of campaigns) {
+  const campaignRoot = path.join(campaignsRoot, campaign.id, 'data');
   const charactersRoot = path.join(campaignsRoot, campaign.id, 'data', 'characters');
   const manifestPath = path.join(charactersRoot, 'manifest.json');
   if (!fs.existsSync(manifestPath)) continue;
   const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+  const idsFromManifest = (folder) => {
+    const root = path.join(campaignRoot, folder);
+    const candidate = path.join(root, 'manifest.json');
+    if (!fs.existsSync(candidate)) return new Set();
+    return new Set(
+      JSON.parse(fs.readFileSync(candidate, 'utf8')).map(
+        (fileName) => JSON.parse(fs.readFileSync(path.join(root, fileName), 'utf8')).id,
+      ),
+    );
+  };
+  const characterIds = new Set(
+    manifest.map(
+      (fileName) => JSON.parse(fs.readFileSync(path.join(charactersRoot, fileName), 'utf8')).id,
+    ),
+  );
+  const npcIds = idsFromManifest('npcs');
+  const sessionIds = idsFromManifest('sessions');
+  const mapsPath = path.join(campaignRoot, 'maps.json');
+  const mapIds = new Set(
+    fs.existsSync(mapsPath)
+      ? JSON.parse(fs.readFileSync(mapsPath, 'utf8')).map((map) => map.id)
+      : [],
+  );
   for (const fileName of manifest) {
     const character = JSON.parse(fs.readFileSync(path.join(charactersRoot, fileName), 'utf8'));
     characterCount += 1;
     if (character.notebook) notebookCount += 1;
     if ((character.gallery ?? []).length > 0) galleryCount += 1;
     if ((character.diary ?? []).length > 0) diaryCount += 1;
+    for (const entry of character.diary ?? []) {
+      const label = `${campaign.id}/${character.id}/${entry.sessionId}`;
+      assert(sessionIds.has(entry.sessionId), `${label} links an unknown session.`);
+      for (const [property, ids] of [
+        ['relatedCharacterIds', characterIds],
+        ['relatedNpcIds', npcIds],
+        ['relatedMapIds', mapIds],
+      ]) {
+        const references = entry[property] ?? [];
+        assert.equal(
+          new Set(references).size,
+          references.length,
+          `${label} repeats an ID in ${property}.`,
+        );
+        for (const id of references) assert(ids.has(id), `${label} links unknown ${property} ${id}.`);
+      }
+    }
     if (
       !character.notebook &&
       !(character.gallery ?? []).length &&
@@ -92,7 +151,7 @@ for (const campaign of campaigns) {
 assert.ok(characterCount > 0, 'At least one character fixture is required.');
 assert.ok(notebookCount > 0, 'At least one character must exercise the notebook destination.');
 assert.ok(diaryCount > 0, 'At least one character must exercise the session destination.');
-assert.match(template, /Nessuna memoria pubblicata/);
+assert.doesNotMatch(template, /Nessuna memoria pubblicata/);
 
 console.log(
   `Character journal contract verified across ${characterCount} characters: ${notebookCount} notebooks, ${galleryCount} galleries, ${diaryCount} diaries and ${emptyJournalCount} empty archives.`,

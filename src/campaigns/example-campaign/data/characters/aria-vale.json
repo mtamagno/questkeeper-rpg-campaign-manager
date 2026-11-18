@@ -92,8 +92,11 @@
       "title": { "en": "Marks beneath the soot", "it": "Segni sotto la fuliggine" },
       "content": {
         "en": "I repaired that lantern yesterday. Someone wanted me to know they could reach the mechanism without breaking the glass.",
-        "it": "Ho riparato quella lanterna ieri. Qualcuno voleva farmi sapere che poteva raggiungere il meccanismo senza rompere il vetro."
-      }
+      "it": "Ho riparato quella lanterna ieri. Qualcuno voleva farmi sapere che poteva raggiungere il meccanismo senza rompere il vetro."
+    },
+    "relatedCharacterIds": ["mira-thorn"],
+    "relatedNpcIds": ["keeper-rowan"],
+    "relatedMapIds": ["embercross"]
     },
     {
       "sessionId": "session-2",
@@ -101,8 +104,11 @@
       "title": { "en": "The light knew me", "it": "La luce mi conosceva" },
       "content": {
         "en": "I showed Mira the shard. Asking for help still feels like handing someone the sharp edge, but she took it carefully.",
-        "it": "Ho mostrato la scheggia a Mira. Chiedere aiuto sembra ancora come porgere a qualcuno il lato tagliente, ma lei l'ha presa con cautela."
-      }
+      "it": "Ho mostrato la scheggia a Mira. Chiedere aiuto sembra ancora come porgere a qualcuno il lato tagliente, ma lei l'ha presa con cautela."
+    },
+    "relatedCharacterIds": ["mira-thorn"],
+    "relatedNpcIds": ["sable-finch"],
+    "relatedMapIds": ["glass-beacon"]
     }
   ],
   "sessionKnowledge": [

@@ -53,4 +53,31 @@
     line-height: $line-height-relaxed;
     margin: 0;
   }
+
+  &__references {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-xs;
+    margin-top: $spacing-xs;
+  }
+
+  &__reference {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-height: 2.25rem;
+    padding: 0.4rem 0.7rem;
+    border: $border-width-default solid rgba($color-gold, 0.34);
+    border-radius: 999px;
+    color: $color-gold-light;
+    background: rgba($color-bg-base, 0.55);
+    text-decoration: none;
+    font-size: $font-size-sm;
+
+    &:hover,
+    &:focus-visible {
+      border-color: $color-gold;
+      background: rgba($color-gold, 0.12);
+    }
+  }
 }

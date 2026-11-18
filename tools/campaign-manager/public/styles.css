@@ -1580,6 +1580,22 @@ button:disabled {
   display: grid;
   gap: 1rem;
 }
+.diary-editor,
+.diary-editor__list {
+  display: grid;
+  gap: 1rem;
+}
+.diary-editor__entry {
+  display: grid;
+  gap: 0.8rem;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(6, 10, 9, 0.36);
+}
+.diary-editor select[multiple] {
+  min-height: 7rem;
+}
 .notebook-asset-preview {
   margin: 0;
 }

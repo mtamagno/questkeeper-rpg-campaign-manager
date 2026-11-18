@@ -7,5 +7,18 @@
     </div>
     <h3 class="diary-entry__title">{{ entry().title | bilingual }}</h3>
     <p class="diary-entry__text">{{ entry().content | bilingual }}</p>
+    @if (references().length > 0) {
+      <nav
+        class="diary-entry__references"
+        [attr.aria-label]="uiText.text('characterJournal.referencesLabel')"
+      >
+        @for (reference of references(); track reference.id) {
+          <a class="diary-entry__reference" [routerLink]="reference.route">
+            <span aria-hidden="true">{{ reference.icon }}</span>
+            <span>{{ reference.label }}</span>
+          </a>
+        }
+      </nav>
+    }
   </div>
 </article>
