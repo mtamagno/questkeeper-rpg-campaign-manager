@@ -118,7 +118,12 @@ planned feature is deleted to create the quality window.
 
 | Recovery day | Commit 1                                                          | Commit 2                                                                             |
 | ------------ | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| **18 Nov**   | [ ] `feat: connect journal entries to sessions people and places` | [ ] `review: close the complete character-story journey and re-plan downstream work` |
+| **18 Nov**   | [x] [`feat: connect journal entries to sessions people and places`](CHARACTER-JOURNAL.md) | [x] [`review: close the complete character-story journey and re-plan downstream work`](CHARACTER-STORY-INTEGRATION-REVIEW.md) |
+
+The integration review keeps the later outcomes but removes duplicate surface
+work: relationship history extends the existing map, shared and party memories
+reference canonical diary/session evidence, and notebook chronology stays inside
+the current lazy Journal workspace.
 
 ## Week 3 — The party remembers together
 
