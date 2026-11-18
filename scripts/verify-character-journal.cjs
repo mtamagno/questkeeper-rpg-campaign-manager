@@ -65,7 +65,7 @@ assert.match(detailTemplate, /app-character-journal/);
 assert.doesNotMatch(detailTemplate, /<app-character-notebook/);
 assert.doesNotMatch(detailTemplate, /<app-image-gallery/);
 assert.doesNotMatch(detailTemplate, /<app-session-diary/);
-assert.match(diaryComponent, /readonly title = input<string>/);
+assert.match(diaryComponent, /readonly title = input\.required<string>/);
 assert.match(component, /UiTextService/);
 assert.doesNotMatch(component, /LanguageService/);
 assert.doesNotMatch(template, /isItalian\(/);
