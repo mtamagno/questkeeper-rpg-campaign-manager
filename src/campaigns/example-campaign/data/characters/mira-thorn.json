@@ -326,11 +326,11 @@
       "title": { "en": "A delivery without an address", "it": "Una consegna senza indirizzo" },
       "content": {
         "en": "The seal matched Aria's lantern. For once, moving faster would not have told me where I was going.",
-      "it": "Il sigillo coincideva con quello della lanterna di Aria. Per una volta, muovermi più in fretta non mi avrebbe detto dove stavo andando."
-    },
-    "relatedCharacterIds": ["aria-vale"],
-    "relatedNpcIds": ["keeper-rowan"],
-    "relatedMapIds": ["embercross"]
+        "it": "Il sigillo coincideva con quello della lanterna di Aria. Per una volta, muovermi più in fretta non mi avrebbe detto dove stavo andando."
+      },
+      "relatedCharacterIds": ["aria-vale"],
+      "relatedNpcIds": ["keeper-rowan"],
+      "relatedMapIds": ["embercross"]
     },
     {
       "sessionId": "session-2",
@@ -338,11 +338,11 @@
       "title": { "en": "The wrong shadow", "it": "L'ombra sbagliata" },
       "content": {
         "en": "Aria was right about the marks. I wish she had been wrong about where they led.",
-      "it": "Aria aveva ragione sui segni. Vorrei che si fosse sbagliata sulla loro destinazione."
-    },
-    "relatedCharacterIds": ["aria-vale"],
-    "relatedNpcIds": ["sable-finch"],
-    "relatedMapIds": ["glass-beacon"]
+        "it": "Aria aveva ragione sui segni. Vorrei che si fosse sbagliata sulla loro destinazione."
+      },
+      "relatedCharacterIds": ["aria-vale"],
+      "relatedNpcIds": ["sable-finch"],
+      "relatedMapIds": ["glass-beacon"]
     }
   ],
   "sessionKnowledge": [

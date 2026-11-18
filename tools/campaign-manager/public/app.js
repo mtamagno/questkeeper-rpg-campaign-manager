@@ -1824,7 +1824,13 @@ function storyLocalizedFields(prefix, label, value, languages, options = {}) {
     .join('');
 }
 
-function diaryMultiSelect(name, label, selectedIds = [], entries = [], labelForEntry = (item) => item.name) {
+function diaryMultiSelect(
+  name,
+  label,
+  selectedIds = [],
+  entries = [],
+  labelForEntry = (item) => item.name,
+) {
   const selected = new Set(selectedIds);
   return `<label class="field"><span>${escapeHtml(label)}</span><select name="${escapeHtml(name)}" multiple size="${Math.min(6, Math.max(3, entries.length))}">${entries.map((item) => `<option value="${escapeHtml(item.id)}" ${selected.has(item.id) ? 'selected' : ''}>${escapeHtml(labelForEntry(item))}</option>`).join('')}</select><small>Optional. Use Ctrl/Cmd to select more than one.</small></label>`;
 }
@@ -3125,16 +3131,22 @@ function buildDiary() {
   const npcs = new Set((state.campaign?.npcs ?? []).map((item) => item.id));
   const maps = new Set((state.campaign?.maps ?? []).map((item) => item.id));
   const selectedValues = (card, name) =>
-    [...(card.querySelector(`[name="${name}"]`)?.selectedOptions ?? [])].map((option) => option.value);
+    [...(card.querySelector(`[name="${name}"]`)?.selectedOptions ?? [])].map(
+      (option) => option.value,
+    );
   return [...(fields.querySelectorAll('[data-diary-entry]') ?? [])].map((card, index) => {
     const sessionId = card.querySelector('[name="diarySessionId"]')?.value.trim();
-    if (!sessions.has(sessionId)) throw new Error(`Memory ${index + 1} must link to an existing session.`);
+    if (!sessions.has(sessionId))
+      throw new Error(`Memory ${index + 1} must link to an existing session.`);
     const relatedCharacterIds = selectedValues(card, 'diaryRelatedCharacters');
     const relatedNpcIds = selectedValues(card, 'diaryRelatedNpcs');
     const relatedMapIds = selectedValues(card, 'diaryRelatedMaps');
-    if (relatedCharacterIds.some((id) => !characters.has(id))) throw new Error(`Memory ${index + 1} links an unknown party member.`);
-    if (relatedNpcIds.some((id) => !npcs.has(id))) throw new Error(`Memory ${index + 1} links an unknown NPC.`);
-    if (relatedMapIds.some((id) => !maps.has(id))) throw new Error(`Memory ${index + 1} links an unknown place.`);
+    if (relatedCharacterIds.some((id) => !characters.has(id)))
+      throw new Error(`Memory ${index + 1} links an unknown party member.`);
+    if (relatedNpcIds.some((id) => !npcs.has(id)))
+      throw new Error(`Memory ${index + 1} links an unknown NPC.`);
+    if (relatedMapIds.some((id) => !maps.has(id)))
+      throw new Error(`Memory ${index + 1} links an unknown place.`);
     return {
       sessionId,
       date: card.querySelector('[name="diaryDate"]')?.value || '',

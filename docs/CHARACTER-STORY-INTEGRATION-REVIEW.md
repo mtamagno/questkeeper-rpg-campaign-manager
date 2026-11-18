@@ -64,4 +64,3 @@ features forward.
 unique reference lists, reader routes, JSON-owned Journal copy and Manager
 authoring hooks. The normal full gate still covers localization parity, strict
 TypeScript, accessibility, mobile layout, build and performance.
-

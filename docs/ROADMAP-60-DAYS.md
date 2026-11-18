@@ -116,8 +116,8 @@ outcome plus a combined character-story integration review. Day 14 then resumes
 on 19 November. All later original delivery days move by 19 calendar days; no
 planned feature is deleted to create the quality window.
 
-| Recovery day | Commit 1                                                          | Commit 2                                                                             |
-| ------------ | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Recovery day | Commit 1                                                                                  | Commit 2                                                                                                                      |
+| ------------ | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
 | **18 Nov**   | [x] [`feat: connect journal entries to sessions people and places`](CHARACTER-JOURNAL.md) | [x] [`review: close the complete character-story journey and re-plan downstream work`](CHARACTER-STORY-INTEGRATION-REVIEW.md) |
 
 The integration review keeps the later outcomes but removes duplicate surface
