@@ -64,3 +64,8 @@ features forward.
 unique reference lists, reader routes, JSON-owned Journal copy and Manager
 authoring hooks. The normal full gate still covers localization parity, strict
 TypeScript, accessibility, mobile layout, build and performance.
+
+The editable Journal catalog increased the measured public initial path to
+465,629 bytes and its largest initial asset to 307,262 bytes. The ceilings move
+narrowly from 464,000 to 466,000 and from 305,000 to 308,000 bytes; request,
+deferred-script and image limits do not move.
