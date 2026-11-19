@@ -19,12 +19,15 @@ import { ActivatedRoute } from '@angular/router';
 import { PasswordService } from '@guild/services/password.service';
 import {
   type CharacterPublicProfile,
+  type CharacterLoreChapter,
+  type CharacterQuote,
   type CharacterCombatResource,
   type CharacterAttunementState,
   type CharacterInventoryCategory,
   type CharacterSignatureItem,
   type CharacterSheet as CharacterSheetModel,
   type CharacterSheetSnapshot,
+  type DiaryEntry,
 } from '@guild/models/character.model';
 import { LanguageService } from '@guild/services/language.service';
 import { UiTextService } from '@guild/services/uiText.service';
@@ -112,6 +115,11 @@ export class CharacterSheetComponent {
 
   /** Public lore included in the printable character dossier. */
   readonly publicProfile = input<CharacterPublicProfile>();
+
+  /** Public story anchors included in complete and shareable dossiers. */
+  readonly loreChapters = input<ReadonlyArray<CharacterLoreChapter>>([]);
+  readonly diary = input<ReadonlyArray<DiaryEntry>>([]);
+  readonly quotes = input<ReadonlyArray<CharacterQuote>>([]);
 
   /** Optional self-authored pronouns included once in the printable dossier. */
   readonly pronouns = input<BilingualText>();
@@ -394,8 +402,11 @@ export class CharacterSheetComponent {
     return this.workspaceForAnchor(fragment.slice(prefix.length, -suffix.length));
   }
 
-  /** Builds and downloads a three-page illustrated PDF in the active language. */
-  async downloadPdf(): Promise<void> {
+  /** Builds and downloads the requested character artifact in the active language. */
+  async downloadPdf(
+    variant: import('../../services/campaignCharacterSheetPdf.service').CampaignPdfVariant =
+      'complete',
+  ): Promise<void> {
     if (this.isGeneratingPdf()) return;
 
     this.isGeneratingPdf.set(true);
@@ -410,7 +421,11 @@ export class CharacterSheetComponent {
         this.sheet(),
         language,
         {
+          variant,
           publicProfile: this.publicProfile(),
+          loreChapters: this.loreChapters(),
+          diary: this.diary(),
+          quotes: this.quotes(),
           pronouns: this.pronouns(),
           profileImageUrl: this.profileImageUrl(),
           portraitImageUrl: this.portraitImageUrl(),
@@ -428,7 +443,7 @@ export class CharacterSheetComponent {
       const objectUrl = URL.createObjectURL(blob);
       const anchor = document.createElement('a');
       anchor.href = objectUrl;
-      anchor.download = `${this.slugify(this.characterName())}-level-${this.sheet().level}-character-sheet-${language}.pdf`;
+      anchor.download = `${this.slugify(this.characterName())}-level-${this.sheet().level}-${variant}-${language}.pdf`;
       anchor.click();
       window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
     } catch {

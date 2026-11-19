@@ -9,8 +9,11 @@ import autoTable, { type CellHookData } from 'jspdf-autotable';
 
 import {
   type AbilityScores,
+  type CharacterLoreChapter,
   type CharacterPublicProfile,
+  type CharacterQuote,
   type CharacterSheet,
+  type DiaryEntry,
 } from '@guild/models/character.model';
 import {
   localizeText,
@@ -22,6 +25,7 @@ import { SPELL_CATEGORIES } from '@arcana/constants/spells.constants';
 import { SPELL_SCHOOLS, isSpellEntry, type SpellEntry } from '@arcana/models/compendium.model';
 
 export type CampaignPdfLanguage = string;
+export type CampaignPdfVariant = 'complete' | 'print' | 'share' | 'game-night';
 
 type AbilityKey = keyof AbilityScores;
 
@@ -39,7 +43,11 @@ interface ResolvedSpell {
 }
 
 export interface CampaignCharacterPdfOptions {
+  readonly variant?: CampaignPdfVariant;
   readonly publicProfile?: CharacterPublicProfile;
+  readonly loreChapters?: ReadonlyArray<CharacterLoreChapter>;
+  readonly diary?: ReadonlyArray<DiaryEntry>;
+  readonly quotes?: ReadonlyArray<CharacterQuote>;
   readonly pronouns?: BilingualText;
   readonly profileImageUrl?: string;
   readonly portraitImageUrl?: string;
@@ -54,6 +62,11 @@ export interface CampaignCharacterPdfOptions {
 interface PdfArtwork {
   readonly token?: string;
   readonly portrait?: string;
+}
+
+interface PdfStoryEntry {
+  readonly heading: string;
+  readonly body: string;
 }
 
 type RgbColor = [number, number, number];
@@ -134,30 +147,60 @@ const SKILLS: ReadonlyArray<SkillDefinition> = [
   { en: 'Survival', it: 'Sopravvivenza', ability: 'wisdom', abbreviation: 'WIS' },
 ];
 
-/** Generates a three-page illustrated A4 character dossier. */
+/** Generates the requested A4 character artifact without including private-profile content. */
 export async function generateCampaignCharacterSheetPdf(
   characterName: string,
   sheet: CharacterSheet,
   language: CampaignPdfLanguage,
   options: CampaignCharacterPdfOptions = {},
 ): Promise<Blob> {
-  const artwork = await loadArtwork(options);
+  const variant = options.variant ?? 'complete';
+  const needsArtwork = variant === 'complete' || variant === 'share';
+  const artwork = needsArtwork ? await loadArtwork(options) : {};
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   doc.setProperties({
-    title: `${characterName} - Character Sheet`,
-    subject: 'Fantasy RPG Character Sheet',
+    title: `${characterName} - ${pdfVariantTitle(variant, language)}`,
+    subject: pdfVariantTitle(variant, language),
     author: 'QuestKeeper',
     creator: 'QuestKeeper',
   });
 
-  drawProfilePage(doc, characterName, sheet, language, options, artwork);
-  doc.addPage();
-  drawPageOne(doc, characterName, sheet, language, options);
-  doc.addPage();
-  drawPageTwo(doc, characterName, sheet, language);
+  if (variant === 'game-night') {
+    drawGameNightPage(doc, characterName, sheet, language, options);
+  } else if (variant === 'print') {
+    drawPageOne(doc, characterName, sheet, language, options);
+    doc.addPage();
+    drawPageTwo(doc, characterName, sheet, language);
+  } else {
+    drawProfilePage(doc, characterName, sheet, language, options, artwork);
+    drawStoryPages(doc, characterName, sheet, language, options);
+    if (variant === 'complete') {
+      doc.addPage();
+      drawPageOne(doc, characterName, sheet, language, options);
+      doc.addPage();
+      drawPageTwo(doc, characterName, sheet, language);
+    }
+  }
   drawPageNumbers(doc, language);
 
   return doc.output('blob');
+}
+
+function pdfVariantTitle(
+  variant: CampaignPdfVariant,
+  language: CampaignPdfLanguage,
+): string {
+  const italian = language === 'it';
+  switch (variant) {
+    case 'print':
+      return italian ? 'Scheda personaggio da stampare' : 'Printable character sheet';
+    case 'share':
+      return italian ? 'Dossier pubblico del personaggio' : 'Public character dossier';
+    case 'game-night':
+      return italian ? 'Scheda rapida per la sessione' : 'Game-night quick sheet';
+    default:
+      return italian ? "Dossier completo dell'avventuriero" : 'Complete adventurer dossier';
+  }
 }
 
 function drawProfilePage(
@@ -372,6 +415,213 @@ function formatRecordedDate(value: string, language: CampaignPdfLanguage): strin
     month: 'long',
     year: 'numeric',
   }).format(date);
+}
+
+function drawStoryPages(
+  doc: jsPDF,
+  characterName: string,
+  sheet: CharacterSheet,
+  language: CampaignPdfLanguage,
+  options: CampaignCharacterPdfOptions,
+): void {
+  const entries = storyEntries(language, options);
+  if (entries.length === 0) return;
+
+  let y = startStoryPage(doc, characterName, sheet, language);
+  for (const entry of entries) {
+    const headingLines = doc.splitTextToSize(entry.heading, PAGE.contentWidth - 4) as string[];
+    const bodyLines = doc.splitTextToSize(entry.body, PAGE.contentWidth - 4) as string[];
+    const requiredHeight = headingLines.length * 4.1 + bodyLines.length * 3.7 + 8;
+    if (y + Math.min(requiredHeight, 42) > PAGE.height - 18) {
+      y = startStoryPage(doc, characterName, sheet, language);
+    }
+
+    doc.setFont('times', 'bold');
+    doc.setFontSize(9.5);
+    doc.setTextColor(...COLOR.burgundy);
+    doc.text(headingLines, PAGE.margin + 2, y, { lineHeightFactor: 1.1 });
+    y += headingLines.length * 4.1 + 2;
+
+    doc.setFont('times', 'normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(...COLOR.ink);
+    const availableLines = Math.max(1, Math.floor((PAGE.height - 18 - y) / 3.7));
+    const visibleLines = bodyLines.slice(0, availableLines);
+    doc.text(visibleLines, PAGE.margin + 2, y, { lineHeightFactor: 1.17 });
+    y += visibleLines.length * 3.7 + 5;
+
+    doc.setDrawColor(...COLOR.line);
+    doc.setLineWidth(0.18);
+    doc.line(PAGE.margin + 2, y - 2, PAGE.width - PAGE.margin - 2, y - 2);
+  }
+}
+
+function startStoryPage(
+  doc: jsPDF,
+  characterName: string,
+  sheet: CharacterSheet,
+  language: CampaignPdfLanguage,
+): number {
+  doc.addPage();
+  drawHeader(
+    doc,
+    characterName,
+    sheet,
+    language,
+    language === 'it' ? 'Storia pubblica e ricordi' : 'Public story & memories',
+  );
+  sectionTitle(doc, language === 'it' ? 'Il viaggio fin qui' : 'The journey so far', 36);
+  return 45;
+}
+
+function storyEntries(
+  language: CampaignPdfLanguage,
+  options: CampaignCharacterPdfOptions,
+): ReadonlyArray<PdfStoryEntry> {
+  const entries: PdfStoryEntry[] = [];
+  const registry = options.localeRegistry;
+  const profile = options.publicProfile;
+
+  if (profile?.hobbies !== undefined) {
+    entries.push({
+      heading: language === 'it' ? 'Interessi e quiete' : 'Interests & comforts',
+      body: cleanPdfText(localized(profile.hobbies, language, registry)),
+    });
+  }
+  for (const fact of profile?.quickFacts ?? []) {
+    entries.push({
+      heading: cleanPdfText(localized(fact.label, language, registry)),
+      body: cleanPdfText(localized(fact.value, language, registry)),
+    });
+  }
+  for (const item of profile?.signatureItems ?? []) {
+    entries.push({
+      heading: `${language === 'it' ? 'Oggetto significativo' : 'Signature item'} - ${cleanPdfText(localized(item.name, language, registry))}`,
+      body: cleanPdfText(localized(item.description, language, registry)),
+    });
+  }
+  for (const moment of profile?.favouriteMoments ?? []) {
+    entries.push({
+      heading: `${language === 'it' ? 'Momento del cuore' : 'Favourite moment'} - ${cleanPdfText(localized(moment.title, language, registry))}`,
+      body: cleanPdfText(localized(moment.summary, language, registry)),
+    });
+  }
+  for (const chapter of options.loreChapters ?? []) {
+    const period = chapter.period === undefined ? '' : localized(chapter.period, language, registry);
+    const title = localized(chapter.title, language, registry);
+    entries.push({
+      heading: cleanPdfText([period, title].filter(Boolean).join(' - ')),
+      body: excerpt(cleanPdfText(localized(chapter.body, language, registry)), 560),
+    });
+  }
+
+  const recentDiary = [...(options.diary ?? [])]
+    .sort((left, right) => right.date.localeCompare(left.date))
+    .slice(0, 3);
+  for (const memory of recentDiary) {
+    entries.push({
+      heading: `${language === 'it' ? 'Memoria' : 'Memory'} - ${cleanPdfText(localized(memory.title, language, registry))}`,
+      body: excerpt(cleanPdfText(localized(memory.content, language, registry)), 420),
+    });
+  }
+  for (const quote of (options.quotes ?? []).slice(-3)) {
+    const context = quote.context === undefined ? '' : localized(quote.context, language, registry);
+    entries.push({
+      heading: language === 'it' ? 'Parole ricordate' : 'Remembered words',
+      body: `“${cleanPdfText(localized(quote.text, language, registry))}”${context ? ` - ${cleanPdfText(context)}` : ''}`,
+    });
+  }
+
+  return entries.filter((entry) => entry.heading.trim() && entry.body.trim());
+}
+
+function drawGameNightPage(
+  doc: jsPDF,
+  characterName: string,
+  sheet: CharacterSheet,
+  language: CampaignPdfLanguage,
+  options: CampaignCharacterPdfOptions,
+): void {
+  drawHeader(
+    doc,
+    characterName,
+    sheet,
+    language,
+    language === 'it' ? 'Scheda rapida per la sessione' : 'Game-night quick sheet',
+  );
+  let y = drawIdentity(doc, sheet, language, 35, options.identityLabels);
+  y = drawCombatSummary(doc, sheet, language, y + 5);
+  y = drawAbilityScores(doc, sheet, language, y + 6);
+
+  const resources = (sheet.combatResources ?? []).map(
+    (resource) => `${resource.name}: ${resource.current}/${resource.maximum}`,
+  );
+  const slots = (sheet.spellcasting?.slots ?? []).map((slot) => {
+    const remaining = Math.max(0, slot.total - (slot.used ?? 0));
+    return `${language === 'it' ? 'Liv.' : 'Lv.'} ${slot.level}: ${remaining}/${slot.total}`;
+  });
+  const equipped = inventoryViews(sheet)
+    .filter((item) => item.equipped)
+    .map((item) => `${item.quantity > 1 ? `${item.quantity}x ` : ''}${item.name}`);
+
+  y = drawCompactList(
+    doc,
+    language === 'it' ? 'Risorse e slot' : 'Resources & slots',
+    [...resources, ...slots],
+    y + 7,
+  );
+  y = drawCompactList(
+    doc,
+    language === 'it' ? 'Equipaggiamento pronto' : 'Ready equipment',
+    equipped,
+    y + 5,
+  );
+  y = drawCompactList(
+    doc,
+    language === 'it' ? 'Incantesimi' : 'Spells',
+    sheet.spells ?? [],
+    y + 5,
+  );
+  drawCompactList(
+    doc,
+    language === 'it' ? 'Privilegi da ricordare' : 'Features to remember',
+    sheet.features,
+    y + 5,
+  );
+}
+
+function drawCompactList(
+  doc: jsPDF,
+  title: string,
+  values: ReadonlyArray<string>,
+  y: number,
+): number {
+  if (y > PAGE.height - 24) return y;
+  sectionTitle(doc, title, y);
+  const text = values.length > 0 ? values.join('  |  ') : '—';
+  doc.setFont('times', 'normal');
+  doc.setFontSize(7.2);
+  doc.setTextColor(...COLOR.ink);
+  const lines = (doc.splitTextToSize(text, PAGE.contentWidth - 2) as string[]).slice(0, 4);
+  doc.text(lines, PAGE.margin + 1, y + 6, { lineHeightFactor: 1.14 });
+  return y + 7 + lines.length * 3.6;
+}
+
+function cleanPdfText(value: string): string {
+  return value
+    .replace(/<br\s*\/?>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function excerpt(value: string, maximumLength: number): string {
+  if (value.length <= maximumLength) return value;
+  const clipped = value.slice(0, maximumLength - 1);
+  const lastSpace = clipped.lastIndexOf(' ');
+  return `${clipped.slice(0, Math.max(lastSpace, maximumLength - 48)).trim()}…`;
 }
 
 function drawPageOne(
