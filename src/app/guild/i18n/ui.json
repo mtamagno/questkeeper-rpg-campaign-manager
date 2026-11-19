@@ -51,6 +51,43 @@
           "description": "The adventurer you seek has wandered beyond the reach of divination magic.",
           "hint": "Perhaps they never existed, or the scrying spell fizzled out."
         },
+        "characterPdf": {
+          "eyebrow": "Character archive",
+          "title": "Choose the right PDF for the moment",
+          "description": "Create a full keepsake, a practical sheet, a public story or a one-page table reference without changing the character data.",
+          "open": "PDF exports",
+          "openLabel": "Choose a character PDF format",
+          "format": "A4",
+          "formatsLabel": "Available character PDF formats",
+          "preparing": "Preparing PDF…",
+          "generate": "Create {format}",
+          "close": "Close PDF choices",
+          "error": "The PDF could not be created. Nothing was changed; choose the format and try again.",
+          "privacyTitle": "Share safely.",
+          "privacyHelp": "The public dossier excludes the protected sheet, private profile, passwords and secret notebook. Other formats contain unlocked mechanical details and should be shared deliberately.",
+          "variants": {
+            "complete": {
+              "title": "Complete fantasy dossier",
+              "description": "Illustrated identity, public story anchors, recent memories and the current mechanical sheet in one keepsake.",
+              "meta": "Story + mechanics · illustrated"
+            },
+            "print": {
+              "title": "Printable character sheet",
+              "description": "A focused two-page mechanical record for filing, annotation or use away from the screen.",
+              "meta": "2 pages · mechanics"
+            },
+            "share": {
+              "title": "Public story dossier",
+              "description": "Portrait, known history, keepsakes and selected memories without protected mechanics or secrets.",
+              "meta": "Public-safe · illustrated"
+            },
+            "gameNight": {
+              "title": "Game-night quick sheet",
+              "description": "One page for combat values, resources, ready gear, spells and features during play.",
+              "meta": "1 page · table-ready"
+            }
+          }
+        },
         "app": {
           "skipToMain": "Skip to main content",
           "toggleNavigation": "Toggle navigation",
@@ -611,6 +648,43 @@
           "title": "Smarrito nelle Nebbie",
           "description": "L'avventuriero che cerchi si è allontanato oltre la portata della magia divinatoria.",
           "hint": "Forse non è mai esistito, oppure l'incantesimo di scrutamento si è dissolto."
+        },
+        "characterPdf": {
+          "eyebrow": "Archivio del personaggio",
+          "title": "Scegli il PDF adatto al momento",
+          "description": "Crea un ricordo completo, una scheda pratica, una storia pubblica o un riferimento da tavolo in una pagina senza modificare i dati del personaggio.",
+          "open": "Esporta PDF",
+          "openLabel": "Scegli un formato PDF per il personaggio",
+          "format": "A4",
+          "formatsLabel": "Formati PDF disponibili per il personaggio",
+          "preparing": "Preparazione PDF…",
+          "generate": "Crea {format}",
+          "close": "Chiudi le scelte PDF",
+          "error": "Non è stato possibile creare il PDF. Non è stato modificato nulla: scegli il formato e riprova.",
+          "privacyTitle": "Condividi con attenzione.",
+          "privacyHelp": "Il dossier pubblico esclude scheda protetta, profilo privato, password e taccuino segreto. Gli altri formati contengono dettagli meccanici sbloccati e vanno condivisi consapevolmente.",
+          "variants": {
+            "complete": {
+              "title": "Dossier fantasy completo",
+              "description": "Identità illustrata, storia pubblica, ricordi recenti e scheda meccanica attuale riuniti in un unico ricordo.",
+              "meta": "Storia + meccaniche · illustrato"
+            },
+            "print": {
+              "title": "Scheda personaggio da stampare",
+              "description": "Due pagine meccaniche essenziali da archiviare, annotare o usare lontano dallo schermo.",
+              "meta": "2 pagine · meccaniche"
+            },
+            "share": {
+              "title": "Dossier pubblico della storia",
+              "description": "Ritratto, storia conosciuta, oggetti e ricordi selezionati senza meccaniche protette o segreti.",
+              "meta": "Pubblico · illustrato"
+            },
+            "gameNight": {
+              "title": "Scheda rapida per la sessione",
+              "description": "Una pagina con valori di combattimento, risorse, equipaggiamento pronto, incantesimi e privilegi.",
+              "meta": "1 pagina · pronta al tavolo"
+            }
+          }
         },
         "app": {
           "skipToMain": "Vai al contenuto principale",

@@ -1,0 +1,211 @@
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+
+.pdf-export {
+  display: grid;
+  gap: $spacing-lg;
+  margin: (-$spacing-sm) 0 $spacing-xl;
+  padding: clamp($spacing-md, 3vw, $spacing-xl);
+  background:
+    radial-gradient(circle at 100% 0, rgba($color-gold, 0.1), transparent 34%),
+    rgba($color-bg-elevated, 0.94);
+  border: $border-width-thin solid $color-border-default;
+  border-radius: $border-radius-md;
+  box-shadow: $shadow-lg;
+
+  &__heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: $spacing-md;
+
+    > div > span {
+      display: block;
+      margin-bottom: $spacing-xs;
+      color: $color-gold;
+      font-family: $font-family-heading;
+      font-size: $font-size-xs;
+      font-weight: $font-weight-semibold;
+      letter-spacing: $letter-spacing-wider;
+      text-transform: uppercase;
+    }
+
+    h3 {
+      margin: 0;
+      color: $color-gold-light;
+      font-family: $font-family-heading;
+      font-size: clamp($font-size-lg, 3vw, $font-size-xl);
+    }
+
+    p {
+      max-width: 52rem;
+      margin: $spacing-sm 0 0;
+      color: $color-text-secondary;
+      line-height: $line-height-relaxed;
+    }
+  }
+
+  &__close {
+    display: grid;
+    flex: 0 0 auto;
+    width: 44px;
+    height: 44px;
+    color: $color-text-secondary;
+    font-size: $font-size-xl;
+    cursor: pointer;
+    background: $color-bg-deep;
+    border: $border-width-thin solid $color-border-default;
+    border-radius: 50%;
+    place-items: center;
+
+    &:hover {
+      color: $color-gold-light;
+      border-color: $color-gold;
+    }
+  }
+
+  &__variants {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: $spacing-md;
+  }
+
+  &__variant {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: $spacing-md;
+    min-height: 8rem;
+    padding: $spacing-md;
+    cursor: pointer;
+    background: rgba($color-bg-deep, 0.72);
+    border: $border-width-thin solid $color-border-subtle;
+    border-radius: $border-radius-md;
+    @include transition-colors;
+
+    input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+    }
+
+    &:hover,
+    &.is-selected {
+      border-color: $color-gold;
+      box-shadow: inset 0 0 0 1px rgba($color-gold, 0.24);
+    }
+
+    &:has(input:focus-visible) {
+      outline: 2px solid $color-gold-light;
+      outline-offset: 3px;
+    }
+  }
+
+  &__variant-icon {
+    display: grid;
+    width: 2.5rem;
+    height: 2.5rem;
+    color: $color-gold-light;
+    font-size: $font-size-lg;
+    background: rgba($color-gold, 0.12);
+    border: $border-width-thin solid rgba($color-gold, 0.35);
+    border-radius: 50%;
+    place-items: center;
+  }
+
+  &__variant-copy {
+    display: grid;
+    align-content: start;
+    gap: $spacing-xs;
+
+    strong {
+      color: $color-parchment-light;
+      font-family: $font-family-heading;
+    }
+
+    > span {
+      color: $color-text-secondary;
+      font-size: $font-size-sm;
+      line-height: $line-height-relaxed;
+    }
+
+    small {
+      color: $color-gold;
+      font-size: $font-size-xs;
+      letter-spacing: $letter-spacing-wide;
+      text-transform: uppercase;
+    }
+  }
+
+  &__privacy {
+    display: flex;
+    align-items: flex-start;
+    gap: $spacing-sm;
+    padding: $spacing-sm $spacing-md;
+    color: $color-text-secondary;
+    background: rgba($color-gold, 0.08);
+    border-left: 3px solid $color-gold;
+    border-radius: 0 $border-radius-sm $border-radius-sm 0;
+
+    p {
+      margin: 0;
+      line-height: $line-height-relaxed;
+    }
+    strong {
+      color: $color-parchment-light;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: $spacing-sm;
+  }
+
+  &__generate,
+  &__cancel {
+    min-height: 44px;
+    padding: $spacing-sm $spacing-lg;
+    font-family: $font-family-heading;
+    font-weight: $font-weight-semibold;
+    cursor: pointer;
+    border-radius: $border-radius-sm;
+  }
+
+  &__generate {
+    color: $color-bg-deep;
+    background: linear-gradient(135deg, $color-gold-light, $color-gold);
+    border: $border-width-thin solid $color-gold-light;
+
+    &:disabled {
+      cursor: wait;
+      opacity: 0.72;
+    }
+  }
+
+  &__cancel {
+    color: $color-text-secondary;
+    background: transparent;
+    border: $border-width-thin solid $color-border-default;
+  }
+
+  button:focus-visible {
+    outline: 2px solid $color-gold-light;
+    outline-offset: 3px;
+  }
+}
+
+@media (max-width: 48rem) {
+  .pdf-export {
+    &__variants {
+      grid-template-columns: 1fr;
+    }
+    &__actions {
+      display: grid;
+    }
+    &__actions button {
+      width: 100%;
+    }
+  }
+}

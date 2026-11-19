@@ -1,0 +1,67 @@
+<section class="pdf-export" aria-labelledby="character-pdf-export-title">
+  <div class="pdf-export__heading">
+    <div>
+      <span>{{ uiText.text('characterPdf.eyebrow') }}</span>
+      <h3 id="character-pdf-export-title">{{ uiText.text('characterPdf.title') }}</h3>
+      <p>{{ uiText.text('characterPdf.description') }}</p>
+    </div>
+    <button
+      type="button"
+      class="pdf-export__close"
+      (click)="closed.emit()"
+      [attr.aria-label]="uiText.text('characterPdf.close')"
+    >
+      <span aria-hidden="true">Ã—</span>
+    </button>
+  </div>
+
+  <div
+    class="pdf-export__variants"
+    role="radiogroup"
+    [attr.aria-label]="uiText.text('characterPdf.formatsLabel')"
+  >
+    @for (variant of variants; track variant.id) {
+      <label class="pdf-export__variant" [class.is-selected]="selectedVariant() === variant.id">
+        <input
+          type="radio"
+          name="character-pdf-variant"
+          [value]="variant.id"
+          [checked]="selectedVariant() === variant.id"
+          (change)="variantSelected.emit(variant.id)"
+        />
+        <span class="pdf-export__variant-icon" aria-hidden="true">{{ variant.icon }}</span>
+        <span class="pdf-export__variant-copy">
+          <strong>{{ uiText.text(variant.titleKey) }}</strong>
+          <span>{{ uiText.text(variant.descriptionKey) }}</span>
+          <small>{{ uiText.text(variant.metaKey) }}</small>
+        </span>
+      </label>
+    }
+  </div>
+
+  <div class="pdf-export__privacy">
+    <span aria-hidden="true">ðŸ›¡</span>
+    <p>
+      <strong>{{ uiText.text('characterPdf.privacyTitle') }}</strong>
+      {{ uiText.text('characterPdf.privacyHelp') }}
+    </p>
+  </div>
+
+  <div class="pdf-export__actions">
+    <button
+      type="button"
+      class="pdf-export__generate"
+      [disabled]="isGenerating()"
+      (click)="generateRequested.emit(selectedVariant())"
+    >
+      {{
+        isGenerating()
+          ? uiText.text('characterPdf.preparing')
+          : uiText.text('characterPdf.generate', { format: selectedTitle() })
+      }}
+    </button>
+    <button type="button" class="pdf-export__cancel" (click)="closed.emit()">
+      {{ uiText.text('characterPdf.close') }}
+    </button>
+  </div>
+</section>

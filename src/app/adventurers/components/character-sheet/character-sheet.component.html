@@ -15,12 +15,10 @@
           class="character-sheet__pdf-button"
           type="button"
           [disabled]="isGeneratingPdf()"
-          (click)="downloadPdf()"
-          [attr.aria-label]="
-            isItalian()
-              ? 'Scarica la scheda personaggio in PDF'
-              : 'Download the character sheet as a PDF'
-          "
+          (click)="togglePdfMenu()"
+          [attr.aria-expanded]="isPdfMenuOpen()"
+          aria-controls="character-pdf-export"
+          [attr.aria-label]="uiText.text('characterPdf.openLabel')"
         >
           @if (isGeneratingPdf()) {
             <span class="character-sheet__pdf-spinner" aria-hidden="true"></span>
@@ -32,15 +30,11 @@
           <span>
             {{
               isGeneratingPdf()
-                ? isItalian()
-                  ? 'Preparazione…'
-                  : 'Preparing…'
-                : isItalian()
-                  ? 'Scarica PDF'
-                  : 'Download PDF'
+                ? uiText.text('characterPdf.preparing')
+                : uiText.text('characterPdf.open')
             }}
           </span>
-          <small>A4</small>
+          <small>{{ uiText.text('characterPdf.format') }}</small>
         </button>
         <button
           class="character-sheet__lock-button"
@@ -55,13 +49,21 @@
     }
   </header>
 
+  @if (isUnlocked() && !isSheetEmpty() && isPdfMenuOpen()) {
+    <app-character-pdf-export
+      id="character-pdf-export"
+      [selectedVariant]="selectedPdfVariant()"
+      [selectedTitle]="selectedPdfTitle()"
+      [isGenerating]="isGeneratingPdf()"
+      (variantSelected)="selectPdfVariant($event)"
+      (generateRequested)="downloadPdf($event)"
+      (closed)="togglePdfMenu()"
+    />
+  }
+
   @if (pdfError()) {
     <p class="character-sheet__pdf-error" role="alert">
-      {{
-        isItalian()
-          ? 'Non è stato possibile creare il PDF. Riprova tra qualche istante.'
-          : 'The PDF could not be created. Please try again in a moment.'
-      }}
+      {{ uiText.text('characterPdf.error') }}
     </p>
   }
 

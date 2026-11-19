@@ -47,6 +47,11 @@ import {
   inventoryViews,
   type CharacterInventoryView,
 } from '../../utils/characterSheetPresentation';
+import type { CampaignPdfVariant } from '../../services/campaignCharacterSheetPdf.service';
+import {
+  CHARACTER_PDF_VARIANTS,
+  CharacterPdfExportComponent,
+} from '../character-pdf-export/character-pdf-export.component';
 
 interface AbilityScoreEntry {
   readonly name: string;
@@ -76,6 +81,7 @@ interface InventoryStoryView extends CharacterInventoryView {
     CharacterSheetHistoryComponent,
     CharacterSheetNavigationComponent,
     CharacterRuleLibraryComponent,
+    CharacterPdfExportComponent,
   ],
   templateUrl: './character-sheet.component.html',
   styleUrl: './character-sheet.component.scss',
@@ -170,6 +176,16 @@ export class CharacterSheetComponent {
 
   /** Whether the printable PDF is currently being generated. */
   readonly isGeneratingPdf: WritableSignal<boolean> = signal(false);
+
+  /** Progressive-disclosure state for the four purpose-built PDF formats. */
+  readonly isPdfMenuOpen = signal(false);
+  readonly selectedPdfVariant = signal<CampaignPdfVariant>('complete');
+  readonly selectedPdfTitle = computed(() => {
+    const selected = CHARACTER_PDF_VARIANTS.find(
+      (variant) => variant.id === this.selectedPdfVariant(),
+    );
+    return selected === undefined ? '' : this.uiText.text(selected.titleKey);
+  });
 
   /** User-facing error raised if PDF generation fails. */
   readonly pdfError: WritableSignal<boolean> = signal(false);
@@ -403,10 +419,7 @@ export class CharacterSheetComponent {
   }
 
   /** Builds and downloads the requested character artifact in the active language. */
-  async downloadPdf(
-    variant: import('../../services/campaignCharacterSheetPdf.service').CampaignPdfVariant =
-      'complete',
-  ): Promise<void> {
+  async downloadPdf(variant: CampaignPdfVariant = 'complete'): Promise<void> {
     if (this.isGeneratingPdf()) return;
 
     this.isGeneratingPdf.set(true);
@@ -446,11 +459,23 @@ export class CharacterSheetComponent {
       anchor.download = `${this.slugify(this.characterName())}-level-${this.sheet().level}-${variant}-${language}.pdf`;
       anchor.click();
       window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+      this.isPdfMenuOpen.set(false);
     } catch {
       this.pdfError.set(true);
     } finally {
       this.isGeneratingPdf.set(false);
     }
+  }
+
+  togglePdfMenu(): void {
+    if (this.isGeneratingPdf()) return;
+    this.pdfError.set(false);
+    this.isPdfMenuOpen.update((open) => !open);
+  }
+
+  selectPdfVariant(variant: CampaignPdfVariant): void {
+    this.selectedPdfVariant.set(variant);
+    this.pdfError.set(false);
   }
 
   /**
