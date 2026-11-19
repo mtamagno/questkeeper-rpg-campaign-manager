@@ -82,7 +82,7 @@ Both are corrective release work, not borrowed scope from a later roadmap day.
 | 11 · 28 Oct | [x] [`feat: add searchable spell and ability library per character`](CHARACTER-RULE-LIBRARY.md) | [x] [`feat: add prepared favourites usage notes and external references`](CHARACTER-RULE-LIBRARY.md) |
 | 12 · 29 Oct | [x] `feat: redesign combat resources currency and inventory`                                    | [x] `feat: add signature equipment and attunement storytelling`                                      |
 | 13 · 30 Oct | [x] `feat: add optional protected character notebooks`                                          | ↪ `feat: connect journal entries to sessions people and places` — rescheduled to 18 Nov              |
-| 14 · 19 Nov | [ ] `feat: generate complete fantasy character dossiers`                                        | [ ] `feat: add print share and compact game-night PDF variants`                                      |
+| 14 · 19 Nov | [x] [`feat: generate complete fantasy character dossiers`](CHARACTER-PDF-EXPORTS.md)            | [x] [`feat: add print share and compact game-night PDF variants`](CHARACTER-PDF-EXPORTS.md)          |
 
 Days 09-12 are also the integrated stabilization window for
 [QuestKeeper 1.1.5 Storyforge](releases/v1.1.5-plan.md). The release plan maps
