@@ -186,10 +186,7 @@ export async function generateCampaignCharacterSheetPdf(
   return doc.output('blob');
 }
 
-function pdfVariantTitle(
-  variant: CampaignPdfVariant,
-  language: CampaignPdfLanguage,
-): string {
+function pdfVariantTitle(variant: CampaignPdfVariant, language: CampaignPdfLanguage): string {
   const italian = language === 'it';
   switch (variant) {
     case 'print':
@@ -507,7 +504,8 @@ function storyEntries(
     });
   }
   for (const chapter of options.loreChapters ?? []) {
-    const period = chapter.period === undefined ? '' : localized(chapter.period, language, registry);
+    const period =
+      chapter.period === undefined ? '' : localized(chapter.period, language, registry);
     const title = localized(chapter.title, language, registry);
     entries.push({
       heading: cleanPdfText([period, title].filter(Boolean).join(' - ')),
@@ -576,12 +574,7 @@ function drawGameNightPage(
     equipped,
     y + 5,
   );
-  y = drawCompactList(
-    doc,
-    language === 'it' ? 'Incantesimi' : 'Spells',
-    sheet.spells ?? [],
-    y + 5,
-  );
+  y = drawCompactList(doc, language === 'it' ? 'Incantesimi' : 'Spells', sheet.spells ?? [], y + 5);
   drawCompactList(
     doc,
     language === 'it' ? 'Privilegi da ricordare' : 'Features to remember',
