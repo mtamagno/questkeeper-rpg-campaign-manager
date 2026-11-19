@@ -76,6 +76,7 @@ const PAGE = {
   height: 297,
   margin: 12,
   contentWidth: 186,
+  contentBottom: 279,
 } as const;
 
 const COLOR: Record<
@@ -293,7 +294,7 @@ function drawProfilePage(
     return;
   }
 
-  let leftY = drawProfileText(
+  drawProfileText(
     doc,
     language === 'it' ? 'Storia' : 'Backstory',
     localized(profile.backstory, language, options.localeRegistry),
@@ -301,9 +302,10 @@ function drawProfilePage(
     78,
     110,
     7.4,
+    14,
   );
 
-  const knownY = Math.max(145, leftY + 5);
+  const knownY = 145;
   const knownEnd = drawProfileText(
     doc,
     language === 'it' ? 'Storia conosciuta' : 'Known history',
@@ -312,12 +314,13 @@ function drawProfilePage(
     knownY,
     PAGE.contentWidth,
     7.4,
+    10,
   );
 
   const detailsY = knownEnd + 6;
   const columnGap = 6;
   const columnWidth = (PAGE.contentWidth - columnGap) / 2;
-  leftY = drawProfileText(
+  let leftY = drawProfileText(
     doc,
     language === 'it' ? 'Tratti caratteriali' : 'Personality traits',
     localized(profile.traits, language, options.localeRegistry),
@@ -325,8 +328,9 @@ function drawProfilePage(
     detailsY,
     columnWidth,
     7,
+    5,
   );
-  drawProfileText(
+  leftY = drawProfileText(
     doc,
     language === 'it' ? 'Ideali' : 'Ideals',
     localized(profile.ideals, language, options.localeRegistry),
@@ -334,6 +338,7 @@ function drawProfilePage(
     leftY + 4,
     columnWidth,
     7,
+    3,
   );
 
   const rightX = PAGE.margin + columnWidth + columnGap;
@@ -345,6 +350,7 @@ function drawProfilePage(
     detailsY,
     columnWidth,
     7,
+    5,
   );
   rightY = drawProfileText(
     doc,
@@ -354,12 +360,24 @@ function drawProfilePage(
     rightY + 4,
     columnWidth,
     7,
+    3,
   );
 
   const profileEnd = Math.max(leftY, rightY) + 5;
-  drawDividerOrnament(doc, profileEnd);
-  if (profileEnd <= 243) {
-    drawJourneySummary(doc, sheet, language, profileEnd + 9);
+  const journeyY = profileEnd + 9;
+  if (journeyY + 22 <= PAGE.contentBottom) {
+    drawDividerOrnament(doc, profileEnd);
+    drawJourneySummary(doc, sheet, language, journeyY);
+  } else {
+    doc.addPage();
+    drawHeader(
+      doc,
+      characterName,
+      sheet,
+      language,
+      language === 'it' ? 'Sigillo del viaggio' : 'Journey seal',
+    );
+    drawJourneySummary(doc, sheet, language, 38);
   }
 }
 
@@ -426,30 +444,43 @@ function drawStoryPages(
 
   let y = startStoryPage(doc, characterName, sheet, language);
   for (const entry of entries) {
-    const headingLines = doc.splitTextToSize(entry.heading, PAGE.contentWidth - 4) as string[];
-    const bodyLines = doc.splitTextToSize(entry.body, PAGE.contentWidth - 4) as string[];
-    const requiredHeight = headingLines.length * 4.1 + bodyLines.length * 3.7 + 8;
-    if (y + Math.min(requiredHeight, 42) > PAGE.height - 18) {
-      y = startStoryPage(doc, characterName, sheet, language);
+    let remainingLines = doc.splitTextToSize(entry.body, PAGE.contentWidth - 4) as string[];
+    let continuation = false;
+
+    while (remainingLines.length > 0) {
+      const continuationLabel = language === 'it' ? 'continua' : 'continued';
+      const heading = continuation ? `${entry.heading} - ${continuationLabel}` : entry.heading;
+      const headingLines = doc.splitTextToSize(heading, PAGE.contentWidth - 4) as string[];
+      const headingHeight = headingLines.length * 4.1 + 2;
+      const minimumBodyHeight = Math.min(2, remainingLines.length) * 3.7;
+      if (y + headingHeight + minimumBodyHeight + 5 > PAGE.contentBottom) {
+        y = startStoryPage(doc, characterName, sheet, language);
+      }
+
+      doc.setFont('times', 'bold');
+      doc.setFontSize(9.5);
+      doc.setTextColor(...COLOR.burgundy);
+      doc.text(headingLines, PAGE.margin + 2, y, { lineHeightFactor: 1.1 });
+      y += headingHeight;
+
+      doc.setFont('times', 'normal');
+      doc.setFontSize(7.5);
+      doc.setTextColor(...COLOR.ink);
+      const availableLines = Math.max(1, Math.floor((PAGE.contentBottom - y - 5) / 3.7));
+      const pageLines = remainingLines.slice(0, availableLines);
+      remainingLines = remainingLines.slice(pageLines.length);
+      doc.text(pageLines, PAGE.margin + 2, y, { lineHeightFactor: 1.17 });
+      y += pageLines.length * 3.7 + 5;
+
+      if (remainingLines.length > 0) {
+        y = startStoryPage(doc, characterName, sheet, language);
+        continuation = true;
+      } else {
+        doc.setDrawColor(...COLOR.line);
+        doc.setLineWidth(0.18);
+        doc.line(PAGE.margin + 2, y - 2, PAGE.width - PAGE.margin - 2, y - 2);
+      }
     }
-
-    doc.setFont('times', 'bold');
-    doc.setFontSize(9.5);
-    doc.setTextColor(...COLOR.burgundy);
-    doc.text(headingLines, PAGE.margin + 2, y, { lineHeightFactor: 1.1 });
-    y += headingLines.length * 4.1 + 2;
-
-    doc.setFont('times', 'normal');
-    doc.setFontSize(7.5);
-    doc.setTextColor(...COLOR.ink);
-    const availableLines = Math.max(1, Math.floor((PAGE.height - 18 - y) / 3.7));
-    const visibleLines = bodyLines.slice(0, availableLines);
-    doc.text(visibleLines, PAGE.margin + 2, y, { lineHeightFactor: 1.17 });
-    y += visibleLines.length * 3.7 + 5;
-
-    doc.setDrawColor(...COLOR.line);
-    doc.setLineWidth(0.18);
-    doc.line(PAGE.margin + 2, y - 2, PAGE.width - PAGE.margin - 2, y - 2);
   }
 }
 
@@ -478,6 +509,22 @@ function storyEntries(
   const entries: PdfStoryEntry[] = [];
   const registry = options.localeRegistry;
   const profile = options.publicProfile;
+
+  if (profile !== undefined) {
+    for (const [heading, body] of [
+      [language === 'it' ? 'Storia completa' : 'Complete backstory', profile.backstory],
+      [language === 'it' ? 'Storia conosciuta' : 'Known history', profile.knownHistory],
+      [language === 'it' ? 'Tratti caratteriali' : 'Personality traits', profile.traits],
+      [language === 'it' ? 'Ideali' : 'Ideals', profile.ideals],
+      [language === 'it' ? 'Legami' : 'Bonds', profile.bonds],
+      [language === 'it' ? 'Difetti' : 'Flaws', profile.flaws],
+    ] as const) {
+      entries.push({
+        heading,
+        body: cleanPdfText(localized(body, language, registry)),
+      });
+    }
+  }
 
   if (profile?.hobbies !== undefined) {
     entries.push({
@@ -655,7 +702,7 @@ function drawPageTwo(
   let y = 35;
 
   y = drawFeatureAndInventoryColumns(doc, sheet, language, y);
-  y = drawSpellcasting(doc, sheet, language, y + 6);
+  y = drawSpellcasting(doc, characterName, sheet, language, y + 6);
   drawNotes(doc, language, y + 7);
 }
 
@@ -867,7 +914,7 @@ function drawProficiencyColumns(
   });
   autoTable(doc, {
     startY: y + 4,
-    margin: { left: PAGE.margin },
+    margin: { left: PAGE.margin, right: PAGE.width - PAGE.margin - leftWidth },
     tableWidth: leftWidth,
     body: savingRows,
     styles: {
@@ -914,7 +961,7 @@ function drawProficiencyColumns(
   });
   autoTable(doc, {
     startY: y + 4,
-    margin: { left: rightX },
+    margin: { left: rightX, right: PAGE.margin },
     tableWidth: rightWidth,
     body: skillRows,
     styles: {
@@ -944,6 +991,7 @@ function drawFeatureAndInventoryColumns(
   const gap = 6;
   const columnWidth = (PAGE.contentWidth - gap) / 2;
   const rightX = PAGE.margin + columnWidth + gap;
+  const emptyValue = language === 'it' ? 'Nessuna voce registrata' : 'No entries recorded';
 
   sectionTitle(
     doc,
@@ -954,9 +1002,9 @@ function drawFeatureAndInventoryColumns(
   );
   autoTable(doc, {
     startY: y + 4,
-    margin: { left: PAGE.margin },
+    margin: { left: PAGE.margin, right: PAGE.width - PAGE.margin - columnWidth },
     tableWidth: columnWidth,
-    body: sheet.features.map((feature) => [feature]),
+    body: sheet.features.length > 0 ? sheet.features.map((feature) => [feature]) : [[emptyValue]],
     styles: {
       font: 'times',
       fontSize: 7.5,
@@ -991,9 +1039,9 @@ function drawFeatureAndInventoryColumns(
   }
   autoTable(doc, {
     startY: y + 4,
-    margin: { left: rightX },
+    margin: { left: rightX, right: PAGE.margin },
     tableWidth: columnWidth,
-    body: inventoryRows,
+    body: inventoryRows.length > 0 ? inventoryRows : [[emptyValue, '']],
     styles: {
       font: 'times',
       fontSize: 7,
@@ -1050,6 +1098,7 @@ function drawCurrency(
 
 function drawSpellcasting(
   doc: jsPDF,
+  characterName: string,
   sheet: CharacterSheet,
   language: CampaignPdfLanguage,
   y: number,
@@ -1118,10 +1167,11 @@ function drawSpellcasting(
   // The public template deliberately ships without a proprietary rules
   // compendium. Keep PDF spell rows readable without emitting dead links.
   const links = resolvedSpells.map(() => undefined);
+  const spellTableStartPage = doc.getNumberOfPages();
 
   autoTable(doc, {
     startY: tableY,
-    margin: { left: PAGE.margin, right: PAGE.margin },
+    margin: { top: 35, right: PAGE.margin, bottom: 18, left: PAGE.margin },
     head: [
       [
         language === 'it' ? 'Liv.' : 'Lvl',
@@ -1152,6 +1202,16 @@ function drawSpellcasting(
     },
     alternateRowStyles: { fillColor: COLOR.panel },
     theme: 'grid',
+    willDrawPage: (): void => {
+      if (doc.getCurrentPageInfo().pageNumber <= spellTableStartPage) return;
+      drawHeader(
+        doc,
+        characterName,
+        sheet,
+        language,
+        language === 'it' ? 'Dotazioni e magia - continua' : 'Equipment & spellcasting - continued',
+      );
+    },
     didDrawCell: (data: CellHookData): void => {
       if (data.section !== 'body' || data.column.index !== 1) return;
       const url = links[data.row.index];
@@ -1233,15 +1293,26 @@ function drawProfileText(
   y: number,
   width: number,
   fontSize: number,
+  maximumLines?: number,
 ): number {
   sectionTitle(doc, title, y, x, width);
   doc.setFont('times', 'normal');
   doc.setFontSize(fontSize);
   doc.setTextColor(...COLOR.ink);
   const lineHeight = fontSize * 0.45;
-  const lines = doc.splitTextToSize(content, width - 2) as string[];
+  const lines = truncateLines(
+    doc.splitTextToSize(cleanPdfText(content), width - 2) as string[],
+    maximumLines,
+  );
   doc.text(lines, x + 1, y + 7, { lineHeightFactor: 1.16 });
   return y + 7 + lines.length * lineHeight;
+}
+
+function truncateLines(lines: ReadonlyArray<string>, maximumLines?: number): string[] {
+  if (maximumLines === undefined || lines.length <= maximumLines) return [...lines];
+  const visible = lines.slice(0, maximumLines);
+  visible[visible.length - 1] = `${visible[visible.length - 1].replace(/[\s,.;:!?-]+$/g, '')}...`;
+  return visible;
 }
 
 function drawFramedImage(

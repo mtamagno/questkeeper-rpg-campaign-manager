@@ -34,6 +34,41 @@ assert.match(service, /drawStoryPages/);
 assert.match(service, /drawGameNightPage/);
 assert.match(service, /variant === 'print'/);
 assert.match(service, /variant === 'share'/);
+assert.match(service, /contentBottom: 279/);
+assert.match(service, /const journeyY = profileEnd \+ 9/);
+assert.match(service, /journeyY \+ 22 <= PAGE\.contentBottom/);
+assert.match(
+  service,
+  /leftY = drawProfileText\([\s\S]+?'Ideali' : 'Ideals'/,
+  'The left profile cursor must include the Ideals block before placing the journey seal.',
+);
+assert.match(service, /while \(remainingLines\.length > 0\)/);
+assert.match(service, /remainingLines = remainingLines\.slice\(pageLines\.length\)/);
+assert.doesNotMatch(service, /const visibleLines = bodyLines\.slice/);
+assert.match(service, /No entries recorded/);
+assert.match(service, /body:\s*sheet\.features\.length > 0/);
+assert.match(service, /inventoryRows\.length > 0 \? inventoryRows/);
+assert.match(service, /const spellTableStartPage = doc\.getNumberOfPages\(\)/);
+assert.match(
+  service,
+  /margin: \{ top: 35, right: PAGE\.margin, bottom: 18, left: PAGE\.margin \}/,
+);
+assert.match(service, /willDrawPage:/);
+assert.match(service, /Dotazioni e magia - continua/);
+for (const completeProfileField of [
+  'profile.backstory',
+  'profile.knownHistory',
+  'profile.traits',
+  'profile.ideals',
+  'profile.bonds',
+  'profile.flaws',
+]) {
+  assert.match(
+    service,
+    new RegExp(completeProfileField.replace('.', '\\.')),
+    `${completeProfileField} is missing from paginated story output.`,
+  );
+}
 assert.match(template, /app-character-pdf-export/);
 assert.match(exportTemplate, /role="radiogroup"/);
 assert.match(exportTemplate, /type="radio"/);

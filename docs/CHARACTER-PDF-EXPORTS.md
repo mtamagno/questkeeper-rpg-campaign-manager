@@ -21,6 +21,13 @@ still review the generated file before distributing it.
 
 - A historical level selected in the sheet exports that level, never silently
   the latest one.
+- The opening profile is a bounded overview. Long backstory, known-history,
+  trait, ideal, bond and flaw text continues in full on automatically paginated
+  story pages; overview text is never allowed to collide with the journey seal.
+- Mechanical tables render an explicit empty state instead of creating an
+  invalid zero-column table, and every fixed-width table respects both page
+  margins. Long spell lists continue on a fully framed page with a repeated
+  table heading and a visible continuation title.
 - Export is read-only and never changes campaign or character data.
 - Interface labels come from the JSON UI catalog; authored story text remains
   campaign data.
