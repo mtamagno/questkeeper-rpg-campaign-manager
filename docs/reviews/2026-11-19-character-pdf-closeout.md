@@ -29,6 +29,12 @@ chooser into a focused component fixed the architecture and preserved the
 budget instead of normalising growth. Future dense sheet additions should use
 the same component boundary and progressive-disclosure rule.
 
+The catalog-owned bilingual chooser then measured 468,755 public initial bytes
+and 515,915 production bytes: 2,755 and 2,915 bytes above the previous baselines.
+The total and largest-initial ceilings therefore move by exactly 3,000 bytes in
+each repository. Request, image and deferred-script limits stay unchanged; an
+attempted deferred block was rejected because its runtime cost was larger.
+
 ## Compatibility and privacy
 
 - Public and production behavior are paired.

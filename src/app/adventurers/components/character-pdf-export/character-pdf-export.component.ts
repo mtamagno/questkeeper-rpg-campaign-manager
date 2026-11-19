@@ -13,28 +13,28 @@ export interface PdfVariantOption {
 export const CHARACTER_PDF_VARIANTS: ReadonlyArray<PdfVariantOption> = [
   {
     id: 'complete',
-    icon: 'âœ¦',
+    icon: '\u2726',
     titleKey: 'characterPdf.variants.complete.title',
     descriptionKey: 'characterPdf.variants.complete.description',
     metaKey: 'characterPdf.variants.complete.meta',
   },
   {
     id: 'print',
-    icon: 'â–¤',
+    icon: '\u25a4',
     titleKey: 'characterPdf.variants.print.title',
     descriptionKey: 'characterPdf.variants.print.description',
     metaKey: 'characterPdf.variants.print.meta',
   },
   {
     id: 'share',
-    icon: 'â—‡',
+    icon: '\u25c7',
     titleKey: 'characterPdf.variants.share.title',
     descriptionKey: 'characterPdf.variants.share.description',
     metaKey: 'characterPdf.variants.share.meta',
   },
   {
     id: 'game-night',
-    icon: 'âš”',
+    icon: '\u2694',
     titleKey: 'characterPdf.variants.gameNight.title',
     descriptionKey: 'characterPdf.variants.gameNight.description',
     metaKey: 'characterPdf.variants.gameNight.meta',
