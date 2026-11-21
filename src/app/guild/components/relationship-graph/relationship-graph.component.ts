@@ -298,6 +298,25 @@ export class RelationshipGraphComponent {
     return [...types];
   });
 
+  /** Current authored activity across the network, without inventing emotional state. */
+  readonly networkPulse = computed(() => ({
+    people: this.nodes().length,
+    bonds: this.relationships().length,
+    feelings: this.relationships().reduce(
+      (total, relationship) =>
+        total +
+        (relationship.perspectives ?? []).reduce(
+          (perspectiveTotal, perspective) => perspectiveTotal + perspective.feelings.length,
+          0,
+        ),
+      0,
+    ),
+    moments: this.relationships().reduce(
+      (total, relationship) => total + (relationship.sharedEvents?.length ?? 0),
+      0,
+    ),
+  }));
+
   /**
    * Returns css class modifier for a node type.
    * @param node - The relationship node.
@@ -390,6 +409,24 @@ export class RelationshipGraphComponent {
     const source = this.nodes().find((node) => node.id === relationship.sourceId)?.name;
     const target = this.nodes().find((node) => node.id === relationship.targetId)?.name;
     return [source, target].filter((name): name is string => name !== undefined).join(' — ');
+  }
+
+  /** Number of current directional feelings explicitly authored for a bond. */
+  relationshipFeelingCount(relationship: Relationship): number {
+    return (relationship.perspectives ?? []).reduce(
+      (total, perspective) => total + perspective.feelings.length,
+      0,
+    );
+  }
+
+  /** Most recent session referenced by the bond's public history. */
+  latestRelationshipSession(relationship: Relationship): string | undefined {
+    const history = [
+      ...(relationship.sharedEvents ?? []).map((entry) => entry.sessionId),
+      ...(relationship.evolution ?? []).map((entry) => entry.sessionId),
+      ...(relationship.quotes ?? []).map((entry) => entry.sessionId),
+    ];
+    return history.at(-1);
   }
 
   /**
