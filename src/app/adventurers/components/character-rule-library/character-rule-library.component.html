@@ -6,18 +6,14 @@
   <div class="rule-library__heading">
     <div>
       <span class="rule-library__kicker">
-        {{ isItalian() ? 'Libreria del personaggio' : 'Character library' }}
+        {{ uiText.text('characterUi.ruleLibrary.eyebrow') }}
       </span>
-      <h3>{{ isItalian() ? 'Incantesimi e capacità' : 'Spells & abilities' }}</h3>
+      <h3>{{ uiText.text('characterUi.ruleLibrary.title') }}</h3>
       <p>
-        {{
-          isItalian()
-            ? 'Cerca nel repertorio di questa scheda. Le regole complete compaiono solo quando sono disponibili nel Compendio locale.'
-            : 'Search this sheet’s repertoire. Complete rules appear only when they are available in the local Compendium.'
-        }}
+        {{ uiText.text('characterUi.ruleLibrary.description') }}
       </p>
       <a class="rule-library__baseline-link" [routerLink]="['/compendium']">
-        {{ isItalian() ? 'Apri il compendio verificato' : 'Open verified compendium' }}
+        {{ uiText.text('characterUi.ruleLibrary.openCompendium') }}
         <span aria-hidden="true">→</span>
       </a>
     </div>
@@ -25,15 +21,15 @@
     @if (spellcastingSummary(); as spellcasting) {
       <dl class="rule-library__casting-stats">
         <div>
-          <dt>{{ isItalian() ? 'Caratteristica' : 'Ability' }}</dt>
+          <dt>{{ uiText.text('characterUi.ruleLibrary.ability') }}</dt>
           <dd>{{ spellcasting.ability }}</dd>
         </div>
         <div>
-          <dt>{{ isItalian() ? 'CD salvezza' : 'Save DC' }}</dt>
+          <dt>{{ uiText.text('characterUi.ruleLibrary.saveDc') }}</dt>
           <dd>{{ spellcasting.saveDC }}</dd>
         </div>
         <div>
-          <dt>{{ isItalian() ? 'Attacco' : 'Attack' }}</dt>
+          <dt>{{ uiText.text('characterUi.ruleLibrary.attack') }}</dt>
           <dd>{{ spellcasting.attackBonus }}</dd>
         </div>
       </dl>
@@ -42,50 +38,46 @@
 
   <div class="rule-library__tools">
     <label class="rule-library__search">
-      <span class="sr-only">{{
-        isItalian() ? 'Cerca incantesimi e capacità' : 'Search spells and abilities'
-      }}</span>
+      <span class="sr-only">{{ uiText.text('characterUi.ruleLibrary.searchLabel') }}</span>
       <span aria-hidden="true">⌕</span>
       <input
         type="search"
         [value]="query()"
         (input)="updateQuery($event)"
-        [placeholder]="
-          isItalian() ? 'Cerca per nome, scuola o livello…' : 'Search by name, school, or level…'
-        "
+        [placeholder]="uiText.text('characterUi.ruleLibrary.searchPlaceholder')"
       />
     </label>
     <div
       class="rule-library__filters"
       role="group"
-      [attr.aria-label]="isItalian() ? 'Filtra la libreria' : 'Filter library'"
+      [attr.aria-label]="uiText.text('characterUi.ruleLibrary.filterLabel')"
     >
       <button type="button" [attr.aria-pressed]="filter() === 'all'" (click)="setFilter('all')">
-        {{ isItalian() ? 'Tutto' : 'All' }} <span>{{ entries().length }}</span>
+        {{ uiText.text('characterUi.ruleLibrary.all') }} <span>{{ entries().length }}</span>
       </button>
       <button
         type="button"
         [attr.aria-pressed]="filter() === 'feature'"
         (click)="setFilter('feature')"
       >
-        {{ isItalian() ? 'Capacità' : 'Abilities' }} <span>{{ featureCount() }}</span>
+        {{ uiText.text('characterUi.ruleLibrary.abilities') }} <span>{{ featureCount() }}</span>
       </button>
       <button type="button" [attr.aria-pressed]="filter() === 'spell'" (click)="setFilter('spell')">
-        {{ isItalian() ? 'Incantesimi' : 'Spells' }} <span>{{ spellCount() }}</span>
+        {{ uiText.text('characterUi.ruleLibrary.spells') }} <span>{{ spellCount() }}</span>
       </button>
       <button
         type="button"
         [attr.aria-pressed]="filter() === 'prepared'"
         (click)="setFilter('prepared')"
       >
-        {{ isItalian() ? 'Preparati' : 'Prepared' }} <span>{{ preparedCount() }}</span>
+        {{ uiText.text('characterUi.ruleLibrary.preparedPlural') }} <span>{{ preparedCount() }}</span>
       </button>
       <button
         type="button"
         [attr.aria-pressed]="filter() === 'favourite'"
         (click)="setFilter('favourite')"
       >
-        {{ isItalian() ? 'Preferiti' : 'Favourites' }} <span>{{ favouriteCount() }}</span>
+        {{ uiText.text('characterUi.ruleLibrary.favourites') }} <span>{{ favouriteCount() }}</span>
       </button>
     </div>
   </div>
@@ -97,11 +89,11 @@
         [attr.aria-label]="uiText.text('interfaceLabels.spellSlots')"
       >
         <span class="rule-library__slots-label">{{
-          isItalian() ? 'Slot disponibili' : 'Available slots'
+          uiText.text('characterUi.ruleLibrary.availableSlots')
         }}</span>
         @for (slot of slots; track slot.level) {
           <div class="rule-library__slot">
-            <span>{{ isItalian() ? 'Liv.' : 'Lvl' }} {{ slot.level }}</span
+            <span>{{ uiText.text('characterUi.ruleLibrary.levelShort') }} {{ slot.level }}</span
             ><strong>{{ slot.total - (slot.used ?? 0) }} / {{ slot.total }}</strong>
           </div>
         }
@@ -110,7 +102,7 @@
   }
 
   <p class="rule-library__result-count" role="status" aria-live="polite">
-    {{ filteredEntries().length }} {{ isItalian() ? 'risultati nella scheda' : 'sheet results' }}
+    {{ uiText.text('characterUi.ruleLibrary.results', { count: filteredEntries().length }) }}
   </p>
 
   @if (filteredEntries().length > 0) {
@@ -129,57 +121,45 @@
               <a
                 class="rule-library__link"
                 [routerLink]="['/compendium', spell.categoryId, spell.key]"
-                [attr.aria-label]="
-                  (isItalian()
-                    ? 'Apri la descrizione verificata di '
-                    : 'Open verified description for ') + spell.name
-                "
+                [attr.aria-label]="uiText.text('characterUi.ruleLibrary.openVerifiedLabel', { name: spell.name })"
               >
-                {{ isItalian() ? 'Descrizione verificata' : 'Verified description' }}
+                {{ uiText.text('characterUi.ruleLibrary.verifiedDescription') }}
                 <span aria-hidden="true">→</span>
               </a>
             }
           } @else {
             <div class="rule-library__topline">
-              <span>{{ isItalian() ? 'Capacità' : 'Ability' }}</span
-              ><span class="rule-library__provenance">{{ isItalian() ? 'Scheda' : 'Sheet' }}</span>
+              <span>{{ uiText.text('characterUi.ruleLibrary.ability') }}</span
+              ><span class="rule-library__provenance">{{ uiText.text('characterUi.ruleLibrary.sheet') }}</span>
             </div>
             <h5>{{ entry.name }}</h5>
             <p class="rule-library__disclaimer">
-              {{
-                isItalian()
-                  ? 'Voce registrata nella scheda del personaggio.'
-                  : 'Entry recorded on the character sheet.'
-              }}
+              {{ uiText.text('characterUi.ruleLibrary.sheetEntry') }}
             </p>
           }
 
           <div
             class="rule-library__personal-state"
-            [attr.aria-label]="isItalian() ? 'Stato personale' : 'Personal state'"
+            [attr.aria-label]="uiText.text('characterUi.ruleLibrary.personalState')"
           >
             @if (entry.preference.prepared) {
-              <span>◆ {{ isItalian() ? 'Preparato' : 'Prepared' }}</span>
+              <span>◆ {{ uiText.text('characterUi.ruleLibrary.prepared') }}</span>
             }
             @if (entry.preference.favourite) {
-              <span>★ {{ isItalian() ? 'Preferito' : 'Favourite' }}</span>
+              <span>★ {{ uiText.text('characterUi.ruleLibrary.favourite') }}</span>
             }
           </div>
           @if (entry.preference.note || entry.preference.reference) {
             <div class="rule-library__annotations">
               @if (entry.preference.note) {
                 <p>
-                  <strong>{{ isItalian() ? 'Nota d’uso:' : 'Usage note:' }}</strong>
+                  <strong>{{ uiText.text('characterUi.ruleLibrary.usageNote') }}</strong>
                   {{ entry.preference.note }}
                 </p>
               }
               @if (entry.preference.reference; as reference) {
                 <div class="rule-library__personal-reference">
-                  <span>{{
-                    isItalian()
-                      ? 'Riferimento personale · non verificato da QuestKeeper'
-                      : 'Personal reference · not verified by QuestKeeper'
-                  }}</span>
+                  <span>{{ uiText.text('characterUi.ruleLibrary.unverifiedReference') }}</span>
                   <a [href]="reference.url" target="_blank" rel="noreferrer"
                     >{{ reference.label }} ↗</a
                   >
@@ -191,9 +171,7 @@
             class="rule-library__settings-link"
             [routerLink]="campaignId() ? ['/', campaignId(), 'settings'] : ['/settings']"
             fragment="rule-library-settings"
-            >{{
-              isItalian() ? 'Gestisci nelle impostazioni utente' : 'Manage in User settings'
-            }}
+            >{{ uiText.text('characterUi.ruleLibrary.manageSettings') }}
             →</a
           >
         </article>
@@ -202,13 +180,9 @@
   } @else {
     <div class="rule-library__empty">
       <span aria-hidden="true">⌕</span
-      ><strong>{{ isItalian() ? 'Nessuna voce trovata' : 'No entries found' }}</strong>
+      ><strong>{{ uiText.text('characterUi.ruleLibrary.noEntries') }}</strong>
       <p>
-        {{
-          isItalian()
-            ? 'Prova un termine diverso o cambia filtro.'
-            : 'Try another search term or change the filter.'
-        }}
+        {{ uiText.text('characterUi.ruleLibrary.noEntriesDescription') }}
       </p>
     </div>
   }
@@ -216,7 +190,7 @@
 
 <ng-template #spellCard let-spell>
   <div class="rule-library__topline">
-    <span>{{ spell.school ?? (isItalian() ? 'Incantesimo' : 'Spell') }}</span>
+    <span>{{ spell.school ?? uiText.text('characterUi.ruleLibrary.spell') }}</span>
     <span class="rule-library__badges">
       @if (spell.isConcentration) {
         <span [title]="uiText.text('interfaceLabels.concentration')">C</span>
@@ -228,13 +202,7 @@
   </div>
   <h5>{{ spell.name }}</h5>
   <span class="rule-library__provenance">{{
-    spell.key
-      ? isItalian()
-        ? 'Compendio locale'
-        : 'Local compendium'
-      : isItalian()
-        ? 'Scheda'
-        : 'Sheet'
+    uiText.text(spell.key ? 'characterUi.ruleLibrary.localCompendium' : 'characterUi.ruleLibrary.sheet')
   }}</span>
   @if (spell.description) {
     <p>{{ spell.description }}</p>
@@ -242,19 +210,19 @@
   <dl class="rule-library__meta">
     @if (spell.castingTime) {
       <div>
-        <dt>{{ isItalian() ? 'Lancio' : 'Cast' }}</dt>
+        <dt>{{ uiText.text('characterUi.ruleLibrary.cast') }}</dt>
         <dd>{{ spell.castingTime }}</dd>
       </div>
     }
     @if (spell.range) {
       <div>
-        <dt>{{ isItalian() ? 'Gittata' : 'Range' }}</dt>
+        <dt>{{ uiText.text('characterUi.ruleLibrary.range') }}</dt>
         <dd>{{ spell.range }}</dd>
       </div>
     }
     @if (spell.duration) {
       <div>
-        <dt>{{ isItalian() ? 'Durata' : 'Duration' }}</dt>
+        <dt>{{ uiText.text('characterUi.ruleLibrary.duration') }}</dt>
         <dd>{{ spell.duration }}</dd>
       </div>
     }

@@ -6,7 +6,7 @@
       <img
         class="party-list__hero-image"
         [src]="imgUrl"
-        alt="The adventuring party"
+        [alt]="uiText.text('characterUi.party.heroAlt')"
         loading="eager"
         decoding="async"
       />
@@ -16,16 +16,12 @@
       <span class="party-list__eyebrow">{{ campaignTitle() }}</span>
       <div class="party-list__hero-row">
         <h1 class="party-list__title">
-          {{ lang() === 'it' ? 'La Compagnia di Avventurieri' : 'The Adventuring Party' }}
+          {{ uiText.text('characterUi.party.title') }}
         </h1>
         <app-language-toggle />
       </div>
       <p class="party-list__subtitle">
-        {{
-          lang() === 'it'
-            ? 'Gli eroi che stanno forgiando la loro leggenda'
-            : 'Meet the heroes forging their legend'
-        }}
+        {{ uiText.text('characterUi.party.description') }}
       </p>
     </div>
   </section>
@@ -58,23 +54,19 @@
             @if (showcase.isReady) {
               <p class="character-card__meta">
                 {{ showcase.character.sheet.race }} · {{ showcase.character.sheet.classType }} ·
-                {{ lang() === 'it' ? 'Liv.' : 'Lv.' }} {{ showcase.character.sheet.level }}
+                {{ uiText.text('characterUi.party.levelShort') }} {{ showcase.character.sheet.level }}
               </p>
             } @else {
               <p class="character-card__pending-label">
-                {{ lang() === 'it' ? 'Scheda in preparazione' : 'Character sheet in preparation' }}
+                {{ uiText.text('characterUi.party.sheetPending') }}
               </p>
               <p class="character-card__pending-copy">
-                {{
-                  lang() === 'it'
-                    ? 'Razza, classe e statistiche saranno rivelate presto.'
-                    : 'Race, class, and statistics will be revealed soon.'
-                }}
+                {{ uiText.text('characterUi.party.sheetPendingDescription') }}
               </p>
             }
             @if (showcase.character.playerName) {
               <p class="character-card__player">
-                {{ lang() === 'it' ? 'Giocato da' : 'Played by' }}
+                {{ uiText.text('characterUi.party.playedBy') }}
                 <span class="character-card__player-name">{{ showcase.character.playerName }}</span>
               </p>
             }
@@ -82,7 +74,7 @@
             @if (myCharacterId() === showcase.character.id) {
               <p class="character-card__identity">
                 <span aria-hidden="true">✦</span>
-                {{ lang() === 'it' ? 'Il mio personaggio' : 'My character' }}
+                {{ uiText.text('characterUi.party.myCharacter') }}
               </p>
             }
 
@@ -149,7 +141,7 @@
                 [routerLink]="['/', cId, 'party', showcase.character.id]"
               >
                 <span class="character-card__action-icon">📋</span>
-                {{ lang() === 'it' ? 'Profilo' : 'Profile' }}
+                {{ uiText.text('characterUi.party.profile') }}
               </a>
               @if (showcase.isReady) {
                 <a
@@ -158,14 +150,14 @@
                   fragment="diary"
                 >
                   <span class="character-card__action-icon">📖</span>
-                  {{ lang() === 'it' ? 'Diario' : 'Diary' }}
+                  {{ uiText.text('characterUi.party.journal') }}
                 </a>
                 <a
                   class="character-card__action"
                   [routerLink]="['/', cId, 'party', 'relationships']"
                 >
                   <span class="character-card__action-icon">💕</span>
-                  {{ lang() === 'it' ? 'Legami' : 'Bonds' }}
+                  {{ uiText.text('characterUi.party.bonds') }}
                 </a>
               }
             </nav>
@@ -179,7 +171,7 @@
       <a class="party-list__bonds-link" [routerLink]="['/', cId, 'party', 'relationships']">
         <span class="party-list__bonds-icon">🕸️</span>
         <span class="party-list__bonds-text">
-          {{ lang() === 'it' ? 'Esplora i legami del gruppo' : 'Explore Party Bonds' }}
+          {{ uiText.text('characterUi.party.exploreBonds') }}
         </span>
       </a>
     </section>
@@ -189,7 +181,7 @@
   @if (isLoading()) {
     <div class="party-list__loading">
       <app-dice-loader
-        [label]="lang() === 'it' ? 'Convoco la compagnia...' : 'Summoning the party...'"
+        [label]="uiText.text('characterUi.party.loading')"
         [playSound]="false"
       />
     </div>

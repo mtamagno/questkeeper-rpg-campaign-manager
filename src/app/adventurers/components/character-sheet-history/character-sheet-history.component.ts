@@ -47,7 +47,6 @@ export class CharacterSheetHistoryComponent {
   readonly snapshots = input.required<ReadonlyArray<CharacterSheetSnapshot>>();
   readonly selectedLevel = input.required<number>();
   readonly currentLevel = input.required<number>();
-  readonly isItalian = input(false);
   readonly levelSelected = output<number>();
   readonly comparisonBaseLevel = signal<number | undefined>(undefined);
   readonly comparisonTargetLevel = signal<number | undefined>(undefined);
@@ -110,7 +109,6 @@ export class CharacterSheetHistoryComponent {
     if (before === undefined || after === undefined) return [];
     const previous = before.sheet;
     const current = after.sheet;
-    const italian = this.isItalian();
     const row = (
       id: string,
       label: string,
@@ -133,28 +131,28 @@ export class CharacterSheetHistoryComponent {
       collections.find((change) => change.id === id)!;
 
     return [
-      row('role', italian ? 'Ruolo' : 'Role', previous.classType, current.classType, 'identity'),
-      row('origin', italian ? 'Origine' : 'Origin', previous.race, current.race, 'identity'),
+      row('role', this.uiText.text('characterUi.sheetHistory.fields.role'), previous.classType, current.classType, 'identity'),
+      row('origin', this.uiText.text('characterUi.sheetHistory.fields.origin'), previous.race, current.race, 'identity'),
       row('background', 'Background', previous.background, current.background, 'identity'),
       row('xp', 'XP', previous.experiencePoints, current.experiencePoints, 'core'),
       row(
         'hp',
-        italian ? 'Punti ferita massimi' : 'Maximum hit points',
+        this.uiText.text('characterUi.sheetHistory.fields.maxHp'),
         previous.maxHitPoints,
         current.maxHitPoints,
         'core',
       ),
       row(
         'ac',
-        italian ? 'Classe armatura' : 'Armor class',
+        this.uiText.text('characterUi.sheetHistory.fields.armorClass'),
         previous.armorClass,
         current.armorClass,
         'core',
       ),
-      row('speed', italian ? 'Velocità' : 'Speed', previous.speed, current.speed, 'core'),
+      row('speed', this.uiText.text('characterUi.sheet.speed'), previous.speed, current.speed, 'core'),
       row(
         'proficiency',
-        italian ? 'Bonus competenza' : 'Proficiency bonus',
+        this.uiText.text('characterUi.sheetHistory.fields.proficiencyBonus'),
         previous.proficiencyBonus,
         current.proficiencyBonus,
         'core',
@@ -162,21 +160,21 @@ export class CharacterSheetHistoryComponent {
       ),
       row(
         'strength',
-        italian ? 'Forza' : 'Strength',
+        this.uiText.text('characterUi.sheetHistory.fields.strength'),
         previous.abilityScores.strength,
         current.abilityScores.strength,
         'abilities',
       ),
       row(
         'dexterity',
-        italian ? 'Destrezza' : 'Dexterity',
+        this.uiText.text('characterUi.sheetHistory.fields.dexterity'),
         previous.abilityScores.dexterity,
         current.abilityScores.dexterity,
         'abilities',
       ),
       row(
         'constitution',
-        italian ? 'Costituzione' : 'Constitution',
+        this.uiText.text('characterUi.sheetHistory.fields.constitution'),
         previous.abilityScores.constitution,
         current.abilityScores.constitution,
         'abilities',
@@ -190,7 +188,7 @@ export class CharacterSheetHistoryComponent {
       ),
       row(
         'wisdom',
-        italian ? 'Saggezza' : 'Wisdom',
+        this.uiText.text('characterUi.sheetHistory.fields.wisdom'),
         previous.abilityScores.wisdom,
         current.abilityScores.wisdom,
         'abilities',
@@ -204,7 +202,7 @@ export class CharacterSheetHistoryComponent {
       ),
       row(
         'skills',
-        italian ? 'Competenze' : 'Skills',
+        this.uiText.text('characterUi.sheet.skills'),
         previous.skills.length,
         current.skills.length,
         'collections',
@@ -213,7 +211,7 @@ export class CharacterSheetHistoryComponent {
       ),
       row(
         'features',
-        italian ? 'Privilegi' : 'Features',
+        this.uiText.text('characterUi.sheetHistory.fields.features'),
         previous.features.length,
         current.features.length,
         'collections',
@@ -222,7 +220,7 @@ export class CharacterSheetHistoryComponent {
       ),
       row(
         'spells',
-        italian ? 'Incantesimi' : 'Spells',
+        this.uiText.text('characterUi.ruleLibrary.spells'),
         previous.spells?.length ?? 0,
         current.spells?.length ?? 0,
         'collections',
@@ -231,7 +229,7 @@ export class CharacterSheetHistoryComponent {
       ),
       row(
         'equipment',
-        italian ? 'Dotazioni' : 'Equipment',
+        this.uiText.text('characterUi.sheetHistory.fields.equipment'),
         previous.equipment.length,
         current.equipment.length,
         'collections',
@@ -291,19 +289,19 @@ export class CharacterSheetHistoryComponent {
 
   comparisonDeltaLabel(row: ComparisonRow): string {
     if (row.state === 'increased')
-      return `${this.isItalian() ? 'Aumentato' : 'Increased'} ${row.delta}`;
+      return `${this.uiText.text('characterUi.sheetHistory.increased')} ${row.delta}`;
     if (row.state === 'decreased')
-      return `${this.isItalian() ? 'Diminuito' : 'Decreased'} ${row.delta}`;
-    if (row.state === 'changed') return this.isItalian() ? 'Modificato' : 'Changed';
-    return this.isItalian() ? 'Invariato' : 'Unchanged';
+      return `${this.uiText.text('characterUi.sheetHistory.decreased')} ${row.delta}`;
+    if (row.state === 'changed') return this.uiText.text('characterUi.sheetHistory.changed');
+    return this.uiText.text('characterUi.sheetHistory.unchanged');
   }
 
   comparisonTitle(snapshot: CharacterSheetSnapshot): string {
     const title = snapshot.title;
     if (title === undefined) {
-      return `${this.isItalian() ? 'Livello' : 'Level'} ${snapshot.sheet.level}`;
+      return this.uiText.text('characterUi.sheetHistory.levelTitle', { level: snapshot.sheet.level });
     }
-    return (this.isItalian() ? title.it : title.en) || title.en || title.it;
+    return this.uiText.localized(title);
   }
 
   private describeChanges(
@@ -311,43 +309,40 @@ export class CharacterSheetHistoryComponent {
     current: CharacterSheet,
   ): ReadonlyArray<EvolutionChange> {
     const changes: EvolutionChange[] = [];
-    const italian = this.isItalian();
 
     this.addNumericChange(changes, 'XP', previous.experiencePoints, current.experiencePoints);
     this.addNumericChange(
       changes,
-      italian ? 'Punti ferita' : 'Hit points',
+      this.uiText.text('characterUi.sheetHistory.fields.hitPoints'),
       previous.maxHitPoints,
       current.maxHitPoints,
     );
     this.addNumericChange(
       changes,
-      italian ? 'Classe armatura' : 'Armor class',
+      this.uiText.text('characterUi.sheetHistory.fields.armorClass'),
       previous.armorClass,
       current.armorClass,
     );
     this.addNumericChange(
       changes,
-      italian ? 'Competenza' : 'Proficiency',
+      this.uiText.text('characterUi.detail.proficiency'),
       previous.proficiencyBonus,
       current.proficiencyBonus,
     );
-    this.addNumericChange(changes, italian ? 'Velocità' : 'Speed', previous.speed, current.speed);
+    this.addNumericChange(changes, this.uiText.text('characterUi.sheet.speed'), previous.speed, current.speed);
 
-    const abilityLabels: ReadonlyArray<
-      readonly [keyof CharacterSheet['abilityScores'], string, string]
-    > = [
-      ['strength', 'FOR', 'STR'],
-      ['dexterity', 'DES', 'DEX'],
-      ['constitution', 'COS', 'CON'],
-      ['intelligence', 'INT', 'INT'],
-      ['wisdom', 'SAG', 'WIS'],
-      ['charisma', 'CAR', 'CHA'],
+    const abilityLabels: ReadonlyArray<readonly [keyof CharacterSheet['abilityScores'], string]> = [
+      ['strength', this.uiText.text('characterUi.sheetHistory.abilities.strength')],
+      ['dexterity', this.uiText.text('characterUi.sheetHistory.abilities.dexterity')],
+      ['constitution', this.uiText.text('characterUi.sheetHistory.abilities.constitution')],
+      ['intelligence', this.uiText.text('characterUi.sheetHistory.abilities.intelligence')],
+      ['wisdom', this.uiText.text('characterUi.sheetHistory.abilities.wisdom')],
+      ['charisma', this.uiText.text('characterUi.sheetHistory.abilities.charisma')],
     ];
-    for (const [ability, labelIt, labelEn] of abilityLabels) {
+    for (const [ability, label] of abilityLabels) {
       this.addNumericChange(
         changes,
-        italian ? labelIt : labelEn,
+        label,
         previous.abilityScores[ability],
         current.abilityScores[ability],
       );
@@ -356,7 +351,7 @@ export class CharacterSheetHistoryComponent {
     const newFeatures = this.countNewEntries(previous.features, current.features);
     if (newFeatures > 0) {
       changes.push({
-        label: italian ? 'Nuovi privilegi' : 'New features',
+        label: this.uiText.text('characterUi.sheetHistory.newFeatures'),
         value: `+${newFeatures}`,
         detail: this.newEntries(previous.features, current.features).join(' · '),
       });
@@ -365,7 +360,7 @@ export class CharacterSheetHistoryComponent {
     const newSpells = this.countNewEntries(previous.spells ?? [], current.spells ?? []);
     if (newSpells > 0) {
       changes.push({
-        label: italian ? 'Nuovi incantesimi' : 'New spells',
+        label: this.uiText.text('characterUi.sheetHistory.newSpells'),
         value: `+${newSpells}`,
         detail: this.newEntries(previous.spells ?? [], current.spells ?? []).join(' · '),
       });
@@ -374,7 +369,7 @@ export class CharacterSheetHistoryComponent {
     const newSkills = this.countNewEntries(previous.skills, current.skills);
     if (newSkills > 0) {
       changes.push({
-        label: italian ? 'Nuove abilità' : 'New skills',
+        label: this.uiText.text('characterUi.sheetHistory.newSkills'),
         value: `+${newSkills}`,
         detail: this.newEntries(previous.skills, current.skills).join(' · '),
       });
@@ -383,7 +378,7 @@ export class CharacterSheetHistoryComponent {
     const newEquipment = this.countNewEntries(previous.equipment, current.equipment);
     if (newEquipment > 0) {
       changes.push({
-        label: italian ? 'Nuove dotazioni' : 'New gear',
+        label: this.uiText.text('characterUi.sheetHistory.newGear'),
         value: `+${newEquipment}`,
         detail: this.newEntries(previous.equipment, current.equipment).join(' · '),
       });
@@ -410,7 +405,6 @@ export class CharacterSheetHistoryComponent {
     previous: CharacterSheet,
     current: CharacterSheet,
   ): ReadonlyArray<CollectionChange> {
-    const italian = this.isItalian();
     const change = (
       id: CollectionChange['id'],
       label: string,
@@ -423,17 +417,17 @@ export class CharacterSheetHistoryComponent {
       lost: this.newEntries(after, before),
     });
     return [
-      change('skills', italian ? 'Competenze' : 'Skills', previous.skills, current.skills),
-      change('features', italian ? 'Privilegi' : 'Features', previous.features, current.features),
+      change('skills', this.uiText.text('characterUi.sheet.skills'), previous.skills, current.skills),
+      change('features', this.uiText.text('characterUi.sheetHistory.fields.features'), previous.features, current.features),
       change(
         'spells',
-        italian ? 'Incantesimi' : 'Spells',
+        this.uiText.text('characterUi.ruleLibrary.spells'),
         previous.spells ?? [],
         current.spells ?? [],
       ),
       change(
         'equipment',
-        italian ? 'Dotazioni' : 'Equipment',
+        this.uiText.text('characterUi.sheetHistory.fields.equipment'),
         previous.equipment,
         current.equipment,
       ),

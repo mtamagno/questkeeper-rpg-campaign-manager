@@ -1,4 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
+
+import { UiTextService } from '@guild/services/uiText.service';
 
 export const CHARACTER_SHEET_WORKSPACES = [
   'overview',
@@ -26,8 +28,8 @@ interface CharacterSheetWorkspaceOption {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CharacterSheetNavigationComponent {
+  readonly uiText = inject(UiTextService);
   readonly characterId = input.required<string>();
-  readonly isItalian = input(false);
   readonly activeSection = input.required<CharacterSheetWorkspace>();
   readonly inventoryCount = input(0);
   readonly libraryCount = input(0);
@@ -38,49 +40,38 @@ export class CharacterSheetNavigationComponent {
   readonly sectionRequested = output<CharacterSheetWorkspace>();
 
   readonly workspaces = computed<ReadonlyArray<CharacterSheetWorkspaceOption>>(() => {
-    const italian = this.isItalian();
     return [
       {
         id: 'overview',
         icon: '\u2694',
-        label: italian ? 'Al tavolo' : 'At the table',
-        description: italian
-          ? 'Identità, difese, monete e risorse pronte da usare.'
-          : 'Identity, defences, coins, and ready-to-use resources.',
+        label: this.uiText.text('characterUi.sheetNavigation.overview'),
+        description: this.uiText.text('characterUi.sheetNavigation.overviewDescription'),
       },
       {
         id: 'training',
         icon: '\u25c6',
-        label: italian ? 'Statistiche' : 'Stats',
-        description: italian
-          ? 'Caratteristiche, tiri salvezza, abilità e lingue.'
-          : 'Abilities, saving throws, skills, and languages.',
+        label: this.uiText.text('characterUi.sheetNavigation.stats'),
+        description: this.uiText.text('characterUi.sheetNavigation.statsDescription'),
       },
       {
         id: 'inventory',
         icon: '\u25c8',
-        label: italian ? 'Equipaggiamento' : 'Equipment',
-        description: italian
-          ? 'Tutto ciò che porta, usa o tiene in sintonia.'
-          : 'Everything carried, equipped, or attuned.',
+        label: this.uiText.text('characterUi.sheetNavigation.equipment'),
+        description: this.uiText.text('characterUi.sheetNavigation.equipmentDescription'),
         count: this.inventoryCount(),
       },
       {
         id: 'spells',
         icon: '\u2726',
-        label: italian ? 'Regole' : 'Rules',
-        description: italian
-          ? 'Privilegi, incantesimi e riferimenti personali.'
-          : 'Features, spells, and personal references.',
+        label: this.uiText.text('characterUi.sheetNavigation.rules'),
+        description: this.uiText.text('characterUi.sheetNavigation.rulesDescription'),
         count: this.libraryCount(),
       },
       {
         id: 'progression',
         icon: '\u231b',
-        label: italian ? 'Progressione' : 'Progression',
-        description: italian
-          ? 'Livelli registrati, confronti e cambiamenti.'
-          : 'Recorded levels, comparisons, and changes.',
+        label: this.uiText.text('characterUi.sheetNavigation.progression'),
+        description: this.uiText.text('characterUi.sheetNavigation.progressionDescription'),
         count: this.recordedLevelCount(),
       },
     ];

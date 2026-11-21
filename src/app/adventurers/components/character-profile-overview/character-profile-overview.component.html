@@ -2,25 +2,21 @@
   <header class="profile-overview__heading">
     <div>
       <p class="profile-overview__eyebrow">
-        {{ lang() === 'it' ? 'Profilo pubblico' : 'Public profile' }}
+        {{ uiText.text('characterUi.profile.eyebrow') }}
       </p>
       <h2 id="profile-overview-title" class="profile-overview__title">
-        {{ lang() === 'it' ? character().name + ' in breve' : character().name + ' at a glance' }}
+        {{ uiText.text('characterUi.profile.title', { character: character().name }) }}
       </h2>
     </div>
     <p class="profile-overview__intro">
-      {{
-        lang() === 'it'
-          ? 'Personalità, principi, legami e fragilità: ciò che serve per capire subito chi è.'
-          : 'Personality, principles, bonds and vulnerabilities: what makes this character immediately recognizable.'
-      }}
+      {{ uiText.text('characterUi.profile.description') }}
     </p>
   </header>
 
   @if (character().publicProfile.quickFacts?.length) {
     <dl
       class="profile-overview__quick-facts"
-      [attr.aria-label]="lang() === 'it' ? 'Fatti rapidi' : 'Quick facts'"
+      [attr.aria-label]="uiText.text('characterUi.profile.quickFacts')"
     >
       @for (fact of character().publicProfile.quickFacts; track fact.id) {
         <div class="profile-overview__quick-fact">
@@ -52,15 +48,7 @@
               [attr.aria-controls]="'profile-facet-' + facet.id"
               (click)="toggleExpanded(facet.id)"
             >
-              {{
-                isExpanded(facet.id)
-                  ? lang() === 'it'
-                    ? 'Riduci'
-                    : 'Show less'
-                  : lang() === 'it'
-                    ? 'Leggi tutto'
-                    : 'Read full text'
-              }}
+              {{ uiText.text(isExpanded(facet.id) ? 'characterUi.profile.showLess' : 'characterUi.profile.readAll') }}
               <span aria-hidden="true">{{ isExpanded(facet.id) ? '↑' : '↓' }}</span>
             </button>
           }
@@ -71,11 +59,7 @@
 
   @if (facets().length === 0) {
     <p class="profile-overview__empty">
-      {{
-        lang() === 'it'
-          ? 'Il profilo pubblico deve ancora essere raccontato.'
-          : 'The public profile is still waiting to be told.'
-      }}
+      {{ uiText.text('characterUi.profile.empty') }}
     </p>
   }
 </section>

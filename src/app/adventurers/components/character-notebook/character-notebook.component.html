@@ -3,13 +3,13 @@
     <header class="notebook__header">
       <div>
         <span class="notebook__eyebrow">{{
-          lang() === 'it' ? 'Archivio privato' : 'Private archive'
+          uiText.text('characterUi.notebook.privateArchive')
         }}</span>
         <h2>{{ notebook().title | bilingual }}</h2>
         <p>{{ notebook().description | bilingual }}</p>
       </div>
       <button type="button" class="notebook__lock" (click)="lockNotebook()">
-        {{ lang() === 'it' ? 'Richiudi' : 'Lock again' }}
+        {{ uiText.text('characterUi.notebook.lockAgain') }}
       </button>
     </header>
 
@@ -18,11 +18,7 @@
         class="notebook-book"
         tabindex="0"
         (keydown)="onBookKeydown($event)"
-        [attr.aria-label]="
-          lang() === 'it'
-            ? 'Notebook sfogliabile di ' + characterName()
-            : characterName() + '\'s page-turning notebook'
-        "
+        [attr.aria-label]="uiText.text('characterUi.notebook.bookLabel', { character: characterName() })"
       >
         @if (currentSlide(); as slide) {
           <div
@@ -36,9 +32,7 @@
                 type="button"
                 class="notebook-book__image-link notebook-book__image-link--cover"
                 (click)="openLightbox(slide.image)"
-                [attr.aria-label]="
-                  (lang() === 'it' ? 'Ingrandisci: ' : 'Enlarge: ') + slideLabel(slide)
-                "
+                [attr.aria-label]="uiText.text('characterUi.notebook.enlarge', { label: slideLabel(slide) })"
               >
                 <img
                   class="notebook-book__image"
@@ -53,9 +47,7 @@
                 type="button"
                 class="notebook-book__image-link"
                 (click)="openLightbox(slide.page.image)"
-                [attr.aria-label]="
-                  (lang() === 'it' ? 'Ingrandisci: ' : 'Enlarge: ') + notebookText(slide.page.title)
-                "
+                [attr.aria-label]="uiText.text('characterUi.notebook.enlarge', { label: notebookText(slide.page.title) })"
               >
                 <img
                   class="notebook-book__image"
@@ -82,7 +74,7 @@
               class="notebook-book__edge-turn notebook-book__edge-turn--previous"
               [disabled]="!canGoPrevious()"
               (click)="previousSlide()"
-              [attr.aria-label]="lang() === 'it' ? 'Sfoglia indietro' : 'Turn back'"
+              [attr.aria-label]="uiText.text('characterUi.notebook.turnBack')"
             >
               <span aria-hidden="true">‹</span>
             </button>
@@ -91,7 +83,7 @@
               class="notebook-book__edge-turn notebook-book__edge-turn--next"
               [disabled]="!canGoNext()"
               (click)="nextSlide()"
-              [attr.aria-label]="lang() === 'it' ? 'Sfoglia avanti' : 'Turn forward'"
+              [attr.aria-label]="uiText.text('characterUi.notebook.turnForward')"
             >
               <span aria-hidden="true">›</span>
             </button>
@@ -99,7 +91,7 @@
 
           <nav
             class="notebook-book__controls"
-            [attr.aria-label]="lang() === 'it' ? 'Controlli del notebook' : 'Notebook controls'"
+            [attr.aria-label]="uiText.text('characterUi.notebook.controls')"
           >
             <button
               type="button"
@@ -108,7 +100,7 @@
               (click)="previousSlide()"
             >
               <span aria-hidden="true">←</span
-              ><span>{{ lang() === 'it' ? 'Precedente' : 'Previous' }}</span>
+              ><span>{{ uiText.text('characterUi.notebook.previous') }}</span>
             </button>
             <div class="notebook-book__progress">
               <span>{{ slideLabel(slide) }}</span>
@@ -131,44 +123,32 @@
               [disabled]="!canGoNext()"
               (click)="nextSlide()"
             >
-              <span>{{ lang() === 'it' ? 'Successiva' : 'Next' }}</span
+              <span>{{ uiText.text('characterUi.notebook.next') }}</span
               ><span aria-hidden="true">→</span>
             </button>
           </nav>
         }
         <p class="notebook-book__hint">
-          {{
-            lang() === 'it'
-              ? 'Clicca i bordi per sfogliare e il centro per ingrandire.'
-              : 'Select the edges to turn pages and the centre to enlarge.'
-          }}
+          {{ uiText.text('characterUi.notebook.instructionsShort') }}
         </p>
       </section>
     } @else {
       <p class="notebook__empty">
-        {{
-          lang() === 'it'
-            ? 'Questo notebook non contiene ancora pagine.'
-            : 'This notebook has no pages yet.'
-        }}
+        {{ uiText.text('characterUi.notebook.empty') }}
       </p>
     }
   } @else {
     <div class="notebook__sealed">
       <div class="notebook__seal" aria-hidden="true">{{ sealInitial() }}</div>
       <p class="notebook__sealed-kicker">
-        {{ lang() === 'it' ? 'Proprietà di ' + characterName() : 'Property of ' + characterName() }}
+        {{ uiText.text('characterUi.notebook.propertyOf', { character: characterName() }) }}
       </p>
       <h2>{{ notebook().title | bilingual }}</h2>
       <p>
-        {{
-          lang() === 'it'
-            ? 'Pensieri, immagini e ricordi custoditi tra queste pagine.'
-            : 'Thoughts, images, and memories kept between these pages.'
-        }}
+        {{ uiText.text('characterUi.notebook.lockedDescription', { character: characterName() }) }}
       </p>
       <button type="button" class="notebook__unlock" (click)="openDialog()">
-        {{ lang() === 'it' ? 'Apri il notebook' : 'Open the notebook' }}
+        {{ uiText.text('characterUi.notebook.open') }}
       </button>
     </div>
   }

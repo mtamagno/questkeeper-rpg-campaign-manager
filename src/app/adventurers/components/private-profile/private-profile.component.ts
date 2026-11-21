@@ -19,6 +19,7 @@ import { LanguageService } from '@guild/services/language.service';
 import { type CharacterPrivateProfile } from '@guild/models/character.model';
 import { BilingualTextPipe } from '@guild/components/bilingual-text/bilingual-text.pipe';
 import { PasswordDialogComponent } from '@guild/components/password-dialog/password-dialog.component';
+import { UiTextService } from '@guild/services/uiText.service';
 
 /**
  * Displays private character profile behind password protection.
@@ -33,6 +34,7 @@ import { PasswordDialogComponent } from '@guild/components/password-dialog/passw
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PrivateProfileComponent {
+  readonly uiText = inject(UiTextService);
   private readonly passwordService = inject(PasswordService);
   private readonly languageService = inject(LanguageService);
 

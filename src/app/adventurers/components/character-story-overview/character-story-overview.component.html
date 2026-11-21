@@ -1,23 +1,17 @@
 <section class="story-overview" aria-labelledby="story-overview-title">
   <header class="story-overview__heading">
-    <span class="story-overview__kicker">{{
-      lang() === 'it' ? 'Percorso narrativo' : 'Story path'
-    }}</span>
+    <span class="story-overview__kicker">{{ uiText.text('characterUi.story.eyebrow') }}</span>
     <h2 id="story-overview-title">
-      {{ lang() === 'it' ? 'Una storia, quattro prospettive' : 'One story, four perspectives' }}
+      {{ uiText.text('characterUi.story.title') }}
     </h2>
     <p>
-      {{
-        lang() === 'it'
-          ? 'Scegli da dove iniziare: ogni tappa porta al contenuto completo senza mescolare segreti o meccaniche.'
-          : 'Choose where to begin: every stop leads to the complete public story without mixing in secrets or mechanics.'
-      }}
+      {{ uiText.text('characterUi.story.description') }}
     </p>
   </header>
 
   <nav
     class="story-overview__grid"
-    [attr.aria-label]="lang() === 'it' ? 'Indice della storia' : 'Story index'"
+    [attr.aria-label]="uiText.text('characterUi.story.indexLabel')"
   >
     @for (destination of destinations(); track destination.id) {
       @if (destination.available) {
@@ -39,7 +33,7 @@
           <span class="story-overview__icon" aria-hidden="true">{{ destination.icon }}</span>
           <span class="story-overview__copy">
             <strong>{{ destination.title }}</strong>
-            <small>{{ lang() === 'it' ? 'Non ancora registrato.' : 'Not recorded yet.' }}</small>
+            <small>{{ uiText.text('characterUi.story.unavailable') }}</small>
           </span>
         </div>
       }

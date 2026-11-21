@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 
 import { type Character } from '@guild/models/character.model';
 import { LanguageService } from '@guild/services/language.service';
+import { UiTextService } from '@guild/services/uiText.service';
 
 interface StoryDestination {
   readonly id: string;
@@ -22,6 +23,7 @@ interface StoryDestination {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CharacterStoryOverviewComponent {
+  readonly uiText = inject(UiTextService);
   private readonly languageService = inject(LanguageService);
 
   readonly character = input.required<Character>();
@@ -30,7 +32,6 @@ export class CharacterStoryOverviewComponent {
 
   readonly destinations = computed<ReadonlyArray<StoryDestination>>(() => {
     const character = this.character();
-    const italian = this.lang() === 'it';
     const chapterCount = character.loreChapters?.length ?? 0;
     const hasOrigins = chapterCount > 0 || this.isRecorded(character.publicProfile.backstory);
     const hasKnownHistory = this.isRecorded(character.publicProfile.knownHistory);
@@ -39,46 +40,34 @@ export class CharacterStoryOverviewComponent {
       {
         id: 'personal-chapters',
         icon: '🧭',
-        title: italian
-          ? chapterCount > 0
-            ? 'Capitoli personali'
-            : 'Origini'
-          : chapterCount > 0
-            ? 'Personal chapters'
-            : 'Origins',
-        description: italian
-          ? 'Da dove viene e quali momenti l’hanno formato.'
-          : 'Where they came from and the moments that shaped them.',
+        title: this.uiText.text(
+          chapterCount > 0 ? 'characterUi.story.personalChapters' : 'characterUi.story.origins',
+        ),
+        description: this.uiText.text('characterUi.story.originsDescription'),
         count: chapterCount || undefined,
         available: hasOrigins,
       },
       {
         id: 'profile-bonds',
         icon: '🕸️',
-        title: italian ? 'Legami in viaggio' : 'Bonds along the road',
-        description: italian
-          ? 'Relazioni, sentimenti e memorie condivise.'
-          : 'Relationships, feelings and shared memories.',
+        title: this.uiText.text('characterUi.story.bonds'),
+        description: this.uiText.text('characterUi.story.bondsDescription'),
         count: this.bondCount(),
         available: this.bondCount() > 0,
       },
       {
         id: 'quotes',
         icon: '💬',
-        title: italian ? 'Citazioni iconiche' : 'Iconic quotes',
-        description: italian
-          ? 'Le parole che hanno lasciato il segno al tavolo.'
-          : 'The words that left their mark at the table.',
+        title: this.uiText.text('characterUi.story.quotes'),
+        description: this.uiText.text('characterUi.story.quotesDescription'),
         count: character.quotes.length,
         available: character.quotes.length > 0,
       },
       {
         id: 'profile-memories',
         icon: '📖',
-        title: italian ? 'Cosa sa il gruppo' : 'What the party knows',
-        description: italian
-          ? 'La storia pubblica e le fonti che la sostengono.'
-          : 'The public story and the sources that support it.',
+        title: this.uiText.text('characterUi.story.partyKnowledge'),
+        description: this.uiText.text('characterUi.story.partyKnowledgeDescription'),
         available: hasKnownHistory,
       },
     ];

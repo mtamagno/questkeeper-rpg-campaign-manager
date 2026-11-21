@@ -186,15 +186,17 @@ export class CharacterNotebookComponent {
 
   slideLabel(slide: NotebookSlide): string {
     if (slide.kind === 'cover') {
-      if (slide.side === 'front') return this.lang() === 'it' ? 'Copertina' : 'Front cover';
-      return this.lang() === 'it' ? 'Quarta di copertina' : 'Back cover';
+      if (slide.side === 'front') return this.uiText.text('characterUi.notebook.frontCover');
+      return this.uiText.text('characterUi.notebook.backCover');
     }
-    const prefix = this.lang() === 'it' ? 'Tavola' : 'Spread';
-    return `${prefix} ${slide.spreadIndex + 1} / ${this.notebook().pages.length}`;
+    return this.uiText.text('characterUi.notebook.spread', {
+      current: slide.spreadIndex + 1,
+      total: this.notebook().pages.length,
+    });
   }
 
   markerLabel(slide: NotebookSlide): string {
-    return `${this.lang() === 'it' ? 'Vai a: ' : 'Go to: '}${this.slideLabel(slide)}`;
+    return this.uiText.text('characterUi.notebook.goTo', { label: this.slideLabel(slide) });
   }
 
   onBookKeydown(event: KeyboardEvent): void {

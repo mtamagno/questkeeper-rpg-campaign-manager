@@ -16,15 +16,7 @@
       (click)="toggleAll()"
       [attr.aria-expanded]="showAll()"
     >
-      {{
-        showAll()
-          ? lang() === 'it'
-            ? 'Mostra meno citazioni'
-            : 'Show fewer quotes'
-          : lang() === 'it'
-            ? 'Mostra tutte le ' + quotes().length + ' citazioni'
-            : 'Show all ' + quotes().length + ' quotes'
-      }}
+      {{ uiText.text(showAll() ? 'characterUi.quotes.showLess' : 'characterUi.quotes.showAll', { count: quotes().length }) }}
     </button>
   }
 </div>

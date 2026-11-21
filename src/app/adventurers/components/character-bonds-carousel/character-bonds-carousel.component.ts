@@ -11,6 +11,7 @@ import {
 import { RouterLink } from '@angular/router';
 
 import { LanguageService } from '@guild/services/language.service';
+import { UiTextService } from '@guild/services/uiText.service';
 
 export interface ProfileBondFeeling {
   readonly label: string;
@@ -41,6 +42,7 @@ export interface ProfileBondPreview {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CharacterBondsCarouselComponent {
+  readonly uiText = inject(UiTextService);
   private readonly languageService = inject(LanguageService);
   private readonly bondCarousel = viewChild<ElementRef<HTMLUListElement>>('bondCarousel');
 

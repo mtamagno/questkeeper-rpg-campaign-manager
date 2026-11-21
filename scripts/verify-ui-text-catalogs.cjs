@@ -135,6 +135,30 @@ const migratedSurfaces = [
   'src/app/guild/components/image-gallery/image-gallery.component.ts',
   'src/app/guild/components/image-lightbox/image-lightbox.component.html',
   'src/app/guild/components/image-lightbox/image-lightbox.component.ts',
+  'src/app/adventurers/pages/party-list/party-list.component.html',
+  'src/app/adventurers/pages/party-list/party-list.component.ts',
+  'src/app/adventurers/pages/character-detail/character-detail.component.html',
+  'src/app/adventurers/pages/character-detail/character-detail.component.ts',
+  'src/app/adventurers/components/character-profile-overview/character-profile-overview.component.html',
+  'src/app/adventurers/components/character-profile-overview/character-profile-overview.component.ts',
+  'src/app/adventurers/components/character-story-overview/character-story-overview.component.html',
+  'src/app/adventurers/components/character-story-overview/character-story-overview.component.ts',
+  'src/app/adventurers/components/character-lore-chapters/character-lore-chapters.component.html',
+  'src/app/adventurers/components/character-lore-chapters/character-lore-chapters.component.ts',
+  'src/app/adventurers/components/character-bonds-carousel/character-bonds-carousel.component.html',
+  'src/app/adventurers/components/character-bonds-carousel/character-bonds-carousel.component.ts',
+  'src/app/adventurers/components/character-quotes/character-quotes.component.html',
+  'src/app/adventurers/components/character-quotes/character-quotes.component.ts',
+  'src/app/adventurers/components/private-profile/private-profile.component.html',
+  'src/app/adventurers/components/private-profile/private-profile.component.ts',
+  'src/app/adventurers/components/character-notebook/character-notebook.component.html',
+  'src/app/adventurers/components/character-notebook/character-notebook.component.ts',
+  'src/app/adventurers/components/character-sheet/character-sheet.component.html',
+  'src/app/adventurers/components/character-sheet-navigation/character-sheet-navigation.component.html',
+  'src/app/adventurers/components/character-sheet-navigation/character-sheet-navigation.component.ts',
+  'src/app/adventurers/components/character-sheet-history/character-sheet-history.component.html',
+  'src/app/adventurers/components/character-sheet-history/character-sheet-history.component.ts',
+  'src/app/adventurers/components/character-rule-library/character-rule-library.component.html',
 ];
 for (const productionSurface of [
   'src/app/chronicle/pages/table-rules/table-rules.component.html',
@@ -154,6 +178,27 @@ for (const relative of migratedSurfaces) {
     )
   ) {
     fail(`${relative} contains a literal user-facing attribute outside ui.json`);
+  }
+}
+
+const dataOwnedLanguageBranches = new Map([
+  [
+    'src/app/adventurers/components/character-sheet/character-sheet.component.ts',
+    { expected: 1, reason: 'the PDF renderer label schema currently ships authored en/it fields' },
+  ],
+  [
+    'src/app/adventurers/components/character-rule-library/character-rule-library.component.ts',
+    { expected: 2, reason: 'local compendium rule fields and D&D abbreviations are game data' },
+  ],
+]);
+for (const [relative, exception] of dataOwnedLanguageBranches) {
+  const source = fs.readFileSync(path.join(root, relative), 'utf8');
+  const branches = source.match(/isItalian\(\)\s*\?|const italian = this\.isItalian\(\)/g) ?? [];
+  const markers = source.match(/UI-TEXT-DATA-OWNED/g) ?? [];
+  if (branches.length !== exception.expected || markers.length !== exception.expected) {
+    fail(
+      `${relative} data-owned language exception drifted (expected ${exception.expected}: ${exception.reason})`,
+    );
   }
 }
 
