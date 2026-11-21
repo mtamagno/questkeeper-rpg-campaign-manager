@@ -130,6 +130,30 @@
               "it": "Mira ricorda la voce di Aria diventare perfettamente ferma non appena qualcun altro ebbe bisogno di fare il primo passo."
             }
           }
+        ],
+        "differences": [
+          {
+            "topic": {
+              "en": "Who chose the first step",
+              "it": "Chi scelse di fare il primo passo"
+            },
+            "accounts": [
+              {
+                "entityId": "aria-vale",
+                "account": {
+                  "en": "Aria believes she asked Mira to wait until the last mark was certain, and that Mira moved before she finished.",
+                  "it": "Aria crede di aver chiesto a Mira di aspettare finché l'ultimo segno non fosse certo e che Mira si sia mossa prima che finisse."
+                }
+              },
+              {
+                "entityId": "mira-thorn",
+                "account": {
+                  "en": "Mira remembers Aria giving one small nod: not an order, but enough of an answer to cross.",
+                  "it": "Mira ricorda un piccolo cenno di Aria: non un ordine, ma una risposta sufficiente per attraversare."
+                }
+              }
+            ]
+          }
         ]
       }
     ],

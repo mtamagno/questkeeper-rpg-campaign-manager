@@ -47,6 +47,15 @@ export class SharedMemoryDetailComponent {
       return character ? [{ character, account: viewpoint.account }] : [];
     });
   });
+  readonly differences = computed(() =>
+    (this.memory()?.differences ?? []).map((difference) => ({
+      topic: difference.topic,
+      accounts: difference.accounts.flatMap((account) => {
+        const character = this.data.getCharacterById(account.entityId)();
+        return character ? [{ character, account: account.account }] : [];
+      }),
+    })),
+  );
   readonly relationshipRoute = computed(() => {
     const ids = this.memory()?.participantIds ?? [];
     return ['/', this.campaignId() ?? '', 'relationships', ids[0] ?? '', ids[1] ?? ''];

@@ -841,6 +841,8 @@
           "sharedFacts": "What everyone agrees happened",
           "openSession": "Open the canonical session",
           "viewpoints": "What each person remembers",
+          "differences": "Where the memories diverge",
+          "differencesHelp": "These are authored differences in recollection, not conclusions generated from the prose.",
           "back": "Back to the bond",
           "notFoundTitle": "Memory not found",
           "notFoundHelp": "This memory is not part of the published campaign."
@@ -1788,6 +1790,8 @@
           "sharedFacts": "Ciò che tutti concordano sia accaduto",
           "openSession": "Apri la sessione canonica",
           "viewpoints": "Ciò che ricorda ogni persona",
+          "differences": "Dove i ricordi divergono",
+          "differencesHelp": "Queste sono differenze di memoria registrate dagli autori, non conclusioni generate dalla prosa.",
           "back": "Torna al legame",
           "notFoundTitle": "Memoria non trovata",
           "notFoundHelp": "Questa memoria non fa parte della campagna pubblicata."

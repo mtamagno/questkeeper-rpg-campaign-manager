@@ -62,6 +62,31 @@
       </div>
     </section>
 
+    @if (differences().length > 0) {
+      <section class="shared-memory__differences" aria-labelledby="shared-memory-differences">
+        <div class="shared-memory__differences-heading">
+          <span aria-hidden="true">≠</span>
+          <div>
+            <h2 id="shared-memory-differences">{{ uiText.text('sharedMemory.differences') }}</h2>
+            <p>{{ uiText.text('sharedMemory.differencesHelp') }}</p>
+          </div>
+        </div>
+        @for (difference of differences(); track $index) {
+          <article>
+            <h3>{{ difference.topic | bilingual }}</h3>
+            <div>
+              @for (account of difference.accounts; track account.character.id) {
+                <blockquote>
+                  <strong>{{ account.character.name }}</strong>
+                  <p>{{ account.account | bilingual }}</p>
+                </blockquote>
+              }
+            </div>
+          </article>
+        }
+      </section>
+    }
+
     <a class="shared-memory__back" [routerLink]="relationshipRoute()"
       >← {{ uiText.text('sharedMemory.back') }}</a
     >

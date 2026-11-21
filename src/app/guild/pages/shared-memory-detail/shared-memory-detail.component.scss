@@ -104,6 +104,54 @@
     color: $color-text-secondary;
     line-height: $line-height-relaxed;
   }
+  &__differences {
+    display: grid;
+    gap: $spacing-lg;
+    padding: $spacing-lg;
+    border: $border-width-thin solid $color-border-accent;
+    border-radius: $border-radius-lg;
+    background: rgba($color-danger, 0.05);
+  }
+  &__differences-heading {
+    display: flex;
+    gap: $spacing-md;
+    align-items: flex-start;
+  }
+  &__differences-heading > span {
+    color: $color-danger-light;
+    font-size: $font-size-3xl;
+    line-height: 1;
+  }
+  &__differences-heading h2,
+  &__differences-heading p {
+    margin: 0;
+  }
+  &__differences-heading p {
+    color: $color-text-secondary;
+  }
+  &__differences > article {
+    @include surface-card;
+    padding: $spacing-lg;
+  }
+  &__differences > article > div {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    gap: $spacing-md;
+  }
+  &__differences h3 {
+    color: $color-parchment-light;
+    font-family: $font-family-heading;
+  }
+  &__differences blockquote {
+    margin: 0;
+    padding: $spacing-md;
+    border-left: $border-width-thick solid $color-danger;
+    background: rgba($color-bg-void, 0.24);
+  }
+  &__differences blockquote p {
+    color: $color-text-secondary;
+    line-height: $line-height-relaxed;
+  }
   &__loading,
   &__missing {
     @include flex-center;

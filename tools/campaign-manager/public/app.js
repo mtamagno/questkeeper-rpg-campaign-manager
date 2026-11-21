@@ -2414,6 +2414,20 @@ function relationshipLines(item, kind, language) {
       ),
     );
   }
+  if (kind === 'memoryDifferences') {
+    return (item.sharedMemories ?? []).flatMap((entry) =>
+      (entry.differences ?? []).flatMap((difference) =>
+        difference.accounts.map((account) =>
+          [
+            entry.id,
+            localized(difference.topic, language),
+            account.entityId,
+            localized(account.account, language),
+          ].join(' | '),
+        ),
+      ),
+    );
+  }
   return (item.evolution ?? []).map((entry) =>
     [entry.sessionId, entry.fromType ?? '', entry.toType, localized(entry.note, language)].join(
       ' | ',
@@ -2501,6 +2515,16 @@ function relationshipForm(kind, item = {}) {
         {
           type: 'textarea',
           hint: 'One per line: memory ID | participant ID | that person’s account.',
+          wide: true,
+        },
+      ),
+      field(
+        `relationshipMemoryDifferences__${language}`,
+        `Conflicting recollections · ${languageName(language)} (${language})`,
+        relationshipLines(item, 'memoryDifferences', language).join('\n'),
+        {
+          type: 'textarea',
+          hint: 'One per line: memory ID | point of difference | participant ID | that participant’s version.',
           wide: true,
         },
       ),
@@ -3277,6 +3301,7 @@ function buildRelationship(form, original = {}, kind = 'party') {
   const promiseRows = relationshipRows(form, 'relationshipPromises', languages);
   const memoryRows = relationshipRows(form, 'relationshipMemories', languages);
   const memoryViewpointRows = relationshipRows(form, 'relationshipMemoryViewpoints', languages);
+  const memoryDifferenceRows = relationshipRows(form, 'relationshipMemoryDifferences', languages);
   const primary = state.campaign?.manifestEntry?.defaultLanguage ?? languages[0];
   const perspectives = [];
   for (const [index, row] of (perspectiveRows[primary] ?? []).entries()) {
@@ -3362,6 +3387,29 @@ function buildRelationship(form, original = {}, kind = 'party') {
     memory.viewpoints.push({
       entityId: row[1],
       account: localizedRelationshipPart(memoryViewpointRows, languages, index, 2),
+    });
+  }
+  const differenceIndex = new Map();
+  for (const [index, row] of (memoryDifferenceRows[primary] ?? []).entries()) {
+    const memory = sharedMemories.find((entry) => entry.id === row[0]);
+    if (!memory)
+      throw new Error(`Memory difference ${index + 1} references unknown memory ${row[0]}.`);
+    if (!memory.participantIds.includes(row[2]))
+      throw new Error(`Memory difference ${index + 1} must belong to a participant.`);
+    const key = `${row[0]}::${row[1]}`;
+    let difference = differenceIndex.get(key);
+    if (!difference) {
+      difference = {
+        topic: localizedRelationshipPart(memoryDifferenceRows, languages, index, 1),
+        accounts: [],
+      };
+      differenceIndex.set(key, difference);
+      memory.differences ??= [];
+      memory.differences.push(difference);
+    }
+    difference.accounts.push({
+      entityId: row[2],
+      account: localizedRelationshipPart(memoryDifferenceRows, languages, index, 3),
     });
   }
   const certainty = String(form.get('perceptionCertainty') ?? '');

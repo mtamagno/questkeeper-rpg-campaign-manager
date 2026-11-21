@@ -178,6 +178,13 @@ export interface SharedRelationshipMemory {
   readonly title: BilingualText;
   readonly sharedFacts: BilingualText;
   readonly viewpoints: ReadonlyArray<SharedMemoryViewpoint>;
+  readonly differences?: ReadonlyArray<SharedMemoryDifference>;
+}
+
+/** An authored point where participants remember the same event differently. */
+export interface SharedMemoryDifference {
+  readonly topic: BilingualText;
+  readonly accounts: ReadonlyArray<SharedMemoryViewpoint>;
 }
 
 /**
