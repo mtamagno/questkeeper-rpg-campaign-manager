@@ -52,6 +52,56 @@
         ]
       }
     ],
+    "history": [
+      {
+        "sessionId": "session-1",
+        "trust": 3,
+        "tension": 2,
+        "affection": 2,
+        "note": {
+          "en": "Their different rhythms still caused friction, but both had begun to rely on the other's judgment.",
+          "it": "I loro ritmi diversi creavano ancora attrito, ma entrambe avevano iniziato ad affidarsi al giudizio dell'altra."
+        }
+      },
+      {
+        "sessionId": "session-2",
+        "trust": 5,
+        "tension": 1,
+        "affection": 4,
+        "note": {
+          "en": "Crossing the broken span turned practiced cooperation into confidence that each would hold her part.",
+          "it": "Attraversare il ponte spezzato trasformò la collaborazione abituale nella certezza che ciascuna avrebbe fatto la propria parte."
+        }
+      }
+    ],
+    "promiseHistory": [
+      {
+        "promiseId": "bring-each-other-home",
+        "sessionId": "session-1",
+        "status": "made",
+        "label": {
+          "en": "Bring each other home",
+          "it": "Riportarsi a casa a vicenda"
+        },
+        "note": {
+          "en": "A practical agreement before the road became dangerous.",
+          "it": "Un accordo concreto prima che la strada diventasse pericolosa."
+        }
+      },
+      {
+        "promiseId": "bring-each-other-home",
+        "sessionId": "session-2",
+        "status": "kept",
+        "label": {
+          "en": "Bring each other home",
+          "it": "Riportarsi a casa a vicenda"
+        },
+        "note": {
+          "en": "Mira crossed on Aria's marks and waited until both were safely beyond the ravine.",
+          "it": "Mira attraversò seguendo i segni di Aria e attese finché entrambe furono al sicuro oltre il burrone."
+        }
+      }
+    ],
     "sharedEvents": [
       {
         "sessionId": "session-2",

@@ -2374,6 +2374,28 @@ function relationshipLines(item, kind, language) {
       [entry.sessionId, entry.speakerId, localized(entry.text, language)].join(' | '),
     );
   }
+  if (kind === 'history') {
+    return (item.history ?? []).map((entry) =>
+      [
+        entry.sessionId,
+        entry.trust ?? '',
+        entry.tension ?? '',
+        entry.affection ?? '',
+        localized(entry.note, language),
+      ].join(' | '),
+    );
+  }
+  if (kind === 'promises') {
+    return (item.promiseHistory ?? []).map((entry) =>
+      [
+        entry.sessionId,
+        entry.promiseId,
+        entry.status,
+        localized(entry.label, language),
+        localized(entry.note, language),
+      ].join(' | '),
+    );
+  }
   return (item.evolution ?? []).map((entry) =>
     [entry.sessionId, entry.fromType ?? '', entry.toType, localized(entry.note, language)].join(
       ' | ',
@@ -2438,6 +2460,29 @@ function relationshipForm(kind, item = {}) {
         {
           type: 'textarea',
           hint: 'One per line: session ID | previous type (optional) | new type | note.',
+          wide: true,
+        },
+      ),
+    ]),
+    section('Trust, tension, affection and promises'),
+    ...languages.flatMap((language) => [
+      field(
+        `relationshipHistory__${language}`,
+        `Bond history · ${languageName(language)} (${language})`,
+        relationshipLines(item, 'history', language).join('\n'),
+        {
+          type: 'textarea',
+          hint: 'One per line: session ID | trust 0-5 | tension 0-5 | affection 0-5 | evidence-based note.',
+          wide: true,
+        },
+      ),
+      field(
+        `relationshipPromises__${language}`,
+        `Promise history · ${languageName(language)} (${language})`,
+        relationshipLines(item, 'promises', language).join('\n'),
+        {
+          type: 'textarea',
+          hint: 'One per line: session ID | stable promise ID | made/kept/broken/released | label | note.',
           wide: true,
         },
       ),
@@ -3187,6 +3232,8 @@ function buildRelationship(form, original = {}, kind = 'party') {
   const eventRows = relationshipRows(form, 'relationshipEvents', languages);
   const quoteRows = relationshipRows(form, 'relationshipQuotes', languages);
   const evolutionRows = relationshipRows(form, 'relationshipEvolution', languages);
+  const historyRows = relationshipRows(form, 'relationshipHistory', languages);
+  const promiseRows = relationshipRows(form, 'relationshipPromises', languages);
   const primary = state.campaign?.manifestEntry?.defaultLanguage ?? languages[0];
   const perspectives = [];
   for (const [index, row] of (perspectiveRows[primary] ?? []).entries()) {
@@ -3219,6 +3266,32 @@ function buildRelationship(form, original = {}, kind = 'party') {
     toType: row[2] || form.get('relationshipType'),
     note: localizedRelationshipPart(evolutionRows, languages, index, 3),
   }));
+  const historyValue = (value) => {
+    if (value === '') return undefined;
+    const parsed = Number.parseInt(value, 10);
+    return Number.isFinite(parsed) ? Math.min(5, Math.max(0, parsed)) : undefined;
+  };
+  const history = (historyRows[primary] ?? []).map((row, index) => ({
+    sessionId: row[0],
+    ...(historyValue(row[1]) !== undefined ? { trust: historyValue(row[1]) } : {}),
+    ...(historyValue(row[2]) !== undefined ? { tension: historyValue(row[2]) } : {}),
+    ...(historyValue(row[3]) !== undefined ? { affection: historyValue(row[3]) } : {}),
+    note: localizedRelationshipPart(historyRows, languages, index, 4),
+  }));
+  const promiseStatuses = new Set(['made', 'kept', 'broken', 'released']);
+  const promiseHistory = (promiseRows[primary] ?? []).map((row, index) => {
+    if (!row[1]) throw new Error(`Promise ${index + 1} needs a stable ID.`);
+    if (!promiseStatuses.has(row[2])) {
+      throw new Error(`Promise ${index + 1} must be made, kept, broken or released.`);
+    }
+    return {
+      sessionId: row[0],
+      promiseId: row[1],
+      status: row[2],
+      label: localizedRelationshipPart(promiseRows, languages, index, 3),
+      note: localizedRelationshipPart(promiseRows, languages, index, 4),
+    };
+  });
   const certainty = String(form.get('perceptionCertainty') ?? '');
   const basis = localizedFormValue(form, 'perceptionBasis', '', languages);
   const npcIds = new Set((state.campaign?.npcs ?? []).map((item) => item.id));
@@ -3238,6 +3311,8 @@ function buildRelationship(form, original = {}, kind = 'party') {
     ...(sharedEvents.length ? { sharedEvents } : { sharedEvents: [] }),
     ...(quotes.length ? { quotes } : { quotes: [] }),
     ...(evolution.length ? { evolution } : { evolution: [] }),
+    ...(history.length ? { history } : { history: [] }),
+    ...(promiseHistory.length ? { promiseHistory } : { promiseHistory: [] }),
     ...(certainty ? { partyPerception: { certainty, basis } } : { partyPerception: undefined }),
   };
 }

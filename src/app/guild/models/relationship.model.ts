@@ -43,6 +43,8 @@ export interface Relationship {
   readonly sharedEvents?: ReadonlyArray<SharedEvent>;
   readonly quotes?: ReadonlyArray<RelationshipQuote>;
   readonly evolution?: ReadonlyArray<RelationshipEvolution>;
+  readonly history?: ReadonlyArray<RelationshipHistoryEntry>;
+  readonly promiseHistory?: ReadonlyArray<RelationshipPromiseChange>;
   readonly perspectives?: ReadonlyArray<RelationshipPerspective>;
   readonly partyPerception?: PartyRelationshipPerception;
 }
@@ -131,6 +133,34 @@ export interface RelationshipEvolution {
   readonly fromType?: RelationshipType;
   readonly toType: RelationshipType;
   readonly note: BilingualText;
+}
+
+/** A session-linked snapshot of the bond's authored emotional dimensions. */
+export interface RelationshipHistoryEntry {
+  readonly sessionId: string;
+  readonly trust?: number;
+  readonly tension?: number;
+  readonly affection?: number;
+  readonly note: BilingualText;
+}
+
+export const RELATIONSHIP_PROMISE_STATUSES = {
+  MADE: 'made',
+  KEPT: 'kept',
+  BROKEN: 'broken',
+  RELEASED: 'released',
+} as const;
+
+export type RelationshipPromiseStatus =
+  (typeof RELATIONSHIP_PROMISE_STATUSES)[keyof typeof RELATIONSHIP_PROMISE_STATUSES];
+
+/** One dated change to a stable promise between the participants. */
+export interface RelationshipPromiseChange {
+  readonly promiseId: string;
+  readonly sessionId: string;
+  readonly status: RelationshipPromiseStatus;
+  readonly label: BilingualText;
+  readonly note?: BilingualText;
 }
 
 /**
