@@ -1,6 +1,8 @@
 <div
   class="lore-chapters"
-  [attr.aria-label]="uiText.text('characterUi.chapters.sectionLabel', { character: characterName() })"
+  [attr.aria-label]="
+    uiText.text('characterUi.chapters.sectionLabel', { character: characterName() })
+  "
 >
   <header class="lore-chapters__introduction">
     <span class="lore-chapters__kicker">

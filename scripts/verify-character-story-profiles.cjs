@@ -167,9 +167,7 @@ assert(
   template.includes('<app-character-bonds-carousel') &&
     bondsTemplate.includes('@for (bond of visibleBonds(); track bond.key)') &&
     bondsComponent.includes('scroll(direction: -1 | 1)') &&
-    template.includes(
-      "[title]=\"lang() === 'it' ? 'Legami in viaggio' : 'Bonds along the road'\"",
-    ) &&
+    template.includes('[title]="uiText.text(\'characterUi.story.bonds\')"') &&
     bondsTemplate.includes('bond.feelings'),
   'Relationships need one closable card carousel with directional feelings.',
 );

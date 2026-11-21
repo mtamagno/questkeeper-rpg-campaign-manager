@@ -1,10 +1,7 @@
 <!-- Character Detail Page -->
 @if (isLoading()) {
   <div class="character-detail__loading">
-    <app-dice-loader
-      [label]="uiText.text('characterUi.detail.loading')"
-      [playSound]="false"
-    />
+    <app-dice-loader [label]="uiText.text('characterUi.detail.loading')" [playSound]="false" />
   </div>
 } @else if (character(); as char) {
   <article class="character-detail">
@@ -150,7 +147,13 @@
           [hidden]="!isTab('story')"
         >
           <app-accordion
-            [title]="uiText.text(char.loreChapters?.length ? 'characterUi.story.personalChapters' : 'characterUi.story.origins')"
+            [title]="
+              uiText.text(
+                char.loreChapters?.length
+                  ? 'characterUi.story.personalChapters'
+                  : 'characterUi.story.origins'
+              )
+            "
             icon="🧭"
             [startOpen]="shouldOpenStorySection('personal-chapters')"
           >

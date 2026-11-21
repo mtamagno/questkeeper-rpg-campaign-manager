@@ -18,7 +18,9 @@
         class="notebook-book"
         tabindex="0"
         (keydown)="onBookKeydown($event)"
-        [attr.aria-label]="uiText.text('characterUi.notebook.bookLabel', { character: characterName() })"
+        [attr.aria-label]="
+          uiText.text('characterUi.notebook.bookLabel', { character: characterName() })
+        "
       >
         @if (currentSlide(); as slide) {
           <div
@@ -32,7 +34,9 @@
                 type="button"
                 class="notebook-book__image-link notebook-book__image-link--cover"
                 (click)="openLightbox(slide.image)"
-                [attr.aria-label]="uiText.text('characterUi.notebook.enlarge', { label: slideLabel(slide) })"
+                [attr.aria-label]="
+                  uiText.text('characterUi.notebook.enlarge', { label: slideLabel(slide) })
+                "
               >
                 <img
                   class="notebook-book__image"
@@ -47,7 +51,11 @@
                 type="button"
                 class="notebook-book__image-link"
                 (click)="openLightbox(slide.page.image)"
-                [attr.aria-label]="uiText.text('characterUi.notebook.enlarge', { label: notebookText(slide.page.title) })"
+                [attr.aria-label]="
+                  uiText.text('characterUi.notebook.enlarge', {
+                    label: notebookText(slide.page.title),
+                  })
+                "
               >
                 <img
                   class="notebook-book__image"

@@ -16,4 +16,3 @@ localized copy.
   links back to canonical sessions and memories.
 - AI may draft only from explicit evidence and never decides which participant
   is correct.
-

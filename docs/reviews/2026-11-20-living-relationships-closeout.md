@@ -14,4 +14,3 @@ linked to sessions; QuestKeeper does not convert prose into hidden scores.
 - Visual summaries always retain a complete keyboard-readable alternative.
 - Production campaign evidence remains local; the public example uses only
   original Lantern Road material.
-

@@ -131,8 +131,20 @@ export class CharacterSheetHistoryComponent {
       collections.find((change) => change.id === id)!;
 
     return [
-      row('role', this.uiText.text('characterUi.sheetHistory.fields.role'), previous.classType, current.classType, 'identity'),
-      row('origin', this.uiText.text('characterUi.sheetHistory.fields.origin'), previous.race, current.race, 'identity'),
+      row(
+        'role',
+        this.uiText.text('characterUi.sheetHistory.fields.role'),
+        previous.classType,
+        current.classType,
+        'identity',
+      ),
+      row(
+        'origin',
+        this.uiText.text('characterUi.sheetHistory.fields.origin'),
+        previous.race,
+        current.race,
+        'identity',
+      ),
       row('background', 'Background', previous.background, current.background, 'identity'),
       row('xp', 'XP', previous.experiencePoints, current.experiencePoints, 'core'),
       row(
@@ -149,7 +161,13 @@ export class CharacterSheetHistoryComponent {
         current.armorClass,
         'core',
       ),
-      row('speed', this.uiText.text('characterUi.sheet.speed'), previous.speed, current.speed, 'core'),
+      row(
+        'speed',
+        this.uiText.text('characterUi.sheet.speed'),
+        previous.speed,
+        current.speed,
+        'core',
+      ),
       row(
         'proficiency',
         this.uiText.text('characterUi.sheetHistory.fields.proficiencyBonus'),
@@ -299,7 +317,9 @@ export class CharacterSheetHistoryComponent {
   comparisonTitle(snapshot: CharacterSheetSnapshot): string {
     const title = snapshot.title;
     if (title === undefined) {
-      return this.uiText.text('characterUi.sheetHistory.levelTitle', { level: snapshot.sheet.level });
+      return this.uiText.text('characterUi.sheetHistory.levelTitle', {
+        level: snapshot.sheet.level,
+      });
     }
     return this.uiText.localized(title);
   }
@@ -329,7 +349,12 @@ export class CharacterSheetHistoryComponent {
       previous.proficiencyBonus,
       current.proficiencyBonus,
     );
-    this.addNumericChange(changes, this.uiText.text('characterUi.sheet.speed'), previous.speed, current.speed);
+    this.addNumericChange(
+      changes,
+      this.uiText.text('characterUi.sheet.speed'),
+      previous.speed,
+      current.speed,
+    );
 
     const abilityLabels: ReadonlyArray<readonly [keyof CharacterSheet['abilityScores'], string]> = [
       ['strength', this.uiText.text('characterUi.sheetHistory.abilities.strength')],
@@ -417,8 +442,18 @@ export class CharacterSheetHistoryComponent {
       lost: this.newEntries(after, before),
     });
     return [
-      change('skills', this.uiText.text('characterUi.sheet.skills'), previous.skills, current.skills),
-      change('features', this.uiText.text('characterUi.sheetHistory.fields.features'), previous.features, current.features),
+      change(
+        'skills',
+        this.uiText.text('characterUi.sheet.skills'),
+        previous.skills,
+        current.skills,
+      ),
+      change(
+        'features',
+        this.uiText.text('characterUi.sheetHistory.fields.features'),
+        previous.features,
+        current.features,
+      ),
       change(
         'spells',
         this.uiText.text('characterUi.ruleLibrary.spells'),

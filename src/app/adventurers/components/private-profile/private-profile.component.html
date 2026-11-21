@@ -1,9 +1,7 @@
 <!-- Private Profile — Locked/Unlocked view -->
 <div class="private-profile">
   <div class="private-profile__header">
-    <h2 class="private-profile__title">
-      🔒 {{ uiText.text('characterUi.privateProfile.title') }}
-    </h2>
+    <h2 class="private-profile__title">🔒 {{ uiText.text('characterUi.privateProfile.title') }}</h2>
 
     @if (isUnlocked()) {
       <button

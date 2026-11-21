@@ -14,14 +14,26 @@
   <div class="sheet-history__summary" aria-live="polite">
     <span>
       <strong>{{ snapshots().length }}</strong>
-      {{ uiText.text(snapshots().length === 1 ? 'characterUi.sheetHistory.chapter' : 'characterUi.sheetHistory.chapters') }}
+      {{
+        uiText.text(
+          snapshots().length === 1
+            ? 'characterUi.sheetHistory.chapter'
+            : 'characterUi.sheetHistory.chapters'
+        )
+      }}
     </span>
     <span>
       {{ uiText.text('characterUi.sheetHistory.recordedLevels') }}
       <strong>{{ levelRange() }}</strong>
     </span>
     <span class="sheet-history__summary-status" [class.is-archive]="!isCurrentSelection()">
-      {{ uiText.text(isCurrentSelection() ? 'characterUi.sheetHistory.currentChapter' : 'characterUi.sheetHistory.archivedMemory') }}
+      {{
+        uiText.text(
+          isCurrentSelection()
+            ? 'characterUi.sheetHistory.currentChapter'
+            : 'characterUi.sheetHistory.archivedMemory'
+        )
+      }}
     </span>
   </div>
 
@@ -119,7 +131,8 @@
                 </strong>
                 <strong role="columnheader">
                   <small
-                    >{{ uiText.text('characterUi.detail.level') }} {{ compared.after.sheet.level }}</small
+                    >{{ uiText.text('characterUi.detail.level') }}
+                    {{ compared.after.sheet.level }}</small
                   >
                   {{ comparisonTitle(compared.after) }}
                 </strong>
@@ -169,7 +182,9 @@
                 <span class="is-gained"
                   >{{ summary.gained }} {{ uiText.text('characterUi.sheetHistory.gained') }}</span
                 >
-                <span class="is-lost">{{ summary.lost }} {{ uiText.text('characterUi.sheetHistory.lost') }}</span>
+                <span class="is-lost"
+                  >{{ summary.lost }} {{ uiText.text('characterUi.sheetHistory.lost') }}</span
+                >
               } @else {
                 <strong>{{ uiText.text('characterUi.sheetHistory.noChanges') }}</strong>
               }

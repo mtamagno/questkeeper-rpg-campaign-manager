@@ -267,11 +267,31 @@ export class CharacterSheetComponent {
     const currency = this.sheet().currency;
     if (currency === undefined) return [];
     const values: ReadonlyArray<CurrencyEntry> = [
-      { code: 'PP', value: currency.pp ?? 0, label: this.uiText.text('characterUi.sheet.currency.pp') },
-      { code: 'GP', value: currency.gp ?? 0, label: this.uiText.text('characterUi.sheet.currency.gp') },
-      { code: 'EP', value: currency.ep ?? 0, label: this.uiText.text('characterUi.sheet.currency.ep') },
-      { code: 'SP', value: currency.sp ?? 0, label: this.uiText.text('characterUi.sheet.currency.sp') },
-      { code: 'CP', value: currency.cp ?? 0, label: this.uiText.text('characterUi.sheet.currency.cp') },
+      {
+        code: 'PP',
+        value: currency.pp ?? 0,
+        label: this.uiText.text('characterUi.sheet.currency.pp'),
+      },
+      {
+        code: 'GP',
+        value: currency.gp ?? 0,
+        label: this.uiText.text('characterUi.sheet.currency.gp'),
+      },
+      {
+        code: 'EP',
+        value: currency.ep ?? 0,
+        label: this.uiText.text('characterUi.sheet.currency.ep'),
+      },
+      {
+        code: 'SP',
+        value: currency.sp ?? 0,
+        label: this.uiText.text('characterUi.sheet.currency.sp'),
+      },
+      {
+        code: 'CP',
+        value: currency.cp ?? 0,
+        label: this.uiText.text('characterUi.sheet.currency.cp'),
+      },
     ];
     return values.filter((entry) => entry.value > 0);
   });

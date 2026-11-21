@@ -48,7 +48,13 @@
               [attr.aria-controls]="'profile-facet-' + facet.id"
               (click)="toggleExpanded(facet.id)"
             >
-              {{ uiText.text(isExpanded(facet.id) ? 'characterUi.profile.showLess' : 'characterUi.profile.readAll') }}
+              {{
+                uiText.text(
+                  isExpanded(facet.id)
+                    ? 'characterUi.profile.showLess'
+                    : 'characterUi.profile.readAll'
+                )
+              }}
               <span aria-hidden="true">{{ isExpanded(facet.id) ? '↑' : '↓' }}</span>
             </button>
           }

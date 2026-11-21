@@ -27,6 +27,7 @@ import { PasswordService } from '@guild/services/password.service';
 import { CampaignService } from '@guild/services/campaign.service';
 import { CharacterReadingPositionService } from '@guild/services/characterReadingPosition.service';
 import { toDisplayUrl } from '@guild/services/imageUrl.service';
+import { UiTextService } from '@guild/services/uiText.service';
 
 type NotebookSlide =
   | {
@@ -51,6 +52,7 @@ type NotebookSlide =
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CharacterNotebookComponent {
+  readonly uiText = inject(UiTextService);
   private readonly passwordService = inject(PasswordService);
   private readonly languageService = inject(LanguageService);
   private readonly campaignLocale = inject(CampaignLocaleService);

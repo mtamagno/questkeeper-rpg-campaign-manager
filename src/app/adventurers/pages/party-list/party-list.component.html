@@ -54,7 +54,8 @@
             @if (showcase.isReady) {
               <p class="character-card__meta">
                 {{ showcase.character.sheet.race }} · {{ showcase.character.sheet.classType }} ·
-                {{ uiText.text('characterUi.party.levelShort') }} {{ showcase.character.sheet.level }}
+                {{ uiText.text('characterUi.party.levelShort') }}
+                {{ showcase.character.sheet.level }}
               </p>
             } @else {
               <p class="character-card__pending-label">
@@ -180,10 +181,7 @@
   <!-- Loading state -->
   @if (isLoading()) {
     <div class="party-list__loading">
-      <app-dice-loader
-        [label]="uiText.text('characterUi.party.loading')"
-        [playSound]="false"
-      />
+      <app-dice-loader [label]="uiText.text('characterUi.party.loading')" [playSound]="false" />
     </div>
   }
 </div>

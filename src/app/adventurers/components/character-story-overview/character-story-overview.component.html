@@ -9,10 +9,7 @@
     </p>
   </header>
 
-  <nav
-    class="story-overview__grid"
-    [attr.aria-label]="uiText.text('characterUi.story.indexLabel')"
-  >
+  <nav class="story-overview__grid" [attr.aria-label]="uiText.text('characterUi.story.indexLabel')">
     @for (destination of destinations(); track destination.id) {
       @if (destination.available) {
         <a class="story-overview__card" [routerLink]="[]" [fragment]="destination.id">

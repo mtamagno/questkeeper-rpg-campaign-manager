@@ -1,7 +1,4 @@
-<nav
-  class="sheet-navigation"
-  [attr.aria-label]="uiText.text('characterUi.sheetNavigation.views')"
->
+<nav class="sheet-navigation" [attr.aria-label]="uiText.text('characterUi.sheetNavigation.views')">
   <div class="sheet-navigation__tabs" role="tablist" aria-orientation="horizontal">
     @for (workspace of workspaces(); track workspace.id) {
       <button

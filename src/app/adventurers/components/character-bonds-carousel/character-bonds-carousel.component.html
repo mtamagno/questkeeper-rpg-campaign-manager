@@ -63,7 +63,9 @@
                   <span
                     class="bonds-carousel__feeling-meter"
                     role="img"
-                    [attr.aria-label]="uiText.text('characterUi.bonds.intensity', { intensity: feeling.intensity })"
+                    [attr.aria-label]="
+                      uiText.text('characterUi.bonds.intensity', { intensity: feeling.intensity })
+                    "
                   >
                     @for (step of feelingScale; track step) {
                       <i [class.is-active]="step <= feeling.intensity"></i>
@@ -88,7 +90,13 @@
         @if (bond.sharedMemoryCount > 0) {
           <span
             >· {{ bond.sharedMemoryCount }}
-            {{ uiText.text(bond.sharedMemoryCount === 1 ? 'characterUi.bonds.memory' : 'characterUi.bonds.memories') }}</span
+            {{
+              uiText.text(
+                bond.sharedMemoryCount === 1
+                  ? 'characterUi.bonds.memory'
+                  : 'characterUi.bonds.memories'
+              )
+            }}</span
           >
         }
       </a>
@@ -105,7 +113,11 @@
       [attr.aria-expanded]="showAll()"
       aria-controls="profile-bond-track"
     >
-      {{ uiText.text(showAll() ? 'characterUi.bonds.showLess' : 'characterUi.bonds.showAll', { count: bonds().length }) }}
+      {{
+        uiText.text(showAll() ? 'characterUi.bonds.showLess' : 'characterUi.bonds.showAll', {
+          count: bonds().length,
+        })
+      }}
     </button>
   }
   <a class="bonds-carousel__map-link" [routerLink]="['/', campaignId(), 'party', 'relationships']">

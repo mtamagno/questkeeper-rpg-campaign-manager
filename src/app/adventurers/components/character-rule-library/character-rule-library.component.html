@@ -70,7 +70,8 @@
         [attr.aria-pressed]="filter() === 'prepared'"
         (click)="setFilter('prepared')"
       >
-        {{ uiText.text('characterUi.ruleLibrary.preparedPlural') }} <span>{{ preparedCount() }}</span>
+        {{ uiText.text('characterUi.ruleLibrary.preparedPlural') }}
+        <span>{{ preparedCount() }}</span>
       </button>
       <button
         type="button"
@@ -121,7 +122,9 @@
               <a
                 class="rule-library__link"
                 [routerLink]="['/compendium', spell.categoryId, spell.key]"
-                [attr.aria-label]="uiText.text('characterUi.ruleLibrary.openVerifiedLabel', { name: spell.name })"
+                [attr.aria-label]="
+                  uiText.text('characterUi.ruleLibrary.openVerifiedLabel', { name: spell.name })
+                "
               >
                 {{ uiText.text('characterUi.ruleLibrary.verifiedDescription') }}
                 <span aria-hidden="true">→</span>
@@ -130,7 +133,9 @@
           } @else {
             <div class="rule-library__topline">
               <span>{{ uiText.text('characterUi.ruleLibrary.ability') }}</span
-              ><span class="rule-library__provenance">{{ uiText.text('characterUi.ruleLibrary.sheet') }}</span>
+              ><span class="rule-library__provenance">{{
+                uiText.text('characterUi.ruleLibrary.sheet')
+              }}</span>
             </div>
             <h5>{{ entry.name }}</h5>
             <p class="rule-library__disclaimer">
@@ -171,8 +176,7 @@
             class="rule-library__settings-link"
             [routerLink]="campaignId() ? ['/', campaignId(), 'settings'] : ['/settings']"
             fragment="rule-library-settings"
-            >{{ uiText.text('characterUi.ruleLibrary.manageSettings') }}
-            →</a
+            >{{ uiText.text('characterUi.ruleLibrary.manageSettings') }} →</a
           >
         </article>
       }
@@ -202,7 +206,9 @@
   </div>
   <h5>{{ spell.name }}</h5>
   <span class="rule-library__provenance">{{
-    uiText.text(spell.key ? 'characterUi.ruleLibrary.localCompendium' : 'characterUi.ruleLibrary.sheet')
+    uiText.text(
+      spell.key ? 'characterUi.ruleLibrary.localCompendium' : 'characterUi.ruleLibrary.sheet'
+    )
   }}</span>
   @if (spell.description) {
     <p>{{ spell.description }}</p>

@@ -335,9 +335,14 @@
                     <h3>{{ uiText.text('characterUi.sheet.inventory') }}</h3>
                   </div>
                   <span class="character-sheet__count">
-                    {{ uiText.text('characterUi.sheet.itemCount', { count: inventoryItems().length }) }}
+                    {{
+                      uiText.text('characterUi.sheet.itemCount', { count: inventoryItems().length })
+                    }}
                     @if (attunedItemCount() > 0) {
-                      · {{ uiText.text('characterUi.sheet.attunedCount', { count: attunedItemCount() }) }}
+                      ·
+                      {{
+                        uiText.text('characterUi.sheet.attunedCount', { count: attunedItemCount() })
+                      }}
                     }
                   </span>
                 </div>

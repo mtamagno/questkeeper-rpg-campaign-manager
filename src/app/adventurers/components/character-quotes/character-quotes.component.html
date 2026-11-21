@@ -16,7 +16,11 @@
       (click)="toggleAll()"
       [attr.aria-expanded]="showAll()"
     >
-      {{ uiText.text(showAll() ? 'characterUi.quotes.showLess' : 'characterUi.quotes.showAll', { count: quotes().length }) }}
+      {{
+        uiText.text(showAll() ? 'characterUi.quotes.showLess' : 'characterUi.quotes.showAll', {
+          count: quotes().length,
+        })
+      }}
     </button>
   }
 </div>
