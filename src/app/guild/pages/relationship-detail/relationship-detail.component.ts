@@ -20,6 +20,7 @@ import {
   type RelationshipEvolution,
   type RelationshipHistoryEntry,
   type RelationshipPromiseChange,
+  type SharedRelationshipMemory,
   type RelationshipFeeling,
   PARTY_PERCEPTION_LABELS,
   RELATIONSHIP_TYPE_LABELS,
@@ -148,6 +149,11 @@ export class RelationshipDetailComponent {
   /** Dated changes to stable promises between the participants. */
   readonly promiseHistory: Signal<ReadonlyArray<RelationshipPromiseChange>> = computed(
     () => this.relationship()?.promiseHistory ?? [],
+  );
+
+  /** Published shared memories anchored to this relationship and a canonical session. */
+  readonly sharedMemories: Signal<ReadonlyArray<SharedRelationshipMemory>> = computed(
+    () => this.relationship()?.sharedMemories ?? [],
   );
 
   /** Directional emotional readings, resolved to the person who holds them. */

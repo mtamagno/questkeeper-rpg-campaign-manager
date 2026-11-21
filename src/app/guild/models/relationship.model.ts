@@ -45,6 +45,7 @@ export interface Relationship {
   readonly evolution?: ReadonlyArray<RelationshipEvolution>;
   readonly history?: ReadonlyArray<RelationshipHistoryEntry>;
   readonly promiseHistory?: ReadonlyArray<RelationshipPromiseChange>;
+  readonly sharedMemories?: ReadonlyArray<SharedRelationshipMemory>;
   readonly perspectives?: ReadonlyArray<RelationshipPerspective>;
   readonly partyPerception?: PartyRelationshipPerception;
 }
@@ -161,6 +162,22 @@ export interface RelationshipPromiseChange {
   readonly status: RelationshipPromiseStatus;
   readonly label: BilingualText;
   readonly note?: BilingualText;
+}
+
+/** One person's authored recollection of a shared event. */
+export interface SharedMemoryViewpoint {
+  readonly entityId: string;
+  readonly account: BilingualText;
+}
+
+/** A character-to-character memory anchored to a canonical session. */
+export interface SharedRelationshipMemory {
+  readonly id: string;
+  readonly sessionId: string;
+  readonly participantIds: ReadonlyArray<string>;
+  readonly title: BilingualText;
+  readonly sharedFacts: BilingualText;
+  readonly viewpoints: ReadonlyArray<SharedMemoryViewpoint>;
 }
 
 /**

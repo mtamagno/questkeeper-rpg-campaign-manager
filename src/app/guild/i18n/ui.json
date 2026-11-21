@@ -833,6 +833,18 @@
           "previous": "Previous image",
           "next": "Next image"
         },
+        "sharedMemory": {
+          "loading": "Opening the shared memory...",
+          "eyebrow": "Shared memory",
+          "sessionEvidence": "Recorded from {session}",
+          "participants": "People in this memory",
+          "sharedFacts": "What everyone agrees happened",
+          "openSession": "Open the canonical session",
+          "viewpoints": "What each person remembers",
+          "back": "Back to the bond",
+          "notFoundTitle": "Memory not found",
+          "notFoundHelp": "This memory is not part of the published campaign."
+        },
         "relationshipGraph": {
           "empty": "No relationships to display.",
           "instructions": "Select a portrait to focus on its connections, or open the relationship list below.",
@@ -928,6 +940,9 @@
             "released": "Released"
           },
           "sharedEvents": "Shared Events",
+          "sharedMemories": "Shared memory pages",
+          "sharedMemoriesHelp": "Each page keeps the common evidence beside the participants’ distinct recollections.",
+          "openMemory": "Open memory",
           "memorableWords": "Memorable Words",
           "evolution": "Relationship Evolution",
           "back": "Back to Relationships",
@@ -1765,6 +1780,18 @@
           "previous": "Immagine precedente",
           "next": "Immagine successiva"
         },
+        "sharedMemory": {
+          "loading": "Apro la memoria condivisa...",
+          "eyebrow": "Memoria condivisa",
+          "sessionEvidence": "Registrata da {session}",
+          "participants": "Persone presenti in questa memoria",
+          "sharedFacts": "Ciò che tutti concordano sia accaduto",
+          "openSession": "Apri la sessione canonica",
+          "viewpoints": "Ciò che ricorda ogni persona",
+          "back": "Torna al legame",
+          "notFoundTitle": "Memoria non trovata",
+          "notFoundHelp": "Questa memoria non fa parte della campagna pubblicata."
+        },
         "relationshipGraph": {
           "empty": "Nessuna relazione da mostrare.",
           "instructions": "Seleziona un ritratto per mettere a fuoco i suoi legami, oppure apri la lista delle relazioni qui sotto.",
@@ -1860,6 +1887,9 @@
             "released": "Sciolta"
           },
           "sharedEvents": "Momenti condivisi",
+          "sharedMemories": "Pagine di memoria condivisa",
+          "sharedMemoriesHelp": "Ogni pagina conserva le prove comuni accanto ai ricordi distinti dei partecipanti.",
+          "openMemory": "Apri memoria",
           "memorableWords": "Parole memorabili",
           "evolution": "Evoluzione del legame",
           "back": "Torna alle relazioni",

@@ -120,6 +120,26 @@
       </section>
     }
 
+    @if (sharedMemories().length > 0) {
+      <section class="rel-detail__section" aria-labelledby="relationship-memories-heading">
+        <h2 id="relationship-memories-heading" class="rel-detail__section-title">
+          ✦ {{ uiText.text('relationshipDetail.sharedMemories') }}
+        </h2>
+        <p class="rel-detail__section-intro">
+          {{ uiText.text('relationshipDetail.sharedMemoriesHelp') }}
+        </p>
+        <div class="rel-detail__memory-links">
+          @for (memory of sharedMemories(); track memory.id) {
+            <a [routerLink]="['/', campaignId() ?? '', 'memories', memory.id]">
+              <span>{{ memory.sessionId }}</span
+              ><strong>{{ memory.title | bilingual }}</strong
+              ><small>{{ uiText.text('relationshipDetail.openMemory') }}</small>
+            </a>
+          }
+        </div>
+      </section>
+    }
+
     <!-- Shared Events Timeline -->
     @if (sharedEvents().length > 0) {
       <section class="rel-detail__section">

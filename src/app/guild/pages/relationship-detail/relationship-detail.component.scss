@@ -247,6 +247,37 @@
     border-left: $border-width-default solid $color-border-accent;
   }
 
+  &__memory-links {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    gap: $spacing-md;
+
+    a {
+      @include surface-card;
+      display: grid;
+      gap: $spacing-xs;
+      min-height: 44px;
+      padding: $spacing-md;
+      color: $color-text-primary;
+      text-decoration: none;
+
+      &:hover,
+      &:focus-visible {
+        border-color: $color-border-accent;
+      }
+    }
+
+    span,
+    small {
+      color: $color-text-muted;
+      font-size: $font-size-xs;
+    }
+    strong {
+      color: $color-gold-light;
+      font-family: $font-family-heading;
+    }
+  }
+
   &__event {
     position: relative;
     padding: $spacing-md 0 $spacing-md $spacing-lg;

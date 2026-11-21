@@ -1,0 +1,123 @@
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+
+:host {
+  display: block;
+}
+.shared-memory {
+  display: grid;
+  gap: $spacing-2xl;
+  max-width: 1040px;
+  margin: 0 auto;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    gap: $spacing-lg;
+    align-items: flex-start;
+    border-bottom: $border-width-thin solid $color-border-subtle;
+    padding-bottom: $spacing-lg;
+  }
+  &__header span {
+    color: $color-gold;
+    font-size: $font-size-xs;
+    letter-spacing: $letter-spacing-wider;
+    text-transform: uppercase;
+  }
+  &__header h1 {
+    margin: $spacing-xs 0;
+    color: $color-gold-light;
+    font-family: $font-family-heading;
+    font-size: $font-size-3xl;
+  }
+  &__header p {
+    margin: 0;
+    color: $color-text-muted;
+  }
+  h2 {
+    color: $color-gold;
+    font-family: $font-family-heading;
+  }
+
+  &__participants {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-sm;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  &__participants li {
+    @include surface-card;
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    padding: $spacing-xs $spacing-md;
+  }
+  &__participants img {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  &__participants a,
+  &__back,
+  &__facts a {
+    color: $color-text-link;
+  }
+
+  &__facts {
+    @include surface-elevated;
+    padding: $spacing-lg;
+    border-left: $border-width-thick solid $color-gold;
+  }
+  &__facts p {
+    color: $color-text-primary;
+    line-height: $line-height-relaxed;
+  }
+
+  &__viewpoints {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+    gap: $spacing-lg;
+  }
+  &__viewpoints > article {
+    @include surface-card;
+    padding: $spacing-lg;
+  }
+  &__viewpoints header {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+  }
+  &__viewpoints img {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  &__viewpoints h3 {
+    color: $color-parchment-light;
+    font-family: $font-family-heading;
+  }
+  &__viewpoints p {
+    color: $color-text-secondary;
+    line-height: $line-height-relaxed;
+  }
+  &__loading,
+  &__missing {
+    @include flex-center;
+    min-height: 320px;
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+@include respond-below(md) {
+  .shared-memory__header {
+    flex-direction: column;
+  }
+  .shared-memory__header h1 {
+    font-size: $font-size-2xl;
+  }
+}

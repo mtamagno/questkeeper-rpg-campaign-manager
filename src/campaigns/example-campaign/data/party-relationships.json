@@ -102,6 +102,37 @@
         }
       }
     ],
+    "sharedMemories": [
+      {
+        "id": "broken-span-crossing",
+        "sessionId": "session-2",
+        "participantIds": ["aria-vale", "mira-thorn"],
+        "title": {
+          "en": "The broken span",
+          "it": "Il ponte spezzato"
+        },
+        "sharedFacts": {
+          "en": "Aria found old route marks beneath the bridge stones. Mira crossed first, and both reached the far side before the remaining span gave way.",
+          "it": "Aria trovò antichi segni di percorso sotto le pietre del ponte. Mira attraversò per prima ed entrambe raggiunsero l'altra sponda prima che il tratto rimasto cedesse."
+        },
+        "viewpoints": [
+          {
+            "entityId": "aria-vale",
+            "account": {
+              "en": "Aria remembers the breath between reading the final mark and seeing Mira trust it without asking for certainty.",
+              "it": "Aria ricorda il respiro tra la lettura dell'ultimo segno e il momento in cui Mira si fidò senza pretendere certezze."
+            }
+          },
+          {
+            "entityId": "mira-thorn",
+            "account": {
+              "en": "Mira remembers Aria's voice becoming completely steady as soon as someone else needed to take the first step.",
+              "it": "Mira ricorda la voce di Aria diventare perfettamente ferma non appena qualcun altro ebbe bisogno di fare il primo passo."
+            }
+          }
+        ]
+      }
+    ],
     "sharedEvents": [
       {
         "sessionId": "session-2",

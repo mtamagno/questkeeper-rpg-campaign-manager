@@ -2396,6 +2396,24 @@ function relationshipLines(item, kind, language) {
       ].join(' | '),
     );
   }
+  if (kind === 'memories') {
+    return (item.sharedMemories ?? []).map((entry) =>
+      [
+        entry.id,
+        entry.sessionId,
+        entry.participantIds.join(','),
+        localized(entry.title, language),
+        localized(entry.sharedFacts, language),
+      ].join(' | '),
+    );
+  }
+  if (kind === 'memoryViewpoints') {
+    return (item.sharedMemories ?? []).flatMap((entry) =>
+      (entry.viewpoints ?? []).map((viewpoint) =>
+        [entry.id, viewpoint.entityId, localized(viewpoint.account, language)].join(' | '),
+      ),
+    );
+  }
   return (item.evolution ?? []).map((entry) =>
     [entry.sessionId, entry.fromType ?? '', entry.toType, localized(entry.note, language)].join(
       ' | ',
@@ -2460,6 +2478,29 @@ function relationshipForm(kind, item = {}) {
         {
           type: 'textarea',
           hint: 'One per line: session ID | previous type (optional) | new type | note.',
+          wide: true,
+        },
+      ),
+    ]),
+    section('Shared memories'),
+    ...languages.flatMap((language) => [
+      field(
+        `relationshipMemories__${language}`,
+        `Memory pages · ${languageName(language)} (${language})`,
+        relationshipLines(item, 'memories', language).join('\n'),
+        {
+          type: 'textarea',
+          hint: 'One per line: stable memory ID | session ID | participant IDs separated by commas | title | shared facts.',
+          wide: true,
+        },
+      ),
+      field(
+        `relationshipMemoryViewpoints__${language}`,
+        `Memory viewpoints · ${languageName(language)} (${language})`,
+        relationshipLines(item, 'memoryViewpoints', language).join('\n'),
+        {
+          type: 'textarea',
+          hint: 'One per line: memory ID | participant ID | that person’s account.',
           wide: true,
         },
       ),
@@ -3234,6 +3275,8 @@ function buildRelationship(form, original = {}, kind = 'party') {
   const evolutionRows = relationshipRows(form, 'relationshipEvolution', languages);
   const historyRows = relationshipRows(form, 'relationshipHistory', languages);
   const promiseRows = relationshipRows(form, 'relationshipPromises', languages);
+  const memoryRows = relationshipRows(form, 'relationshipMemories', languages);
+  const memoryViewpointRows = relationshipRows(form, 'relationshipMemoryViewpoints', languages);
   const primary = state.campaign?.manifestEntry?.defaultLanguage ?? languages[0];
   const perspectives = [];
   for (const [index, row] of (perspectiveRows[primary] ?? []).entries()) {
@@ -3292,6 +3335,35 @@ function buildRelationship(form, original = {}, kind = 'party') {
       note: localizedRelationshipPart(promiseRows, languages, index, 4),
     };
   });
+  const sharedMemories = (memoryRows[primary] ?? []).map((row, index) => {
+    const id = row[0];
+    const participantIds = String(row[2] || '')
+      .split(',')
+      .map((value) => value.trim())
+      .filter(Boolean);
+    if (!id) throw new Error(`Shared memory ${index + 1} needs a stable ID.`);
+    if (!participantIds.includes(sourceId) || !participantIds.includes(targetId))
+      throw new Error(`Shared memory ${id} must include both people in this relationship.`);
+    return {
+      id,
+      sessionId: row[1],
+      participantIds: [...new Set(participantIds)],
+      title: localizedRelationshipPart(memoryRows, languages, index, 3),
+      sharedFacts: localizedRelationshipPart(memoryRows, languages, index, 4),
+      viewpoints: [],
+    };
+  });
+  for (const [index, row] of (memoryViewpointRows[primary] ?? []).entries()) {
+    const memory = sharedMemories.find((entry) => entry.id === row[0]);
+    if (!memory)
+      throw new Error(`Memory viewpoint ${index + 1} references unknown memory ${row[0]}.`);
+    if (!memory.participantIds.includes(row[1]))
+      throw new Error(`Memory viewpoint ${index + 1} must belong to a participant.`);
+    memory.viewpoints.push({
+      entityId: row[1],
+      account: localizedRelationshipPart(memoryViewpointRows, languages, index, 2),
+    });
+  }
   const certainty = String(form.get('perceptionCertainty') ?? '');
   const basis = localizedFormValue(form, 'perceptionBasis', '', languages);
   const npcIds = new Set((state.campaign?.npcs ?? []).map((item) => item.id));
@@ -3313,6 +3385,7 @@ function buildRelationship(form, original = {}, kind = 'party') {
     ...(evolution.length ? { evolution } : { evolution: [] }),
     ...(history.length ? { history } : { history: [] }),
     ...(promiseHistory.length ? { promiseHistory } : { promiseHistory: [] }),
+    ...(sharedMemories.length ? { sharedMemories } : { sharedMemories: [] }),
     ...(certainty ? { partyPerception: { certainty, basis } } : { partyPerception: undefined }),
   };
 }

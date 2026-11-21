@@ -280,7 +280,8 @@ export class CharacterDetailComponent {
         description: this.campaignLocale.resolve(relationship.description),
         sourceId: relationship.sourceId,
         targetId: relationship.targetId,
-        sharedMemoryCount: relationship.sharedEvents?.length ?? 0,
+        sharedMemoryCount:
+          relationship.sharedMemories?.length ?? relationship.sharedEvents?.length ?? 0,
         feelings:
           (relationship.perspectives ?? [])
             .find((perspective) => perspective.entityId === character.id)
