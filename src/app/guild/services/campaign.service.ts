@@ -21,6 +21,7 @@ import { filter } from 'rxjs';
 import { type ActivatedRouteSnapshot } from '@angular/router';
 
 import { type CampaignManifestEntry } from '@guild/models/campaignConfig.model';
+import { type UiTextTree } from '@guild/i18n/uiCatalog';
 import { resolveRulesetProfile, type RulesetProfile } from '@guild/models/rulesetProfile.model';
 import {
   PLATFORM_PALETTE,
@@ -129,6 +130,14 @@ export class CampaignService {
 
   /** Whether the manifest has been loaded. */
   readonly manifestLoaded: Signal<boolean> = this._manifestLoaded.asReadonly();
+
+  /** Partial interface-copy values owned by the active campaign manifest entry. */
+  readonly activeInterfaceTextOverrides: Signal<Readonly<Record<string, UiTextTree>>> = computed(
+    () => {
+      const id = this._activeCampaignId();
+      return this._manifest().find((entry) => entry.id === id)?.interfaceTextOverrides ?? {};
+    },
+  );
 
   constructor() {
     this.listenToRouteChanges();

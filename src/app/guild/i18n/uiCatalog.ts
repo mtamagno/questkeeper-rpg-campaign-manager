@@ -1,4 +1,5 @@
 import catalog from '@guild/i18n/ui.json';
+import deploymentOverrides from '@guild/i18n/ui-overrides.json';
 
 export type InterfaceTextDirection = 'ltr' | 'rtl' | 'auto';
 export type UiTextTree = Readonly<Record<string, unknown>>;
@@ -17,7 +18,7 @@ interface UiTextLocaleCatalog {
   readonly texts: UiTextTree;
 }
 
-interface UiTextCatalogRegistry {
+export interface UiTextCatalogRegistry {
   readonly meta: {
     readonly version: number;
     readonly defaultLocale: string;
@@ -25,8 +26,16 @@ interface UiTextCatalogRegistry {
   readonly locales: Readonly<Record<string, UiTextLocaleCatalog>>;
 }
 
+export interface UiTextOverrideRegistry {
+  readonly meta: { readonly version: number };
+  readonly locales: Readonly<Record<string, UiTextTree>>;
+}
+
 /** Versioned interface-copy registry. Adding a locale is a JSON-only change. */
 export const UI_TEXT_CATALOG = catalog as UiTextCatalogRegistry;
+
+/** Optional deployment-owned partial values layered over the base product catalog. */
+export const UI_TEXT_DEPLOYMENT_OVERRIDES = deploymentOverrides as UiTextOverrideRegistry;
 
 const localeLookup = new Map(
   Object.keys(UI_TEXT_CATALOG.locales).map((tag) => [tag.toLowerCase(), tag]),

@@ -9,6 +9,7 @@ import {
   type CampaignPalette,
 } from '@guild/models/campaignPalette.model';
 import { type CampaignGameSystem } from '@guild/models/rulesetProfile.model';
+import { type UiTextTree } from '@guild/i18n/uiCatalog';
 
 /** A single campaign listed in the global campaigns manifest. */
 export interface CampaignManifestEntry {
@@ -19,6 +20,8 @@ export interface CampaignManifestEntry {
   readonly languages?: ReadonlyArray<string>;
   /** Language selected for first-time visitors when their saved choice is unavailable. */
   readonly defaultLanguage?: string;
+  /** Optional partial product-copy overrides, keyed by interface locale. */
+  readonly interfaceTextOverrides?: Readonly<Record<string, UiTextTree>>;
   /** Curated visual identity. Missing values retain the legacy heroic theme. */
   readonly palette?: CampaignPalette;
   /** Versioned semantic role overrides. Preserved even when invalid so authors can repair drafts. */

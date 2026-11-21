@@ -65,6 +65,19 @@ for local-only routes such as Table Rules, Gazette, DM tools or the extended
 Compendium; those additions must stay out of the public template unless the
 feature itself becomes reusable.
 
+## Optional overrides
+
+QuestKeeper resolves product copy in this order: active-campaign override,
+deployment override, then the base catalog and its fallback chain. A deployment
+can replace selected values in `src/app/guild/i18n/ui-overrides.json`; a campaign
+can add the same partial tree under `interfaceTextOverrides` in
+`src/campaigns/campaigns.json`. Neither layer needs to repeat the whole catalog.
+
+Overrides may use only shipped interface locales and existing semantic keys,
+and must preserve named placeholders. `test:ui-texts` validates both layers, so
+a typo cannot silently create a dead key. Campaign-authored prose still belongs
+to campaign data and must not be moved into this product-copy mechanism.
+
 ## Authoring rules
 
 - Never add translatable prose directly to an Angular template or TypeScript
