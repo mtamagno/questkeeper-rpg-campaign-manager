@@ -10,7 +10,25 @@
         <h1>{{ memory.title | bilingual }}</h1>
         <p>{{ uiText.text('sharedMemory.sessionEvidence', { session: memory.sessionId }) }}</p>
       </div>
-      <app-language-toggle />
+      <div class="shared-memory__header-actions">
+        <button
+          type="button"
+          class="shared-memory__favourite"
+          [class.shared-memory__favourite--active]="isFavourite()"
+          [attr.aria-pressed]="isFavourite()"
+          [attr.aria-label]="
+            uiText.text(
+              isFavourite() ? 'memoryGallery.removeFavourite' : 'memoryGallery.addFavourite',
+              { title: (memory.title | bilingual) }
+            )
+          "
+          (click)="toggleFavourite()"
+        >
+          <span aria-hidden="true">{{ isFavourite() ? '★' : '☆' }}</span>
+          {{ uiText.text('memoryGallery.favourites') }}
+        </button>
+        <app-language-toggle />
+      </div>
     </header>
 
     <ul
@@ -87,9 +105,15 @@
       </section>
     }
 
-    <a class="shared-memory__back" [routerLink]="relationshipRoute()"
-      >← {{ uiText.text('sharedMemory.back') }}</a
+    <nav
+      class="shared-memory__navigation"
+      [attr.aria-label]="uiText.text('sharedMemory.navigation')"
     >
+      <a [routerLink]="['/', campaignId() ?? '', 'memories']"
+        >← {{ uiText.text('sharedMemory.backToGallery') }}</a
+      >
+      <a [routerLink]="relationshipRoute()">{{ uiText.text('sharedMemory.back') }}</a>
+    </nav>
   </article>
 } @else {
   <div class="shared-memory__missing">

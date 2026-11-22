@@ -1966,3 +1966,33 @@ and issue #142.
 **Revisit when:** The interface catalog is replaced by a generated localization
 pipeline, or a supported extension contract needs independently versioned UI
 namespaces with equivalent validation.
+
+### QK-073 — Favourite memories are local views over canonical evidence
+
+**Date:** 22 November 2026
+
+**Status:** Active
+
+**Decision:** Campaign-wide memory discovery reads the stable shared-memory IDs
+owned by party relationships. Favourite state reuses Journey Memory and stores
+only campaign-scoped route metadata in the current browser. It never creates a
+second campaign-content collection or writes preference state into published
+campaign JSON.
+
+**Why:** Relationship history already owns the common facts, attributed
+viewpoints, disagreements and source session. A parallel gallery archive would
+drift from that evidence, while a second preference store would give the same
+reader two incompatible favourite systems.
+
+**Consequences:** Gallery filters are projections over referenced participants
+and sessions. A favourite can be toggled on a card or detail page without
+changing canon. Empty campaigns remain valid. Day 18 chronology stays in the
+existing Character Journal and links to these stable IDs; future keepsakes may
+reference them but cannot duplicate their facts.
+
+**Source:** [Campaign memory gallery](CAMPAIGN-MEMORY-GALLERY.md) and
+[Day 17 closeout](reviews/2026-11-22-memory-gallery-closeout.md).
+
+**Revisit when:** Preference synchronization becomes account-based, or a
+cross-campaign anthology needs an explicit export contract that preserves
+campaign ownership and privacy.

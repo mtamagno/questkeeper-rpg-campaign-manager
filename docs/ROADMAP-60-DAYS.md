@@ -131,7 +131,7 @@ the current lazy Journal workspace.
 | ----------- | -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
 | 15 · 20 Nov | [x] `feat: redesign party bonds as a living relationship map`                    | [x] [`feat: add trust tension affection and promise histories`](RELATIONSHIP-HISTORY.md) |
 | 16 · 21 Nov | [x] [`feat: add character-to-character shared memory pages`](SHARED-MEMORIES.md) | [x] [`feat: surface conflicting versions of the same event`](SHARED-MEMORIES.md)         |
-| 17 · 22 Nov | [ ] `feat: introduce favourite campaign memories`                                | [ ] `feat: build a party-wide memory gallery and filters`                                |
+| 17 · 22 Nov | [x] [`feat: introduce favourite campaign memories`](CAMPAIGN-MEMORY-GALLERY.md)  | [x] [`feat: build a party-wide memory gallery and filters`](CAMPAIGN-MEMORY-GALLERY.md)  |
 | 18 · 23 Nov | [ ] `feat: create notebook table of contents and chronology`                     | [ ] `feat: add mood session character and secrecy filters`                               |
 | 19 · 24 Nov | [ ] `feat: add letters sketches handouts and keepsakes`                          | [ ] `feat: create accessible lightbox and print layouts for keepsakes`                   |
 | 20 · 25 Nov | [ ] `style: ship multiple parchment and handwriting moods`                       | [ ] `feat: adapt journal styling to narrator and emotional state`                        |

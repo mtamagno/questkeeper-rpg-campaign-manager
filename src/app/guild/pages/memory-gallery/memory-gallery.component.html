@@ -1,0 +1,111 @@
+<article class="memory-gallery">
+  <header class="memory-gallery__header">
+    <div>
+      <span>{{ uiText.text('memoryGallery.eyebrow') }}</span>
+      <h1>{{ uiText.text('memoryGallery.title') }}</h1>
+      <p>{{ uiText.text('memoryGallery.intro') }}</p>
+    </div>
+    <app-language-toggle />
+  </header>
+
+  <section class="memory-gallery__filters" [attr.aria-label]="uiText.text('memoryGallery.filters')">
+    <label>
+      <span>{{ uiText.text('memoryGallery.person') }}</span>
+      <select [value]="selectedParticipant()" (change)="setParticipant($event)">
+        <option value="all">{{ uiText.text('memoryGallery.allPeople') }}</option>
+        @for (participant of participants(); track participant.id) {
+          <option [value]="participant.id">{{ participant.name }}</option>
+        }
+      </select>
+    </label>
+    <label>
+      <span>{{ uiText.text('memoryGallery.session') }}</span>
+      <select [value]="selectedSession()" (change)="setSession($event)">
+        <option value="all">{{ uiText.text('memoryGallery.allSessions') }}</option>
+        @for (session of sessions(); track session.id) {
+          <option [value]="session.id">
+            {{
+              uiText.text('memoryGallery.sessionLabel', {
+                number: session.sessionNumber,
+                title: (session.title | bilingual),
+              })
+            }}
+          </option>
+        }
+      </select>
+    </label>
+    <button
+      type="button"
+      class="memory-gallery__favourites-filter"
+      [class.memory-gallery__favourites-filter--active]="favouritesOnly()"
+      [attr.aria-pressed]="favouritesOnly()"
+      (click)="favouritesOnly.set(!favouritesOnly())"
+    >
+      <span aria-hidden="true">★</span>
+      {{ uiText.text('memoryGallery.favourites') }}
+      <strong>{{ favouriteCount() }}</strong>
+    </button>
+    @if (hasActiveFilters()) {
+      <button type="button" class="memory-gallery__reset" (click)="resetFilters()">
+        {{ uiText.text('memoryGallery.reset') }}
+      </button>
+    }
+  </section>
+
+  <p class="memory-gallery__result-count" aria-live="polite">
+    {{ uiText.text('memoryGallery.resultCount', { count: filteredMemories().length }) }}
+  </p>
+
+  @if (filteredMemories().length > 0) {
+    <section class="memory-gallery__grid" [attr.aria-label]="uiText.text('memoryGallery.results')">
+      @for (memory of filteredMemories(); track memory.id) {
+        <article class="memory-gallery__card">
+          <div class="memory-gallery__card-heading">
+            <div>
+              <span>{{ sessionLabel(memory.sessionId) }}</span>
+              <h2>
+                <a [routerLink]="memoryUrl(memory)">{{ memory.title | bilingual }}</a>
+              </h2>
+            </div>
+            <button
+              type="button"
+              class="memory-gallery__favourite"
+              [class.memory-gallery__favourite--active]="isFavourite(memory)"
+              [attr.aria-pressed]="isFavourite(memory)"
+              [attr.aria-label]="
+                uiText.text(
+                  isFavourite(memory)
+                    ? 'memoryGallery.removeFavourite'
+                    : 'memoryGallery.addFavourite',
+                  { title: (memory.title | bilingual) }
+                )
+              "
+              (click)="toggleFavourite(memory)"
+            >
+              <span aria-hidden="true">{{ isFavourite(memory) ? '★' : '☆' }}</span>
+            </button>
+          </div>
+          <p class="memory-gallery__people">{{ participantNames(memory) }}</p>
+          <p>{{ memory.sharedFacts | bilingual }}</p>
+          <footer>
+            <span>
+              {{ uiText.text('memoryGallery.viewpointCount', { count: memory.viewpoints.length }) }}
+            </span>
+            <a [routerLink]="memoryUrl(memory)">{{ uiText.text('memoryGallery.open') }} →</a>
+          </footer>
+        </article>
+      }
+    </section>
+  } @else {
+    <section class="memory-gallery__empty" aria-live="polite">
+      <span aria-hidden="true">✦</span>
+      <h2>{{ uiText.text('memoryGallery.emptyTitle') }}</h2>
+      <p>{{ uiText.text('memoryGallery.emptyHelp') }}</p>
+      @if (hasActiveFilters()) {
+        <button type="button" (click)="resetFilters()">
+          {{ uiText.text('memoryGallery.reset') }}
+        </button>
+      }
+    </section>
+  }
+</article>

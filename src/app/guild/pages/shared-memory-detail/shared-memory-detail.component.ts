@@ -6,8 +6,10 @@ import { map } from 'rxjs';
 import { BilingualTextPipe } from '@guild/components/bilingual-text/bilingual-text.pipe';
 import { DiceLoaderComponent } from '@guild/components/dice-loader/dice-loader.component';
 import { LanguageToggleComponent } from '@guild/components/language-toggle/language-toggle.component';
+import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
 import { CampaignService } from '@guild/services/campaign.service';
 import { DataService } from '@guild/services/data.service';
+import { JourneyMemoryService } from '@guild/services/journeyMemory.service';
 import { UiTextService } from '@guild/services/uiText.service';
 
 @Component({
@@ -22,6 +24,8 @@ export class SharedMemoryDetailComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly data = inject(DataService);
   private readonly campaign = inject(CampaignService);
+  private readonly campaignLocale = inject(CampaignLocaleService);
+  private readonly journeyMemory = inject(JourneyMemoryService);
   readonly uiText = inject(UiTextService);
 
   readonly campaignId = this.campaign.activeCampaignId;
@@ -60,4 +64,24 @@ export class SharedMemoryDetailComponent {
     const ids = this.memory()?.participantIds ?? [];
     return ['/', this.campaignId() ?? '', 'relationships', ids[0] ?? '', ids[1] ?? ''];
   });
+  readonly isFavourite = computed(() => {
+    this.journeyMemory.favoritePages();
+    return this.journeyMemory.isFavoriteUrl(this.memoryUrl());
+  });
+
+  private memoryUrl(): string {
+    return `/${this.campaignId() ?? ''}/memories/${this.memoryId()}`;
+  }
+
+  toggleFavourite(): void {
+    const campaignId = this.campaignId();
+    const memory = this.memory();
+    if (campaignId === undefined || memory === undefined) return;
+    this.journeyMemory.toggleFavorite({
+      campaignId,
+      url: this.memoryUrl(),
+      title: this.campaignLocale.resolve(memory.title),
+      visitedAt: Date.now(),
+    });
+  }
 }

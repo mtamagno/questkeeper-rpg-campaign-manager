@@ -83,6 +83,7 @@ __pycache__/
 !/scripts/verify-offline-pack.cjs
 !/scripts/verify-command-palette.cjs
 !/scripts/verify-journey-memory.cjs
+!/scripts/verify-memory-gallery.cjs
 !/scripts/import-approved-compendium-sources.mjs
 !/scripts/verify-baseline-compendium.mjs
 !/scripts/verify-local-compendia.cjs

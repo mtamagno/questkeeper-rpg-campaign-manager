@@ -17,12 +17,14 @@ const roadmap = read('docs/ROADMAP-60-DAYS.md');
 for (const phrase of [
   'campaign-companion:journey-memory:v1',
   'MAX_RECENT_PAGES = 12',
-  'MAX_FAVORITE_PAGES = 12',
+  'MAX_FAVORITE_PAGES = 50',
   'isReadableCampaignPage',
   'url.split(/[?#]/)',
   'title: pageTitle(url)',
   'localStorage.setItem',
   'toggleCurrentFavorite',
+  'toggleFavorite',
+  'isFavoriteUrl',
   'clearRecent',
 ]) {
   assert.ok(service.includes(phrase), `Journey-memory contract is missing: ${phrase}`);

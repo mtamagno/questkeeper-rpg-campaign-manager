@@ -200,6 +200,15 @@
 
         <a
           class="sidebar__section-link"
+          [routerLink]="['/', cId, 'memories']"
+          routerLinkActive="sidebar__section-link--active"
+          (click)="close()"
+        >
+          ✦ {{ uiText.text('sidebar.memoryGallery') }}
+        </a>
+
+        <a
+          class="sidebar__section-link"
           [routerLink]="['/', cId, 'campaign']"
           routerLinkActive="sidebar__section-link--active"
           [routerLinkActiveOptions]="{ exact: true }"

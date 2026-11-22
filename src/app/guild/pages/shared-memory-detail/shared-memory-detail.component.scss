@@ -34,6 +34,24 @@
     margin: 0;
     color: $color-text-muted;
   }
+  &__header-actions {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+  }
+  &__favourite {
+    min-height: 44px;
+    padding: $spacing-xs $spacing-md;
+    border: $border-width-thin solid $color-border-subtle;
+    border-radius: $border-radius-pill;
+    color: $color-text-secondary;
+    background: $color-bg-surface;
+    cursor: pointer;
+  }
+  &__favourite--active {
+    border-color: $color-gold;
+    color: $color-gold-light;
+  }
   h2 {
     color: $color-gold;
     font-family: $font-family-heading;
@@ -61,9 +79,15 @@
     object-fit: cover;
   }
   &__participants a,
-  &__back,
+  &__navigation a,
   &__facts a {
     color: $color-text-link;
+  }
+  &__navigation {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: $spacing-md;
   }
 
   &__facts {

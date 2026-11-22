@@ -203,6 +203,11 @@ export class DataService {
     [...this._sessions()].sort((a, b) => a.sessionNumber - b.sessionNumber),
   );
 
+  /** Canonical party memories, flattened once from their owning relationship edges. */
+  readonly sharedMemories: Signal<ReadonlyArray<SharedRelationshipMemory>> = computed(() =>
+    this._partyRelationships().flatMap((relationship) => relationship.sharedMemories ?? []),
+  );
+
   /**
    * Finds a map/location by ID.
    * @param id - The unique map identifier.
@@ -260,19 +265,13 @@ export class DataService {
 
   /** Finds one shared character memory by its campaign-wide stable ID. */
   getSharedMemoryById(id: string): Signal<SharedRelationshipMemory | undefined> {
-    return computed(() =>
-      this._partyRelationships()
-        .flatMap((relationship) => relationship.sharedMemories ?? [])
-        .find((memory) => memory.id === id),
-    );
+    return computed(() => this.sharedMemories().find((memory) => memory.id === id));
   }
 
   /** Returns authored shared memories involving one player character. */
   getSharedMemoriesForEntity(entityId: string): Signal<ReadonlyArray<SharedRelationshipMemory>> {
     return computed(() =>
-      this._partyRelationships()
-        .flatMap((relationship) => relationship.sharedMemories ?? [])
-        .filter((memory) => memory.participantIds.includes(entityId)),
+      this.sharedMemories().filter((memory) => memory.participantIds.includes(entityId)),
     );
   }
 

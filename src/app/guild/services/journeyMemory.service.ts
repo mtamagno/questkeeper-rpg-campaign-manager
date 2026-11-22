@@ -5,7 +5,7 @@ import { filter } from 'rxjs/operators';
 
 const STORAGE_KEY = 'campaign-companion:journey-memory:v1';
 const MAX_RECENT_PAGES = 12;
-const MAX_FAVORITE_PAGES = 12;
+const MAX_FAVORITE_PAGES = 50;
 
 export interface JourneyPage {
   readonly campaignId: string;
@@ -146,6 +146,27 @@ export class JourneyMemoryService {
     const url = this.currentUrl();
     const campaignId = campaignIdFromUrl(url);
     if (campaignId === undefined || !isReadableCampaignPage(url)) return;
+    const known = this.state().recent.find((page): boolean => page.url === url);
+    this.toggleFavorite(
+      known ?? {
+        campaignId,
+        url,
+        title: pageTitle(url),
+        visitedAt: Date.now(),
+      },
+    );
+  }
+
+  /** Returns whether one normalized campaign URL is in the local favourites list. */
+  isFavoriteUrl(url: string): boolean {
+    const normalized = normalizeUrl(url);
+    return this.state().favorites.some((page): boolean => page.url === normalized);
+  }
+
+  /** Toggles an explicitly identified readable campaign page without navigating to it first. */
+  toggleFavorite(page: JourneyPage): void {
+    const url = normalizeUrl(page.url);
+    if (!isJourneyPage({ ...page, url }) || !isReadableCampaignPage(url)) return;
     this.state.update((current): JourneyMemoryState => {
       if (current.favorites.some((page): boolean => page.url === url)) {
         return {
@@ -153,16 +174,16 @@ export class JourneyMemoryService {
           favorites: current.favorites.filter((page): boolean => page.url !== url),
         };
       }
-      const known = current.recent.find((page): boolean => page.url === url);
-      const page: JourneyPage = known ?? {
-        campaignId,
+      const known = current.recent.find((candidate): boolean => candidate.url === url);
+      const nextPage: JourneyPage = known ?? {
+        campaignId: page.campaignId,
         url,
-        title: pageTitle(url),
-        visitedAt: Date.now(),
+        title: page.title,
+        visitedAt: page.visitedAt,
       };
       return {
         ...current,
-        favorites: [page, ...current.favorites].slice(0, MAX_FAVORITE_PAGES),
+        favorites: [nextPage, ...current.favorites].slice(0, MAX_FAVORITE_PAGES),
       };
     });
   }
