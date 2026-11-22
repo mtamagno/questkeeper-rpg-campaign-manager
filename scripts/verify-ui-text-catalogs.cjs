@@ -240,10 +240,14 @@ for (const [relative, exception] of dataOwnedLanguageBranches) {
   }
 }
 
-const trackedTemplates = execFileSync('git', ['ls-files', 'src/app/**/*.html'], {
+const repositoryTemplates = execFileSync(
+  'git',
+  ['ls-files', '--cached', '--others', '--exclude-standard', 'src/app/**/*.html'],
+  {
   cwd: root,
   encoding: 'utf8',
-})
+  },
+)
   .trim()
   .split(/\r?\n/)
   .filter(Boolean);
@@ -266,7 +270,7 @@ const reviewedLiteralAttributes = [
     reason: 'URL syntax example rather than translatable interface prose',
   },
 ];
-for (const relative of trackedTemplates) {
+for (const relative of repositoryTemplates) {
   const source = fs.readFileSync(path.join(root, relative), 'utf8');
   for (const match of source.matchAll(
     /(?:^|\s)(?:aria-label|placeholder|title)="(?!\s*\{\{)[^"]*\p{L}[^"]*"/gmu,
