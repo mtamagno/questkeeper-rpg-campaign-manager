@@ -16,3 +16,8 @@ localized copy.
   links back to canonical sessions and memories.
 - AI may draft only from explicit evidence and never decides which participant
   is correct.
+
+The paired final gate measured the completed single-catalog UI migration at
+538,735 initial bytes in production and 491,481 in the public template. Only
+the initial and largest-initial ceilings moved, with narrow headroom; request,
+deferred-script and image limits remain unchanged.

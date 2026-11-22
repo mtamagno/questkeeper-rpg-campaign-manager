@@ -20,7 +20,7 @@
       @for (participant of participants(); track participant.id) {
         <li>
           <img
-            [src]="participant.profileImageUrl ?? participant.avatar.url"
+            [src]="participant.profileImageUrl"
             [alt]="participant.name"
             loading="lazy"
             decoding="async"
@@ -49,7 +49,7 @@
           <article>
             <header>
               <img
-                [src]="viewpoint.character.profileImageUrl ?? viewpoint.character.avatar.url"
+                [src]="viewpoint.character.profileImageUrl"
                 [alt]="viewpoint.character.name"
                 loading="lazy"
                 decoding="async"

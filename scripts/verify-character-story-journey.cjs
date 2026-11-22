@@ -128,7 +128,7 @@ assert(
   'Plural feelings and the complete relationship list need accessible disclosure.',
 );
 assert(
-  bonds.includes('Open the complete map') && bonds.includes('Apri la mappa completa'),
+  bonds.includes('characterUi.bonds.openMap'),
   'The complete relationship map must remain reachable.',
 );
 assert(
@@ -149,7 +149,7 @@ assert(
 );
 assert(
   detail.includes('character-detail__history-links') &&
-    detail.includes('Ultima memoria registrata'),
+    detail.includes('characterUi.detail.history.latestMemory'),
   'Known history must retain its source links and latest public memory.',
 );
 

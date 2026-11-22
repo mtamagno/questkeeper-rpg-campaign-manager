@@ -15,6 +15,7 @@ const navigationTemplate = read(
 const detailTemplate = read(
   'src/app/adventurers/pages/character-detail/character-detail.component.html',
 );
+const uiCatalog = read('src/app/guild/i18n/ui.json');
 
 for (const workspace of ['overview', 'training', 'inventory', 'spells', 'progression']) {
   assert.match(navigation, new RegExp(`'${workspace}'`));
@@ -49,8 +50,10 @@ for (const preservedContent of [
   );
 }
 
-assert.match(template, /Nessun equipaggiamento registrato/);
-assert.match(template, /Nessuna regola personale registrata/);
+assert.match(template, /characterUi\.sheet\.noEquipment/);
+assert.match(template, /characterUi\.sheet\.noRules/);
+assert.match(uiCatalog, /Nessun equipaggiamento registrato/);
+assert.match(uiCatalog, /Nessuna regola personale registrata/);
 assert.match(template, /app-character-sheet-history/);
 assert.match(template, /app-character-rule-library/);
 assert.match(template, /character-sheet__pdf-button/);
