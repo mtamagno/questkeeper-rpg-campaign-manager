@@ -16,7 +16,7 @@ import { filter } from 'rxjs/operators';
 import { CampaignService } from '@guild/services/campaign.service';
 import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
 import { AudiencePreferenceService } from '@guild/services/audiencePreference.service';
-import { LanguageService } from '@guild/services/language.service';
+import { UiTextService } from '@guild/services/uiText.service';
 import { GuidedTourService } from '@guild/services/guidedTour.service';
 import { PwaInstallService } from '@guild/services/pwaInstall.service';
 import { JourneyMemoryService, type JourneyPage } from '@guild/services/journeyMemory.service';
@@ -39,18 +39,18 @@ interface BreadcrumbItem {
   readonly url: string;
 }
 
-const ROUTE_LABELS: Readonly<Record<string, { readonly it: string; readonly en: string }>> = {
-  party: { it: 'Compagnia', en: 'Party' },
-  offline: { it: 'Offline', en: 'Offline' },
-  relationships: { it: 'Relazioni', en: 'Relationships' },
-  npcs: { it: 'PNG', en: 'NPCs' },
-  campaign: { it: 'Campagna', en: 'Campaign' },
-  'story-so-far': { it: 'La storia fin qui', en: 'Story so far' },
-  'table-moments': { it: 'Momenti al tavolo', en: 'Around the Table' },
-  story: { it: 'Cronache', en: 'Chronicles' },
-  maps: { it: 'Luoghi', en: 'Places' },
-  gallery: { it: 'Galleria', en: 'Gallery' },
-  settings: { it: 'Impostazioni', en: 'Settings' },
+const ROUTE_LABEL_KEYS: Readonly<Record<string, string>> = {
+  party: 'party',
+  offline: 'offline',
+  relationships: 'relationships',
+  npcs: 'npcs',
+  campaign: 'campaign',
+  'story-so-far': 'storySoFar',
+  'table-moments': 'tableMoments',
+  story: 'story',
+  maps: 'maps',
+  gallery: 'gallery',
+  settings: 'settings',
 };
 
 function humanizeSegment(segment: string): string {
@@ -75,7 +75,7 @@ export class SiteCommandBarComponent {
   private readonly campaigns = inject(CampaignService);
   private readonly campaignLocale = inject(CampaignLocaleService);
   private readonly audiencePreference = inject(AudiencePreferenceService);
-  private readonly language = inject(LanguageService);
+  readonly uiText = inject(UiTextService);
   private readonly guidedTour = inject(GuidedTourService);
   private readonly pwaInstall = inject(PwaInstallService);
   private readonly journeyMemory = inject(JourneyMemoryService);
@@ -92,7 +92,6 @@ export class SiteCommandBarComponent {
   readonly isActionsOpen = signal(false);
   readonly query = signal('');
   readonly activeIndex = signal(0);
-  readonly isItalian = this.language.isItalian;
   readonly activeCampaignId = this.campaigns.activeCampaignId;
   readonly tourStatus = this.guidedTour.status;
   readonly canInstall = this.pwaInstall.canInstall;
@@ -104,33 +103,32 @@ export class SiteCommandBarComponent {
   readonly managerUrl = this.localManager.managerUrl;
 
   readonly tourActionLabel = computed((): string => {
-    const it = this.isItalian();
     if (this.audiencePreference.audience() === null) {
-      return it ? 'Scegli un percorso per iniziare il tour' : 'Choose a path to begin the tour';
+      return this.uiText.text('commandBar.tour.choose');
     }
     if (this.tourStatus() === 'active') {
-      return it ? 'Torna al tour in corso' : 'Return to active tour';
+      return this.uiText.text('commandBar.tour.activeAction');
     }
     if (this.tourStatus() === 'paused') {
-      return it ? 'Riprendi il tour guidato' : 'Resume guided tour';
+      return this.uiText.text('commandBar.tour.resumeAction');
     }
     if (this.tourStatus() === 'completed') {
-      return it ? 'Ricomincia il tour guidato' : 'Restart guided tour';
+      return this.uiText.text('commandBar.tour.restartAction');
     }
-    return it ? 'Apri il tour guidato' : 'Open guided tour';
+    return this.uiText.text('commandBar.tour.openAction');
   });
 
   readonly tourButtonLabel = computed((): string => {
     if (this.tourStatus() === 'active') {
-      return this.isItalian() ? 'Tour attivo' : 'Tour active';
+      return this.uiText.text('commandBar.tour.active');
     }
     if (this.tourStatus() === 'paused') {
-      return this.isItalian() ? 'Riprendi' : 'Resume';
+      return this.uiText.text('commandBar.tour.resume');
     }
     if (this.tourStatus() === 'completed') {
-      return this.isItalian() ? 'Rifai tour' : 'Restart tour';
+      return this.uiText.text('commandBar.tour.restart');
     }
-    return 'Tour';
+    return this.uiText.text('commandBar.tour.default');
   });
 
   readonly activeCampaignName = computed((): string | undefined => {
@@ -142,11 +140,10 @@ export class SiteCommandBarComponent {
   });
 
   readonly breadcrumbs = computed((): ReadonlyArray<BreadcrumbItem> => {
-    const lang = this.language.currentLanguage();
     const cleanUrl = this.currentUrl().split(/[?#]/)[0];
     const segments = cleanUrl.split('/').filter(Boolean);
     const items: Array<BreadcrumbItem> = [
-      { label: lang === 'it' ? 'Campagne' : 'Campaigns', url: '/' },
+      { label: this.uiText.text('commandBar.campaigns'), url: '/' },
     ];
     let path = '';
 
@@ -154,13 +151,15 @@ export class SiteCommandBarComponent {
       path += `/${segment}`;
       const campaign =
         index === 0 ? this.campaigns.manifest().find(({ id }) => id === segment) : undefined;
-      const mapped = ROUTE_LABELS[segment];
+      const mapped = ROUTE_LABEL_KEYS[segment];
       items.push({
         label:
           (campaign === undefined
             ? undefined
             : this.campaignLocale.resolveForCampaign(campaign, campaign.name)) ||
-          mapped?.[lang === 'it' ? 'it' : 'en'] ||
+          (mapped === undefined
+            ? undefined
+            : this.uiText.text(`commandBar.routeLabels.${mapped}`)) ||
           humanizeSegment(segment),
         url: path,
       });
@@ -169,15 +168,16 @@ export class SiteCommandBarComponent {
   });
 
   readonly commands = computed((): ReadonlyArray<NavigationCommand> => {
-    const it = this.isItalian();
     const activeId = this.activeCampaignId();
     const activeName = this.activeCampaignName();
+    const commandCopy = (name: string, field: 'title' | 'detail'): string =>
+      this.uiText.text(`commandBar.commands.${name}.${field}`);
     const global: Array<NavigationCommand> = [
       {
         id: 'global-settings',
         icon: '\u2699',
-        title: it ? 'Impostazioni utente' : 'User settings',
-        detail: it ? 'Preferenze di questo dispositivo' : 'Preferences for this device',
+        title: commandCopy('settings', 'title'),
+        detail: commandCopy('settings', 'detail'),
         url: activeId === undefined ? '/settings' : `/${activeId}/settings`,
         keywords: 'settings impostazioni preferences preferenze audio character personaggio',
         scope: 'global',
@@ -185,8 +185,8 @@ export class SiteCommandBarComponent {
       {
         id: 'global-campaigns',
         icon: '\u2302',
-        title: it ? 'Tutte le campagne' : 'All campaigns',
-        detail: it ? 'Torna al registro delle avventure' : 'Return to the adventure ledger',
+        title: commandCopy('campaigns', 'title'),
+        detail: commandCopy('campaigns', 'detail'),
         url: '/',
         keywords: 'home campaigns campagne registro',
         scope: 'global',
@@ -198,7 +198,7 @@ export class SiteCommandBarComponent {
       title: this.campaignLocale.resolveForCampaign(campaign, campaign.name),
       detail:
         this.campaignLocale.resolveForCampaign(campaign, campaign.status) ||
-        (it ? 'Campagna' : 'Campaign'),
+        this.uiText.text('commandBar.commands.campaignFallback'),
       url: `/${campaign.id}`,
       keywords: `${campaign.id} ${Object.values(campaign.description).join(' ')}`,
       scope: 'campaign',
@@ -214,7 +214,7 @@ export class SiteCommandBarComponent {
         id: `favorite-${page.url}`,
         icon: '\u2605',
         title: page.title,
-        detail: it ? 'Pagina preferita' : 'Favorite page',
+        detail: this.uiText.text('commandBar.commands.favorite'),
         url: page.url,
         keywords: `favorite favourite preferito preferita saved ${page.title}`,
         scope: 'memory',
@@ -227,7 +227,7 @@ export class SiteCommandBarComponent {
         id: `recent-${page.url}`,
         icon: '\u21ba',
         title: page.title,
-        detail: it ? 'Aperta di recente' : 'Recently opened',
+        detail: this.uiText.text('commandBar.commands.recent'),
         url: page.url,
         keywords: `recent recente continue continua reading lettura ${page.title}`,
         scope: 'memory',
@@ -237,14 +237,10 @@ export class SiteCommandBarComponent {
         id: 'current-my-character',
         icon: '\u2726',
         title:
-          this.myCharacter()?.name ?? (it ? 'Scegli il mio personaggio' : 'Choose my character'),
+          this.myCharacter()?.name ?? this.uiText.text('commandBar.commands.myCharacter.choose'),
         detail: this.myCharacter()
-          ? it
-            ? 'Torna subito al mio profilo'
-            : 'Return straight to my profile'
-          : it
-            ? 'Imposta una volta il tuo accesso rapido'
-            : 'Set your quick return once',
+          ? this.uiText.text('commandBar.commands.myCharacter.return')
+          : this.uiText.text('commandBar.commands.myCharacter.setup'),
         url: this.myCharacter()?.id
           ? `${prefix}/party/${this.myCharacter()!.id}`
           : `${prefix}/settings#campaign-settings`,
@@ -255,7 +251,7 @@ export class SiteCommandBarComponent {
         id: 'current-overview',
         icon: '\u2605',
         title: activeName,
-        detail: it ? 'Panoramica della campagna' : 'Campaign overview',
+        detail: this.uiText.text('commandBar.commands.overview'),
         url: prefix,
         keywords: 'home overview panoramica',
         scope: 'current',
@@ -263,8 +259,8 @@ export class SiteCommandBarComponent {
       {
         id: 'current-party',
         icon: '\u2694',
-        title: it ? 'La compagnia' : 'The party',
-        detail: it ? 'Eroi, profili e diari' : 'Heroes, profiles and journals',
+        title: commandCopy('party', 'title'),
+        detail: commandCopy('party', 'detail'),
         url: `${prefix}/party`,
         keywords: 'party compagnia characters personaggi heroes eroi',
         scope: 'current',
@@ -272,8 +268,8 @@ export class SiteCommandBarComponent {
       {
         id: 'current-offline',
         icon: '\u21e9',
-        title: it ? 'Kit offline' : 'Offline pack',
-        detail: it ? 'Profili pubblici e recap recenti' : 'Public profiles and recent recaps',
+        title: commandCopy('offline', 'title'),
+        detail: commandCopy('offline', 'detail'),
         url: `${prefix}/offline`,
         keywords: 'offline download save pack kit recap profile profili salva',
         scope: 'current',
@@ -281,8 +277,8 @@ export class SiteCommandBarComponent {
       {
         id: 'current-party-relationships',
         icon: '\u26af',
-        title: it ? 'Legami del gruppo' : 'Party bonds',
-        detail: it ? 'Affinit\u00e0 e tensioni' : 'Affinities and tensions',
+        title: commandCopy('partyBonds', 'title'),
+        detail: commandCopy('partyBonds', 'detail'),
         url: `${prefix}/party/relationships`,
         keywords: 'party relationships bonds relazioni legami',
         scope: 'current',
@@ -290,8 +286,8 @@ export class SiteCommandBarComponent {
       {
         id: 'current-npcs',
         icon: '\u265f',
-        title: it ? 'Volti conosciuti' : 'Known figures',
-        detail: it ? 'Alleati, nemici e PNG' : 'Allies, enemies and NPCs',
+        title: commandCopy('npcs', 'title'),
+        detail: commandCopy('npcs', 'detail'),
         url: `${prefix}/npcs`,
         keywords: 'npc png allies enemies alleati nemici',
         scope: 'current',
@@ -299,8 +295,8 @@ export class SiteCommandBarComponent {
       {
         id: 'current-npc-relationships',
         icon: '\u21ad',
-        title: it ? 'Relazioni dei PNG' : 'NPC relationships',
-        detail: it ? 'Connessioni tra i volti conosciuti' : 'Connections between known figures',
+        title: commandCopy('npcBonds', 'title'),
+        detail: commandCopy('npcBonds', 'detail'),
         url: `${prefix}/npcs/relationships`,
         keywords: 'npc png relationships relazioni connections connessioni',
         scope: 'current',
@@ -308,8 +304,8 @@ export class SiteCommandBarComponent {
       {
         id: 'current-chronicles',
         icon: '\u270e',
-        title: it ? 'Cronache delle sessioni' : 'Session chronicles',
-        detail: it ? 'Briefing ed eventi chiave' : 'Briefing and key events',
+        title: commandCopy('chronicles', 'title'),
+        detail: commandCopy('chronicles', 'detail'),
         url: `${prefix}/campaign`,
         keywords: 'campaign briefing sessioni sessions events eventi chronicle cronache',
         scope: 'current',
@@ -317,8 +313,8 @@ export class SiteCommandBarComponent {
       {
         id: 'current-story-so-far',
         icon: '\u2637',
-        title: it ? 'La storia fin qui' : 'The story so far',
-        detail: it ? "Riprendi il filo dell'avventura" : 'Catch up with the adventure',
+        title: commandCopy('story', 'title'),
+        detail: commandCopy('story', 'detail'),
         url: `${prefix}/campaign/story-so-far`,
         keywords: 'story storia recap catch up riassunto fin qui',
         scope: 'current',
@@ -326,8 +322,8 @@ export class SiteCommandBarComponent {
       {
         id: 'current-table-moments',
         icon: '\ud83c\udfad',
-        title: it ? 'Momenti al tavolo' : 'Around the Table',
-        detail: it ? 'Battute e ricordi fuori personaggio' : 'Out-of-character jokes and memories',
+        title: commandCopy('tableMoments', 'title'),
+        detail: commandCopy('tableMoments', 'detail'),
         url: `${prefix}/campaign/table-moments`,
         keywords: 'table moments tavolo battute jokes funny ooc off character ricordi memories',
         scope: 'current',
@@ -335,8 +331,8 @@ export class SiteCommandBarComponent {
       {
         id: 'current-maps',
         icon: '\u2316',
-        title: it ? 'Luoghi esplorati' : 'Explored places',
-        detail: it ? 'Mappe e destinazioni' : 'Maps and destinations',
+        title: commandCopy('maps', 'title'),
+        detail: commandCopy('maps', 'detail'),
         url: `${prefix}/maps`,
         keywords: 'maps mappe places luoghi locations',
         scope: 'current',
@@ -344,8 +340,8 @@ export class SiteCommandBarComponent {
       {
         id: 'current-gallery',
         icon: '\u25c7',
-        title: it ? 'Galleria' : 'Gallery',
-        detail: it ? 'Immagini e ricordi' : 'Images and memories',
+        title: commandCopy('gallery', 'title'),
+        detail: commandCopy('gallery', 'detail'),
         url: `${prefix}/gallery`,
         keywords: 'gallery galleria images immagini',
         scope: 'current',
@@ -384,10 +380,10 @@ export class SiteCommandBarComponent {
 
   readonly resultSummary = computed((): string => {
     const count = this.filteredCommands().length;
-    if (this.isItalian()) {
-      return count === 1 ? '1 destinazione' : `${count} destinazioni`;
-    }
-    return count === 1 ? '1 destination' : `${count} destinations`;
+    return this.uiText.text(
+      count === 1 ? 'commandBar.palette.oneResult' : 'commandBar.palette.manyResults',
+      { count },
+    );
   });
 
   constructor() {
@@ -533,17 +529,7 @@ export class SiteCommandBarComponent {
   }
 
   commandScopeLabel(command: NavigationCommand): string {
-    const it = this.isItalian();
-    if (command.scope === 'memory') {
-      return it ? 'Il tuo percorso' : 'Your trail';
-    }
-    if (command.scope === 'current') {
-      return it ? 'In questa campagna' : 'In this campaign';
-    }
-    if (command.scope === 'campaign') {
-      return it ? 'Campagna' : 'Campaign';
-    }
-    return 'QuestKeeper';
+    return this.uiText.text(`commandBar.scopes.${command.scope}`);
   }
 
   isCurrent(command: NavigationCommand): boolean {

@@ -91,13 +91,24 @@ to campaign data and must not be moved into this product-copy mechanism.
   while the default reader experience keeps supported interface and campaign
   locales together.
 
-The character reading experience now resolves its party list, profile, story,
-relationship, protected-profile, notebook, sheet, progression and rule-library
-chrome from `characterUi` in the same registry. The audit permits only two
-reviewed data-owned boundaries: the PDF renderer's current en/it field schema,
-and local-compendium rule fields plus D&D ability abbreviations. Both carry an
-`UI-TEXT-DATA-OWNED` marker and an exact-count regression check; adding another
-branch fails `test:ui-texts` until its ownership is reviewed explicitly.
+The audit now covers every tracked and newly created Angular template plus
+TypeScript bilingual branches. The homepage, global commands, guided tour,
+audio/loading states, offline pack and character PDF chrome all resolve through
+the registry. PDF interface labels follow the reader's interface locale, while
+campaign-authored prose and dates continue to follow the campaign content
+locale.
 
-Issues #140-#142 complete the remaining chronicle, NPC, compendium,
-PDF/offline and accessibility surfaces until the zero-inline-copy audit passes.
+Reviewed data-owned boundaries stay outside the interface catalog:
+
+- `src/app/arcana/pages/baseline-compendium/**` selects the redistributable
+  baseline's authored rule fields;
+- `rulesetProfile.model.ts` selects built-in ruleset display data;
+- `character-rule-library.component.ts` selects compendium fields and compact
+  game abbreviations.
+
+Every exception carries an `UI-TEXT-DATA-OWNED` marker and an exact-count
+regression check. Any new bilingual branch elsewhere fails `test:ui-texts`
+until it is migrated or its ownership is reviewed and documented.
+
+Issue #142 is source-complete with this audit. It remains awaiting release
+until the containing QuestKeeper artifact is published and verified.

@@ -133,10 +133,20 @@ const migratedSurfaces = [
   'src/app/app.html',
   'src/app/app.ts',
   'src/app/guild/components/language-toggle/language-toggle.component.ts',
+  'src/app/guild/components/audio-toggle/audio-toggle.component.html',
+  'src/app/guild/components/audio-toggle/audio-toggle.component.ts',
+  'src/app/guild/components/dice-loader/dice-loader.component.ts',
+  'src/app/guild/components/guided-tour/guided-tour.component.html',
+  'src/app/guild/components/guided-tour/guided-tour.component.ts',
+  'src/app/guild/components/site-command-bar/site-command-bar.component.html',
+  'src/app/guild/components/site-command-bar/site-command-bar.component.ts',
   'src/app/guild/components/sidebar/sidebar.component.html',
   'src/app/guild/components/sidebar/sidebar.component.ts',
   'src/app/guild/pages/campaign-selector/campaign-selector.component.html',
   'src/app/guild/pages/campaign-selector/campaign-selector.component.ts',
+  'src/app/guild/pages/homepage/homepage.component.html',
+  'src/app/guild/pages/offline-pack/offline-pack.component.html',
+  'src/app/guild/pages/offline-pack/offline-pack.component.ts',
   'src/app/bestiary/pages/npc-list/npc-list.component.html',
   'src/app/bestiary/pages/npc-list/npc-list.component.ts',
   'src/app/bestiary/pages/npc-detail/npc-detail.component.html',
@@ -192,6 +202,8 @@ const migratedSurfaces = [
   'src/app/adventurers/components/character-notebook/character-notebook.component.html',
   'src/app/adventurers/components/character-notebook/character-notebook.component.ts',
   'src/app/adventurers/components/character-sheet/character-sheet.component.html',
+  'src/app/adventurers/components/character-sheet/character-sheet.component.ts',
+  'src/app/adventurers/services/campaignCharacterSheetPdf.service.ts',
   'src/app/adventurers/components/character-sheet-navigation/character-sheet-navigation.component.html',
   'src/app/adventurers/components/character-sheet-navigation/character-sheet-navigation.component.ts',
   'src/app/adventurers/components/character-sheet-history/character-sheet-history.component.html',
@@ -221,22 +233,48 @@ for (const relative of migratedSurfaces) {
 
 const dataOwnedLanguageBranches = new Map([
   [
-    'src/app/adventurers/components/character-sheet/character-sheet.component.ts',
-    { expected: 1, reason: 'the PDF renderer label schema currently ships authored en/it fields' },
+    'src/app/arcana/pages/baseline-compendium/baseline-compendium.component.ts',
+    { expected: 1, reason: 'the redistributable SRD fixture ships authored en/it fields' },
   ],
   [
     'src/app/adventurers/components/character-rule-library/character-rule-library.component.ts',
     { expected: 2, reason: 'local compendium rule fields and D&D abbreviations are game data' },
   ],
+  [
+    'src/app/guild/models/rulesetProfile.model.ts',
+    { expected: 1, reason: 'built-in ruleset profiles ship authored en/it labels' },
+  ],
 ]);
 for (const [relative, exception] of dataOwnedLanguageBranches) {
   const source = fs.readFileSync(path.join(root, relative), 'utf8');
-  const branches = source.match(/isItalian\(\)\s*\?|const italian = this\.isItalian\(\)/g) ?? [];
+  const branches =
+    source.match(
+      /isItalian\(\)\s*\?|const italian = this\.isItalian\(\)|language\s*===\s*['"]it['"]\s*\?/g,
+    ) ?? [];
   const markers = source.match(/UI-TEXT-DATA-OWNED/g) ?? [];
   if (branches.length !== exception.expected || markers.length !== exception.expected) {
     fail(
       `${relative} data-owned language exception drifted (expected ${exception.expected}: ${exception.reason})`,
     );
+  }
+}
+
+const repositoryTypescript = execFileSync(
+  'git',
+  ['ls-files', '--cached', '--others', '--exclude-standard', 'src/app/**/*.ts'],
+  { cwd: root, encoding: 'utf8' },
+)
+  .trim()
+  .split(/\r?\n/)
+  .filter(Boolean);
+for (const relative of repositoryTypescript) {
+  const source = fs.readFileSync(path.join(root, relative), 'utf8');
+  const branches =
+    source.match(
+      /isItalian\(\)\s*\?|lang\(\)\s*===\s*['"]it['"]|language\s*===\s*['"]it['"]\s*\?|const italian = this\.isItalian\(\)/g,
+    ) ?? [];
+  if (branches.length > 0 && !dataOwnedLanguageBranches.has(relative)) {
+    fail(`${relative} contains unreviewed embedded bilingual TypeScript copy`);
   }
 }
 

@@ -428,8 +428,6 @@ export class CharacterSheetComponent {
       const { generateCampaignCharacterSheetPdf } =
         await import('../../services/campaignCharacterSheetPdf.service');
       const language = this.campaignLocale.currentLocale();
-      // UI-TEXT-DATA-OWNED: the PDF renderer currently exposes an explicit en/it field-label schema.
-      const interfaceLanguage = this.isItalian() ? 'it' : 'en';
       const blob = await generateCampaignCharacterSheetPdf(
         this.characterName(),
         this.sheet(),
@@ -446,10 +444,11 @@ export class CharacterSheetComponent {
           chapterTitle: this.activeSnapshot()?.title,
           recordedAt: this.activeSnapshot()?.recordedAt,
           localeRegistry: this.campaignLocale.registry(),
+          interfaceText: (key, parameters = {}) => this.uiText.text(key, parameters),
           identityLabels: Object.fromEntries(
             this.rulesetProfile().fields.map((field) => [
               field.storageKey,
-              field.labels[interfaceLanguage],
+              this.uiText.localized(field.labels),
             ]),
           ),
         },

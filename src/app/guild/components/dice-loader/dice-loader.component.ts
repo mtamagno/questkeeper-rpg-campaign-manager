@@ -18,7 +18,7 @@ import {
 } from '@angular/core';
 
 import { AudioService } from '@guild/services/audio.service';
-import { LanguageService } from '@guild/services/language.service';
+import { UiTextService } from '@guild/services/uiText.service';
 import { SFX } from '@guild/constants/sfx.constant';
 
 @Component({
@@ -36,7 +36,7 @@ import { SFX } from '@guild/constants/sfx.constant';
 })
 export class DiceLoaderComponent implements OnInit {
   private readonly audio = inject(AudioService);
-  private readonly languageService = inject(LanguageService);
+  private readonly uiText = inject(UiTextService);
 
   /** Pixel size of the dice icon (square). */
   readonly size = input<number>(64);
@@ -51,9 +51,6 @@ export class DiceLoaderComponent implements OnInit {
    */
   readonly playSound = input<boolean>(true);
 
-  /** Whether the UI label set should be Italian. */
-  readonly isItalian: Signal<boolean> = this.languageService.isItalian;
-
   /**
    * Accessible label for the host element. Uses the explicit `label`
    * input when present, otherwise a localized fallback.
@@ -63,7 +60,7 @@ export class DiceLoaderComponent implements OnInit {
     if (explicit.length > 0) {
       return explicit;
     }
-    return this.isItalian() ? 'Caricamento' : 'Loading';
+    return this.uiText.text('common.loading');
   });
 
   ngOnInit(): void {

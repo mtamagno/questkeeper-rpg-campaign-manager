@@ -7,9 +7,9 @@
 
 import { ChangeDetectionStrategy, Component, inject, type Signal } from '@angular/core';
 
-import { LanguageService } from '@guild/services/language.service';
 import { AudioService } from '@guild/services/audio.service';
 import { UserPreferencesService } from '@guild/services/userPreferences.service';
+import { UiTextService } from '@guild/services/uiText.service';
 import { SFX } from '@guild/constants/sfx.constant';
 
 @Component({
@@ -23,16 +23,13 @@ import { SFX } from '@guild/constants/sfx.constant';
 export class AudioToggleComponent {
   private readonly preferences = inject(UserPreferencesService);
   private readonly audio = inject(AudioService);
-  private readonly languageService = inject(LanguageService);
+  readonly uiText = inject(UiTextService);
 
   /** Whether sound effects are currently muted. */
   readonly isMuted: Signal<boolean> = this.preferences.audioMuted;
 
   /** Current playback volume in [0, 1]. */
   readonly volume: Signal<number> = this.preferences.audioVolume;
-
-  /** Whether the UI label set should be Italian. */
-  readonly isItalian: Signal<boolean> = this.languageService.isItalian;
 
   /** Toggles mute. Plays a confirmation click only when un-muting. */
   toggleMute(): void {

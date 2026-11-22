@@ -73,6 +73,7 @@ export function rulesetDisplayIdentity(
   legacyEdition = '',
   language = 'en',
 ): RulesetDisplayIdentity {
+  // UI-TEXT-DATA-OWNED: built-in ruleset profile labels currently ship authored en/it fields.
   const locale = language === 'it' ? 'it' : 'en';
   const authoredLabel = String(system?.edition ?? legacyEdition).trim();
   const requestedId = system?.id || inferRulesetId(legacyEdition);

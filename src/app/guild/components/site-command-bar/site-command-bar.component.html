@@ -1,8 +1,5 @@
 <div class="command-bar">
-  <nav
-    class="command-bar__breadcrumbs"
-    [attr.aria-label]="isItalian() ? 'Percorso di navigazione' : 'Breadcrumb'"
-  >
+  <nav class="command-bar__breadcrumbs" [attr.aria-label]="uiText.text('commandBar.breadcrumb')">
     @for (crumb of breadcrumbs(); track crumb.url; let last = $last) {
       @if (!last) {
         <a class="command-bar__crumb" [routerLink]="crumb.url">{{ crumb.label }}</a>
@@ -23,17 +20,13 @@
         [fragment]="myCharacterRoute() ? undefined : 'campaign-settings'"
         [attr.aria-label]="
           myCharacter()
-            ? isItalian()
-              ? 'Apri il mio personaggio: ' + myCharacter()!.name
-              : 'Open my character: ' + myCharacter()!.name
-            : isItalian()
-              ? 'Scegli il mio personaggio'
-              : 'Choose my character'
+            ? uiText.text('commandBar.openCharacter', { name: myCharacter()!.name })
+            : uiText.text('commandBar.chooseCharacter')
         "
       >
         <span aria-hidden="true">✦</span>
         <span class="command-bar__my-character-label">
-          {{ isItalian() ? 'Personaggio' : 'Character' }}
+          {{ uiText.text('commandBar.character') }}
         </span>
       </a>
     }
@@ -41,12 +34,10 @@
       <a
         class="command-bar__continue"
         [routerLink]="page.url"
-        [attr.aria-label]="
-          isItalian() ? 'Continua a leggere: ' + page.title : 'Continue reading: ' + page.title
-        "
+        [attr.aria-label]="uiText.text('commandBar.continueReading', { title: page.title })"
       >
         <span aria-hidden="true">&#8634;</span>
-        <span class="command-bar__continue-label">{{ isItalian() ? 'Continua' : 'Continue' }}</span>
+        <span class="command-bar__continue-label">{{ uiText.text('commandBar.continue') }}</span>
       </a>
     }
     <button
@@ -56,10 +47,10 @@
       aria-haspopup="dialog"
       aria-keyshortcuts="Control+K Meta+K"
       [attr.aria-expanded]="isOpen()"
-      [attr.aria-label]="isItalian() ? 'Apri la navigazione rapida' : 'Open quick navigation'"
+      [attr.aria-label]="uiText.text('commandBar.openNavigation')"
     >
       <span aria-hidden="true">&#9906;</span>
-      <span class="command-bar__search-label">{{ isItalian() ? 'Vai a...' : 'Go to...' }}</span>
+      <span class="command-bar__search-label">{{ uiText.text('commandBar.goTo') }}</span>
       <kbd>Ctrl K</kbd>
     </button>
     <div #actionsShell class="command-bar__overflow">
@@ -70,11 +61,11 @@
         aria-controls="command-bar-overflow"
         aria-haspopup="true"
         [attr.aria-expanded]="isActionsOpen()"
-        [attr.aria-label]="isItalian() ? 'Altre azioni' : 'More actions'"
+        [attr.aria-label]="uiText.text('commandBar.moreActions')"
         (click)="toggleActions()"
       >
         <span aria-hidden="true">•••</span>
-        <span class="command-bar__overflow-label">{{ isItalian() ? 'Altro' : 'More' }}</span>
+        <span class="command-bar__overflow-label">{{ uiText.text('commandBar.more') }}</span>
       </button>
       <div
         #actionsMenu
@@ -82,13 +73,13 @@
         class="command-bar__overflow-menu"
         role="group"
         [hidden]="!isActionsOpen()"
-        [attr.aria-label]="isItalian() ? 'Altre azioni' : 'More actions'"
+        [attr.aria-label]="uiText.text('commandBar.moreActions')"
       >
         @if (activeCampaignName(); as campaignName) {
           <a class="command-bar__campaign-switch" routerLink="/" (click)="closeActions()">
             <span class="command-bar__campaign-dot" aria-hidden="true"></span>
             <span class="command-bar__campaign-name">{{ campaignName }}</span>
-            <span class="command-bar__switch-copy">{{ isItalian() ? 'Cambia' : 'Switch' }}</span>
+            <span class="command-bar__switch-copy">{{ uiText.text('commandBar.switch') }}</span>
           </a>
         }
         @if (canRememberCurrent()) {
@@ -99,7 +90,7 @@
             (click)="toggleCurrentFavorite(); closeActions()"
           >
             <span aria-hidden="true">{{ isCurrentFavorite() ? '★' : '☆' }}</span>
-            <span>{{ isItalian() ? 'Preferito' : 'Favourite' }}</span>
+            <span>{{ uiText.text('commandBar.favourite') }}</span>
           </button>
         }
         @if (managerUrl()) {
@@ -109,7 +100,7 @@
             (click)="openManager(); closeActions()"
           >
             <span aria-hidden="true">⚙</span>
-            <span>{{ isItalian() ? 'Gestore campagne' : 'Campaign Manager' }}</span>
+            <span>{{ uiText.text('commandBar.manager') }}</span>
           </button>
         }
         @if (canInstall()) {
@@ -119,7 +110,7 @@
             (click)="installCompanion(); closeActions()"
           >
             <span aria-hidden="true">⇩</span>
-            <span>{{ isItalian() ? 'Installa QuestKeeper' : 'Install QuestKeeper' }}</span>
+            <span>{{ uiText.text('commandBar.install') }}</span>
           </button>
         }
         <button
@@ -156,21 +147,17 @@
         <span class="command-palette__mark" aria-hidden="true">&#10022;</span>
         <div>
           <h2 id="command-palette-title" class="command-palette__title">
-            {{ isItalian() ? 'Dove vuoi andare?' : 'Where would you like to go?' }}
+            {{ uiText.text('commandBar.palette.title') }}
           </h2>
           <p id="command-palette-description" class="command-palette__subtitle">
-            {{
-              isItalian()
-                ? 'Cerca in questa campagna e in tutto QuestKeeper'
-                : 'Search this campaign and all of QuestKeeper'
-            }}
+            {{ uiText.text('commandBar.palette.description') }}
           </p>
         </div>
         <button
           class="command-palette__close"
           type="button"
           (click)="close()"
-          [attr.aria-label]="isItalian() ? 'Chiudi ricerca' : 'Close search'"
+          [attr.aria-label]="uiText.text('commandBar.palette.close')"
         >
           &times;
         </button>
@@ -192,13 +179,11 @@
           (input)="updateQuery($event)"
           (keydown)="onSearchKeydown($event)"
           [placeholder]="
-            activeCampaignId()
-              ? isItalian()
-                ? 'Es. incantesimi, PNG, mappe...'
-                : 'Try spells, NPCs, maps...'
-              : isItalian()
-                ? 'Es. campagne, incantesimi, armeria...'
-                : 'Try campaigns, spells, armory...'
+            uiText.text(
+              activeCampaignId()
+                ? 'commandBar.palette.campaignPlaceholder'
+                : 'commandBar.palette.globalPlaceholder'
+            )
           "
         />
         <kbd>Esc</kbd>
@@ -225,7 +210,7 @@
                 <span>{{ commandScopeLabel(command) }}</span>
                 @if (isCurrent(command)) {
                   <span class="command-palette__current">
-                    {{ isItalian() ? 'Pagina attuale' : 'Current page' }}
+                    {{ uiText.text('commandBar.palette.currentPage') }}
                   </span>
                 }
               </span>
@@ -237,19 +222,19 @@
         } @empty {
           <div class="command-palette__empty">
             <span aria-hidden="true">&#9671;</span>
-            <strong>{{ isItalian() ? 'Nessun passaggio trovato' : 'No path found' }}</strong>
-            <small>{{
-              isItalian() ? 'Prova con un termine diverso.' : 'Try a different search term.'
-            }}</small>
+            <strong>{{ uiText.text('commandBar.palette.emptyTitle') }}</strong>
+            <small>{{ uiText.text('commandBar.palette.emptyHelp') }}</small>
           </div>
         }
       </div>
 
       <footer class="command-palette__footer">
         <span>{{ resultSummary() }}</span>
-        <span><kbd>&uarr;</kbd><kbd>&darr;</kbd> {{ isItalian() ? 'seleziona' : 'select' }}</span>
-        <span><kbd>&crarr;</kbd> {{ isItalian() ? 'apri' : 'open' }}</span>
-        <span><kbd>Esc</kbd> {{ isItalian() ? 'chiudi' : 'close' }}</span>
+        <span
+          ><kbd>&uarr;</kbd><kbd>&darr;</kbd> {{ uiText.text('commandBar.palette.select') }}</span
+        >
+        <span><kbd>&crarr;</kbd> {{ uiText.text('commandBar.palette.open') }}</span>
+        <span><kbd>Esc</kbd> {{ uiText.text('commandBar.palette.closeAction') }}</span>
       </footer>
     </section>
   </div>

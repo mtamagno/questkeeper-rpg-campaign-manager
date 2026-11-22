@@ -1,19 +1,9 @@
 <article class="offline-pack">
   <header class="offline-pack__hero">
     <div>
-      <span class="offline-pack__eyebrow">{{
-        lang() === 'it' ? 'Kit per la serata' : 'Game-night kit'
-      }}</span>
-      <h1>
-        {{ lang() === 'it' ? 'La cronaca, anche senza rete' : 'Your chronicle, even offline' }}
-      </h1>
-      <p>
-        {{
-          lang() === 'it'
-            ? 'Scegli i profili pubblici da portare con te. QuestKeeper aggiunge automaticamente gli ultimi tre recap disponibili.'
-            : 'Choose the public profiles to take with you. QuestKeeper automatically adds the latest three available recaps.'
-        }}
-      </p>
+      <span class="offline-pack__eyebrow">{{ uiText.text('offlinePack.eyebrow') }}</span>
+      <h1>{{ uiText.text('offlinePack.title') }}</h1>
+      <p>{{ uiText.text('offlinePack.description') }}</p>
     </div>
     <app-language-toggle />
     <span
@@ -22,7 +12,7 @@
       role="status"
     >
       <span aria-hidden="true"></span>
-      {{ isOnline() ? 'Online' : lang() === 'it' ? 'Senza connessione' : 'Offline' }}
+      {{ uiText.text(isOnline() ? 'offlinePack.online' : 'offlinePack.offline') }}
     </span>
   </header>
 
@@ -30,14 +20,10 @@
     <span aria-hidden="true">◇</span>
     <div>
       <h2 id="offline-trust-title">
-        {{ lang() === 'it' ? 'Solo ciò che può viaggiare' : 'Only what can safely travel' }}
+        {{ uiText.text('offlinePack.safeTitle') }}
       </h2>
       <p>
-        {{
-          lang() === 'it'
-            ? 'Vengono salvati in questo browser soltanto profili pubblici e recap sintetici. Schede protette, password, segreti, note del DM e capitoli completi restano esclusi.'
-            : 'Only public profiles and concise recaps are stored in this browser. Protected sheets, passwords, secrets, GM notes and full chapters stay excluded.'
-        }}
+        {{ uiText.text('offlinePack.safeHelp') }}
       </p>
     </div>
   </section>
@@ -45,17 +31,12 @@
   @if (isOnline()) {
     <section class="offline-pack__builder" aria-labelledby="offline-builder-title">
       <header>
-        <span>{{ lang() === 'it' ? 'Preparazione' : 'Preparation' }}</span>
-        <h2 id="offline-builder-title">
-          {{ lang() === 'it' ? 'Scegli cosa portare al tavolo' : 'Choose what comes to the table' }}
-        </h2>
+        <span>{{ uiText.text('offlinePack.preparation') }}</span>
+        <h2 id="offline-builder-title">{{ uiText.text('offlinePack.choose') }}</h2>
       </header>
 
       @if (isLoading()) {
-        <app-dice-loader
-          [label]="lang() === 'it' ? 'Raccolgo le cronache...' : 'Gathering the chronicles...'"
-          [playSound]="false"
-        />
+        <app-dice-loader [label]="uiText.text('offlinePack.loading')" [playSound]="false" />
       } @else {
         <form
           class="offline-pack__form"
@@ -63,7 +44,7 @@
           aria-describedby="offline-storage-note"
         >
           <fieldset>
-            <legend>{{ lang() === 'it' ? 'Profili pubblici' : 'Public profiles' }}</legend>
+            <legend>{{ uiText.text('offlinePack.profiles') }}</legend>
             <div class="offline-pack__choices">
               @for (character of characters(); track character.id) {
                 <label [class.is-selected]="isSelected(character.id)">
@@ -92,11 +73,7 @@
                 </label>
               } @empty {
                 <p class="offline-pack__empty">
-                  {{
-                    lang() === 'it'
-                      ? 'Nessun profilo pubblico disponibile.'
-                      : 'No public profiles are available.'
-                  }}
+                  {{ uiText.text('offlinePack.profilesEmpty') }}
                 </p>
               }
             </div>
@@ -104,14 +81,12 @@
 
           <div class="offline-pack__recap-plan">
             <div>
-              <span>{{ lang() === 'it' ? 'Recap recenti' : 'Recent recaps' }}</span>
+              <span>{{ uiText.text('offlinePack.recaps') }}</span>
               <strong>
                 {{
                   recentSessions().length === 1
-                    ? lang() === 'it'
-                      ? '1 sessione'
-                      : '1 session'
-                    : recentSessions().length + (lang() === 'it' ? ' sessioni' : ' sessions')
+                    ? uiText.text('offlinePack.recapOne')
+                    : uiText.text('offlinePack.recapMany', { count: recentSessions().length })
                 }}
               </strong>
             </div>
@@ -122,29 +97,25 @@
                   ><strong>{{ session.title | bilingual }}</strong>
                 </li>
               } @empty {
-                <li>{{ lang() === 'it' ? 'Nessun recap disponibile' : 'No recap available' }}</li>
+                <li>{{ uiText.text('offlinePack.noRecap') }}</li>
               }
             </ol>
           </div>
 
           <p id="offline-storage-note" class="offline-pack__storage-note">
-            {{
-              lang() === 'it'
-                ? 'Il pacchetto resta solo su questo dispositivo. Preparandolo di nuovo sostituisci la versione precedente.'
-                : 'The pack stays only on this device. Preparing it again replaces the previous version.'
-            }}
+            {{ uiText.text('offlinePack.storageNote') }}
           </p>
 
           <button class="offline-pack__prepare" type="submit" [disabled]="!canPrepare()">
             @if (preparationState() === 'preparing') {
               <span class="offline-pack__spinner" aria-hidden="true"></span>
-              {{ lang() === 'it' ? 'Preparazione...' : 'Preparing...' }}
+              {{ uiText.text('offlinePack.preparing') }}
             } @else if (pack()) {
               <span aria-hidden="true">↻</span>
-              {{ lang() === 'it' ? 'Aggiorna pacchetto' : 'Update pack' }}
+              {{ uiText.text('offlinePack.update') }}
             } @else {
               <span aria-hidden="true">⇩</span>
-              {{ lang() === 'it' ? 'Prepara per offline' : 'Prepare for offline' }}
+              {{ uiText.text('offlinePack.prepare') }}
             }
           </button>
         </form>
@@ -152,14 +123,8 @@
     </section>
   } @else if (!pack()) {
     <section class="offline-pack__warning" role="status">
-      <strong>{{ lang() === 'it' ? 'Nessun pacchetto disponibile' : 'No pack available' }}</strong>
-      <p>
-        {{
-          lang() === 'it'
-            ? 'Riconnettiti, torna qui e prepara almeno un profilo o un recap prima della sessione.'
-            : 'Reconnect, return here and prepare at least one profile or recap before the session.'
-        }}
-      </p>
+      <strong>{{ uiText.text('offlinePack.none') }}</strong>
+      <p>{{ uiText.text('offlinePack.noneHelp') }}</p>
     </section>
   }
 
@@ -167,23 +132,15 @@
     @if (preparationState() === 'ready') {
       <p class="offline-pack__feedback--success">
         <span aria-hidden="true">✓</span>
-        {{
-          lang() === 'it'
-            ? 'Pacchetto pronto. Testi salvati e ' + cachedImageCount() + ' risorse verificate.'
-            : 'Pack ready. Text saved and ' + cachedImageCount() + ' resources verified.'
-        }}
+        {{ uiText.text('offlinePack.ready', { images: cachedImageCount() }) }}
       </p>
     } @else if (preparationState() === 'removed') {
       <p>
-        {{ lang() === 'it' ? 'Pacchetto rimosso dal dispositivo.' : 'Pack removed from device.' }}
+        {{ uiText.text('offlinePack.removed') }}
       </p>
     } @else if (preparationState() === 'error') {
       <p class="offline-pack__feedback--error">
-        {{
-          lang() === 'it'
-            ? 'Non è stato possibile aggiornare lo spazio offline. Controlla lo spazio del browser e riprova.'
-            : 'The offline space could not be updated. Check browser storage and try again.'
-        }}
+        {{ uiText.text('offlinePack.error') }}
       </p>
     }
   </div>
@@ -192,26 +149,29 @@
     <section class="offline-pack__library" aria-labelledby="offline-library-title">
       <header class="offline-pack__library-header">
         <div>
-          <span>{{
-            lang() === 'it' ? 'Disponibile su questo dispositivo' : 'Available on this device'
-          }}</span>
+          <span>{{ uiText.text('offlinePack.available') }}</span>
           <h2 id="offline-library-title">{{ saved.campaignName | bilingual }}</h2>
           <p>
-            {{ lang() === 'it' ? 'Preparato il' : 'Prepared' }}
+            {{ uiText.text('offlinePack.prepared') }}
             <time [attr.datetime]="saved.preparedAt">{{ formatPreparedAt(saved.preparedAt) }}</time>
-            · {{ saved.characters.length }} {{ lang() === 'it' ? 'profili' : 'profiles' }} ·
-            {{ saved.recaps.length }} {{ lang() === 'it' ? 'recap' : 'recaps' }}
+            ·
+            {{
+              uiText.text('offlinePack.savedSummary', {
+                profiles: saved.characters.length,
+                recaps: saved.recaps.length,
+              })
+            }}
           </p>
         </div>
         <button class="offline-pack__remove" type="button" (click)="remove()">
-          {{ lang() === 'it' ? 'Rimuovi dal dispositivo' : 'Remove from device' }}
+          {{ uiText.text('offlinePack.remove') }}
         </button>
       </header>
 
       @if (saved.characters.length > 0) {
         <section class="offline-pack__saved-section" aria-labelledby="offline-characters-title">
           <h3 id="offline-characters-title">
-            {{ lang() === 'it' ? 'Avventurieri' : 'Adventurers' }}
+            {{ uiText.text('offlinePack.adventurers') }}
           </h3>
           <div class="offline-pack__saved-grid">
             @for (character of saved.characters; track character.id) {
@@ -238,32 +198,32 @@
                 </summary>
                 <div class="offline-pack__profile">
                   <section>
-                    <h4>{{ lang() === 'it' ? 'Storia' : 'Backstory' }}</h4>
+                    <h4>{{ uiText.text('offlinePack.backstory') }}</h4>
                     <p>{{ character.publicProfile.backstory | bilingual }}</p>
                   </section>
                   <section>
-                    <h4>{{ lang() === 'it' ? 'Tratti' : 'Traits' }}</h4>
+                    <h4>{{ uiText.text('offlinePack.traits') }}</h4>
                     <p>{{ character.publicProfile.traits | bilingual }}</p>
                   </section>
                   <section>
-                    <h4>{{ lang() === 'it' ? 'Ideali' : 'Ideals' }}</h4>
+                    <h4>{{ uiText.text('offlinePack.ideals') }}</h4>
                     <p>{{ character.publicProfile.ideals | bilingual }}</p>
                   </section>
                   <section>
-                    <h4>{{ lang() === 'it' ? 'Legami' : 'Bonds' }}</h4>
+                    <h4>{{ uiText.text('offlinePack.bonds') }}</h4>
                     <p>{{ character.publicProfile.bonds | bilingual }}</p>
                   </section>
                   <section>
-                    <h4>{{ lang() === 'it' ? 'Difetti' : 'Flaws' }}</h4>
+                    <h4>{{ uiText.text('offlinePack.flaws') }}</h4>
                     <p>{{ character.publicProfile.flaws | bilingual }}</p>
                   </section>
                   <section>
-                    <h4>{{ lang() === 'it' ? 'Storia conosciuta' : 'Known history' }}</h4>
+                    <h4>{{ uiText.text('offlinePack.knownHistory') }}</h4>
                     <p>{{ character.publicProfile.knownHistory | bilingual }}</p>
                   </section>
                   @if (character.publicProfile.hobbies) {
                     <section>
-                      <h4>{{ lang() === 'it' ? 'Interessi' : 'Interests' }}</h4>
+                      <h4>{{ uiText.text('offlinePack.interests') }}</h4>
                       <p>{{ character.publicProfile.hobbies | bilingual }}</p>
                     </section>
                   }
@@ -277,7 +237,7 @@
       @if (saved.recaps.length > 0) {
         <section class="offline-pack__saved-section" aria-labelledby="offline-recaps-title">
           <h3 id="offline-recaps-title">
-            {{ lang() === 'it' ? 'Ultimi recap' : 'Latest recaps' }}
+            {{ uiText.text('offlinePack.latestRecaps') }}
           </h3>
           <div class="offline-pack__recaps">
             @for (recap of saved.recaps; track recap.id; let first = $first) {
@@ -298,7 +258,7 @@
                   }
                   <p>{{ recap.summary | bilingual }}</p>
                   @if (recap.keyEvents.length > 0) {
-                    <h4>{{ lang() === 'it' ? 'Momenti chiave' : 'Key moments' }}</h4>
+                    <h4>{{ uiText.text('offlinePack.keyMoments') }}</h4>
                     <ul>
                       @for (event of recap.keyEvents; track $index) {
                         <li>{{ event | bilingual }}</li>
