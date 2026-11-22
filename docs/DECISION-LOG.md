@@ -1996,3 +1996,34 @@ reference them but cannot duplicate their facts.
 **Revisit when:** Preference synchronization becomes account-based, or a
 cross-campaign anthology needs an explicit export contract that preserves
 campaign ownership and privacy.
+
+### QK-074 — Interface copy enforcement follows ownership, not file type
+
+**Date:** 22 November 2026
+
+**Status:** Active
+
+**Decision:** Product-owned visible copy, accessible names, state messages and
+PDF/offline chrome resolve through the versioned interface registry. The
+repository-wide guard checks both Angular templates and TypeScript language
+branches. Authored campaign prose, ruleset display data and compendium records
+remain outside that registry and require an explicit, reviewed exception.
+
+**Why:** Template-only checks left command construction and generated documents
+able to reintroduce fixed English/Italian branches. Conversely, treating every
+localized rules field as interface chrome would move licensed or campaign-owned
+content into the wrong persistence and distribution boundary.
+
+**Consequences:** New product copy must be added to every declared interface
+locale with placeholder parity. PDF labels use the interface locale while
+campaign prose uses the campaign locale. Reviewed data boundaries carry exact
+markers or a documented production-only prefix; an unclassified branch fails
+`test:ui-texts`.
+
+**Source:** [UI text catalogs](UI-TEXT-CATALOGS.md),
+[22 November closeout](reviews/2026-11-22-ui-catalog-final-closeout.md) and issue
+#142.
+
+**Revisit when:** Independently versioned extensions need their own UI catalog
+namespace, or generated localization tooling can provide equivalent ownership,
+parity and diagnostics guarantees.

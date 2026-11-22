@@ -27,16 +27,8 @@ assert.match(snapshotSection, /publicProfile/);
 assert.match(snapshotSection, /classType/);
 
 const template = read('src/app/guild/pages/offline-pack/offline-pack.component.html');
-for (const phrase of [
-  'Prepare for offline',
-  'Prepara per offline',
-  'Update pack',
-  'Aggiorna pacchetto',
-  'Remove from device',
-  'Rimuovi dal dispositivo',
-  'Protected sheets, passwords, secrets, GM notes and full chapters stay excluded.',
-]) {
-  assert.ok(template.includes(phrase), 'Offline UI is missing: ' + phrase);
+for (const key of ['prepare', 'update', 'remove', 'safeHelp']) {
+  assert.match(template, new RegExp(`uiText\\.text\\('offlinePack\\.${key}'`));
 }
 assert.match(template, /aria-live="polite"/);
 assert.match(template, /type="checkbox"/);
@@ -46,8 +38,8 @@ assert.match(routes, /path: 'offline'/);
 assert.match(routes, /OfflinePackComponent/);
 
 const commandBar = read('src/app/guild/components/site-command-bar/site-command-bar.component.ts');
-assert.match(commandBar, /Offline pack/);
-assert.match(commandBar, /Kit offline/);
+assert.match(commandBar, /commandCopy\('offline', 'title'\)/);
+assert.match(commandBar, /commandCopy\('offline', 'detail'\)/);
 assert.match(commandBar, /\/offline/);
 
 const sidebar = read('src/app/guild/components/sidebar/sidebar.component.html');
@@ -55,6 +47,10 @@ const uiCatalog = readJson('src/app/guild/i18n/ui.json');
 assert.match(sidebar, /uiText\.text\('sidebar\.offlinePack'\)/);
 assert.equal(uiCatalog.locales.en.texts.sidebar.offlinePack, 'Offline Pack');
 assert.equal(uiCatalog.locales.it.texts.sidebar.offlinePack, 'Kit offline');
+assert.equal(uiCatalog.locales.en.texts.offlinePack.prepare, 'Prepare for offline');
+assert.equal(uiCatalog.locales.it.texts.offlinePack.prepare, 'Prepara per offline');
+assert.equal(uiCatalog.locales.en.texts.commandBar.commands.offline.title, 'Offline pack');
+assert.equal(uiCatalog.locales.it.texts.commandBar.commands.offline.title, 'Kit offline');
 
 const workerConfig = readJson('ngsw-config.json');
 const dataGroups = JSON.stringify(workerConfig.dataGroups);

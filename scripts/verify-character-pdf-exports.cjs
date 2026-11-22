@@ -39,13 +39,13 @@ assert.match(service, /const journeyY = profileEnd \+ 9/);
 assert.match(service, /journeyY \+ 22 <= PAGE\.contentBottom/);
 assert.match(
   service,
-  /leftY = drawProfileText\([\s\S]+?'Ideali' : 'Ideals'/,
+  /leftY = drawProfileText\([\s\S]+?pdfText\('characterPdf\.document\.ideals'\)/,
   'The left profile cursor must include the Ideals block before placing the journey seal.',
 );
 assert.match(service, /while \(remainingLines\.length > 0\)/);
 assert.match(service, /remainingLines = remainingLines\.slice\(pageLines\.length\)/);
 assert.doesNotMatch(service, /const visibleLines = bodyLines\.slice/);
-assert.match(service, /No entries recorded/);
+assert.match(service, /const emptyValue = pdfText\('characterPdf\.document\.empty'\)/);
 assert.match(service, /body:\s*sheet\.features\.length > 0/);
 assert.match(service, /inventoryRows\.length > 0 \? inventoryRows/);
 assert.match(service, /const spellTableStartPage = doc\.getNumberOfPages\(\)/);
@@ -54,7 +54,12 @@ assert.match(
   /margin: \{ top: 35, right: PAGE\.margin, bottom: 18, left: PAGE\.margin \}/,
 );
 assert.match(service, /willDrawPage:/);
-assert.match(service, /Dotazioni e magia - continua/);
+assert.match(
+  service,
+  /pdfText\('characterPdf\.document\.equipmentMagic'\)[\s\S]+?pdfText\('characterPdf\.document\.continued'\)/,
+);
+assert.match(service, /readonly interfaceText\?: PdfInterfaceText/);
+assert.match(component, /interfaceText: \(key, parameters = \{\}\) => this\.uiText\.text/);
 for (const completeProfileField of [
   'profile.backstory',
   'profile.knownHistory',
@@ -83,6 +88,8 @@ for (const locale of ['en', 'it']) {
   const pdfCopy = catalog.locales?.[locale]?.texts?.characterPdf;
   assert.ok(pdfCopy, `${locale} characterPdf catalog is missing.`);
   assert.ok(pdfCopy.privacyHelp, `${locale} PDF privacy guidance is missing.`);
+  assert.ok(pdfCopy.document?.ideals, `${locale} PDF document labels are missing.`);
+  assert.ok(pdfCopy.document?.page, `${locale} PDF page-number copy is missing.`);
   for (const variant of ['complete', 'print', 'share', 'gameNight']) {
     assert.ok(pdfCopy.variants?.[variant]?.title, `${locale}/${variant} title is missing.`);
     assert.ok(

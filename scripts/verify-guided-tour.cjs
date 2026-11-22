@@ -3,6 +3,7 @@ const path = require('node:path');
 
 const root = path.resolve(__dirname, '..');
 const read = (relativePath) => fs.readFileSync(path.join(root, relativePath), 'utf8');
+const readJson = (relativePath) => JSON.parse(read(relativePath));
 const service = read('src/app/guild/services/guidedTour.service.ts');
 const component = read('src/app/guild/components/guided-tour/guided-tour.component.ts');
 const template = read('src/app/guild/components/guided-tour/guided-tour.component.html');
@@ -16,6 +17,9 @@ const commandBarComponent = read(
   'src/app/guild/components/site-command-bar/site-command-bar.component.ts',
 );
 const app = read('src/app/app.html');
+const uiCatalog = readJson('src/app/guild/i18n/ui.json');
+const englishTour = uiCatalog.locales.en.texts.guidedTour;
+const italianTour = uiCatalog.locales.it.texts.guidedTour;
 
 const checks = [
   ['a versioned local progress key', service.includes("'guided-demo-tour-v1'")],
@@ -24,13 +28,28 @@ const checks = [
   ['remembered campaign association', service.includes('attachCampaign(campaignId: string)')],
   ['explicit progress reset', service.includes('reset(): void')],
   ['route-aware recovery', component.includes('isAtExpectedStop')],
-  ['spoiler-consent explanation', component.includes('never bypasses spoiler consent')],
-  ['audience-personalized opening', component.includes("audience === 'gm'")],
-  ['English and Italian copy', component.includes('Ritrova la tua avventura')],
+  [
+    'spoiler-consent explanation',
+    englishTour.choose.hint.includes('never bypasses spoiler consent') &&
+      component.includes("prefix = 'guidedTour.choose'"),
+  ],
+  [
+    'audience-personalized opening',
+    component.includes("audience === 'gm' ? 'guidedTour.gmIntro' : 'guidedTour.playerIntro'"),
+  ],
+  [
+    'English and Italian catalog copy',
+    englishTour.playerIntro.title.length > 0 &&
+      italianTour.playerIntro.title.length > 0 &&
+      englishTour.playerIntro.title !== italianTour.playerIntro.title,
+  ],
   ['semantic progress indicator', template.includes('role="progressbar"')],
   ['focusable tour region', template.includes('#tourPanel') && template.includes('tabindex="-1"')],
   ['focus restoration after pause', component.includes('restoreLaunchFocus')],
-  ['visible continue-later action', template.includes('Continue later')],
+  [
+    'visible continue-later action',
+    template.includes("uiText.text('guidedTour.later')") && englishTour.later === 'Continue later',
+  ],
   ['keyboard pause with Escape', component.includes('pauseOnEscape')],
   ['reduced-motion treatment', styles.includes('prefers-reduced-motion: reduce')],
   ['small-screen layout', styles.includes('@include respond-below(sm)')],

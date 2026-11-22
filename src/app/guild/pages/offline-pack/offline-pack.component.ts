@@ -15,6 +15,7 @@ import { CampaignService } from '@guild/services/campaign.service';
 import { LanguageService } from '@guild/services/language.service';
 import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
 import { OfflinePackService } from '@guild/services/offlinePack.service';
+import { UiTextService } from '@guild/services/uiText.service';
 
 type PreparationState = 'idle' | 'preparing' | 'ready' | 'error' | 'removed';
 
@@ -33,6 +34,7 @@ export class OfflinePackComponent {
   private readonly language = inject(LanguageService);
   private readonly campaignLocale = inject(CampaignLocaleService);
   private readonly offline = inject(OfflinePackService);
+  readonly uiText = inject(UiTextService);
   private initializedCampaignId: string | undefined;
 
   readonly lang = this.language.currentLanguage;
@@ -114,11 +116,7 @@ export class OfflinePackComponent {
     if (campaignId === undefined) {
       return;
     }
-    const confirmed = window.confirm(
-      this.lang() === 'it'
-        ? 'Rimuovere da questo dispositivo il pacchetto offline della campagna?'
-        : 'Remove this campaign offline pack from this device?',
-    );
+    const confirmed = window.confirm(this.uiText.text('offlinePack.removeConfirm'));
     if (!confirmed) {
       return;
     }
@@ -126,7 +124,7 @@ export class OfflinePackComponent {
   }
 
   formatPreparedAt(value: string): string {
-    const locale = this.lang() === 'it' ? 'it-IT' : 'en-GB';
+    const locale = this.lang();
     return new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' }).format(
       new Date(value),
     );

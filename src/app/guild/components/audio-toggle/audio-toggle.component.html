@@ -1,22 +1,10 @@
 <!-- Audio Toggle — mute button + volume slider for SFX preferences -->
-<div
-  class="audio-toggle"
-  role="group"
-  [attr.aria-label]="isItalian() ? 'Effetti sonori' : 'Sound effects'"
->
+<div class="audio-toggle" role="group" [attr.aria-label]="uiText.text('audioToggle.group')">
   <button
     class="audio-toggle__button"
     type="button"
     [attr.aria-pressed]="isMuted()"
-    [attr.aria-label]="
-      isMuted()
-        ? isItalian()
-          ? 'Riattiva effetti sonori'
-          : 'Unmute sound effects'
-        : isItalian()
-          ? 'Disattiva effetti sonori'
-          : 'Mute sound effects'
-    "
+    [attr.aria-label]="uiText.text(isMuted() ? 'audioToggle.unmute' : 'audioToggle.mute')"
     (click)="toggleMute()"
   >
     <span class="audio-toggle__icon" aria-hidden="true">
@@ -32,7 +20,7 @@
     step="0.05"
     [value]="volume()"
     [disabled]="isMuted()"
-    [attr.aria-label]="isItalian() ? 'Volume effetti sonori' : 'Sound effects volume'"
+    [attr.aria-label]="uiText.text('audioToggle.volume')"
     (input)="onVolumeInput($event)"
     (change)="onVolumeCommit()"
   />

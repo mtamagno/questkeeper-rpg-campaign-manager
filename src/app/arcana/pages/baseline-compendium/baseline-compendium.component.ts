@@ -21,6 +21,7 @@ export class BaselineCompendiumComponent {
   readonly uiText = inject(UiTextService);
   readonly query = signal('');
   readonly isItalian = computed(() => this.language.currentLanguage() === 'it');
+  // UI-TEXT-DATA-OWNED: the redistributable SRD fixture currently ships authored en/it fields.
   readonly locale = computed<'en' | 'it'>(() => (this.isItalian() ? 'it' : 'en'));
   readonly manifest = BASELINE.manifest;
   readonly entries = computed(() => {

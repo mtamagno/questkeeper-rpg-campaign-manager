@@ -26,6 +26,10 @@ import { SPELL_SCHOOLS, isSpellEntry, type SpellEntry } from '@arcana/models/com
 
 export type CampaignPdfLanguage = string;
 export type CampaignPdfVariant = 'complete' | 'print' | 'share' | 'game-night';
+type PdfInterfaceText = (
+  key: string,
+  parameters?: Readonly<Record<string, string | number>>,
+) => string;
 
 type AbilityKey = keyof AbilityScores;
 
@@ -57,6 +61,7 @@ export interface CampaignCharacterPdfOptions {
   readonly identityLabels?: Partial<
     Record<'classType' | 'background' | 'race' | 'subclass', string>
   >;
+  readonly interfaceText?: PdfInterfaceText;
 }
 
 interface PdfArtwork {
@@ -148,6 +153,12 @@ const SKILLS: ReadonlyArray<SkillDefinition> = [
   { en: 'Survival', it: 'Sopravvivenza', ability: 'wisdom', abbreviation: 'WIS' },
 ];
 
+let activeInterfaceText: PdfInterfaceText | undefined;
+
+function pdfText(key: string, parameters: Readonly<Record<string, string | number>> = {}): string {
+  return activeInterfaceText?.(key, parameters) ?? `Missing PDF text: ${key}`;
+}
+
 /** Generates the requested A4 character artifact without including private-profile content. */
 export async function generateCampaignCharacterSheetPdf(
   characterName: string,
@@ -158,46 +169,50 @@ export async function generateCampaignCharacterSheetPdf(
   const variant = options.variant ?? 'complete';
   const needsArtwork = variant === 'complete' || variant === 'share';
   const artwork = needsArtwork ? await loadArtwork(options) : {};
-  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-  doc.setProperties({
-    title: `${characterName} - ${pdfVariantTitle(variant, language)}`,
-    subject: pdfVariantTitle(variant, language),
-    author: 'QuestKeeper',
-    creator: 'QuestKeeper',
-  });
+  activeInterfaceText = options.interfaceText;
+  try {
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    doc.setProperties({
+      title: `${characterName} - ${pdfVariantTitle(variant)}`,
+      subject: pdfVariantTitle(variant),
+      author: 'QuestKeeper',
+      creator: 'QuestKeeper',
+    });
 
-  if (variant === 'game-night') {
-    drawGameNightPage(doc, characterName, sheet, language, options);
-  } else if (variant === 'print') {
-    drawPageOne(doc, characterName, sheet, language, options);
-    doc.addPage();
-    drawPageTwo(doc, characterName, sheet, language);
-  } else {
-    drawProfilePage(doc, characterName, sheet, language, options, artwork);
-    drawStoryPages(doc, characterName, sheet, language, options);
-    if (variant === 'complete') {
-      doc.addPage();
+    if (variant === 'game-night') {
+      drawGameNightPage(doc, characterName, sheet, language, options);
+    } else if (variant === 'print') {
       drawPageOne(doc, characterName, sheet, language, options);
       doc.addPage();
       drawPageTwo(doc, characterName, sheet, language);
+    } else {
+      drawProfilePage(doc, characterName, sheet, language, options, artwork);
+      drawStoryPages(doc, characterName, sheet, language, options);
+      if (variant === 'complete') {
+        doc.addPage();
+        drawPageOne(doc, characterName, sheet, language, options);
+        doc.addPage();
+        drawPageTwo(doc, characterName, sheet, language);
+      }
     }
-  }
-  drawPageNumbers(doc, language);
+    drawPageNumbers(doc);
 
-  return doc.output('blob');
+    return doc.output('blob');
+  } finally {
+    activeInterfaceText = undefined;
+  }
 }
 
-function pdfVariantTitle(variant: CampaignPdfVariant, language: CampaignPdfLanguage): string {
-  const italian = language === 'it';
+function pdfVariantTitle(variant: CampaignPdfVariant): string {
   switch (variant) {
     case 'print':
-      return italian ? 'Scheda personaggio da stampare' : 'Printable character sheet';
+      return pdfText('characterPdf.variants.print.title');
     case 'share':
-      return italian ? 'Dossier pubblico del personaggio' : 'Public character dossier';
+      return pdfText('characterPdf.variants.share.title');
     case 'game-night':
-      return italian ? 'Scheda rapida per la sessione' : 'Game-night quick sheet';
+      return pdfText('characterPdf.variants.gameNight.title');
     default:
-      return italian ? "Dossier completo dell'avventuriero" : 'Complete adventurer dossier';
+      return pdfText('characterPdf.variants.complete.title');
   }
 }
 
@@ -214,7 +229,7 @@ function drawProfilePage(
     characterName,
     sheet,
     language,
-    language === 'it' ? "Dossier dell'avventuriero" : 'Adventurer dossier',
+    pdfText('characterPdf.document.adventurerDossier'),
   );
 
   const tokenSize = 30;
@@ -242,12 +257,12 @@ function drawProfilePage(
   }
   doc.setFontSize(9);
   doc.text(
-    `${sheet.race} | ${sheet.classType} | ${language === 'it' ? 'Livello' : 'Level'} ${sheet.level}`,
+    `${sheet.race} | ${sheet.classType} | ${pdfText('characterPdf.document.level')} ${sheet.level}`,
     47,
     identityY,
   );
 
-  const chapterLabel = language === 'it' ? `Capitolo ${sheet.level}` : `Chapter ${sheet.level}`;
+  const chapterLabel = pdfText('characterPdf.document.chapter', { level: sheet.level });
   const chapterTitle = options.chapterTitle;
   const chapterText =
     chapterTitle === undefined
@@ -276,27 +291,17 @@ function drawProfilePage(
 
   const profile = options.publicProfile;
   if (profile === undefined) {
-    sectionTitle(
-      doc,
-      language === 'it' ? 'Profilo pubblico' : 'Public profile',
-      79,
-      PAGE.margin,
-      110,
-    );
+    sectionTitle(doc, pdfText('characterPdf.document.publicProfile'), 79, PAGE.margin, 110);
     doc.setFont('times', 'italic');
     doc.setTextColor(...COLOR.muted);
     doc.setFontSize(9);
-    doc.text(
-      language === 'it' ? 'Profilo ancora da raccontare.' : 'This profile is still being written.',
-      PAGE.margin,
-      89,
-    );
+    doc.text(pdfText('characterPdf.document.profilePending'), PAGE.margin, 89);
     return;
   }
 
   drawProfileText(
     doc,
-    language === 'it' ? 'Storia' : 'Backstory',
+    pdfText('characterPdf.document.backstory'),
     localized(profile.backstory, language, options.localeRegistry),
     PAGE.margin,
     78,
@@ -308,7 +313,7 @@ function drawProfilePage(
   const knownY = 145;
   const knownEnd = drawProfileText(
     doc,
-    language === 'it' ? 'Storia conosciuta' : 'Known history',
+    pdfText('characterPdf.document.knownHistory'),
     localized(profile.knownHistory, language, options.localeRegistry),
     PAGE.margin,
     knownY,
@@ -322,7 +327,7 @@ function drawProfilePage(
   const columnWidth = (PAGE.contentWidth - columnGap) / 2;
   let leftY = drawProfileText(
     doc,
-    language === 'it' ? 'Tratti caratteriali' : 'Personality traits',
+    pdfText('characterPdf.document.traits'),
     localized(profile.traits, language, options.localeRegistry),
     PAGE.margin,
     detailsY,
@@ -332,7 +337,7 @@ function drawProfilePage(
   );
   leftY = drawProfileText(
     doc,
-    language === 'it' ? 'Ideali' : 'Ideals',
+    pdfText('characterPdf.document.ideals'),
     localized(profile.ideals, language, options.localeRegistry),
     PAGE.margin,
     leftY + 4,
@@ -344,7 +349,7 @@ function drawProfilePage(
   const rightX = PAGE.margin + columnWidth + columnGap;
   let rightY = drawProfileText(
     doc,
-    language === 'it' ? 'Legami' : 'Bonds',
+    pdfText('characterPdf.document.bonds'),
     localized(profile.bonds, language, options.localeRegistry),
     rightX,
     detailsY,
@@ -354,7 +359,7 @@ function drawProfilePage(
   );
   rightY = drawProfileText(
     doc,
-    language === 'it' ? 'Difetti' : 'Flaws',
+    pdfText('characterPdf.document.flaws'),
     localized(profile.flaws, language, options.localeRegistry),
     rightX,
     rightY + 4,
@@ -370,13 +375,7 @@ function drawProfilePage(
     drawJourneySummary(doc, sheet, language, journeyY);
   } else {
     doc.addPage();
-    drawHeader(
-      doc,
-      characterName,
-      sheet,
-      language,
-      language === 'it' ? 'Sigillo del viaggio' : 'Journey seal',
-    );
+    drawHeader(doc, characterName, sheet, language, pdfText('characterPdf.document.journeySeal'));
     drawJourneySummary(doc, sheet, language, 38);
   }
 }
@@ -389,17 +388,17 @@ function drawJourneySummary(
 ): void {
   sectionTitle(
     doc,
-    language === 'it' ? 'Sigillo del viaggio' : 'Journey seal',
+    pdfText('characterPdf.document.journeySeal'),
     y,
     PAGE.margin,
     PAGE.contentWidth,
   );
 
   const entries: ReadonlyArray<readonly [string, string]> = [
-    [language === 'it' ? 'Livello' : 'Level', String(sheet.level)],
+    [pdfText('characterPdf.document.level'), String(sheet.level)],
     ['HP', `${sheet.hitPoints}/${sheet.maxHitPoints}`],
     ['AC', String(sheet.armorClass)],
-    [language === 'it' ? 'Competenza' : 'Proficiency', `+${sheet.proficiencyBonus}`],
+    [pdfText('characterPdf.document.proficiency'), `+${sheet.proficiencyBonus}`],
     ['XP', String(sheet.experiencePoints)],
   ];
   const gap = 3;
@@ -425,7 +424,7 @@ function drawJourneySummary(
 function formatRecordedDate(value: string, language: CampaignPdfLanguage): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-  return new Intl.DateTimeFormat(language === 'it' ? 'it-IT' : 'en-GB', {
+  return new Intl.DateTimeFormat(language, {
     day: '2-digit',
     month: 'long',
     year: 'numeric',
@@ -448,7 +447,7 @@ function drawStoryPages(
     let continuation = false;
 
     while (remainingLines.length > 0) {
-      const continuationLabel = language === 'it' ? 'continua' : 'continued';
+      const continuationLabel = pdfText('characterPdf.document.continued');
       const heading = continuation ? `${entry.heading} - ${continuationLabel}` : entry.heading;
       const headingLines = doc.splitTextToSize(heading, PAGE.contentWidth - 4) as string[];
       const headingHeight = headingLines.length * 4.1 + 2;
@@ -491,14 +490,8 @@ function startStoryPage(
   language: CampaignPdfLanguage,
 ): number {
   doc.addPage();
-  drawHeader(
-    doc,
-    characterName,
-    sheet,
-    language,
-    language === 'it' ? 'Storia pubblica e ricordi' : 'Public story & memories',
-  );
-  sectionTitle(doc, language === 'it' ? 'Il viaggio fin qui' : 'The journey so far', 36);
+  drawHeader(doc, characterName, sheet, language, pdfText('characterPdf.document.publicStory'));
+  sectionTitle(doc, pdfText('characterPdf.document.journeySoFar'), 36);
   return 45;
 }
 
@@ -512,12 +505,12 @@ function storyEntries(
 
   if (profile !== undefined) {
     for (const [heading, body] of [
-      [language === 'it' ? 'Storia completa' : 'Complete backstory', profile.backstory],
-      [language === 'it' ? 'Storia conosciuta' : 'Known history', profile.knownHistory],
-      [language === 'it' ? 'Tratti caratteriali' : 'Personality traits', profile.traits],
-      [language === 'it' ? 'Ideali' : 'Ideals', profile.ideals],
-      [language === 'it' ? 'Legami' : 'Bonds', profile.bonds],
-      [language === 'it' ? 'Difetti' : 'Flaws', profile.flaws],
+      [pdfText('characterPdf.document.completeBackstory'), profile.backstory],
+      [pdfText('characterPdf.document.knownHistory'), profile.knownHistory],
+      [pdfText('characterPdf.document.traits'), profile.traits],
+      [pdfText('characterPdf.document.ideals'), profile.ideals],
+      [pdfText('characterPdf.document.bonds'), profile.bonds],
+      [pdfText('characterPdf.document.flaws'), profile.flaws],
     ] as const) {
       entries.push({
         heading,
@@ -528,7 +521,7 @@ function storyEntries(
 
   if (profile?.hobbies !== undefined) {
     entries.push({
-      heading: language === 'it' ? 'Interessi e quiete' : 'Interests & comforts',
+      heading: pdfText('characterPdf.document.interests'),
       body: cleanPdfText(localized(profile.hobbies, language, registry)),
     });
   }
@@ -540,13 +533,13 @@ function storyEntries(
   }
   for (const item of profile?.signatureItems ?? []) {
     entries.push({
-      heading: `${language === 'it' ? 'Oggetto significativo' : 'Signature item'} - ${cleanPdfText(localized(item.name, language, registry))}`,
+      heading: `${pdfText('characterPdf.document.signatureItem')} - ${cleanPdfText(localized(item.name, language, registry))}`,
       body: cleanPdfText(localized(item.description, language, registry)),
     });
   }
   for (const moment of profile?.favouriteMoments ?? []) {
     entries.push({
-      heading: `${language === 'it' ? 'Momento del cuore' : 'Favourite moment'} - ${cleanPdfText(localized(moment.title, language, registry))}`,
+      heading: `${pdfText('characterPdf.document.favouriteMoment')} - ${cleanPdfText(localized(moment.title, language, registry))}`,
       body: cleanPdfText(localized(moment.summary, language, registry)),
     });
   }
@@ -565,14 +558,14 @@ function storyEntries(
     .slice(0, 3);
   for (const memory of recentDiary) {
     entries.push({
-      heading: `${language === 'it' ? 'Memoria' : 'Memory'} - ${cleanPdfText(localized(memory.title, language, registry))}`,
+      heading: `${pdfText('characterPdf.document.memory')} - ${cleanPdfText(localized(memory.title, language, registry))}`,
       body: excerpt(cleanPdfText(localized(memory.content, language, registry)), 420),
     });
   }
   for (const quote of (options.quotes ?? []).slice(-3)) {
     const context = quote.context === undefined ? '' : localized(quote.context, language, registry);
     entries.push({
-      heading: language === 'it' ? 'Parole ricordate' : 'Remembered words',
+      heading: pdfText('characterPdf.document.rememberedWords'),
       body: `“${cleanPdfText(localized(quote.text, language, registry))}”${context ? ` - ${cleanPdfText(context)}` : ''}`,
     });
   }
@@ -587,13 +580,7 @@ function drawGameNightPage(
   language: CampaignPdfLanguage,
   options: CampaignCharacterPdfOptions,
 ): void {
-  drawHeader(
-    doc,
-    characterName,
-    sheet,
-    language,
-    language === 'it' ? 'Scheda rapida per la sessione' : 'Game-night quick sheet',
-  );
+  drawHeader(doc, characterName, sheet, language, pdfText('characterPdf.document.gameNightSheet'));
   let y = drawIdentity(doc, sheet, language, 35, options.identityLabels);
   y = drawCombatSummary(doc, sheet, language, y + 5);
   y = drawAbilityScores(doc, sheet, language, y + 6);
@@ -603,7 +590,7 @@ function drawGameNightPage(
   );
   const slots = (sheet.spellcasting?.slots ?? []).map((slot) => {
     const remaining = Math.max(0, slot.total - (slot.used ?? 0));
-    return `${language === 'it' ? 'Liv.' : 'Lv.'} ${slot.level}: ${remaining}/${slot.total}`;
+    return `${pdfText('characterPdf.document.levelShort')} ${slot.level}: ${remaining}/${slot.total}`;
   });
   const equipped = inventoryViews(sheet)
     .filter((item) => item.equipped)
@@ -611,23 +598,13 @@ function drawGameNightPage(
 
   y = drawCompactList(
     doc,
-    language === 'it' ? 'Risorse e slot' : 'Resources & slots',
+    pdfText('characterPdf.document.resources'),
     [...resources, ...slots],
     y + 7,
   );
-  y = drawCompactList(
-    doc,
-    language === 'it' ? 'Equipaggiamento pronto' : 'Ready equipment',
-    equipped,
-    y + 5,
-  );
-  y = drawCompactList(doc, language === 'it' ? 'Incantesimi' : 'Spells', sheet.spells ?? [], y + 5);
-  drawCompactList(
-    doc,
-    language === 'it' ? 'Privilegi da ricordare' : 'Features to remember',
-    sheet.features,
-    y + 5,
-  );
+  y = drawCompactList(doc, pdfText('characterPdf.document.readyEquipment'), equipped, y + 5);
+  y = drawCompactList(doc, pdfText('characterPdf.document.spells'), sheet.spells ?? [], y + 5);
+  drawCompactList(doc, pdfText('characterPdf.document.featuresReminder'), sheet.features, y + 5);
 }
 
 function drawCompactList(
@@ -671,13 +648,7 @@ function drawPageOne(
   language: CampaignPdfLanguage,
   options: CampaignCharacterPdfOptions,
 ): void {
-  drawHeader(
-    doc,
-    characterName,
-    sheet,
-    language,
-    language === 'it' ? 'Scheda personaggio' : 'Character sheet',
-  );
+  drawHeader(doc, characterName, sheet, language, pdfText('characterPdf.document.characterSheet'));
 
   let y = 35;
   y = drawIdentity(doc, sheet, language, y, options.identityLabels);
@@ -692,18 +663,12 @@ function drawPageTwo(
   sheet: CharacterSheet,
   language: CampaignPdfLanguage,
 ): void {
-  drawHeader(
-    doc,
-    characterName,
-    sheet,
-    language,
-    language === 'it' ? 'Dotazioni e magia' : 'Equipment & spellcasting',
-  );
+  drawHeader(doc, characterName, sheet, language, pdfText('characterPdf.document.equipmentMagic'));
   let y = 35;
 
   y = drawFeatureAndInventoryColumns(doc, sheet, language, y);
   y = drawSpellcasting(doc, characterName, sheet, language, y + 6);
-  drawNotes(doc, language, y + 7);
+  drawNotes(doc, y + 7);
 }
 
 function drawHeader(
@@ -727,7 +692,7 @@ function drawHeader(
   doc.setFont('times', 'italic');
   doc.setTextColor(...COLOR.white);
   doc.setFontSize(9);
-  const classLine = `${sheet.race} | ${sheet.classType}${sheet.subclass ? ` (${sheet.subclass})` : ''} | ${language === 'it' ? 'Livello' : 'Level'} ${sheet.level}`;
+  const classLine = `${sheet.race} | ${sheet.classType}${sheet.subclass ? ` (${sheet.subclass})` : ''} | ${pdfText('characterPdf.document.level')} ${sheet.level}`;
   doc.text(classLine, PAGE.margin, 20);
 
   doc.setFont('times', 'bold');
@@ -747,11 +712,11 @@ function drawIdentity(
   identityLabels: CampaignCharacterPdfOptions['identityLabels'],
 ): number {
   const labels = [
-    `${identityLabels?.classType ?? (language === 'it' ? 'Classe' : 'Class')} ${language === 'it' ? 'e livello' : '& level'}`,
+    identityLabels?.classType ?? pdfText('characterPdf.document.classLevel'),
     identityLabels?.background ?? 'Background',
-    identityLabels?.race ?? (language === 'it' ? 'Razza' : 'Race'),
-    language === 'it' ? 'Allineamento' : 'Alignment',
-    language === 'it' ? 'Punti esperienza' : 'Experience points',
+    identityLabels?.race ?? pdfText('characterPdf.document.race'),
+    pdfText('characterPdf.document.alignment'),
+    pdfText('characterPdf.document.experience'),
   ];
   const values = [
     `${sheet.classType}${sheet.subclass ? ` - ${sheet.subclass}` : ''} ${sheet.level}`,
@@ -792,31 +757,21 @@ function drawCombatSummary(
   language: CampaignPdfLanguage,
   y: number,
 ): number {
-  sectionTitle(doc, language === 'it' ? 'Combattimento' : 'Combat', y);
+  sectionTitle(doc, pdfText('characterPdf.document.combat'), y);
   const dexterity = modifier(sheet.abilityScores.dexterity);
   const passivePerception =
     10 +
     modifier(sheet.abilityScores.wisdom) +
     (hasProficiency(sheet.skills, 'Perception', 'Percezione') ? sheet.proficiencyBonus : 0);
 
-  const headers =
-    language === 'it'
-      ? [
-          'Classe Armatura',
-          'Iniziativa',
-          'Velocità',
-          'Punti Ferita',
-          'Bonus Competenza',
-          'Percezione Passiva',
-        ]
-      : [
-          'Armor Class',
-          'Initiative',
-          'Speed',
-          'Hit Points',
-          'Proficiency Bonus',
-          'Passive Perception',
-        ];
+  const headers = [
+    pdfText('characterPdf.document.armorClass'),
+    pdfText('characterPdf.document.initiative'),
+    pdfText('characterPdf.document.speed'),
+    pdfText('characterPdf.document.hitPoints'),
+    pdfText('characterPdf.document.proficiencyBonus'),
+    pdfText('characterPdf.document.passivePerception'),
+  ];
   const values = [
     String(sheet.armorClass),
     signed(dexterity),
@@ -856,9 +811,9 @@ function drawAbilityScores(
   language: CampaignPdfLanguage,
   y: number,
 ): number {
-  sectionTitle(doc, language === 'it' ? 'Caratteristiche' : 'Ability Scores', y);
+  sectionTitle(doc, pdfText('characterPdf.document.abilityScores'), y);
   const headers = ABILITIES.map((ability) =>
-    language === 'it' ? ability.abbreviationIt : ability.abbreviationEn,
+    localized({ en: ability.abbreviationEn, it: ability.abbreviationIt }, language),
   );
   const values = ABILITIES.map((ability) => String(sheet.abilityScores[ability.key]));
   const modifiers = ABILITIES.map((ability) => signed(modifier(sheet.abilityScores[ability.key])));
@@ -899,18 +854,12 @@ function drawProficiencyColumns(
   const rightX = PAGE.margin + leftWidth + gap;
   const rightWidth = PAGE.contentWidth - leftWidth - gap;
 
-  sectionTitle(
-    doc,
-    language === 'it' ? 'Tiri salvezza' : 'Saving Throws',
-    y,
-    PAGE.margin,
-    leftWidth,
-  );
+  sectionTitle(doc, pdfText('characterPdf.document.savingThrows'), y, PAGE.margin, leftWidth);
   const savingRows = ABILITIES.map((ability) => {
     const proficient = hasProficiency(sheet.savingThrows, ability.en, ability.it);
     const value =
       modifier(sheet.abilityScores[ability.key]) + (proficient ? sheet.proficiencyBonus : 0);
-    return [proficient ? 'X' : '', language === 'it' ? ability.it : ability.en, signed(value)];
+    return [proficient ? 'X' : '', localized(ability, language), signed(value)];
   });
   autoTable(doc, {
     startY: y + 4,
@@ -936,7 +885,7 @@ function drawProficiencyColumns(
   const savingEnd = tableEnd(doc);
   sectionTitle(
     doc,
-    language === 'it' ? 'Lingue' : 'Languages',
+    pdfText('characterPdf.document.languages'),
     savingEnd + 6,
     PAGE.margin,
     leftWidth,
@@ -947,15 +896,15 @@ function drawProficiencyColumns(
   const languageLines = doc.splitTextToSize(sheet.languages.join(' | '), leftWidth - 4) as string[];
   doc.text(languageLines, PAGE.margin + 2, savingEnd + 15);
 
-  sectionTitle(doc, language === 'it' ? 'Abilità' : 'Skills', y, rightX, rightWidth);
+  sectionTitle(doc, pdfText('characterPdf.document.skills'), y, rightX, rightWidth);
   const skillRows = SKILLS.map((skill) => {
     const proficient = hasProficiency(sheet.skills, skill.en, skill.it);
     const value =
       modifier(sheet.abilityScores[skill.ability]) + (proficient ? sheet.proficiencyBonus : 0);
     return [
       proficient ? 'X' : '',
-      language === 'it' ? skill.it : skill.en,
-      language === 'it' ? abilityAbbreviation(skill.ability, 'it') : skill.abbreviation,
+      localized({ en: skill.en, it: skill.it }, language),
+      abilityAbbreviation(skill.ability, language),
       signed(value),
     ];
   });
@@ -991,15 +940,9 @@ function drawFeatureAndInventoryColumns(
   const gap = 6;
   const columnWidth = (PAGE.contentWidth - gap) / 2;
   const rightX = PAGE.margin + columnWidth + gap;
-  const emptyValue = language === 'it' ? 'Nessuna voce registrata' : 'No entries recorded';
+  const emptyValue = pdfText('characterPdf.document.empty');
 
-  sectionTitle(
-    doc,
-    language === 'it' ? 'Privilegi e tratti' : 'Features & Traits',
-    y,
-    PAGE.margin,
-    columnWidth,
-  );
+  sectionTitle(doc, pdfText('characterPdf.document.featuresTraits'), y, PAGE.margin, columnWidth);
   autoTable(doc, {
     startY: y + 4,
     margin: { left: PAGE.margin, right: PAGE.width - PAGE.margin - columnWidth },
@@ -1018,19 +961,15 @@ function drawFeatureAndInventoryColumns(
   });
   const featureEnd = tableEnd(doc);
 
-  sectionTitle(doc, language === 'it' ? 'Inventario' : 'Inventory', y, rightX, columnWidth);
+  sectionTitle(doc, pdfText('characterPdf.document.inventory'), y, rightX, columnWidth);
   const inventoryRows: string[][] = [];
   const inventory = inventoryViews(sheet).map((item) => {
     const quantity = item.quantity > 1 ? ` ×${item.quantity}` : '';
     const attunement =
       item.attunement === 'attuned'
-        ? language === 'it'
-          ? ' · in sintonia'
-          : ' · attuned'
+        ? pdfText('characterPdf.document.attuned')
         : item.attunement === 'required'
-          ? language === 'it'
-            ? ' · sintonia richiesta'
-            : ' · attunement required'
+          ? pdfText('characterPdf.document.attunementRequired')
           : '';
     return `${item.name}${quantity}${attunement}`;
   });
@@ -1067,7 +1006,7 @@ function drawCurrency(
   y: number,
 ): void {
   const currency = sheet.currency;
-  sectionTitle(doc, language === 'it' ? 'Monete' : 'Currency', y);
+  sectionTitle(doc, pdfText('characterPdf.document.currency'), y);
   const headers = ['PP', 'GP', 'EP', 'SP', 'CP'];
   const values = [
     currency?.pp ?? 0,
@@ -1106,7 +1045,7 @@ function drawSpellcasting(
   const resolvedSpells = (sheet.spells ?? []).map(resolveSpell);
   if (resolvedSpells.length === 0) return y;
 
-  sectionTitle(doc, language === 'it' ? 'Magia' : 'Spellcasting', y);
+  sectionTitle(doc, pdfText('characterPdf.document.spellcasting'), y);
   const spellcasting = sheet.spellcasting;
   let tableY = y + 4;
 
@@ -1114,15 +1053,17 @@ function drawSpellcasting(
     const spellModifier = modifier(sheet.abilityScores[spellcasting.ability]);
     const saveDC = spellcasting.spellSaveDC ?? 8 + sheet.proficiencyBonus + spellModifier;
     const attackBonus = spellcasting.spellAttackBonus ?? sheet.proficiencyBonus + spellModifier;
-    const metaHeaders =
-      language === 'it'
-        ? ['Caratteristica', 'CD Incantesimi', 'Bonus Attacco', 'Slot disponibili']
-        : ['Ability', 'Spell Save DC', 'Attack Bonus', 'Available Slots'];
+    const metaHeaders = [
+      pdfText('characterPdf.document.ability'),
+      pdfText('characterPdf.document.spellSaveDc'),
+      pdfText('characterPdf.document.attackBonus'),
+      pdfText('characterPdf.document.availableSlots'),
+    ];
     const slotLabel =
       (spellcasting.slots ?? [])
         .map(
           (slot) =>
-            `${language === 'it' ? 'Liv.' : 'Lv.'} ${slot.level}: ${slot.total - (slot.used ?? 0)}/${slot.total}`,
+            `${pdfText('characterPdf.document.levelShort')} ${slot.level}: ${slot.total - (slot.used ?? 0)}/${slot.total}`,
         )
         .join(' | ') || '-';
     const metaValues = [
@@ -1156,12 +1097,12 @@ function drawSpellcasting(
     if (spell === undefined) return ['-', resolved.originalName, '-', '-', '-', '-'];
     const school = SPELL_SCHOOLS[spell.school] ?? { en: spell.school, it: spell.school };
     return [
-      spell.level === 0 ? (language === 'it' ? 'Trucc.' : 'Cantrip') : String(spell.level),
-      language === 'it' ? spell.it : spell.en,
-      language === 'it' ? school.it : school.en,
-      language === 'it' ? spell.castingTimeIt : spell.castingTimeEn,
-      language === 'it' ? spell.rangeIt : spell.rangeEn,
-      language === 'it' ? spell.durationIt : spell.durationEn,
+      spell.level === 0 ? pdfText('characterPdf.document.cantripShort') : String(spell.level),
+      localized({ en: spell.en, it: spell.it }, language),
+      localized(school, language),
+      localized({ en: spell.castingTimeEn, it: spell.castingTimeIt }, language),
+      localized({ en: spell.rangeEn, it: spell.rangeIt }, language),
+      localized({ en: spell.durationEn, it: spell.durationIt }, language),
     ];
   });
   // The public template deliberately ships without a proprietary rules
@@ -1174,12 +1115,12 @@ function drawSpellcasting(
     margin: { top: 35, right: PAGE.margin, bottom: 18, left: PAGE.margin },
     head: [
       [
-        language === 'it' ? 'Liv.' : 'Lvl',
-        language === 'it' ? 'Incantesimo' : 'Spell',
-        language === 'it' ? 'Scuola' : 'School',
-        language === 'it' ? 'Lancio' : 'Cast',
-        language === 'it' ? 'Gittata' : 'Range',
-        language === 'it' ? 'Durata' : 'Duration',
+        pdfText('characterPdf.document.levelShort'),
+        pdfText('characterPdf.document.spell'),
+        pdfText('characterPdf.document.school'),
+        pdfText('characterPdf.document.cast'),
+        pdfText('characterPdf.document.range'),
+        pdfText('characterPdf.document.duration'),
       ],
     ],
     body: spellRows,
@@ -1209,7 +1150,7 @@ function drawSpellcasting(
         characterName,
         sheet,
         language,
-        language === 'it' ? 'Dotazioni e magia - continua' : 'Equipment & spellcasting - continued',
+        `${pdfText('characterPdf.document.equipmentMagic')} - ${pdfText('characterPdf.document.continued')}`,
       );
     },
     didDrawCell: (data: CellHookData): void => {
@@ -1223,19 +1164,13 @@ function drawSpellcasting(
   doc.setFont('times', 'italic');
   doc.setFontSize(6.5);
   doc.setTextColor(...COLOR.muted);
-  doc.text(
-    language === 'it'
-      ? 'I nomi degli incantesimi sono cliccabili e aprono la descrizione completa nel Compendio.'
-      : 'Spell names are clickable and open their full descriptions in the Compendium.',
-    PAGE.margin,
-    tableEnd(doc) + 4,
-  );
+  doc.text(pdfText('characterPdf.document.spellReferenceNote'), PAGE.margin, tableEnd(doc) + 4);
   return tableEnd(doc) + 8;
 }
 
-function drawNotes(doc: jsPDF, language: CampaignPdfLanguage, y: number): void {
+function drawNotes(doc: jsPDF, y: number): void {
   if (y > 260) return;
-  sectionTitle(doc, language === 'it' ? 'Note' : 'Notes', y);
+  sectionTitle(doc, pdfText('characterPdf.document.notes'), y);
   doc.setDrawColor(...COLOR.line);
   doc.setLineWidth(0.2);
   const bottom = PAGE.height - 14;
@@ -1244,7 +1179,7 @@ function drawNotes(doc: jsPDF, language: CampaignPdfLanguage, y: number): void {
   }
 }
 
-function drawPageNumbers(doc: jsPDF, language: CampaignPdfLanguage): void {
+function drawPageNumbers(doc: jsPDF): void {
   const pages = doc.getNumberOfPages();
   for (let page = 1; page <= pages; page++) {
     doc.setPage(page);
@@ -1252,7 +1187,7 @@ function drawPageNumbers(doc: jsPDF, language: CampaignPdfLanguage): void {
     doc.setFontSize(6.5);
     doc.setTextColor(...COLOR.muted);
     doc.text(
-      `${language === 'it' ? 'Pagina' : 'Page'} ${page} / ${pages}`,
+      pdfText('characterPdf.document.page', { page, pages }),
       PAGE.width - PAGE.margin,
       PAGE.height - 6,
       { align: 'right' },
@@ -1453,7 +1388,7 @@ function hasProficiency(
 function abilityAbbreviation(ability: AbilityKey, language: CampaignPdfLanguage): string {
   const definition = ABILITIES.find((entry) => entry.key === ability);
   if (definition === undefined) return ability.slice(0, 3).toUpperCase();
-  return language === 'it' ? definition.abbreviationIt : definition.abbreviationEn;
+  return localized({ en: definition.abbreviationEn, it: definition.abbreviationIt }, language);
 }
 
 function resolveSpell(originalName: string): ResolvedSpell {

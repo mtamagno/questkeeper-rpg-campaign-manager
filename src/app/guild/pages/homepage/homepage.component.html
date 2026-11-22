@@ -5,7 +5,7 @@
       <img
         class="homepage__hero-image"
         [src]="imgUrl"
-        alt="The adventuring party"
+        [alt]="uiText.text('homepage.heroAlt')"
         loading="eager"
         decoding="async"
         fetchpriority="high"
@@ -14,7 +14,7 @@
     <div class="homepage__atmosphere" aria-hidden="true"></div>
     <div class="homepage__hero-overlay">
       <span class="homepage__eyebrow">
-        {{ lang() === 'it' ? 'Cronache della campagna' : 'Campaign chronicles' }}
+        {{ uiText.text('homepage.eyebrow') }}
       </span>
       @if (rulesetIdentity(); as ruleset) {
         <span class="homepage__ruleset" [attr.aria-label]="ruleset.label">
@@ -56,45 +56,30 @@
       <div class="homepage__pulse-copy">
         <span class="homepage__pulse-kicker">
           {{
-            sessionCount() === 0
-              ? lang() === 'it'
-                ? 'Il viaggio sta per cominciare'
-                : 'The journey is about to begin'
-              : lang() === 'it'
-                ? 'Il viaggio finora'
-                : 'The journey so far'
+            uiText.text(
+              sessionCount() === 0 ? 'homepage.newJourneyKicker' : 'homepage.journeyKicker'
+            )
           }}
         </span>
         <h2 id="campaign-pulse-title" class="homepage__pulse-title">
           {{
-            sessionCount() === 0
-              ? lang() === 'it'
-                ? 'Le nebbie attendono gli avventurieri'
-                : 'The mists await the adventurers'
-              : lang() === 'it'
-                ? 'La leggenda continua'
-                : 'The legend continues'
+            uiText.text(sessionCount() === 0 ? 'homepage.newJourneyTitle' : 'homepage.journeyTitle')
           }}
         </h2>
         <p class="homepage__pulse-text">
           {{
-            sessionCount() === 0
-              ? lang() === 'it'
-                ? 'La compagnia è riunita. Dopo la prima sessione, qui compariranno cronache, incontri e luoghi scoperti.'
-                : 'The company is assembled. After the first session, chronicles, encounters, and discovered places will appear here.'
-              : lang() === 'it'
-                ? 'Ritrova rapidamente i protagonisti, gli incontri e i luoghi che hanno segnato la campagna.'
-                : 'Quickly return to the heroes, encounters, and places that shaped the campaign.'
+            uiText.text(
+              sessionCount() === 0
+                ? 'homepage.newJourneyDescription'
+                : 'homepage.journeyDescription'
+            )
           }}
         </p>
       </div>
 
-      <nav
-        class="homepage__metrics"
-        [attr.aria-label]="lang() === 'it' ? 'Destinazioni principali' : 'Primary destinations'"
-      >
+      <nav class="homepage__metrics" [attr.aria-label]="uiText.text('homepage.destinationsLabel')">
         <a class="homepage__metric" [routerLink]="['/', cId, 'party']" appSfxHover>
-          <span>{{ lang() === 'it' ? 'Avventurieri' : 'Adventurers' }}</span>
+          <span>{{ uiText.text('homepage.adventurers') }}</span>
           <strong>{{ partyCount() }}</strong>
         </a>
         <a class="homepage__metric" [routerLink]="['/', cId, 'npcs']" appSfxHover>
@@ -102,11 +87,11 @@
           <strong>{{ npcCount() }}</strong>
         </a>
         <a class="homepage__metric" [routerLink]="['/', cId, 'campaign']" appSfxHover>
-          <span>{{ lang() === 'it' ? 'Sessioni' : 'Sessions' }}</span>
+          <span>{{ uiText.text('homepage.sessions') }}</span>
           <strong>{{ sessionCount() }}</strong>
         </a>
         <a class="homepage__metric" [routerLink]="['/', cId, 'maps']" appSfxHover>
-          <span>{{ lang() === 'it' ? 'Luoghi' : 'Places' }}</span>
+          <span>{{ uiText.text('homepage.places') }}</span>
           <strong>{{ mapCount() }}</strong>
         </a>
       </nav>

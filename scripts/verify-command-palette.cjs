@@ -4,12 +4,14 @@ const path = require('node:path');
 
 const root = path.resolve(__dirname, '..');
 const read = (relativePath) => fs.readFileSync(path.join(root, relativePath), 'utf8');
+const readJson = (relativePath) => JSON.parse(read(relativePath));
 
 const component = read('src/app/guild/components/site-command-bar/site-command-bar.component.ts');
 const template = read('src/app/guild/components/site-command-bar/site-command-bar.component.html');
 const styles = read('src/app/guild/components/site-command-bar/site-command-bar.component.scss');
 const roadmap = read('docs/ROADMAP-60-DAYS.md');
 const guide = read('docs/GLOBAL-COMMAND-PALETTE.md');
+const uiCatalog = readJson('src/app/guild/i18n/ui.json');
 
 for (const phrase of [
   "scope: 'current'",
@@ -46,13 +48,16 @@ for (const phrase of [
   'role="option"',
   'aria-live="polite"',
   'aria-keyshortcuts="Control+K Meta+K"',
-  'Pagina attuale',
-  'Current page',
   'aria-controls="command-bar-overflow"',
   '[hidden]="!isActionsOpen()"',
 ]) {
   assert.ok(template.includes(phrase), `Accessible palette UI is missing: ${phrase}`);
 }
+
+assert.match(component, /uiText\.text\(`commandBar\.scopes\.\$\{command\.scope\}`\)/);
+assert.match(template, /uiText\.text\('commandBar\.palette\.currentPage'\)/);
+assert.equal(uiCatalog.locales.en.texts.commandBar.palette.currentPage, 'Current page');
+assert.equal(uiCatalog.locales.it.texts.commandBar.palette.currentPage, 'Pagina attuale');
 
 assert.match(styles, /&--active/);
 assert.match(styles, /prefers-reduced-motion: reduce/);

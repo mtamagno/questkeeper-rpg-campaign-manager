@@ -11,7 +11,7 @@
     <header class="guided-tour__header">
       <div>
         <span class="guided-tour__step">
-          {{ isItalian() ? 'Tappa' : 'Stop' }} {{ stepNumber() }} / {{ totalSteps }}
+          {{ uiText.text('guidedTour.stopLabel') }} {{ stepNumber() }} / {{ totalSteps }}
         </span>
         <span class="guided-tour__kicker">{{ copy().kicker }}</span>
       </div>
@@ -19,9 +19,7 @@
         class="guided-tour__pause"
         type="button"
         (click)="pause()"
-        [attr.aria-label]="
-          isItalian() ? 'Sospendi e continua più tardi' : 'Pause and continue later'
-        "
+        [attr.aria-label]="uiText.text('guidedTour.pause')"
       >
         &times;
       </button>
@@ -30,7 +28,7 @@
     <div
       class="guided-tour__progress"
       role="progressbar"
-      [attr.aria-label]="isItalian() ? 'Progresso del tour' : 'Tour progress'"
+      [attr.aria-label]="uiText.text('guidedTour.progress')"
       [attr.aria-valuenow]="stepNumber()"
       aria-valuemin="1"
       [attr.aria-valuemax]="totalSteps"
@@ -47,7 +45,7 @@
     <footer class="guided-tour__actions">
       @if (tour.state().step > 0) {
         <button class="qk-button qk-button--ghost" type="button" (click)="previous()">
-          {{ isItalian() ? 'Indietro' : 'Back' }}
+          {{ uiText.text('guidedTour.back') }}
         </button>
       }
       <button
@@ -61,7 +59,7 @@
     </footer>
 
     <button class="guided-tour__later" type="button" (click)="pause()">
-      {{ isItalian() ? 'Continua più tardi' : 'Continue later' }}
+      {{ uiText.text('guidedTour.later') }}
     </button>
   </aside>
 }
