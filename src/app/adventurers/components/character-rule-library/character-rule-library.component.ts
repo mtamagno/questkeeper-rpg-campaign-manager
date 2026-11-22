@@ -191,6 +191,7 @@ export class CharacterRuleLibraryComponent {
     categoryId: string,
     spell: SpellEntry,
   ): CharacterSpellCard {
+    // UI-TEXT-DATA-OWNED: local compendium entries ship authored en/it rule fields.
     const italian = this.isItalian();
     const school = SPELL_SCHOOLS[spell.school] ?? { en: spell.school, it: spell.school };
     return {
@@ -218,6 +219,7 @@ export class CharacterRuleLibraryComponent {
       wisdom: ['WIS', 'SAG'],
       charisma: ['CHA', 'CAR'],
     };
+    // UI-TEXT-DATA-OWNED: D&D ability abbreviations are compendium/game data, not product copy.
     return labels[ability][this.isItalian() ? 1 : 0];
   }
 

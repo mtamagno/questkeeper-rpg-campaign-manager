@@ -1,14 +1,10 @@
 <div class="bonds-carousel__toolbar">
   <div>
     <p class="bonds-carousel__eyebrow">
-      {{ lang() === 'it' ? 'Compagni, incontri, promesse' : 'Companions, encounters, promises' }}
+      {{ uiText.text('characterUi.bonds.eyebrow') }}
     </p>
     <p class="bonds-carousel__intro">
-      {{
-        lang() === 'it'
-          ? 'Ogni carta racconta un legame. I sentimenti restano disponibili senza appesantire la prima lettura.'
-          : 'Each card tells a bond. Feelings remain available without weighing down the first read.'
-      }}
+      {{ uiText.text('characterUi.bonds.description') }}
     </p>
   </div>
   @if (visibleBonds().length > 1) {
@@ -16,7 +12,7 @@
       <button
         type="button"
         (click)="scroll(-1)"
-        [attr.aria-label]="lang() === 'it' ? 'Legami precedenti' : 'Previous bonds'"
+        [attr.aria-label]="uiText.text('characterUi.bonds.previous')"
         aria-controls="profile-bond-track"
       >
         ←
@@ -24,7 +20,7 @@
       <button
         type="button"
         (click)="scroll(1)"
-        [attr.aria-label]="lang() === 'it' ? 'Legami successivi' : 'Next bonds'"
+        [attr.aria-label]="uiText.text('characterUi.bonds.next')"
         aria-controls="profile-bond-track"
       >
         →
@@ -38,7 +34,7 @@
   id="profile-bond-track"
   class="bonds-carousel__track"
   tabindex="0"
-  [attr.aria-label]="lang() === 'it' ? 'Legami del personaggio' : 'Character bonds'"
+  [attr.aria-label]="uiText.text('characterUi.bonds.listLabel')"
 >
   @for (bond of visibleBonds(); track bond.key) {
     <li class="bonds-carousel__card">
@@ -56,7 +52,7 @@
       @if (bond.feelings.length > 0) {
         <details class="bonds-carousel__feelings">
           <summary>
-            <span>{{ lang() === 'it' ? 'Cosa prova' : 'How they feel' }}</span
+            <span>{{ uiText.text('characterUi.bonds.feelings') }}</span
             ><strong>{{ bond.feelings.length }}</strong>
           </summary>
           <div class="bonds-carousel__feelings-list">
@@ -68,9 +64,7 @@
                     class="bonds-carousel__feeling-meter"
                     role="img"
                     [attr.aria-label]="
-                      (lang() === 'it' ? 'Intensità ' : 'Intensity ') +
-                      feeling.intensity +
-                      (lang() === 'it' ? ' su 5' : ' out of 5')
+                      uiText.text('characterUi.bonds.intensity', { intensity: feeling.intensity })
                     "
                   >
                     @for (step of feelingScale; track step) {
@@ -85,25 +79,23 @@
         </details>
       } @else {
         <p class="bonds-carousel__feelings-empty">
-          {{ lang() === 'it' ? 'Sentimenti non ancora registrati.' : 'Feelings not recorded yet.' }}
+          {{ uiText.text('characterUi.bonds.emptyFeelings') }}
         </p>
       }
       <a
         class="bonds-carousel__bond-link"
         [routerLink]="['/', campaignId(), 'relationships', bond.sourceId, bond.targetId]"
       >
-        {{ lang() === 'it' ? 'Apri la relazione' : 'Open relationship' }}
+        {{ uiText.text('characterUi.bonds.openRelationship') }}
         @if (bond.sharedMemoryCount > 0) {
           <span
             >· {{ bond.sharedMemoryCount }}
             {{
-              bond.sharedMemoryCount === 1
-                ? lang() === 'it'
-                  ? 'memoria'
-                  : 'memory'
-                : lang() === 'it'
-                  ? 'memorie'
-                  : 'memories'
+              uiText.text(
+                bond.sharedMemoryCount === 1
+                  ? 'characterUi.bonds.memory'
+                  : 'characterUi.bonds.memories'
+              )
             }}</span
           >
         }
@@ -122,18 +114,14 @@
       aria-controls="profile-bond-track"
     >
       {{
-        showAll()
-          ? lang() === 'it'
-            ? 'Mostra meno legami'
-            : 'Show fewer bonds'
-          : lang() === 'it'
-            ? 'Mostra tutti i ' + bonds().length + ' legami'
-            : 'Show all ' + bonds().length + ' bonds'
+        uiText.text(showAll() ? 'characterUi.bonds.showLess' : 'characterUi.bonds.showAll', {
+          count: bonds().length,
+        })
       }}
     </button>
   }
   <a class="bonds-carousel__map-link" [routerLink]="['/', campaignId(), 'party', 'relationships']">
-    {{ lang() === 'it' ? 'Apri la mappa completa' : 'Open the complete map' }}
+    {{ uiText.text('characterUi.bonds.openMap') }}
     <span>· {{ bonds().length }}</span
     ><span aria-hidden="true">→</span>
   </a>

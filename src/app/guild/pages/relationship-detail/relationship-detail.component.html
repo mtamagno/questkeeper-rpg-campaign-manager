@@ -120,6 +120,26 @@
       </section>
     }
 
+    @if (sharedMemories().length > 0) {
+      <section class="rel-detail__section" aria-labelledby="relationship-memories-heading">
+        <h2 id="relationship-memories-heading" class="rel-detail__section-title">
+          ✦ {{ uiText.text('relationshipDetail.sharedMemories') }}
+        </h2>
+        <p class="rel-detail__section-intro">
+          {{ uiText.text('relationshipDetail.sharedMemoriesHelp') }}
+        </p>
+        <div class="rel-detail__memory-links">
+          @for (memory of sharedMemories(); track memory.id) {
+            <a [routerLink]="['/', campaignId() ?? '', 'memories', memory.id]">
+              <span>{{ memory.sessionId }}</span
+              ><strong>{{ memory.title | bilingual }}</strong
+              ><small>{{ uiText.text('relationshipDetail.openMemory') }}</small>
+            </a>
+          }
+        </div>
+      </section>
+    }
+
     <!-- Shared Events Timeline -->
     @if (sharedEvents().length > 0) {
       <section class="rel-detail__section">
@@ -157,6 +177,86 @@
             </blockquote>
           }
         </div>
+      </section>
+    }
+
+    @if (history().length > 0 || promiseHistory().length > 0) {
+      <section class="rel-detail__section" aria-labelledby="relationship-history-heading">
+        <h2 id="relationship-history-heading" class="rel-detail__section-title">
+          ◫ {{ uiText.text('relationshipDetail.historyTitle') }}
+        </h2>
+        <p class="rel-detail__section-intro">{{ uiText.text('relationshipDetail.historyHelp') }}</p>
+        @if (history().length > 0) {
+          <div class="rel-detail__history">
+            @for (entry of history(); track entry.sessionId) {
+              <article class="rel-detail__history-entry">
+                <header>
+                  <strong>{{ entry.sessionId }}</strong>
+                </header>
+                <dl class="rel-detail__dimensions">
+                  @for (
+                    dimension of [
+                      { key: 'trust', label: 'relationshipDetail.trust', value: entry.trust },
+                      { key: 'tension', label: 'relationshipDetail.tension', value: entry.tension },
+                      {
+                        key: 'affection',
+                        label: 'relationshipDetail.affection',
+                        value: entry.affection,
+                      },
+                    ];
+                    track dimension.key
+                  ) {
+                    @if (dimension.value !== undefined) {
+                      <div>
+                        <dt>{{ uiText.text(dimension.label) }}</dt>
+                        <dd>
+                          <span
+                            class="rel-detail__dimension-meter"
+                            role="img"
+                            [attr.aria-label]="
+                              uiText.text('relationshipDetail.dimensionValue', {
+                                label: uiText.text(dimension.label),
+                                value: normalizeHistoryValue(dimension.value),
+                              })
+                            "
+                          >
+                            @for (step of [1, 2, 3, 4, 5]; track step) {
+                              <i
+                                [class.is-active]="step <= normalizeHistoryValue(dimension.value)"
+                              ></i>
+                            }
+                          </span>
+                        </dd>
+                      </div>
+                    }
+                  }
+                </dl>
+                <p>{{ entry.note | bilingual }}</p>
+              </article>
+            }
+          </div>
+        }
+        @if (promiseHistory().length > 0) {
+          <div class="rel-detail__promises">
+            @for (
+              promise of promiseHistory();
+              track promise.promiseId + promise.sessionId + promise.status
+            ) {
+              <article class="rel-detail__promise">
+                <div>
+                  <strong>{{ promise.label | bilingual }}</strong
+                  ><span [attr.data-status]="promise.status">{{
+                    uiText.text('relationshipDetail.promiseStatuses.' + promise.status)
+                  }}</span>
+                </div>
+                @if (promise.note) {
+                  <p>{{ promise.note | bilingual }}</p>
+                }
+                <small>{{ promise.sessionId }}</small>
+              </article>
+            }
+          </div>
+        }
       </section>
     }
 

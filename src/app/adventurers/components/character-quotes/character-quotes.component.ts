@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, input, signal } f
 import { BilingualTextPipe } from '@guild/components/bilingual-text/bilingual-text.pipe';
 import { type CharacterQuote } from '@guild/models/character.model';
 import { LanguageService } from '@guild/services/language.service';
+import { UiTextService } from '@guild/services/uiText.service';
 
 @Component({
   selector: 'app-character-quotes',
@@ -13,6 +14,7 @@ import { LanguageService } from '@guild/services/language.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CharacterQuotesComponent {
+  readonly uiText = inject(UiTextService);
   private readonly languageService = inject(LanguageService);
   readonly quotes = input.required<ReadonlyArray<CharacterQuote>>();
   readonly lang = this.languageService.currentLanguage;

@@ -140,6 +140,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'memories/:memoryId',
+        loadComponent: () =>
+          import('./guild/pages/shared-memory-detail/shared-memory-detail.component').then(
+            (m) => m.SharedMemoryDetailComponent,
+          ),
+      },
+      {
         path: 'gallery',
         loadComponent: () =>
           import('./guild/pages/gallery/gallery.component').then((m) => m.GalleryComponent),

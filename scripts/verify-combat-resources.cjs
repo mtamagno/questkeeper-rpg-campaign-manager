@@ -23,7 +23,7 @@ for (const contract of [
 }
 assert.match(adapter, /sheet\.inventory/);
 assert.match(adapter, /sheet\.equipment\.map/);
-assert.match(view, /Combat resources/);
+assert.match(view, /characterUi\.sheet\.combatResources/);
 assert.match(view, /inventoryItems\(\)/);
 assert.match(manager, /parseInventory/);
 assert.match(manager, /parseResources/);

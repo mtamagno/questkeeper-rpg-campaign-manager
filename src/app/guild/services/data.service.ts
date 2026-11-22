@@ -23,7 +23,7 @@ import { type Character } from '@guild/models/character.model';
 import { type Npc } from '@guild/models/npc.model';
 import { type Session } from '@guild/models/session.model';
 import { type GameMap } from '@guild/models/map.model';
-import { type Relationship } from '@guild/models/relationship.model';
+import { type Relationship, type SharedRelationshipMemory } from '@guild/models/relationship.model';
 import { type Campaign } from '@guild/models/campaign.model';
 import { CampaignService } from '@guild/services/campaign.service';
 
@@ -256,6 +256,24 @@ export class DataService {
           (r.sourceId === entityB && r.targetId === entityA),
       );
     });
+  }
+
+  /** Finds one shared character memory by its campaign-wide stable ID. */
+  getSharedMemoryById(id: string): Signal<SharedRelationshipMemory | undefined> {
+    return computed(() =>
+      this._partyRelationships()
+        .flatMap((relationship) => relationship.sharedMemories ?? [])
+        .find((memory) => memory.id === id),
+    );
+  }
+
+  /** Returns authored shared memories involving one player character. */
+  getSharedMemoriesForEntity(entityId: string): Signal<ReadonlyArray<SharedRelationshipMemory>> {
+    return computed(() =>
+      this._partyRelationships()
+        .flatMap((relationship) => relationship.sharedMemories ?? [])
+        .filter((memory) => memory.participantIds.includes(entityId)),
+    );
   }
 
   /**

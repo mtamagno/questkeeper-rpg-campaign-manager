@@ -7,6 +7,7 @@ import { type CharacterLoreChapter } from '@guild/models/character.model';
 import { LanguageService } from '@guild/services/language.service';
 import { toDisplayUrl } from '@guild/services/imageUrl.service';
 import { BilingualTextPipe } from '@guild/components/bilingual-text/bilingual-text.pipe';
+import { UiTextService } from '@guild/services/uiText.service';
 
 @Component({
   selector: 'app-character-lore-chapters',
@@ -17,6 +18,7 @@ import { BilingualTextPipe } from '@guild/components/bilingual-text/bilingual-te
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CharacterLoreChaptersComponent {
+  readonly uiText = inject(UiTextService);
   private readonly languageService = inject(LanguageService);
 
   readonly chapters = input.required<ReadonlyArray<CharacterLoreChapter>>();

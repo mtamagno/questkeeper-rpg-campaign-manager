@@ -12,6 +12,7 @@ const template = read(
 const styles = read(
   'src/app/adventurers/components/character-sheet-history/character-sheet-history.component.scss',
 );
+const uiCatalog = read('src/app/guild/i18n/ui.json');
 
 assert.match(component, /comparisonBaseLevel/);
 assert.match(component, /comparisonTargetLevel/);
@@ -30,11 +31,22 @@ assert.match(template, /role="table"/);
 assert.match(template, /role="rowheader"/);
 assert.match(template, /data-change/);
 assert.match(template, /comparisonDeltaLabel/);
-assert.match(template, /Evolution detected/);
-assert.match(template, /Changed spells, features, skills and equipment/);
-assert.match(template, /Gained/);
-assert.match(template, /Lost/);
-assert.match(template, /One more chapter needed/);
+for (const key of [
+  'evolutionDetected',
+  'collectionChangesLabel',
+  'gained',
+  'lost',
+  'needAnotherChapter',
+]) {
+  assert.match(template, new RegExp(`characterUi\\.sheetHistory\\.${key}`));
+}
+for (const copy of [
+  'Evolution detected',
+  'Changed spells, features, skills and equipment',
+  'One more chapter needed',
+]) {
+  assert.match(uiCatalog, new RegExp(copy));
+}
 assert.match(styles, /overflow-x: auto/);
 assert.match(styles, /min-width: 620px/);
 assert.match(styles, /&__comparison-selectors\s*{\s*grid-template-columns: minmax\(0, 1fr\);/);

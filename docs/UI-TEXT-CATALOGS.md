@@ -65,6 +65,19 @@ for local-only routes such as Table Rules, Gazette, DM tools or the extended
 Compendium; those additions must stay out of the public template unless the
 feature itself becomes reusable.
 
+## Optional overrides
+
+QuestKeeper resolves product copy in this order: active-campaign override,
+deployment override, then the base catalog and its fallback chain. A deployment
+can replace selected values in `src/app/guild/i18n/ui-overrides.json`; a campaign
+can add the same partial tree under `interfaceTextOverrides` in
+`src/campaigns/campaigns.json`. Neither layer needs to repeat the whole catalog.
+
+Overrides may use only shipped interface locales and existing semantic keys,
+and must preserve named placeholders. `test:ui-texts` validates both layers, so
+a typo cannot silently create a dead key. Campaign-authored prose still belongs
+to campaign data and must not be moved into this product-copy mechanism.
+
 ## Authoring rules
 
 - Never add translatable prose directly to an Angular template or TypeScript
@@ -78,7 +91,13 @@ feature itself becomes reusable.
   while the default reader experience keeps supported interface and campaign
   locales together.
 
-The initial slice externalizes the language selector, campaign selector,
-sidebar navigation, alignment controls and production Table Rules chrome.
-Issues #139-#142 complete the remaining character, chronicle, NPC, compendium,
+The character reading experience now resolves its party list, profile, story,
+relationship, protected-profile, notebook, sheet, progression and rule-library
+chrome from `characterUi` in the same registry. The audit permits only two
+reviewed data-owned boundaries: the PDF renderer's current en/it field schema,
+and local-compendium rule fields plus D&D ability abbreviations. Both carry an
+`UI-TEXT-DATA-OWNED` marker and an exact-count regression check; adding another
+branch fails `test:ui-texts` until its ownership is reviewed explicitly.
+
+Issues #140-#142 complete the remaining chronicle, NPC, compendium,
 PDF/offline and accessibility surfaces until the zero-inline-copy audit passes.

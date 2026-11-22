@@ -18,6 +18,9 @@ import {
   type SharedEvent,
   type RelationshipQuote,
   type RelationshipEvolution,
+  type RelationshipHistoryEntry,
+  type RelationshipPromiseChange,
+  type SharedRelationshipMemory,
   type RelationshipFeeling,
   PARTY_PERCEPTION_LABELS,
   RELATIONSHIP_TYPE_LABELS,
@@ -138,6 +141,21 @@ export class RelationshipDetailComponent {
     () => this.relationship()?.evolution ?? [],
   );
 
+  /** Session-linked emotional snapshots, ordered as authored. */
+  readonly history: Signal<ReadonlyArray<RelationshipHistoryEntry>> = computed(
+    () => this.relationship()?.history ?? [],
+  );
+
+  /** Dated changes to stable promises between the participants. */
+  readonly promiseHistory: Signal<ReadonlyArray<RelationshipPromiseChange>> = computed(
+    () => this.relationship()?.promiseHistory ?? [],
+  );
+
+  /** Published shared memories anchored to this relationship and a canonical session. */
+  readonly sharedMemories: Signal<ReadonlyArray<SharedRelationshipMemory>> = computed(
+    () => this.relationship()?.sharedMemories ?? [],
+  );
+
   /** Directional emotional readings, resolved to the person who holds them. */
   readonly perspectives: Signal<ReadonlyArray<ResolvedRelationshipPerspective>> = computed(() => {
     const perspectives = this.relationship()?.perspectives ?? [];
@@ -177,6 +195,11 @@ export class RelationshipDetailComponent {
   /** Keeps author-provided feeling ratings inside the documented five-step scale. */
   normalizeFeelingIntensity(value: number): number {
     return Math.min(5, Math.max(1, Math.round(value)));
+  }
+
+  /** Keeps relationship-history dimensions inside their documented zero-to-five range. */
+  normalizeHistoryValue(value: number | undefined): number {
+    return Math.min(5, Math.max(0, Math.round(value ?? 0)));
   }
 
   /**

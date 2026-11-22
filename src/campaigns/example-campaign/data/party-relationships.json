@@ -52,6 +52,111 @@
         ]
       }
     ],
+    "history": [
+      {
+        "sessionId": "session-1",
+        "trust": 3,
+        "tension": 2,
+        "affection": 2,
+        "note": {
+          "en": "Their different rhythms still caused friction, but both had begun to rely on the other's judgment.",
+          "it": "I loro ritmi diversi creavano ancora attrito, ma entrambe avevano iniziato ad affidarsi al giudizio dell'altra."
+        }
+      },
+      {
+        "sessionId": "session-2",
+        "trust": 5,
+        "tension": 1,
+        "affection": 4,
+        "note": {
+          "en": "Crossing the broken span turned practiced cooperation into confidence that each would hold her part.",
+          "it": "Attraversare il ponte spezzato trasformò la collaborazione abituale nella certezza che ciascuna avrebbe fatto la propria parte."
+        }
+      }
+    ],
+    "promiseHistory": [
+      {
+        "promiseId": "bring-each-other-home",
+        "sessionId": "session-1",
+        "status": "made",
+        "label": {
+          "en": "Bring each other home",
+          "it": "Riportarsi a casa a vicenda"
+        },
+        "note": {
+          "en": "A practical agreement before the road became dangerous.",
+          "it": "Un accordo concreto prima che la strada diventasse pericolosa."
+        }
+      },
+      {
+        "promiseId": "bring-each-other-home",
+        "sessionId": "session-2",
+        "status": "kept",
+        "label": {
+          "en": "Bring each other home",
+          "it": "Riportarsi a casa a vicenda"
+        },
+        "note": {
+          "en": "Mira crossed on Aria's marks and waited until both were safely beyond the ravine.",
+          "it": "Mira attraversò seguendo i segni di Aria e attese finché entrambe furono al sicuro oltre il burrone."
+        }
+      }
+    ],
+    "sharedMemories": [
+      {
+        "id": "broken-span-crossing",
+        "sessionId": "session-2",
+        "participantIds": ["aria-vale", "mira-thorn"],
+        "title": {
+          "en": "The broken span",
+          "it": "Il ponte spezzato"
+        },
+        "sharedFacts": {
+          "en": "Aria found old route marks beneath the bridge stones. Mira crossed first, and both reached the far side before the remaining span gave way.",
+          "it": "Aria trovò antichi segni di percorso sotto le pietre del ponte. Mira attraversò per prima ed entrambe raggiunsero l'altra sponda prima che il tratto rimasto cedesse."
+        },
+        "viewpoints": [
+          {
+            "entityId": "aria-vale",
+            "account": {
+              "en": "Aria remembers the breath between reading the final mark and seeing Mira trust it without asking for certainty.",
+              "it": "Aria ricorda il respiro tra la lettura dell'ultimo segno e il momento in cui Mira si fidò senza pretendere certezze."
+            }
+          },
+          {
+            "entityId": "mira-thorn",
+            "account": {
+              "en": "Mira remembers Aria's voice becoming completely steady as soon as someone else needed to take the first step.",
+              "it": "Mira ricorda la voce di Aria diventare perfettamente ferma non appena qualcun altro ebbe bisogno di fare il primo passo."
+            }
+          }
+        ],
+        "differences": [
+          {
+            "topic": {
+              "en": "Who chose the first step",
+              "it": "Chi scelse di fare il primo passo"
+            },
+            "accounts": [
+              {
+                "entityId": "aria-vale",
+                "account": {
+                  "en": "Aria believes she asked Mira to wait until the last mark was certain, and that Mira moved before she finished.",
+                  "it": "Aria crede di aver chiesto a Mira di aspettare finché l'ultimo segno non fosse certo e che Mira si sia mossa prima che finisse."
+                }
+              },
+              {
+                "entityId": "mira-thorn",
+                "account": {
+                  "en": "Mira remembers Aria giving one small nod: not an order, but enough of an answer to cross.",
+                  "it": "Mira ricorda un piccolo cenno di Aria: non un ordine, ma una risposta sufficiente per attraversare."
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "sharedEvents": [
       {
         "sessionId": "session-2",

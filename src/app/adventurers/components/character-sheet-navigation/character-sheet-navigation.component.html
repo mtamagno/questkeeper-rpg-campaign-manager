@@ -1,7 +1,4 @@
-<nav
-  class="sheet-navigation"
-  [attr.aria-label]="isItalian() ? 'Viste della scheda' : 'Sheet views'"
->
+<nav class="sheet-navigation" [attr.aria-label]="uiText.text('characterUi.sheetNavigation.views')">
   <div class="sheet-navigation__tabs" role="tablist" aria-orientation="horizontal">
     @for (workspace of workspaces(); track workspace.id) {
       <button
@@ -30,14 +27,10 @@
   @if (selectedLevel() !== currentLevel()) {
     <div class="sheet-navigation__archive" role="status">
       <span>
-        {{
-          isItalian()
-            ? 'Stai consultando una scheda archiviata di livello ' + selectedLevel() + '.'
-            : 'You are viewing an archived level ' + selectedLevel() + ' sheet.'
-        }}
+        {{ uiText.text('characterUi.sheetNavigation.archived', { level: selectedLevel() }) }}
       </span>
       <button type="button" (click)="currentRequested.emit()">
-        {{ isItalian() ? 'Torna al livello attuale' : 'Return to current level' }}
+        {{ uiText.text('characterUi.sheetNavigation.returnCurrent') }}
       </button>
     </div>
   }

@@ -247,6 +247,37 @@
     border-left: $border-width-default solid $color-border-accent;
   }
 
+  &__memory-links {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    gap: $spacing-md;
+
+    a {
+      @include surface-card;
+      display: grid;
+      gap: $spacing-xs;
+      min-height: 44px;
+      padding: $spacing-md;
+      color: $color-text-primary;
+      text-decoration: none;
+
+      &:hover,
+      &:focus-visible {
+        border-color: $color-border-accent;
+      }
+    }
+
+    span,
+    small {
+      color: $color-text-muted;
+      font-size: $font-size-xs;
+    }
+    strong {
+      color: $color-gold-light;
+      font-family: $font-family-heading;
+    }
+  }
+
   &__event {
     position: relative;
     padding: $spacing-md 0 $spacing-md $spacing-lg;
@@ -323,6 +354,97 @@
   &__evolution {
     @include flex-column;
     gap: $spacing-md;
+  }
+
+  &__history,
+  &__promises {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+    gap: $spacing-md;
+  }
+
+  &__history-entry,
+  &__promise {
+    @include surface-card;
+    display: grid;
+    gap: $spacing-sm;
+    padding: $spacing-md;
+
+    p,
+    small {
+      margin: 0;
+      color: $color-text-secondary;
+      line-height: $line-height-relaxed;
+    }
+
+    small {
+      color: $color-text-muted;
+    }
+  }
+
+  &__dimensions {
+    display: grid;
+    gap: $spacing-xs;
+    margin: 0;
+
+    > div {
+      display: grid;
+      grid-template-columns: minmax(5rem, auto) 1fr;
+      align-items: center;
+      gap: $spacing-sm;
+    }
+
+    dt {
+      color: $color-text-muted;
+      font-size: $font-size-xs;
+      text-transform: uppercase;
+    }
+
+    dd {
+      margin: 0;
+    }
+  }
+
+  &__dimension-meter {
+    display: flex;
+    gap: 4px;
+
+    i {
+      width: 100%;
+      height: 6px;
+      border-radius: $border-radius-pill;
+      background: $color-border-default;
+
+      &.is-active {
+        background: $color-gold;
+      }
+    }
+  }
+
+  &__promise > div {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: $spacing-sm;
+
+    span {
+      padding: $spacing-2xs $spacing-sm;
+      border: $border-width-thin solid $color-border-subtle;
+      border-radius: $border-radius-pill;
+      color: $color-text-secondary;
+      font-size: $font-size-xs;
+      text-transform: uppercase;
+    }
+
+    span[data-status='kept'] {
+      border-color: $color-success;
+      color: $color-success;
+    }
+
+    span[data-status='broken'] {
+      border-color: $color-danger;
+      color: $color-danger;
+    }
   }
 
   &__evo-entry {

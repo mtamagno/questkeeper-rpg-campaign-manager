@@ -13,6 +13,28 @@
       {{ uiText.text('relationshipGraph.instructions') }}
     </p>
 
+    <dl
+      class="relationship-graph__pulse"
+      [attr.aria-label]="uiText.text('relationshipGraph.pulseLabel')"
+    >
+      <div>
+        <dt>{{ uiText.text('relationshipGraph.people') }}</dt>
+        <dd>{{ networkPulse().people }}</dd>
+      </div>
+      <div>
+        <dt>{{ uiText.text('relationshipGraph.bonds') }}</dt>
+        <dd>{{ networkPulse().bonds }}</dd>
+      </div>
+      <div>
+        <dt>{{ uiText.text('relationshipGraph.feelings') }}</dt>
+        <dd>{{ networkPulse().feelings }}</dd>
+      </div>
+      <div>
+        <dt>{{ uiText.text('relationshipGraph.moments') }}</dt>
+        <dd>{{ networkPulse().moments }}</dd>
+      </div>
+    </dl>
+
     <div class="relationship-graph__container">
       <svg
         class="relationship-graph__svg"
@@ -164,6 +186,19 @@
               ◈ {{ uiText.text('relationshipGraph.partyReading') }}
             </span>
           }
+          <span class="relationship-graph__tooltip-pulse">
+            {{
+              uiText.text('relationshipGraph.edgePulse', {
+                feelings: relationshipFeelingCount(edge.relationship),
+                moments: edge.relationship.sharedEvents?.length ?? 0,
+              })
+            }}
+          </span>
+          @if (latestRelationshipSession(edge.relationship); as sessionId) {
+            <span class="relationship-graph__tooltip-session">{{
+              uiText.text('relationshipGraph.latestChange', { session: sessionId })
+            }}</span>
+          }
         </div>
       }
     </div>
@@ -192,6 +227,17 @@
               <strong>{{ relationshipParticipants(relationship) }}</strong>
               <span>{{ formatRelationshipType(relationship.type) }}</span>
               <small>{{ relationship.description | bilingual }}</small>
+              <span class="relationship-graph__linear-pulse">{{
+                uiText.text('relationshipGraph.edgePulse', {
+                  feelings: relationshipFeelingCount(relationship),
+                  moments: relationship.sharedEvents?.length ?? 0,
+                })
+              }}</span>
+              @if (latestRelationshipSession(relationship); as sessionId) {
+                <small>{{
+                  uiText.text('relationshipGraph.latestChange', { session: sessionId })
+                }}</small>
+              }
             </button>
           </li>
         }

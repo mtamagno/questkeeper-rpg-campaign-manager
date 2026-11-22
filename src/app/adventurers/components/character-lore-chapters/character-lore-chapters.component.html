@@ -1,27 +1,21 @@
 <div
   class="lore-chapters"
   [attr.aria-label]="
-    lang() === 'it'
-      ? 'Capitoli personali di ' + characterName()
-      : characterName() + ' personal chapters'
+    uiText.text('characterUi.chapters.sectionLabel', { character: characterName() })
   "
 >
   <header class="lore-chapters__introduction">
     <span class="lore-chapters__kicker">
-      {{ lang() === 'it' ? 'Cronaca personale' : 'Personal chronicle' }}
+      {{ uiText.text('characterUi.chapters.eyebrow') }}
     </span>
     <p>
-      {{
-        lang() === 'it'
-          ? 'Momenti scelti della vita precedente all’avventura, raccontati senza anticipare ciò che il personaggio custodisce ancora per sé.'
-          : 'Selected moments from the life before the adventure, told without revealing what the character still keeps private.'
-      }}
+      {{ uiText.text('characterUi.chapters.description') }}
     </p>
   </header>
 
   <nav
     class="lore-chapters__index"
-    [attr.aria-label]="lang() === 'it' ? 'Indice dei capitoli personali' : 'Personal chapter index'"
+    [attr.aria-label]="uiText.text('characterUi.chapters.indexLabel')"
   >
     @for (chapter of chapters(); track chapter.id; let chapterIndex = $index) {
       <a [routerLink]="[]" [fragment]="'lore-chapter-' + chapter.id">
@@ -62,7 +56,7 @@
         <div class="lore-chapters__copy">
           <div class="lore-chapters__heading">
             <span class="lore-chapters__chapter-label">
-              {{ lang() === 'it' ? 'Capitolo' : 'Chapter' }}
+              {{ uiText.text('characterUi.chapters.chapter') }}
               {{ chapterIndex + 1 }}
             </span>
             @if (chapter.period) {

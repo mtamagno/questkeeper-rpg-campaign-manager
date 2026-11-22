@@ -5,6 +5,7 @@ const { execFileSync } = require('node:child_process');
 const root = path.resolve(__dirname, '..');
 const catalogDirectory = path.join(root, 'src', 'app', 'guild', 'i18n');
 const catalogFile = path.join(catalogDirectory, 'ui.json');
+const deploymentOverridesFile = path.join(catalogDirectory, 'ui-overrides.json');
 
 function fail(message) {
   console.error(`UI text catalog verification failed: ${message}`);
@@ -85,6 +86,43 @@ function verifyFallbackChain(locale, pathToLocale = []) {
 }
 for (const locale of localeTags) verifyFallbackChain(locale);
 
+function verifyPartialOverrides(owner, locales) {
+  if (locales === null || typeof locales !== 'object' || Array.isArray(locales)) {
+    fail(`${owner} overrides must be an object keyed by interface locale`);
+    return;
+  }
+  for (const [locale, tree] of Object.entries(locales)) {
+    if (!localeTags.has(locale)) {
+      fail(`${owner} overrides reference unsupported interface locale ${locale}`);
+      continue;
+    }
+    const reference = flatten(registry.locales[locale].texts);
+    for (const [key, value] of flatten(tree)) {
+      const referenceValue = reference.get(key);
+      if (referenceValue === undefined) {
+        fail(`${owner}.${locale} overrides unknown key ${key}`);
+      } else if (placeholders(value).join('|') !== placeholders(referenceValue).join('|')) {
+        fail(`${owner}.${locale}.${key} does not preserve placeholders`);
+      }
+    }
+  }
+}
+
+const deploymentOverrides = JSON.parse(fs.readFileSync(deploymentOverridesFile, 'utf8'));
+if (deploymentOverrides.meta?.version !== 1) {
+  fail('ui-overrides.json must declare override registry version 1');
+}
+verifyPartialOverrides('deployment', deploymentOverrides.locales);
+
+const campaignManifest = JSON.parse(
+  fs.readFileSync(path.join(root, 'src', 'campaigns', 'campaigns.json'), 'utf8'),
+);
+for (const campaign of campaignManifest) {
+  if (campaign.interfaceTextOverrides !== undefined) {
+    verifyPartialOverrides(`campaign:${campaign.id}`, campaign.interfaceTextOverrides);
+  }
+}
+
 for (const obsolete of ['ui.en.json', 'ui.it.json']) {
   if (fs.existsSync(path.join(catalogDirectory, obsolete))) {
     fail(`${obsolete} is obsolete; all locales belong in ui.json`);
@@ -135,6 +173,30 @@ const migratedSurfaces = [
   'src/app/guild/components/image-gallery/image-gallery.component.ts',
   'src/app/guild/components/image-lightbox/image-lightbox.component.html',
   'src/app/guild/components/image-lightbox/image-lightbox.component.ts',
+  'src/app/adventurers/pages/party-list/party-list.component.html',
+  'src/app/adventurers/pages/party-list/party-list.component.ts',
+  'src/app/adventurers/pages/character-detail/character-detail.component.html',
+  'src/app/adventurers/pages/character-detail/character-detail.component.ts',
+  'src/app/adventurers/components/character-profile-overview/character-profile-overview.component.html',
+  'src/app/adventurers/components/character-profile-overview/character-profile-overview.component.ts',
+  'src/app/adventurers/components/character-story-overview/character-story-overview.component.html',
+  'src/app/adventurers/components/character-story-overview/character-story-overview.component.ts',
+  'src/app/adventurers/components/character-lore-chapters/character-lore-chapters.component.html',
+  'src/app/adventurers/components/character-lore-chapters/character-lore-chapters.component.ts',
+  'src/app/adventurers/components/character-bonds-carousel/character-bonds-carousel.component.html',
+  'src/app/adventurers/components/character-bonds-carousel/character-bonds-carousel.component.ts',
+  'src/app/adventurers/components/character-quotes/character-quotes.component.html',
+  'src/app/adventurers/components/character-quotes/character-quotes.component.ts',
+  'src/app/adventurers/components/private-profile/private-profile.component.html',
+  'src/app/adventurers/components/private-profile/private-profile.component.ts',
+  'src/app/adventurers/components/character-notebook/character-notebook.component.html',
+  'src/app/adventurers/components/character-notebook/character-notebook.component.ts',
+  'src/app/adventurers/components/character-sheet/character-sheet.component.html',
+  'src/app/adventurers/components/character-sheet-navigation/character-sheet-navigation.component.html',
+  'src/app/adventurers/components/character-sheet-navigation/character-sheet-navigation.component.ts',
+  'src/app/adventurers/components/character-sheet-history/character-sheet-history.component.html',
+  'src/app/adventurers/components/character-sheet-history/character-sheet-history.component.ts',
+  'src/app/adventurers/components/character-rule-library/character-rule-library.component.html',
 ];
 for (const productionSurface of [
   'src/app/chronicle/pages/table-rules/table-rules.component.html',
@@ -154,6 +216,27 @@ for (const relative of migratedSurfaces) {
     )
   ) {
     fail(`${relative} contains a literal user-facing attribute outside ui.json`);
+  }
+}
+
+const dataOwnedLanguageBranches = new Map([
+  [
+    'src/app/adventurers/components/character-sheet/character-sheet.component.ts',
+    { expected: 1, reason: 'the PDF renderer label schema currently ships authored en/it fields' },
+  ],
+  [
+    'src/app/adventurers/components/character-rule-library/character-rule-library.component.ts',
+    { expected: 2, reason: 'local compendium rule fields and D&D abbreviations are game data' },
+  ],
+]);
+for (const [relative, exception] of dataOwnedLanguageBranches) {
+  const source = fs.readFileSync(path.join(root, relative), 'utf8');
+  const branches = source.match(/isItalian\(\)\s*\?|const italian = this\.isItalian\(\)/g) ?? [];
+  const markers = source.match(/UI-TEXT-DATA-OWNED/g) ?? [];
+  if (branches.length !== exception.expected || markers.length !== exception.expected) {
+    fail(
+      `${relative} data-owned language exception drifted (expected ${exception.expected}: ${exception.reason})`,
+    );
   }
 }
 
@@ -223,7 +306,13 @@ for (const required of [
   if (!service.includes(required)) fail(`UI text resolver is missing ${required}`);
 }
 const catalogHelper = fs.readFileSync(path.join(catalogDirectory, 'uiCatalog.ts'), 'utf8');
-for (const required of ['ui.json', 'INTERFACE_LOCALES', 'resolveInterfaceLocale']) {
+for (const required of [
+  'ui.json',
+  'ui-overrides.json',
+  'INTERFACE_LOCALES',
+  'resolveInterfaceLocale',
+  'UI_TEXT_DEPLOYMENT_OVERRIDES',
+]) {
   if (!catalogHelper.includes(required)) fail(`UI catalog helper is missing ${required}`);
 }
 const languageService = fs.readFileSync(

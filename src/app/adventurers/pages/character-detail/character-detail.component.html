@@ -1,12 +1,7 @@
 <!-- Character Detail Page -->
 @if (isLoading()) {
   <div class="character-detail__loading">
-    <app-dice-loader
-      [label]="
-        lang() === 'it' ? 'Apro la scheda del personaggio...' : 'Opening the character sheet...'
-      "
-      [playSound]="false"
-    />
+    <app-dice-loader [label]="uiText.text('characterUi.detail.loading')" [playSound]="false" />
   </div>
 } @else if (character(); as char) {
   <article class="character-detail">
@@ -31,7 +26,7 @@
           @if (char.pronouns && isRecorded(char.pronouns)) {
             <p
               class="character-detail__pronouns"
-              [attr.aria-label]="lang() === 'it' ? 'Pronomi' : 'Pronouns'"
+              [attr.aria-label]="uiText.text('characterUi.detail.pronouns')"
             >
               {{ char.pronouns | bilingual }}
             </p>
@@ -41,7 +36,7 @@
             @if (char.sheet.subclass) {
               ({{ char.sheet.subclass }})
             }
-            · Level {{ char.sheet.level }}
+            · {{ uiText.text('characterUi.detail.level') }} {{ char.sheet.level }}
           </p>
           @if (isCharacterReady()) {
             <dl
@@ -57,19 +52,19 @@
                 <dd>{{ char.sheet.armorClass }}</dd>
               </div>
               <div class="character-detail__quick-stat">
-                <dt>{{ lang() === 'it' ? 'Competenza' : 'Proficiency' }}</dt>
+                <dt>{{ uiText.text('characterUi.detail.proficiency') }}</dt>
                 <dd>+{{ char.sheet.proficiencyBonus }}</dd>
               </div>
               @if (char.heightCm) {
                 <div class="character-detail__quick-stat">
-                  <dt>{{ lang() === 'it' ? 'Altezza' : 'Height' }}</dt>
+                  <dt>{{ uiText.text('characterUi.detail.height') }}</dt>
                   <dd>{{ formatHeight(char.heightCm) }}</dd>
                 </div>
               }
             </dl>
           } @else {
             <span class="character-detail__pending">
-              {{ lang() === 'it' ? 'Scheda in preparazione' : 'Character sheet in preparation' }}
+              {{ uiText.text('characterUi.party.sheetPending') }}
             </span>
           }
           @if (char.playerName) {
@@ -84,7 +79,7 @@
               class="character-detail__fullbody"
               [class.is-loaded]="isPortraitLoaded()"
               [src]="displayPortraitUrl() ?? char.portraitImageUrl"
-              [alt]="char.name + ' full body'"
+              [alt]="uiText.text('characterUi.detail.portraitAlt', { character: char.name })"
               (load)="isPortraitLoaded.set(true)"
               (error)="onPortraitImageError($event)"
               loading="lazy"
@@ -97,7 +92,7 @@
 
     <nav
       class="character-detail__tabs-shell"
-      [attr.aria-label]="lang() === 'it' ? 'Sezioni del personaggio' : 'Character sections'"
+      [attr.aria-label]="uiText.text('characterUi.detail.sections')"
     >
       <div class="character-detail__tabs" role="tablist">
         @for (tab of tabs(); track tab.id) {
@@ -153,13 +148,11 @@
         >
           <app-accordion
             [title]="
-              char.loreChapters?.length
-                ? lang() === 'it'
-                  ? 'Capitoli personali'
-                  : 'Personal Chapters'
-                : lang() === 'it'
-                  ? 'Origini'
-                  : 'Origins'
+              uiText.text(
+                char.loreChapters?.length
+                  ? 'characterUi.story.personalChapters'
+                  : 'characterUi.story.origins'
+              )
             "
             icon="🧭"
             [startOpen]="shouldOpenStorySection('personal-chapters')"
@@ -182,7 +175,7 @@
       @if (profileBonds().length > 0) {
         <section id="profile-bonds" class="character-detail__section" [hidden]="!isTab('story')">
           <app-accordion
-            [title]="lang() === 'it' ? 'Legami in viaggio' : 'Bonds along the road'"
+            [title]="uiText.text('characterUi.story.bonds')"
             icon="🕸️"
             [startOpen]="shouldOpenStorySection('profile-bonds')"
             [allowOverflow]="true"
@@ -206,23 +199,17 @@
           [hidden]="!isTab('overview')"
         >
           <app-accordion
-            [title]="
-              lang() === 'it' ? 'Oggetti e momenti del cuore' : 'Keepsakes & Favourite Moments'
-            "
+            [title]="uiText.text('characterUi.detail.highlights.title')"
             icon="✧"
             [startOpen]="false"
           >
             <p class="character-detail__section-intro">
-              {{
-                lang() === 'it'
-                  ? 'Piccoli dettagli scelti dal personaggio, con un rimando alla storia che li rende importanti.'
-                  : 'Small details chosen by the character, with a path back to the story that made them matter.'
-              }}
+              {{ uiText.text('characterUi.detail.highlights.description') }}
             </p>
             <div class="character-detail__highlight-columns">
               @if (char.publicProfile.signatureItems?.length) {
                 <section class="character-detail__highlight-group">
-                  <h3>{{ lang() === 'it' ? 'Oggetti significativi' : 'Signature Items' }}</h3>
+                  <h3>{{ uiText.text('characterUi.detail.highlights.items') }}</h3>
                   <div class="character-detail__highlight-list">
                     @for (item of char.publicProfile.signatureItems; track item.id) {
                       <article
@@ -248,7 +235,7 @@
               }
               @if (char.publicProfile.favouriteMoments?.length) {
                 <section class="character-detail__highlight-group">
-                  <h3>{{ lang() === 'it' ? 'Momenti preferiti' : 'Favourite Moments' }}</h3>
+                  <h3>{{ uiText.text('characterUi.detail.highlights.moments') }}</h3>
                   <div class="character-detail__highlight-list">
                     @for (moment of char.publicProfile.favouriteMoments; track moment.id) {
                       <article
@@ -278,7 +265,7 @@
       <!-- Private Profile (password-protected) -->
       <section id="private-profile" class="character-detail__section" [hidden]="!isTab('sheet')">
         <app-accordion
-          [title]="lang() === 'it' ? 'Profilo segreto' : 'Secret Profile'"
+          [title]="uiText.text('characterUi.privateProfile.title')"
           icon="🔒"
           [startOpen]="false"
         >
@@ -294,7 +281,7 @@
       <!-- Character Sheet (password-protected) -->
       <section id="character-sheet" class="character-detail__section" [hidden]="!isTab('sheet')">
         <app-accordion
-          [title]="lang() === 'it' ? 'Scheda personaggio' : 'Character Sheet'"
+          [title]="uiText.text('characterUi.sheet.title')"
           icon="📋"
           [startOpen]="hasSheetReadingPosition(char.id) || shouldOpenSheet()"
           [allowOverflow]="true"
@@ -320,7 +307,7 @@
       @if (char.quotes.length > 0) {
         <section id="quotes" class="character-detail__section" [hidden]="!isTab('story')">
           <app-accordion
-            [title]="lang() === 'it' ? 'Citazioni iconiche' : 'Iconic Quotes'"
+            [title]="uiText.text('characterUi.story.quotes')"
             icon="💬"
             [startOpen]="shouldOpenStorySection('quotes')"
           >
@@ -333,7 +320,7 @@
       @if (isRecorded(char.publicProfile.knownHistory)) {
         <section id="profile-memories" class="character-detail__section" [hidden]="!isTab('story')">
           <app-accordion
-            [title]="lang() === 'it' ? 'Cosa sa il gruppo' : 'What the Party Knows'"
+            [title]="uiText.text('characterUi.story.partyKnowledge')"
             icon="📖"
             [startOpen]="true"
           >
@@ -341,54 +328,48 @@
               <p>{{ char.publicProfile.knownHistory | bilingual }}</p>
             </div>
             <p class="character-detail__history-sources-title">
-              {{
-                lang() === 'it'
-                  ? 'Ritrova le fonti di questa storia'
-                  : 'Return to the sources of this story'
-              }}
+              {{ uiText.text('characterUi.detail.history.sourcesTitle') }}
             </p>
             <nav
               class="character-detail__history-links"
-              [attr.aria-label]="lang() === 'it' ? 'Riferimenti della storia' : 'Story references'"
+              [attr.aria-label]="uiText.text('characterUi.detail.history.referencesLabel')"
             >
               @if (char.loreChapters?.length) {
                 <a [routerLink]="[]" fragment="personal-chapters">
                   <span aria-hidden="true">🧭</span>
-                  {{ lang() === 'it' ? 'Capitoli personali' : 'Personal chapters' }}
+                  {{ uiText.text('characterUi.story.personalChapters') }}
                   <strong>{{ char.loreChapters?.length }}</strong>
                 </a>
               }
               @if (profileBonds().length > 0) {
                 <a [routerLink]="[]" fragment="profile-bonds">
                   <span aria-hidden="true">🕸️</span>
-                  {{ lang() === 'it' ? 'Legami' : 'Bonds' }}
+                  {{ uiText.text('characterUi.party.bonds') }}
                   <strong>{{ profileBonds().length }}</strong>
                 </a>
               }
               @if (char.notebook) {
                 <a [routerLink]="[]" fragment="notebook">
                   <span aria-hidden="true">📓</span>
-                  {{ lang() === 'it' ? 'Taccuino' : 'Notebook' }}
+                  {{ uiText.text('characterUi.detail.history.notebook') }}
                   <strong>{{ char.notebook.pages.length }}</strong>
                 </a>
               }
               @if (char.quotes.length > 0) {
                 <a [routerLink]="[]" fragment="quotes">
                   <span aria-hidden="true">💬</span>
-                  {{ lang() === 'it' ? 'Citazioni' : 'Quotes' }}
+                  {{ uiText.text('characterUi.detail.history.quotes') }}
                   <strong>{{ char.quotes.length }}</strong>
                 </a>
               }
               <a [routerLink]="['/', campaignId() ?? '', 'campaign']">
                 <span aria-hidden="true">📜</span>
-                {{ lang() === 'it' ? 'Cronaca completa' : 'Full chronicle' }}
+                {{ uiText.text('characterUi.detail.history.fullChronicle') }}
               </a>
             </nav>
             @if (latestDiaryEntry(); as latestMemory) {
               <a class="character-detail__latest-memory" [routerLink]="[]" fragment="diary">
-                <span>{{
-                  lang() === 'it' ? 'Ultima memoria registrata' : 'Latest recorded memory'
-                }}</span>
+                <span>{{ uiText.text('characterUi.detail.history.latestMemory') }}</span>
                 <strong>{{ latestMemory.title | bilingual }}</strong>
                 <small>{{ profileExcerpt(latestMemory.content, 130) }}</small>
               </a>

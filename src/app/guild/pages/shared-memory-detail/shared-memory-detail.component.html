@@ -1,0 +1,99 @@
+@if (isLoading()) {
+  <div class="shared-memory__loading">
+    <app-dice-loader [label]="uiText.text('sharedMemory.loading')" [playSound]="false" />
+  </div>
+} @else if (memory(); as memory) {
+  <article class="shared-memory">
+    <header class="shared-memory__header">
+      <div>
+        <span>{{ uiText.text('sharedMemory.eyebrow') }}</span>
+        <h1>{{ memory.title | bilingual }}</h1>
+        <p>{{ uiText.text('sharedMemory.sessionEvidence', { session: memory.sessionId }) }}</p>
+      </div>
+      <app-language-toggle />
+    </header>
+
+    <ul
+      class="shared-memory__participants"
+      [attr.aria-label]="uiText.text('sharedMemory.participants')"
+    >
+      @for (participant of participants(); track participant.id) {
+        <li>
+          <img
+            [src]="participant.profileImageUrl"
+            [alt]="participant.name"
+            loading="lazy"
+            decoding="async"
+          />
+          <a [routerLink]="['/', campaignId() ?? '', 'party', participant.id]">{{
+            participant.name
+          }}</a>
+        </li>
+      }
+    </ul>
+
+    <section class="shared-memory__facts" aria-labelledby="shared-memory-facts">
+      <h2 id="shared-memory-facts">{{ uiText.text('sharedMemory.sharedFacts') }}</h2>
+      <p>{{ memory.sharedFacts | bilingual }}</p>
+      <a
+        [routerLink]="['/', campaignId() ?? '', 'campaign', 'story-so-far']"
+        [fragment]="memory.sessionId"
+        >{{ uiText.text('sharedMemory.openSession') }}</a
+      >
+    </section>
+
+    <section aria-labelledby="shared-memory-viewpoints">
+      <h2 id="shared-memory-viewpoints">{{ uiText.text('sharedMemory.viewpoints') }}</h2>
+      <div class="shared-memory__viewpoints">
+        @for (viewpoint of viewpoints(); track viewpoint.character.id) {
+          <article>
+            <header>
+              <img
+                [src]="viewpoint.character.profileImageUrl"
+                [alt]="viewpoint.character.name"
+                loading="lazy"
+                decoding="async"
+              />
+              <h3>{{ viewpoint.character.name }}</h3>
+            </header>
+            <p>{{ viewpoint.account | bilingual }}</p>
+          </article>
+        }
+      </div>
+    </section>
+
+    @if (differences().length > 0) {
+      <section class="shared-memory__differences" aria-labelledby="shared-memory-differences">
+        <div class="shared-memory__differences-heading">
+          <span aria-hidden="true">≠</span>
+          <div>
+            <h2 id="shared-memory-differences">{{ uiText.text('sharedMemory.differences') }}</h2>
+            <p>{{ uiText.text('sharedMemory.differencesHelp') }}</p>
+          </div>
+        </div>
+        @for (difference of differences(); track $index) {
+          <article>
+            <h3>{{ difference.topic | bilingual }}</h3>
+            <div>
+              @for (account of difference.accounts; track account.character.id) {
+                <blockquote>
+                  <strong>{{ account.character.name }}</strong>
+                  <p>{{ account.account | bilingual }}</p>
+                </blockquote>
+              }
+            </div>
+          </article>
+        }
+      </section>
+    }
+
+    <a class="shared-memory__back" [routerLink]="relationshipRoute()"
+      >← {{ uiText.text('sharedMemory.back') }}</a
+    >
+  </article>
+} @else {
+  <div class="shared-memory__missing">
+    <h1>{{ uiText.text('sharedMemory.notFoundTitle') }}</h1>
+    <p>{{ uiText.text('sharedMemory.notFoundHelp') }}</p>
+  </div>
+}

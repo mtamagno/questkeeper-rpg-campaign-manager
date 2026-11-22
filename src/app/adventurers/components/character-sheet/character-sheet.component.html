@@ -3,10 +3,10 @@
   <header class="character-sheet__header">
     <div>
       <span class="character-sheet__eyebrow">
-        {{ isItalian() ? 'Dossier dell’avventuriero' : 'Adventurer dossier' }}
+        {{ uiText.text('characterUi.sheet.eyebrow') }}
       </span>
       <h2 class="character-sheet__title">
-        {{ isItalian() ? 'Scheda personaggio' : 'Character sheet' }}
+        {{ uiText.text('characterUi.sheet.title') }}
       </h2>
     </div>
     @if (isUnlocked() && !isSheetEmpty()) {
@@ -40,10 +40,10 @@
           class="character-sheet__lock-button"
           type="button"
           (click)="lockSheet()"
-          [attr.aria-label]="isItalian() ? 'Blocca di nuovo la scheda' : 'Lock the sheet again'"
+          [attr.aria-label]="uiText.text('characterUi.sheet.lockLabel')"
         >
           <span aria-hidden="true">&#128274;</span>
-          <span>{{ isItalian() ? 'Blocca' : 'Lock' }}</span>
+          <span>{{ uiText.text('characterUi.privateProfile.lock') }}</span>
         </button>
       </div>
     }
@@ -72,21 +72,16 @@
       <div class="character-sheet__empty">
         <span class="character-sheet__empty-icon" aria-hidden="true">📜</span>
         <p class="character-sheet__empty-title">
-          {{ isItalian() ? 'Scheda ancora da compilare' : 'Character sheet not yet compiled' }}
+          {{ uiText.text('characterUi.sheet.emptyTitle') }}
         </p>
         <p class="character-sheet__empty-text">
-          {{
-            isItalian()
-              ? 'L’avventura è appena iniziata: la storia di questo eroe deve ancora essere scritta.'
-              : 'The adventure has just begun — this hero’s tale is still being written.'
-          }}
+          {{ uiText.text('characterUi.sheet.emptyDescription') }}
         </p>
       </div>
     } @else {
       <div class="character-sheet__content">
         <app-character-sheet-navigation
           [characterId]="characterId()"
-          [isItalian]="isItalian()"
           [activeSection]="activeWorkspace()"
           [inventoryCount]="inventoryItems().length"
           [libraryCount]="sheet().features.length + (sheet().spells?.length ?? 0)"
@@ -114,7 +109,7 @@
             >
               <div class="character-sheet__identity-copy">
                 <span class="character-sheet__level-seal">
-                  <small>{{ isItalian() ? 'Livello' : 'Level' }}</small>
+                  <small>{{ uiText.text('characterUi.detail.level') }}</small>
                   <strong>{{ sheet().level }}</strong>
                 </span>
                 <div>
@@ -158,7 +153,7 @@
               <div class="character-sheet__vital">
                 <span class="character-sheet__vital-icon" aria-hidden="true">➜</span>
                 <span class="character-sheet__vital-label">
-                  {{ isItalian() ? 'Velocità' : 'Speed' }}
+                  {{ uiText.text('characterUi.sheet.speed') }}
                 </span>
                 <strong
                   >{{ sheet().speed
@@ -168,21 +163,21 @@
               <div class="character-sheet__vital">
                 <span class="character-sheet__vital-icon" aria-hidden="true">⚡</span>
                 <span class="character-sheet__vital-label">
-                  {{ isItalian() ? 'Iniziativa' : 'Initiative' }}
+                  {{ uiText.text('characterUi.sheet.initiative') }}
                 </span>
                 <strong>{{ initiativeModifier() }}</strong>
               </div>
               <div class="character-sheet__vital">
                 <span class="character-sheet__vital-icon" aria-hidden="true">◉</span>
                 <span class="character-sheet__vital-label">
-                  {{ isItalian() ? 'Percezione passiva' : 'Passive Perception' }}
+                  {{ uiText.text('characterUi.sheet.passivePerception') }}
                 </span>
                 <strong>{{ passivePerception() }}</strong>
               </div>
               <div class="character-sheet__vital">
                 <span class="character-sheet__vital-icon" aria-hidden="true">✦</span>
                 <span class="character-sheet__vital-label">
-                  {{ isItalian() ? 'Competenza' : 'Proficiency' }}
+                  {{ uiText.text('characterUi.detail.proficiency') }}
                 </span>
                 <strong>+{{ sheet().proficiencyBonus }}</strong>
               </div>
@@ -191,7 +186,7 @@
                 <div class="character-sheet__purse">
                   <div class="character-sheet__purse-heading">
                     <span aria-hidden="true">◎</span>
-                    <span>{{ isItalian() ? 'Borsa' : 'Coin purse' }}</span>
+                    <span>{{ uiText.text('characterUi.sheet.coinPurse') }}</span>
                   </div>
                   <div class="character-sheet__coins">
                     @for (coin of currencyEntries(); track coin.code) {
@@ -209,12 +204,12 @@
               <section class="character-sheet__resources" aria-labelledby="combat-resources-title">
                 <div class="character-sheet__resource-heading">
                   <div>
-                    <span>{{ isItalian() ? 'Pronte al tavolo' : 'Table ready' }}</span>
+                    <span>{{ uiText.text('characterUi.sheet.tableReady') }}</span>
                     <h3 id="combat-resources-title">
-                      {{ isItalian() ? 'Risorse da combattimento' : 'Combat resources' }}
+                      {{ uiText.text('characterUi.sheet.combatResources') }}
                     </h3>
                   </div>
-                  <small>{{ isItalian() ? 'Disponibili / massimo' : 'Available / maximum' }}</small>
+                  <small>{{ uiText.text('characterUi.sheet.availableMaximum') }}</small>
                 </div>
                 <div class="character-sheet__resource-grid">
                   @for (resource of combatResources(); track resource.id) {
@@ -257,8 +252,8 @@
             >
               <div class="character-sheet__section-heading">
                 <div>
-                  <span>{{ isItalian() ? 'Fondamenta' : 'Core' }}</span>
-                  <h3>{{ isItalian() ? 'Caratteristiche' : 'Ability scores' }}</h3>
+                  <span>{{ uiText.text('characterUi.sheet.core') }}</span>
+                  <h3>{{ uiText.text('characterUi.sheet.abilityScores') }}</h3>
                 </div>
               </div>
               <div class="character-sheet__ability-grid">
@@ -280,14 +275,14 @@
               <section class="character-sheet__panel">
                 <div class="character-sheet__section-heading">
                   <div>
-                    <span>{{ isItalian() ? 'Addestramento' : 'Training' }}</span>
-                    <h3>{{ isItalian() ? 'Competenze' : 'Proficiencies' }}</h3>
+                    <span>{{ uiText.text('characterUi.sheet.training') }}</span>
+                    <h3>{{ uiText.text('characterUi.sheet.proficiencies') }}</h3>
                   </div>
                 </div>
 
                 @if (sheet().savingThrows.length > 0) {
                   <div class="character-sheet__list-section">
-                    <h4>{{ isItalian() ? 'Tiri salvezza' : 'Saving throws' }}</h4>
+                    <h4>{{ uiText.text('characterUi.sheet.savingThrows') }}</h4>
                     <div class="character-sheet__tags">
                       @for (save of sheet().savingThrows; track save) {
                         <span class="character-sheet__tag character-sheet__tag--accent">{{
@@ -300,7 +295,7 @@
 
                 @if (sheet().skills.length > 0) {
                   <div class="character-sheet__list-section">
-                    <h4>{{ isItalian() ? 'Abilità' : 'Skills' }}</h4>
+                    <h4>{{ uiText.text('characterUi.sheet.skills') }}</h4>
                     <div class="character-sheet__tags">
                       @for (skill of sheet().skills; track skill) {
                         <span class="character-sheet__tag">{{ skill }}</span>
@@ -311,7 +306,7 @@
 
                 @if (sheet().languages.length > 0) {
                   <div class="character-sheet__list-section">
-                    <h4>{{ isItalian() ? 'Lingue' : 'Languages' }}</h4>
+                    <h4>{{ uiText.text('characterUi.sheet.languages') }}</h4>
                     <p class="character-sheet__prose-list">{{ sheet().languages.join(' · ') }}</p>
                   </div>
                 }
@@ -336,13 +331,18 @@
               >
                 <div class="character-sheet__section-heading">
                   <div>
-                    <span>{{ isItalian() ? 'Al seguito' : 'Carried gear' }}</span>
-                    <h3>{{ isItalian() ? 'Inventario' : 'Inventory' }}</h3>
+                    <span>{{ uiText.text('characterUi.sheet.carriedGear') }}</span>
+                    <h3>{{ uiText.text('characterUi.sheet.inventory') }}</h3>
                   </div>
                   <span class="character-sheet__count">
-                    {{ inventoryItems().length }} {{ isItalian() ? 'voci' : 'items' }}
+                    {{
+                      uiText.text('characterUi.sheet.itemCount', { count: inventoryItems().length })
+                    }}
                     @if (attunedItemCount() > 0) {
-                      · {{ attunedItemCount() }} {{ isItalian() ? 'in sintonia' : 'attuned' }}
+                      ·
+                      {{
+                        uiText.text('characterUi.sheet.attunedCount', { count: attunedItemCount() })
+                      }}
                     }
                   </span>
                 </div>
@@ -363,7 +363,7 @@
                         <span>{{ inventoryCategoryLabel(item.category) }}</span>
                         @if (item.equipped) {
                           <span class="character-sheet__equipped">
-                            {{ isItalian() ? 'Equipaggiato' : 'Equipped' }}
+                            {{ uiText.text('characterUi.sheet.equipped') }}
                           </span>
                         }
                         @if (item.attunement; as attunement) {
@@ -380,13 +380,11 @@
                       }
                       @if (item.signatureItem; as signatureItem) {
                         <aside class="character-sheet__item-story">
-                          <span>{{
-                            isItalian() ? 'Oggetto significativo' : 'Signature item'
-                          }}</span>
+                          <span>{{ uiText.text('characterUi.sheet.signatureItem') }}</span>
                           <strong>{{ storyText(signatureItem.name) }}</strong>
                           <p>{{ storyText(signatureItem.description) }}</p>
                           <a href="#profile-highlights">
-                            {{ isItalian() ? 'Torna alla storia' : 'Return to the story' }}
+                            {{ uiText.text('characterUi.sheet.returnStory') }}
                             <span aria-hidden="true">↑</span>
                           </a>
                         </aside>
@@ -401,15 +399,9 @@
                 [id]="'character-sheet-inventory-' + characterId()"
               >
                 <span aria-hidden="true">&#9672;</span>
-                <strong>{{
-                  isItalian() ? 'Nessun equipaggiamento registrato' : 'No equipment recorded'
-                }}</strong>
+                <strong>{{ uiText.text('characterUi.sheet.noEquipment') }}</strong>
                 <p>
-                  {{
-                    isItalian()
-                      ? 'Questa vista si popolerà quando verranno aggiunti oggetti alla scheda.'
-                      : 'This view will fill when items are added to the sheet.'
-                  }}
+                  {{ uiText.text('characterUi.sheet.noEquipmentDescription') }}
                 </p>
               </div>
             }
@@ -437,15 +429,9 @@
                 [id]="'character-sheet-spells-' + characterId()"
               >
                 <span aria-hidden="true">&#10022;</span>
-                <strong>{{
-                  isItalian() ? 'Nessuna regola personale registrata' : 'No personal rules recorded'
-                }}</strong>
+                <strong>{{ uiText.text('characterUi.sheet.noRules') }}</strong>
                 <p>
-                  {{
-                    isItalian()
-                      ? 'Privilegi e incantesimi appariranno qui senza allungare le altre viste.'
-                      : 'Features and spells will appear here without lengthening the other views.'
-                  }}
+                  {{ uiText.text('characterUi.sheet.noRulesDescription') }}
                 </p>
               </div>
             }
@@ -466,7 +452,6 @@
                 [snapshots]="sheetSnapshots()"
                 [selectedLevel]="sheet().level"
                 [currentLevel]="currentSheet().level"
-                [isItalian]="isItalian()"
                 (levelSelected)="selectSheetLevel($event)"
               />
             </div>
@@ -478,14 +463,10 @@
     <div class="character-sheet__locked">
       <span class="character-sheet__lock-icon" aria-hidden="true">📋🔒</span>
       <p>
-        {{
-          isItalian()
-            ? 'La scheda è protetta. Inserisci la password per consultare statistiche e inventario.'
-            : 'The character sheet is protected. Enter the password to view stats and inventory.'
-        }}
+        {{ uiText.text('characterUi.sheet.lockedDescription') }}
       </p>
       <button class="character-sheet__unlock-btn" type="button" (click)="openDialog()">
-        {{ isItalian() ? 'Inserisci password' : 'Enter password' }}
+        {{ uiText.text('characterUi.privateProfile.enterPassword') }}
       </button>
     </div>
   }

@@ -19,6 +19,7 @@ const navigation = read(
   'src/app/adventurers/components/character-sheet-navigation/character-sheet-navigation.component.ts',
 );
 const preferences = read('src/app/guild/services/characterRulePreferences.service.ts');
+const uiCatalog = read('src/app/guild/i18n/ui.json');
 
 assert.match(component, /readonly entries/);
 assert.match(component, /readonly filteredEntries/);
@@ -32,12 +33,12 @@ assert.match(component, /characterRuleEntryId/);
 assert.match(template, /type="search"/);
 assert.match(template, /setFilter\('feature'\)/);
 assert.match(template, /setFilter\('spell'\)/);
-assert.match(template, /Local compendium/);
-assert.match(template, /Entry recorded on the character sheet/);
+assert.match(template, /characterUi\.ruleLibrary\.localCompendium/);
+assert.match(template, /characterUi\.ruleLibrary\.sheetEntry/);
 assert.match(template, /aria-live="polite"/);
-assert.match(template, /not verified by QuestKeeper/);
+assert.match(template, /characterUi\.ruleLibrary\.unverifiedReference/);
 assert.match(template, /rel="noreferrer"/);
-assert.match(template, /Manage in User settings/);
+assert.match(template, /characterUi\.ruleLibrary\.manageSettings/);
 assert.match(template, /rule-library-settings/);
 assert.match(styles, /&__tools/);
 assert.match(styles, /min-height: 44px/);
@@ -49,8 +50,16 @@ assert.match(preferences, /MAX_NOTE_LENGTH = 2000/);
 assert.match(preferences, /MAX_ENTRIES = 500/);
 assert.match(preferences, /encodeURIComponent/);
 assert.match(preferences, /campaignId.*characterId.*entryId/s);
-assert.match(navigation, /Rules/);
+assert.match(navigation, /characterUi\.sheetNavigation\.rules/);
 assert.match(sheetTemplate, /app-character-rule-library/);
+for (const copy of [
+  'Local compendium',
+  'Entry recorded on the character sheet',
+  'Manage in User settings',
+  'not verified by QuestKeeper',
+]) {
+  assert.match(uiCatalog, new RegExp(copy));
+}
 
 const campaignsRoot = path.join('src', 'campaigns');
 const campaigns = JSON.parse(read(path.join(campaignsRoot, 'campaigns.json')));

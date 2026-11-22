@@ -123,39 +123,30 @@ export class CharacterDetailComponent {
 
   /** Stable task-oriented areas keep the complete profile readable without one endless page. */
   readonly tabs: Signal<ReadonlyArray<CharacterDetailTab>> = computed(() => {
-    const italian = this.lang() === 'it';
     return [
       {
         id: 'overview',
         icon: '✦',
-        label: italian ? 'Profilo' : 'Profile',
-        description: italian
-          ? 'Identità, tratti e dettagli essenziali a colpo d’occhio.'
-          : 'Identity, traits and essential details at a glance.',
+        label: this.uiText.text('characterUi.detail.tabs.profile'),
+        description: this.uiText.text('characterUi.detail.tabs.profileDescription'),
       },
       {
         id: 'story',
         icon: '📖',
-        label: italian ? 'Storia e legami' : 'Story & bonds',
-        description: italian
-          ? 'Capitoli personali, relazioni, citazioni e ciò che il gruppo conosce.'
-          : 'Personal chapters, relationships, quotes and what the party knows.',
+        label: this.uiText.text('characterUi.detail.tabs.story'),
+        description: this.uiText.text('characterUi.detail.tabs.storyDescription'),
       },
       {
         id: 'sheet',
         icon: '⚔',
-        label: italian ? 'Scheda' : 'Sheet',
-        description: italian
-          ? 'Statistiche, risorse, inventario, regole, livelli e download PDF.'
-          : 'Stats, resources, inventory, rules, levels and PDF download.',
+        label: this.uiText.text('characterUi.detail.tabs.sheet'),
+        description: this.uiText.text('characterUi.detail.tabs.sheetDescription'),
       },
       {
         id: 'journal',
         icon: '🖋',
-        label: italian ? 'Diario' : 'Journal',
-        description: italian
-          ? 'Taccuino, immagini e memoria delle sessioni.'
-          : 'Notebook, images and session memories.',
+        label: this.uiText.text('characterUi.detail.tabs.journal'),
+        description: this.uiText.text('characterUi.detail.tabs.journalDescription'),
       },
     ];
   });
@@ -289,7 +280,8 @@ export class CharacterDetailComponent {
         description: this.campaignLocale.resolve(relationship.description),
         sourceId: relationship.sourceId,
         targetId: relationship.targetId,
-        sharedMemoryCount: relationship.sharedEvents?.length ?? 0,
+        sharedMemoryCount:
+          relationship.sharedMemories?.length ?? relationship.sharedEvents?.length ?? 0,
         feelings:
           (relationship.perspectives ?? [])
             .find((perspective) => perspective.entityId === character.id)
@@ -352,8 +344,11 @@ export class CharacterDetailComponent {
 
   /** Formats a canonical centimetre value as metres in the selected language. */
   formatHeight(heightCm: number): string {
-    const metres = (heightCm / 100).toFixed(2);
-    return `${this.lang() === 'it' ? metres.replace('.', ',') : metres} m`;
+    const metres = new Intl.NumberFormat(this.campaignLocale.currentLocale(), {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(heightCm / 100);
+    return `${metres} m`;
   }
 
   isTab(tab: CharacterDetailTabId): boolean {

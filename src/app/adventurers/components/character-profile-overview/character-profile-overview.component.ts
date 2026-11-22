@@ -5,6 +5,7 @@ import { type Character } from '@guild/models/character.model';
 import { type BilingualText } from '@guild/models/language.model';
 import { LanguageService } from '@guild/services/language.service';
 import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
+import { UiTextService } from '@guild/services/uiText.service';
 
 type ProfileFacetId = 'traits' | 'ideals' | 'bonds' | 'flaws' | 'hobbies';
 
@@ -28,6 +29,7 @@ const COLLAPSED_COPY_LIMIT = 260;
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CharacterProfileOverviewComponent {
+  readonly uiText = inject(UiTextService);
   private readonly languageService = inject(LanguageService);
   private readonly campaignLocale = inject(CampaignLocaleService);
 
@@ -38,13 +40,12 @@ export class CharacterProfileOverviewComponent {
   /** Only authored facets are shown; placeholder copy remains an honest empty state. */
   readonly facets = computed<ReadonlyArray<ProfileFacet>>(() => {
     const profile = this.character().publicProfile;
-    const italian = this.lang() === 'it';
     const candidates: ReadonlyArray<ProfileFacet | undefined> = [
       this.isRecorded(profile.traits)
         ? {
             id: 'traits',
             icon: '✦',
-            label: italian ? 'Tratti caratteriali' : 'Personality Traits',
+            label: this.uiText.text('characterUi.profile.facets.traits'),
             value: profile.traits,
             wide: false,
           }
@@ -53,7 +54,7 @@ export class CharacterProfileOverviewComponent {
         ? {
             id: 'ideals',
             icon: '◇',
-            label: italian ? 'Ideali' : 'Ideals',
+            label: this.uiText.text('characterUi.profile.facets.ideals'),
             value: profile.ideals,
             wide: false,
           }
@@ -62,7 +63,7 @@ export class CharacterProfileOverviewComponent {
         ? {
             id: 'bonds',
             icon: '∞',
-            label: italian ? 'Legami' : 'Bonds',
+            label: this.uiText.text('characterUi.profile.facets.bonds'),
             value: profile.bonds,
             wide: false,
           }
@@ -71,7 +72,7 @@ export class CharacterProfileOverviewComponent {
         ? {
             id: 'flaws',
             icon: '◈',
-            label: italian ? 'Fragilità' : 'Vulnerabilities',
+            label: this.uiText.text('characterUi.profile.facets.flaws'),
             value: profile.flaws,
             wide: false,
           }
@@ -80,7 +81,7 @@ export class CharacterProfileOverviewComponent {
         ? {
             id: 'hobbies',
             icon: '♬',
-            label: italian ? 'Abitudini e passatempi' : 'Habits & Pastimes',
+            label: this.uiText.text('characterUi.profile.facets.hobbies'),
             value: profile.hobbies,
             wide: true,
           }

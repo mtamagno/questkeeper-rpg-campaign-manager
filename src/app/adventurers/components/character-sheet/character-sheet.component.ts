@@ -267,11 +267,31 @@ export class CharacterSheetComponent {
     const currency = this.sheet().currency;
     if (currency === undefined) return [];
     const values: ReadonlyArray<CurrencyEntry> = [
-      { code: 'PP', value: currency.pp ?? 0, label: this.isItalian() ? 'Platino' : 'Platinum' },
-      { code: 'GP', value: currency.gp ?? 0, label: this.isItalian() ? 'Oro' : 'Gold' },
-      { code: 'EP', value: currency.ep ?? 0, label: this.isItalian() ? 'Elettro' : 'Electrum' },
-      { code: 'SP', value: currency.sp ?? 0, label: this.isItalian() ? 'Argento' : 'Silver' },
-      { code: 'CP', value: currency.cp ?? 0, label: this.isItalian() ? 'Rame' : 'Copper' },
+      {
+        code: 'PP',
+        value: currency.pp ?? 0,
+        label: this.uiText.text('characterUi.sheet.currency.pp'),
+      },
+      {
+        code: 'GP',
+        value: currency.gp ?? 0,
+        label: this.uiText.text('characterUi.sheet.currency.gp'),
+      },
+      {
+        code: 'EP',
+        value: currency.ep ?? 0,
+        label: this.uiText.text('characterUi.sheet.currency.ep'),
+      },
+      {
+        code: 'SP',
+        value: currency.sp ?? 0,
+        label: this.uiText.text('characterUi.sheet.currency.sp'),
+      },
+      {
+        code: 'CP',
+        value: currency.cp ?? 0,
+        label: this.uiText.text('characterUi.sheet.currency.cp'),
+      },
     ];
     return values.filter((entry) => entry.value > 0);
   });
@@ -297,25 +317,11 @@ export class CharacterSheetComponent {
   );
 
   inventoryCategoryLabel(category: CharacterInventoryCategory): string {
-    const labels: Readonly<Record<CharacterInventoryCategory, readonly [string, string]>> = {
-      weapon: ['Arma', 'Weapon'],
-      armor: ['Armatura', 'Armor'],
-      consumable: ['Consumabile', 'Consumable'],
-      tool: ['Strumento', 'Tool'],
-      quest: ['Missione', 'Quest'],
-      gear: ['Equipaggiamento', 'Gear'],
-      other: ['Altro', 'Other'],
-    };
-    return labels[category][this.isItalian() ? 0 : 1];
+    return this.uiText.text(`characterUi.sheet.inventoryCategories.${category}`);
   }
 
   attunementLabel(state: CharacterAttunementState): string {
-    const labels: Readonly<Record<CharacterAttunementState, readonly [string, string]>> = {
-      'not-required': ['Nessuna sintonia', 'No attunement'],
-      required: ['Richiede sintonia', 'Requires attunement'],
-      attuned: ['In sintonia', 'Attuned'],
-    };
-    return labels[state][this.isItalian() ? 0 : 1];
+    return this.uiText.text(`characterUi.sheet.attunement.${state}`);
   }
 
   storyText(value: BilingualText): string {
@@ -323,14 +329,8 @@ export class CharacterSheetComponent {
   }
 
   resourceRecoveryLabel(resource: CharacterCombatResource): string {
-    const labels = {
-      'short-rest': ['Riposo breve', 'Short rest'],
-      'long-rest': ['Riposo lungo', 'Long rest'],
-      dawn: ['All’alba', 'At dawn'],
-      manual: ['Manuale', 'Manual'],
-    } as const;
     const recovery = resource.recovery ?? 'manual';
-    return labels[recovery][this.isItalian() ? 0 : 1];
+    return this.uiText.text(`characterUi.sheet.recovery.${recovery}`);
   }
 
   resourceFill(resource: CharacterCombatResource): string {
@@ -428,6 +428,7 @@ export class CharacterSheetComponent {
       const { generateCampaignCharacterSheetPdf } =
         await import('../../services/campaignCharacterSheetPdf.service');
       const language = this.campaignLocale.currentLocale();
+      // UI-TEXT-DATA-OWNED: the PDF renderer currently exposes an explicit en/it field-label schema.
       const interfaceLanguage = this.isItalian() ? 'it' : 'en';
       const blob = await generateCampaignCharacterSheetPdf(
         this.characterName(),

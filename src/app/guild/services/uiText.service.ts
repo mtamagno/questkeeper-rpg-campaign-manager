@@ -3,10 +3,12 @@ import { Injectable, inject } from '@angular/core';
 import {
   DEFAULT_INTERFACE_LOCALE,
   UI_TEXT_CATALOG,
+  UI_TEXT_DEPLOYMENT_OVERRIDES,
   resolveInterfaceLocale,
   type UiTextTree,
 } from '@guild/i18n/uiCatalog';
 import { LanguageService } from '@guild/services/language.service';
+import { CampaignService } from '@guild/services/campaign.service';
 
 type UiTextParameters = Readonly<Record<string, string | number>>;
 type LocalizedInterfaceText = Readonly<Record<string, string | undefined>>;
@@ -30,6 +32,7 @@ function interpolate(template: string, parameters: UiTextParameters): string {
 @Injectable({ providedIn: 'root' })
 export class UiTextService {
   private readonly language = inject(LanguageService);
+  private readonly campaign = inject(CampaignService);
   private readonly warnedKeys = new Set<string>();
 
   text(key: string, parameters: UiTextParameters = {}): string {
@@ -50,8 +53,13 @@ export class UiTextService {
     appendLocale(requestedLocale);
     appendLocale(DEFAULT_INTERFACE_LOCALE);
 
+    const campaignOverrides = this.campaign.activeInterfaceTextOverrides();
     const resolved = searchOrder
-      .map((locale) => readPath(UI_TEXT_CATALOG.locales[locale].texts, key))
+      .flatMap((locale) => [
+        readPath(campaignOverrides[locale] ?? {}, key),
+        readPath(UI_TEXT_DEPLOYMENT_OVERRIDES.locales[locale] ?? {}, key),
+        readPath(UI_TEXT_CATALOG.locales[locale].texts, key),
+      ])
       .find((value) => value !== undefined);
     if (resolved !== undefined) return interpolate(resolved, parameters);
 

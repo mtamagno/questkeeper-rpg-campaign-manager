@@ -43,6 +43,9 @@ export interface Relationship {
   readonly sharedEvents?: ReadonlyArray<SharedEvent>;
   readonly quotes?: ReadonlyArray<RelationshipQuote>;
   readonly evolution?: ReadonlyArray<RelationshipEvolution>;
+  readonly history?: ReadonlyArray<RelationshipHistoryEntry>;
+  readonly promiseHistory?: ReadonlyArray<RelationshipPromiseChange>;
+  readonly sharedMemories?: ReadonlyArray<SharedRelationshipMemory>;
   readonly perspectives?: ReadonlyArray<RelationshipPerspective>;
   readonly partyPerception?: PartyRelationshipPerception;
 }
@@ -131,6 +134,57 @@ export interface RelationshipEvolution {
   readonly fromType?: RelationshipType;
   readonly toType: RelationshipType;
   readonly note: BilingualText;
+}
+
+/** A session-linked snapshot of the bond's authored emotional dimensions. */
+export interface RelationshipHistoryEntry {
+  readonly sessionId: string;
+  readonly trust?: number;
+  readonly tension?: number;
+  readonly affection?: number;
+  readonly note: BilingualText;
+}
+
+export const RELATIONSHIP_PROMISE_STATUSES = {
+  MADE: 'made',
+  KEPT: 'kept',
+  BROKEN: 'broken',
+  RELEASED: 'released',
+} as const;
+
+export type RelationshipPromiseStatus =
+  (typeof RELATIONSHIP_PROMISE_STATUSES)[keyof typeof RELATIONSHIP_PROMISE_STATUSES];
+
+/** One dated change to a stable promise between the participants. */
+export interface RelationshipPromiseChange {
+  readonly promiseId: string;
+  readonly sessionId: string;
+  readonly status: RelationshipPromiseStatus;
+  readonly label: BilingualText;
+  readonly note?: BilingualText;
+}
+
+/** One person's authored recollection of a shared event. */
+export interface SharedMemoryViewpoint {
+  readonly entityId: string;
+  readonly account: BilingualText;
+}
+
+/** A character-to-character memory anchored to a canonical session. */
+export interface SharedRelationshipMemory {
+  readonly id: string;
+  readonly sessionId: string;
+  readonly participantIds: ReadonlyArray<string>;
+  readonly title: BilingualText;
+  readonly sharedFacts: BilingualText;
+  readonly viewpoints: ReadonlyArray<SharedMemoryViewpoint>;
+  readonly differences?: ReadonlyArray<SharedMemoryDifference>;
+}
+
+/** An authored point where participants remember the same event differently. */
+export interface SharedMemoryDifference {
+  readonly topic: BilingualText;
+  readonly accounts: ReadonlyArray<SharedMemoryViewpoint>;
 }
 
 /**
