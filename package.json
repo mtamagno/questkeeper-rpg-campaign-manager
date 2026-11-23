@@ -18,6 +18,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:manager": "node --test tools/campaign-manager/tests/*.test.mjs && npm run test:compendium-baseline",
+    "test:campaign-authority": "node --test tools/campaign-manager/tests/campaign-authority.test.mjs",
     "test:compendium-packages": "node --test tools/campaign-manager/tests/compendium-packages.test.mjs",
     "test:compendium-baseline": "npm run prepare:compendia && node scripts/verify-baseline-compendium.mjs",
     "test:local-compendia": "node scripts/verify-local-compendia.cjs && node --test tools/campaign-manager/tests/compendium-store.test.mjs",

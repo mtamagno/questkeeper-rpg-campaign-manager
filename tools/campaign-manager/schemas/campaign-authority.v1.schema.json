@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://questkeeper.app/schemas/campaign-authority.v1.schema.json",
+  "title": "QuestKeeper campaign authority registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "campaignId", "trustMode", "claimState", "memberships", "audit"],
+  "properties": {
+    "version": { "const": 1 },
+    "campaignId": { "$ref": "#/$defs/campaignId" },
+    "trustMode": { "enum": ["local-only", "owner-managed", "shared"] },
+    "claimState": { "enum": ["unclaimed", "claimed", "transfer-pending"] },
+    "localControllerInstallationId": { "$ref": "#/$defs/installationId" },
+    "memberships": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/membership" }
+    },
+    "pendingTransfer": { "$ref": "#/$defs/transfer" },
+    "audit": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/auditEvent" }
+    }
+  },
+  "$defs": {
+    "campaignId": { "type": "string", "pattern": "^campaign_[a-z0-9][a-z0-9_-]{5,127}$" },
+    "personId": { "type": "string", "pattern": "^person_[a-z0-9][a-z0-9_-]{5,127}$" },
+    "installationId": {
+      "type": "string",
+      "pattern": "^installation_[a-z0-9][a-z0-9_-]{5,127}$"
+    },
+    "membershipId": {
+      "type": "string",
+      "pattern": "^membership_[a-z0-9][a-z0-9_-]{5,127}$"
+    },
+    "membership": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "subjectId", "role", "status", "provenance", "grantedBy", "grantedAt"],
+      "properties": {
+        "id": { "$ref": "#/$defs/membershipId" },
+        "subjectId": { "$ref": "#/$defs/personId" },
+        "role": { "enum": ["owner", "gm", "editor", "player", "viewer"] },
+        "status": { "enum": ["active", "revoked", "pending"] },
+        "provenance": { "enum": ["created", "invitation", "import", "transfer"] },
+        "grantedBy": { "$ref": "#/$defs/personId" },
+        "grantedAt": { "type": "string", "format": "date-time" },
+        "expiresAt": { "type": "string", "format": "date-time" },
+        "revokedAt": { "type": "string", "format": "date-time" },
+        "revokedBy": { "$ref": "#/$defs/personId" }
+      }
+    },
+    "transfer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "fromSubjectId", "toSubjectId", "requestedAt", "expiresAt"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^transfer_[a-z0-9][a-z0-9_-]{5,127}$" },
+        "fromSubjectId": { "$ref": "#/$defs/personId" },
+        "toSubjectId": { "$ref": "#/$defs/personId" },
+        "requestedAt": { "type": "string", "format": "date-time" },
+        "expiresAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "auditEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "actorSubjectId", "campaignId", "occurredAt"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^audit_[a-z0-9][a-z0-9_-]{5,127}$" },
+        "type": {
+          "enum": [
+            "authority.created",
+            "legacy.marked-unclaimed",
+            "membership.granted",
+            "membership.revoked",
+            "ownership.transfer-started",
+            "ownership.transferred",
+            "ownership.transfer-cancelled"
+          ]
+        },
+        "actorSubjectId": { "type": "string" },
+        "campaignId": { "$ref": "#/$defs/campaignId" },
+        "occurredAt": { "type": "string", "format": "date-time" },
+        "targetSubjectId": { "$ref": "#/$defs/personId" },
+        "previousOwnerSubjectId": { "$ref": "#/$defs/personId" },
+        "installationId": { "$ref": "#/$defs/installationId" },
+        "membershipId": { "$ref": "#/$defs/membershipId" },
+        "transferId": {
+          "type": "string",
+          "pattern": "^transfer_[a-z0-9][a-z0-9_-]{5,127}$"
+        },
+        "role": { "enum": ["owner", "gm", "editor", "player", "viewer"] },
+        "reasonCode": { "type": "string", "pattern": "^[a-z0-9-]+$" }
+      }
+    }
+  }
+}

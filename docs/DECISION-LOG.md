@@ -2027,3 +2027,31 @@ markers or a documented production-only prefix; an unclassified branch fails
 **Revisit when:** Independently versioned extensions need their own UI catalog
 namespace, or generated localization tooling can provide equivalent ownership,
 parity and diagnostics guarantees.
+
+### QK-075 — Campaign roles are scoped grants, not global personas
+
+**Date:** 23 November 2026
+
+**Status:** Active; release and service enforcement tracked by #120-#124
+
+**Decision:** Stable person identities receive one active role per campaign.
+Roles explain the interface, while protected actions check deterministic
+capabilities from a versioned authority registry. Local installation identity is
+provenance, not ownership. Legacy campaigns remain explicitly unclaimed until a
+separate proof flow succeeds.
+
+**Why:** One person can own one campaign, GM another and play a third. Global
+Player/GM choices, folder names and shared FTP credentials cannot represent or
+enforce that reality.
+
+**Consequences:** Membership, revocation, expiry and two-party ownership
+transfer are campaign-scoped and audited. Public Companion artifacts receive
+only a privacy-safe authority summary. The local model must never be presented
+as remote security; authoritative mutations still require the trusted service
+boundary in #121.
+
+**Source:** [Campaign authority model](CAMPAIGN-AUTHORITY.md),
+[publishing authority decision](PUBLISHING-AUTHORITY.md) and issue #120.
+
+**Revisit when:** Account recovery, organization ownership or independently
+hosted authority services need a new schema version.

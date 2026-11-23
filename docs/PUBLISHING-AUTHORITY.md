@@ -190,11 +190,12 @@ replace authorization or revision checks.
 ## Implementation disposition
 
 Disposition: **implement through the existing epic split**. Research issue #119
-may close; it does not ship shared authorization. #120 defines identity, roles,
-grants and transfer. #121 implements the service boundary, revision protocol and
-adapters. #122 consumes effective capabilities in Manager UI. #123 removes the
-global home role fork. #124 owns reversible claim and migration. Those issues
-remain open until their behavior is released and smoke-tested.
+is complete. #120 now has a versioned, tested campaign authority model documented
+in `CAMPAIGN-AUTHORITY.md`; it remains awaiting release under its explicit release
+policy. #121 implements the service boundary, revision protocol and adapters.
+#122 consumes effective capabilities in Manager UI. #123 removes the global home
+role fork. #124 owns reversible claim and migration. Those issues remain open
+until their behavior is released and smoke-tested.
 
 ## Authoritative references
 
