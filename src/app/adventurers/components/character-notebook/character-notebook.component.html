@@ -12,6 +12,119 @@
         {{ uiText.text('characterUi.notebook.lockAgain') }}
       </button>
     </header>
+    <div class="notebook-tools">
+      <details class="notebook-tools__panel">
+        <summary>
+          <span>{{ uiText.text('characterUi.notebook.contents.title') }}</span>
+          <small>{{
+            uiText.text('characterUi.notebook.contents.count', {
+              visible: tableOfContents().length,
+              total: notebook().pages.length,
+            })
+          }}</small>
+        </summary>
+        <p>{{ uiText.text('characterUi.notebook.contents.help') }}</p>
+        <ol class="notebook-tools__contents">
+          @for (entry of tableOfContents(); track entry.page.id) {
+            <li>
+              <button
+                type="button"
+                [class.is-current]="slides()[entry.slideIndex]?.id === currentSlide()?.id"
+                [attr.aria-current]="
+                  slides()[entry.slideIndex]?.id === currentSlide()?.id ? 'page' : null
+                "
+                (click)="goToSlide(entry.slideIndex)"
+              >
+                <span>{{ (entry.originalIndex + 1).toString().padStart(2, '0') }}</span>
+                <strong>{{ notebookText(entry.page.title) }}</strong>
+                <small>{{ pageDate(entry.page) }}</small>
+              </button>
+            </li>
+          }
+        </ol>
+      </details>
+
+      <details class="notebook-tools__panel">
+        <summary>
+          <span>{{ uiText.text('characterUi.notebook.filters.title') }}</span>
+          <small>{{
+            hasActiveFilters()
+              ? uiText.text('characterUi.notebook.filters.active')
+              : uiText.text('characterUi.notebook.filters.inactive')
+          }}</small>
+        </summary>
+        <p>{{ uiText.text('characterUi.notebook.filters.help') }}</p>
+        <div class="notebook-tools__filters">
+          <label>
+            <span>{{ uiText.text('characterUi.notebook.filters.order') }}</span>
+            <select
+              [value]="chronologyOrder()"
+              (change)="chronologyOrder.set($any($event.target).value)"
+            >
+              <option value="authored">
+                {{ uiText.text('characterUi.notebook.order.authored') }}
+              </option>
+              <option value="oldest">{{ uiText.text('characterUi.notebook.order.oldest') }}</option>
+              <option value="newest">{{ uiText.text('characterUi.notebook.order.newest') }}</option>
+            </select>
+          </label>
+          <label>
+            <span>{{ uiText.text('characterUi.notebook.filters.mood') }}</span>
+            <select [value]="selectedMood()" (change)="selectedMood.set($any($event.target).value)">
+              <option value="all">{{ uiText.text('characterUi.notebook.filters.all') }}</option>
+              @for (mood of moodOptions(); track mood) {
+                <option [value]="mood">{{ moodLabel(mood) }}</option>
+              }
+            </select>
+          </label>
+          <label>
+            <span>{{ uiText.text('characterUi.notebook.filters.session') }}</span>
+            <select
+              [value]="selectedSessionId()"
+              (change)="selectedSessionId.set($any($event.target).value)"
+            >
+              <option value="all">{{ uiText.text('characterUi.notebook.filters.all') }}</option>
+              @for (sessionId of sessionOptions(); track sessionId) {
+                <option [value]="sessionId">{{ sessionLabel(sessionId) }}</option>
+              }
+            </select>
+          </label>
+          <label>
+            <span>{{ uiText.text('characterUi.notebook.filters.character') }}</span>
+            <select
+              [value]="selectedCharacterId()"
+              (change)="selectedCharacterId.set($any($event.target).value)"
+            >
+              <option value="all">{{ uiText.text('characterUi.notebook.filters.all') }}</option>
+              @for (characterId of characterOptions(); track characterId) {
+                <option [value]="characterId">{{ characterLabel(characterId) }}</option>
+              }
+            </select>
+          </label>
+          <label>
+            <span>{{ uiText.text('characterUi.notebook.filters.secrecy') }}</span>
+            <select
+              [value]="selectedSecrecy()"
+              (change)="selectedSecrecy.set($any($event.target).value)"
+            >
+              <option value="all">{{ uiText.text('characterUi.notebook.filters.all') }}</option>
+              @for (secrecy of secrecyOptions(); track secrecy) {
+                <option [value]="secrecy">{{ secrecyLabel(secrecy) }}</option>
+              }
+            </select>
+          </label>
+        </div>
+        @if (hasActiveFilters()) {
+          <button type="button" class="notebook-tools__clear" (click)="clearFilters()">
+            {{ uiText.text('characterUi.notebook.filters.clear') }}
+          </button>
+        }
+      </details>
+    </div>
+
+    @if (filteredPages().length === 0) {
+      <p class="notebook__empty">{{ uiText.text('characterUi.notebook.filters.empty') }}</p>
+    }
 
     @if (slides().length > 0) {
       <section
@@ -71,6 +184,13 @@
                 </span>
                 <div>
                   <span class="notebook-book__era">{{ slide.page.era | bilingual }}</span>
+                  <div class="notebook-book__metadata">
+                    <span>{{ pageDate(slide.page) }}</span>
+                    @if (slide.page.sessionId; as sessionId) {
+                      <span>{{ sessionLabel(sessionId) }}</span>
+                    }
+                    <span>{{ secrecyLabel(slide.page.secrecy ?? 'private') }}</span>
+                  </div>
                   <h3>{{ notebookText(slide.page.title) }}</h3>
                   <blockquote>{{ notebookText(slide.page.reflection) }}</blockquote>
                 </div>

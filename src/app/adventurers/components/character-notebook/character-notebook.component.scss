@@ -142,6 +142,161 @@
   }
 }
 
+.notebook-tools {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: $spacing-md;
+  max-width: 1240px;
+  margin: 0 auto $spacing-xl;
+
+  &__panel {
+    border: $border-width-thin solid $color-border-strong;
+    border-radius: $border-radius-md;
+    background: rgba($color-bg-elevated, 0.72);
+
+    &[open] {
+      grid-column: 1 / -1;
+    }
+
+    > summary {
+      display: flex;
+      min-height: 48px;
+      align-items: center;
+      justify-content: space-between;
+      gap: $spacing-md;
+      padding: $spacing-sm $spacing-md;
+      color: $color-gold-light;
+      cursor: pointer;
+      font-family: $font-family-heading;
+
+      small {
+        color: $color-text-muted;
+        font-family: $font-family-body;
+      }
+
+      &:focus-visible {
+        outline: $border-width-default solid $color-gold-light;
+        outline-offset: 3px;
+      }
+    }
+
+    > p {
+      margin: 0;
+      padding: 0 $spacing-md $spacing-md;
+      color: $color-text-secondary;
+      font-size: $font-size-sm;
+    }
+  }
+
+  &__contents {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: $spacing-xs;
+    max-height: 340px;
+    margin: 0;
+    padding: 0 $spacing-md $spacing-md;
+    overflow: auto;
+    list-style: none;
+
+    button {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: $spacing-sm;
+      width: 100%;
+      align-items: center;
+      padding: $spacing-sm;
+      border: $border-width-thin solid transparent;
+      border-radius: $border-radius-sm;
+      background: rgba($color-bg-void, 0.32);
+      color: $color-text-secondary;
+      text-align: left;
+      cursor: pointer;
+
+      > span,
+      > small {
+        color: $color-text-muted;
+        font-size: $font-size-xs;
+      }
+
+      &.is-current {
+        border-color: $color-gold-dark;
+        background: rgba($color-gold-dark, 0.16);
+        color: $color-text-primary;
+      }
+
+      &:focus-visible {
+        outline: $border-width-default solid $color-gold-light;
+        outline-offset: 2px;
+      }
+    }
+  }
+
+  &__filters {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: $spacing-sm;
+    padding: 0 $spacing-md $spacing-md;
+
+    label {
+      display: grid;
+      gap: $spacing-2xs;
+      color: $color-text-secondary;
+      font-size: $font-size-sm;
+    }
+
+    select {
+      width: 100%;
+      min-height: 44px;
+      padding: $spacing-xs $spacing-sm;
+      border: $border-width-thin solid $color-border-strong;
+      border-radius: $border-radius-sm;
+      background: $color-bg-void;
+      color: $color-text-primary;
+
+      &:focus-visible {
+        outline: $border-width-default solid $color-gold-light;
+        outline-offset: 2px;
+      }
+    }
+  }
+
+  &__clear {
+    margin: 0 $spacing-md $spacing-md;
+    padding: $spacing-xs $spacing-md;
+    border: $border-width-thin solid $color-gold-dark;
+    border-radius: $border-radius-pill;
+    background: transparent;
+    color: $color-gold-light;
+    cursor: pointer;
+  }
+
+  @include respond-below(md) {
+    grid-template-columns: 1fr;
+
+    &__contents {
+      grid-template-columns: 1fr;
+    }
+
+    &__filters {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @include respond-below(sm) {
+    &__filters {
+      grid-template-columns: 1fr;
+    }
+
+    &__contents button {
+      grid-template-columns: auto minmax(0, 1fr);
+
+      > small {
+        grid-column: 2;
+      }
+    }
+  }
+}
+
 .notebook-book {
   position: relative;
   max-width: 1240px;
@@ -355,6 +510,21 @@
     font-weight: $font-weight-semibold;
     letter-spacing: $letter-spacing-wide;
     text-transform: uppercase;
+  }
+
+  &__metadata {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-xs;
+    margin-top: $spacing-xs;
+
+    span {
+      padding: 2px $spacing-xs;
+      border: $border-width-thin solid $color-border-strong;
+      border-radius: $border-radius-pill;
+      color: $color-text-muted;
+      font-size: $font-size-xs;
+    }
   }
 
   &__controls {

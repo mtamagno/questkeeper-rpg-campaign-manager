@@ -14,7 +14,9 @@ import {
 
 import {
   type CharacterNotebook,
+  type CharacterNotebookMood,
   type CharacterNotebookPage,
+  type CharacterNotebookSecrecy,
   type CharacterNotebookText,
   type ImageRef,
 } from '@guild/models/character.model';
@@ -28,6 +30,14 @@ import { CampaignService } from '@guild/services/campaign.service';
 import { CharacterReadingPositionService } from '@guild/services/characterReadingPosition.service';
 import { toDisplayUrl } from '@guild/services/imageUrl.service';
 import { UiTextService } from '@guild/services/uiText.service';
+import { DataService } from '@guild/services/data.service';
+
+type NotebookOrder = 'authored' | 'oldest' | 'newest';
+
+interface IndexedNotebookPage {
+  readonly page: CharacterNotebookPage;
+  readonly originalIndex: number;
+}
 
 type NotebookSlide =
   | {
@@ -58,6 +68,7 @@ export class CharacterNotebookComponent {
   private readonly campaignLocale = inject(CampaignLocaleService);
   private readonly campaignService = inject(CampaignService);
   private readonly readingPosition = inject(CharacterReadingPositionService);
+  private readonly data = inject(DataService);
   private restoredIdentity = '';
 
   readonly characterId = input.required<string>();
@@ -69,6 +80,11 @@ export class CharacterNotebookComponent {
   readonly hasPasswordError: WritableSignal<boolean> = signal(false);
   readonly currentSlideIndex: WritableSignal<number> = signal(0);
   readonly lightboxImage: WritableSignal<ImageRef | null> = signal(null);
+  readonly selectedMood = signal<CharacterNotebookMood | 'all'>('all');
+  readonly selectedSessionId = signal('all');
+  readonly selectedCharacterId = signal('all');
+  readonly selectedSecrecy = signal<CharacterNotebookSecrecy | 'all'>('all');
+  readonly chronologyOrder = signal<NotebookOrder>('authored');
 
   private readonly accessId: Signal<string> = computed(() => `${this.characterId()}:notebook`);
 
@@ -76,16 +92,67 @@ export class CharacterNotebookComponent {
     this.passwordService.isUnlocked(this.accessId())(),
   );
 
+  readonly moodOptions = computed(() => [
+    ...new Set(this.notebook().pages.map((page) => page.mood)),
+  ]);
+  readonly sessionOptions = computed(() => [
+    ...new Set(
+      this.notebook()
+        .pages.map((page) => page.sessionId)
+        .filter((id): id is string => Boolean(id)),
+    ),
+  ]);
+  readonly characterOptions = computed(() => [
+    ...new Set(this.notebook().pages.flatMap((page) => page.relatedCharacterIds ?? [])),
+  ]);
+  readonly secrecyOptions = computed(() => [
+    ...new Set(this.notebook().pages.map((page) => page.secrecy ?? 'private')),
+  ]);
+  readonly hasActiveFilters = computed(
+    () =>
+      this.selectedMood() !== 'all' ||
+      this.selectedSessionId() !== 'all' ||
+      this.selectedCharacterId() !== 'all' ||
+      this.selectedSecrecy() !== 'all',
+  );
+  readonly filteredPages: Signal<ReadonlyArray<IndexedNotebookPage>> = computed(() => {
+    const mood = this.selectedMood();
+    const sessionId = this.selectedSessionId();
+    const characterId = this.selectedCharacterId();
+    const secrecy = this.selectedSecrecy();
+    const order = this.chronologyOrder();
+    const pages = this.notebook()
+      .pages.map((page, originalIndex) => ({ page, originalIndex }))
+      .filter(({ page }) => mood === 'all' || page.mood === mood)
+      .filter(({ page }) => sessionId === 'all' || page.sessionId === sessionId)
+      .filter(
+        ({ page }) =>
+          characterId === 'all' || (page.relatedCharacterIds ?? []).includes(characterId),
+      )
+      .filter(({ page }) => secrecy === 'all' || (page.secrecy ?? 'private') === secrecy);
+    if (order === 'authored') return pages;
+    return [...pages].sort((left, right) => {
+      const leftDate = Date.parse(left.page.recordedAt ?? '');
+      const rightDate = Date.parse(right.page.recordedAt ?? '');
+      if (Number.isNaN(leftDate) && Number.isNaN(rightDate)) {
+        return left.originalIndex - right.originalIndex;
+      }
+      if (Number.isNaN(leftDate)) return 1;
+      if (Number.isNaN(rightDate)) return -1;
+      return order === 'oldest' ? leftDate - rightDate : rightDate - leftDate;
+    });
+  });
+
   readonly slides: Signal<ReadonlyArray<NotebookSlide>> = computed(() => {
     const notebook = this.notebook();
     const slides: NotebookSlide[] = [];
-    if (notebook.frontCover) {
+    if (!this.hasActiveFilters() && notebook.frontCover) {
       slides.push({ kind: 'cover', side: 'front', id: 'front-cover', image: notebook.frontCover });
     }
-    notebook.pages.forEach((page, spreadIndex) => {
-      slides.push({ kind: 'spread', id: page.id, spreadIndex, page });
+    this.filteredPages().forEach(({ page, originalIndex }) => {
+      slides.push({ kind: 'spread', id: page.id, spreadIndex: originalIndex, page });
     });
-    if (notebook.backCover) {
+    if (!this.hasActiveFilters() && notebook.backCover) {
       slides.push({ kind: 'cover', side: 'back', id: 'back-cover', image: notebook.backCover });
     }
     return slides;
@@ -93,6 +160,13 @@ export class CharacterNotebookComponent {
 
   readonly currentSlide: Signal<NotebookSlide | undefined> = computed(
     () => this.slides()[this.currentSlideIndex()],
+  );
+  readonly tableOfContents = computed(() =>
+    this.filteredPages().map(({ page, originalIndex }) => ({
+      page,
+      originalIndex,
+      slideIndex: this.slides().findIndex((slide) => slide.id === page.id),
+    })),
   );
   readonly slideIndexes: Signal<number[]> = computed(() =>
     Array.from({ length: this.slides().length }, (_, index) => index),
@@ -125,6 +199,11 @@ export class CharacterNotebookComponent {
     const remembered = this.readingPosition.get(campaignId, characterId)?.notebookSlide ?? 0;
     this.currentSlideIndex.set(Math.min(remembered, Math.max(0, slides.length - 1)));
     this.restoredIdentity = identity;
+  });
+
+  private readonly keepCurrentSlideValid = effect(() => {
+    const lastIndex = Math.max(0, this.slides().length - 1);
+    if (this.currentSlideIndex() > lastIndex) this.currentSlideIndex.set(lastIndex);
   });
 
   openDialog(): void {
@@ -171,6 +250,38 @@ export class CharacterNotebookComponent {
       this.characterId(),
       safeIndex,
     );
+  }
+
+  clearFilters(): void {
+    this.selectedMood.set('all');
+    this.selectedSessionId.set('all');
+    this.selectedCharacterId.set('all');
+    this.selectedSecrecy.set('all');
+  }
+
+  moodLabel(mood: CharacterNotebookMood): string {
+    return this.uiText.text(`characterUi.notebook.moods.${mood}`);
+  }
+
+  secrecyLabel(secrecy: CharacterNotebookSecrecy): string {
+    return this.uiText.text(`characterUi.notebook.secrecy.${secrecy}`);
+  }
+
+  sessionLabel(sessionId: string): string {
+    const session = this.data.sessions().find((candidate) => candidate.id === sessionId);
+    return session
+      ? this.campaignLocale.resolve(session.title)
+      : this.uiText.text('characterUi.notebook.sessionFallback', { id: sessionId });
+  }
+
+  characterLabel(characterId: string): string {
+    return (
+      this.data.characters().find((candidate) => candidate.id === characterId)?.name ?? characterId
+    );
+  }
+
+  pageDate(page: CharacterNotebookPage): string {
+    return page.recordedAt ?? this.uiText.text('characterUi.notebook.undated');
   }
 
   openLightbox(image: ImageRef): void {

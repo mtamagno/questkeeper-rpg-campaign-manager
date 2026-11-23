@@ -118,6 +118,9 @@ export type CharacterNotebookMood =
 /** Notebook copy may be authored in one language or localized per campaign. */
 export type CharacterNotebookText = string | BilingualText;
 
+/** Intended audience of one notebook spread after the notebook itself is unlocked. */
+export type CharacterNotebookSecrecy = 'private' | 'party' | 'public';
+
 /** One complete illustrated two-page spread from a character's notebook. */
 export interface CharacterNotebookPage {
   readonly id: string;
@@ -126,6 +129,13 @@ export interface CharacterNotebookPage {
   readonly image: ImageRef;
   readonly reflection: CharacterNotebookText;
   readonly mood: CharacterNotebookMood;
+  /** Optional ISO date used by the notebook chronology. */
+  readonly recordedAt?: string;
+  /** Stable evidence links used by filters; display names remain entity-owned. */
+  readonly sessionId?: string;
+  readonly relatedCharacterIds?: ReadonlyArray<string>;
+  /** Legacy pages default to private because the containing notebook is protected. */
+  readonly secrecy?: CharacterNotebookSecrecy;
 }
 
 /** Optional separately protected visual notebook attached to a character. */

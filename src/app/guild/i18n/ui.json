@@ -192,7 +192,54 @@
             "frontCover": "Front cover",
             "backCover": "Back cover",
             "spread": "Spread {current} / {total}",
-            "goTo": "Go to: {label}"
+            "goTo": "Go to: {label}",
+            "undated": "Undated",
+            "sessionFallback": "Session {id}",
+            "contents": {
+              "title": "Contents and chronology",
+              "count": "{visible} of {total} spreads",
+              "help": "Jump to an entry without turning every page. Dates and evidence links remain attached to the authored spread."
+            },
+            "filters": {
+              "title": "Browse these pages",
+              "active": "Filters active",
+              "inactive": "All pages",
+              "help": "Narrow the notebook without changing or duplicating its authored chronology.",
+              "order": "Order",
+              "mood": "Mood",
+              "session": "Session",
+              "character": "Person",
+              "secrecy": "Secrecy",
+              "all": "All",
+              "clear": "Clear filters",
+              "empty": "No notebook spread matches these filters."
+            },
+            "order": {
+              "authored": "Notebook order",
+              "oldest": "Oldest first",
+              "newest": "Newest first"
+            },
+            "secrecy": {
+              "private": "Private",
+              "party": "Shared with the party",
+              "public": "Public"
+            },
+            "moods": {
+              "joyful": "Joyful",
+              "tender": "Tender",
+              "calm": "Calm",
+              "hopeful": "Hopeful",
+              "mysterious": "Mysterious",
+              "wary": "Wary",
+              "uneasy": "Uneasy",
+              "fractured": "Fractured",
+              "grief": "Grief",
+              "guilt": "Guilt",
+              "memory": "Memory",
+              "time": "Time",
+              "music": "Music",
+              "renewal": "Renewal"
+            }
           },
           "sheetNavigation": {
             "views": "Sheet views",
@@ -1449,7 +1496,54 @@
             "frontCover": "Copertina",
             "backCover": "Quarta di copertina",
             "spread": "Tavola {current} / {total}",
-            "goTo": "Vai a: {label}"
+            "goTo": "Vai a: {label}",
+            "undated": "Senza data",
+            "sessionFallback": "Sessione {id}",
+            "contents": {
+              "title": "Indice e cronologia",
+              "count": "{visible} di {total} tavole",
+              "help": "Raggiungi una pagina senza sfogliare tutto il taccuino. Date e riferimenti restano legati alla tavola originale."
+            },
+            "filters": {
+              "title": "Esplora queste pagine",
+              "active": "Filtri attivi",
+              "inactive": "Tutte le pagine",
+              "help": "Restringi il taccuino senza modificare o duplicare la cronologia scritta.",
+              "order": "Ordine",
+              "mood": "Umore",
+              "session": "Sessione",
+              "character": "Persona",
+              "secrecy": "Segretezza",
+              "all": "Tutti",
+              "clear": "Azzera i filtri",
+              "empty": "Nessuna tavola del taccuino corrisponde a questi filtri."
+            },
+            "order": {
+              "authored": "Ordine del taccuino",
+              "oldest": "Prima le più vecchie",
+              "newest": "Prima le più recenti"
+            },
+            "secrecy": {
+              "private": "Privata",
+              "party": "Condivisa con il gruppo",
+              "public": "Pubblica"
+            },
+            "moods": {
+              "joyful": "Gioiosa",
+              "tender": "Affettuosa",
+              "calm": "Calma",
+              "hopeful": "Speranzosa",
+              "mysterious": "Misteriosa",
+              "wary": "Guardinga",
+              "uneasy": "Inquieta",
+              "fractured": "Spezzata",
+              "grief": "Dolore",
+              "guilt": "Colpa",
+              "memory": "Ricordo",
+              "time": "Tempo",
+              "music": "Musica",
+              "renewal": "Rinascita"
+            }
           },
           "sheetNavigation": {
             "views": "Viste della scheda",
