@@ -1357,6 +1357,10 @@ async function routeApi(request, response, url) {
         era: localized(page.era),
         reflection: localized(page.reflection),
         mood: page.mood,
+        ...(String(page.recordedAt || '').trim()
+          ? { recordedAt: String(page.recordedAt).trim() }
+          : {}),
+        secrecy: page.secrecy || 'private',
         image: { url: image?.path ?? '', alt: page.alt },
       };
     });

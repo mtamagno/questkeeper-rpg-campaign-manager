@@ -20,8 +20,10 @@ const allowedMoods = new Set([
   'music',
   'renewal',
 ]);
+const allowedSecrecy = new Set(['private', 'party', 'public']);
 const failures = [];
 let notebookCount = 0;
+let enrichedPageCount = 0;
 
 function assert(condition, message) {
   if (!condition) failures.push(message);
@@ -42,9 +44,23 @@ function assertAsset(campaignRoot, asset, label) {
 for (const campaign of campaigns) {
   const campaignRoot = path.join(campaignsRoot, campaign.id);
   const characterRoot = path.join(campaignRoot, 'data', 'characters');
+  const sessionRoot = path.join(campaignRoot, 'data', 'sessions');
   const manifestPath = path.join(characterRoot, 'manifest.json');
   if (!fs.existsSync(manifestPath)) continue;
   const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+  const characterIds = new Set(
+    manifest.map(
+      (fileName) => JSON.parse(fs.readFileSync(path.join(characterRoot, fileName), 'utf8')).id,
+    ),
+  );
+  const sessionManifestPath = path.join(sessionRoot, 'manifest.json');
+  const sessionIds = new Set(
+    fs.existsSync(sessionManifestPath)
+      ? JSON.parse(fs.readFileSync(sessionManifestPath, 'utf8')).map(
+          (fileName) => JSON.parse(fs.readFileSync(path.join(sessionRoot, fileName), 'utf8')).id,
+        )
+      : [],
+  );
   for (const fileName of manifest) {
     const character = JSON.parse(fs.readFileSync(path.join(characterRoot, fileName), 'utf8'));
     if (!character.notebook) continue;
@@ -72,6 +88,44 @@ for (const campaign of campaigns) {
         allowedMoods.has(page.mood),
         `${label}/${page.id} uses unsupported mood ${page.mood}.`,
       );
+      if (page.recordedAt !== undefined) {
+        assert(
+          /^\d{4}-\d{2}-\d{2}$/.test(page.recordedAt) && !Number.isNaN(Date.parse(page.recordedAt)),
+          `${label}/${page.id} has invalid recordedAt ${page.recordedAt}.`,
+        );
+      }
+      if (page.sessionId !== undefined) {
+        assert(
+          sessionIds.has(page.sessionId),
+          `${label}/${page.id} links unknown session ${page.sessionId}.`,
+        );
+      }
+      if (page.relatedCharacterIds !== undefined) {
+        assert(
+          Array.isArray(page.relatedCharacterIds),
+          `${label}/${page.id} character links must be an array.`,
+        );
+        const relatedIds = page.relatedCharacterIds || [];
+        assert(
+          new Set(relatedIds).size === relatedIds.length,
+          `${label}/${page.id} repeats a character link.`,
+        );
+        relatedIds.forEach((characterId) =>
+          assert(
+            characterIds.has(characterId),
+            `${label}/${page.id} links unknown character ${characterId}.`,
+          ),
+        );
+      }
+      if (page.secrecy !== undefined) {
+        assert(
+          allowedSecrecy.has(page.secrecy),
+          `${label}/${page.id} uses unsupported secrecy ${page.secrecy}.`,
+        );
+      }
+      if (page.recordedAt || page.sessionId || page.relatedCharacterIds?.length || page.secrecy) {
+        enrichedPageCount += 1;
+      }
       assertAsset(campaignRoot, page.image, `${label}/${page.id}`);
     }
   }
@@ -101,9 +155,38 @@ for (const fileName of componentFiles) {
   const source = fs.readFileSync(fileName, 'utf8');
   assert(!/Shyra/i.test(source), `${path.basename(fileName)} must remain character-agnostic.`);
 }
+const componentContract = componentFiles
+  .map((fileName) => fs.readFileSync(fileName, 'utf8'))
+  .join('\n');
+for (const token of [
+  'chronologyOrder',
+  'selectedMood',
+  'selectedSessionId',
+  'selectedCharacterId',
+  'selectedSecrecy',
+  'notebook-tools__contents',
+]) {
+  assert(componentContract.includes(token), `Notebook reader is missing ${token}.`);
+}
+const managerSource = fs.readFileSync(
+  path.join(projectRoot, 'tools', 'campaign-manager', 'public', 'app.js'),
+  'utf8',
+);
+for (const fieldName of [
+  'notebookPageRecordedAt',
+  'notebookPageSessionId',
+  'notebookPageCharacters',
+  'notebookPageSecrecy',
+]) {
+  assert(managerSource.includes(fieldName), `Campaign Manager is missing ${fieldName}.`);
+}
 assert(
   notebookCount > 0,
   'At least one existing campaign must exercise the optional notebook contract.',
+);
+assert(
+  enrichedPageCount > 0,
+  'At least one notebook page must exercise chronology and filter metadata.',
 );
 
 if (failures.length) {
@@ -111,5 +194,5 @@ if (failures.length) {
   process.exit(1);
 }
 console.log(
-  `Character notebook contract verified across ${campaigns.length} campaign(s) and ${notebookCount} notebook(s).`,
+  `Character notebook contract verified across ${campaigns.length} campaign(s), ${notebookCount} notebook(s) and ${enrichedPageCount} enriched page(s).`,
 );

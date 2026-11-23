@@ -176,6 +176,10 @@
           "it": "La pioggia rende sincero ogni miglio. Continua a muoverti, ma ascolta quando la strada tace."
         },
         "mood": "wary",
+        "recordedAt": "2026-01-01",
+        "sessionId": "session-1",
+        "relatedCharacterIds": ["aria-vale"],
+        "secrecy": "party",
         "image": {
           "url": "images/characters/mira-notebook-page-01.svg",
           "alt": "Mira's sketched two-page spread with a rain-soaked courier, route map and silver whistle"

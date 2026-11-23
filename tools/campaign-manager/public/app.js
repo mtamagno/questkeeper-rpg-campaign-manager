@@ -1757,11 +1757,32 @@ function notebookLocalizedFields(prefix, label, value, languages, options = {}) 
 
 function notebookPageEditor(page = {}, languages = campaignLanguages(), index = 0) {
   const pageId = page.id || `page-${index + 1}`;
+  const defaultLanguage = state.campaign?.manifestEntry?.defaultLanguage ?? languages[0];
+  const sessions = state.campaign?.sessions ?? [];
+  const characters = state.campaign?.characters ?? [];
+  const sessionOptions = [
+    ['', 'No linked session'],
+    ...sessions.map((session) => [
+      session.id,
+      `${session.sessionNumber ?? '—'} · ${localized(session.title, defaultLanguage) || session.id}`,
+    ]),
+  ];
   return `<article class="notebook-page-card" data-notebook-page>
     <div class="notebook-page-card__header"><strong>Spread ${index + 1}</strong><button class="quiet-button" type="button" data-notebook-remove-page>Remove page</button></div>
     <div class="form-grid">
       ${field('notebookPageId', 'Page ID', pageId, { hint: 'Stable identifier. It must be unique inside this notebook.' })}
       ${field('notebookPageMood', 'Mood', page.mood || 'memory', { type: 'select', values: NOTEBOOK_MOODS.map((mood) => [mood, mood.charAt(0).toUpperCase() + mood.slice(1)]) })}
+      ${field('notebookPageRecordedAt', 'Chronology date', page.recordedAt || '', { type: 'date', hint: 'Optional. Used for oldest/newest notebook ordering.' })}
+      ${field('notebookPageSessionId', 'Linked session', page.sessionId || '', { type: 'select', values: sessionOptions })}
+      ${field('notebookPageSecrecy', 'Secrecy', page.secrecy || 'private', {
+        type: 'select',
+        values: [
+          ['private', 'Private'],
+          ['party', 'Shared with the party'],
+          ['public', 'Public'],
+        ],
+      })}
+      ${diaryMultiSelect('notebookPageCharacters', 'People in this spread', page.relatedCharacterIds, characters)}
       ${notebookLocalizedFields('pageTitle', 'Page title', page.title, languages)}
       ${notebookLocalizedFields('pageEra', 'Era / chapter', page.era, languages)}
       ${notebookLocalizedFields('pageReflection', 'Owner reflection', page.reflection, languages, { type: 'textarea', wide: true })}
@@ -3154,6 +3175,12 @@ async function buildNotebook(original = {}) {
       era: localizedNotebookValue(card, 'pageEra', languages),
       reflection: localizedNotebookValue(card, 'pageReflection', languages),
       mood: card.querySelector('[name="notebookPageMood"]')?.value || 'memory',
+      recordedAt: card.querySelector('[name="notebookPageRecordedAt"]')?.value || undefined,
+      sessionId: card.querySelector('[name="notebookPageSessionId"]')?.value || undefined,
+      relatedCharacterIds: [
+        ...(card.querySelector('[name="notebookPageCharacters"]')?.selectedOptions ?? []),
+      ].map((option) => option.value),
+      secrecy: card.querySelector('[name="notebookPageSecrecy"]')?.value || 'private',
       image: {
         url,
         alt: card.querySelector('[name="notebookPageAlt"]')?.value.trim() || '',

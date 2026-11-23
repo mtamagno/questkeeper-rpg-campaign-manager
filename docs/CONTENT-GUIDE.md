@@ -230,6 +230,10 @@ AI draft; both paths produce the same data:
           "it": "La pioggia rende sincero ogni miglio."
         },
         "mood": "wary",
+        "recordedAt": "2026-01-01",
+        "sessionId": "session-1",
+        "relatedCharacterIds": ["aria-vale"],
+        "secrecy": "party",
         "image": {
           "url": "images/characters/mira-notebook-01.webp",
           "alt": "A sketched rainy route"
@@ -244,6 +248,15 @@ An interior asset is one complete two-page spread, not one page. Keep notebook
 passwords different from the character-sheet password when the audiences
 differ, and remember that client-side password gates discourage casual spoilers
 but are not encryption.
+
+`recordedAt`, `sessionId`, `relatedCharacterIds` and `secrecy` are optional,
+authored evidence metadata. They power the table of contents, chronology and
+filters without duplicating session or character names. `secrecy` accepts
+`private`, `party` or `public` and defaults to `private` when omitted. These
+labels describe the intended audience; they do not turn a static build into an
+authorization boundary. AI drafts may propose a date or audience only when the
+brief states it explicitly, while stable entity links are always reviewed and
+selected by the author.
 
 The local manager is the recommended way to maintain these fields. Existing
 art is preserved when editing a character; uploading a new square profile no

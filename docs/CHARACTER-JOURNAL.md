@@ -51,6 +51,13 @@ authorization boundary. Private campaign prose and protected media must never be
 copied into the public template. AI-assisted pages remain editable drafts and
 must be reviewed before save or publication.
 
+The notebook reader keeps covers and authored order intact by default. Its
+collapsible index and filters operate inside the lazy Journal workspace, so a
+long archive does not become a second infinite profile page. Optional page
+metadata supplies chronology, mood, linked session, related people and intended
+audience. Missing metadata remains valid and is shown as undated/private rather
+than inferred from prose or artwork.
+
 ## Performance and future growth
 
 The index must not decode gallery images or initialize the notebook reader.
