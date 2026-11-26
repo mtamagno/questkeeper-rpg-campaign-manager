@@ -92,7 +92,8 @@ QuestKeeper becomes the page the group opens when everyone sits down to play.
 
 - A game-night dashboard with party status, current location and open threads.
 - A five-minute catch-up beside the complete written chronicle.
-- Pinned clues, promises, quests and unresolved mysteries.
+- Party and personal Quest Logs with session-by-session evolution, plus compact
+  pinned clues, promises and unresolved mysteries.
 - A campaign-wide search that understands people, places, sessions and clues.
 - Recently visited pages, bookmarks and a continue-reading shortcut.
 - Printable game-night summaries for tables that prefer paper.
@@ -138,7 +139,8 @@ Every name, clue and location becomes part of one connected world.
 - Interactive party and NPC relationship histories.
 - Maps with discovered locations, notes and session-linked markers.
 - A clue board connecting mysteries, evidence, suspects and unresolved questions.
-- Quest and promise tracking without turning the campaign into a task manager.
+- Quest, promise and obligation consequences built on the canonical Quest Log,
+  without turning the campaign into a task manager or creating a second store.
 - Search paths that lead naturally from a remembered detail to its complete story.
 - Spoiler-aware views so public discoveries and Game Master knowledge stay distinct.
 

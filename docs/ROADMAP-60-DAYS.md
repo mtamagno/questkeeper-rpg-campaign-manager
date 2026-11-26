@@ -1,6 +1,6 @@
 # QuestKeeper — Extended AI-Accelerated Delivery Plan
 
-**Period:** 18 October 2026–4 January 2027
+**Period:** 18 October 2026–6 January 2027
 
 **Target:** QuestKeeper 1.5 · Game Night Edition
 
@@ -133,45 +133,72 @@ the current lazy Journal workspace.
 | 16 · 21 Nov | [x] [`feat: add character-to-character shared memory pages`](SHARED-MEMORIES.md)     | [x] [`feat: surface conflicting versions of the same event`](SHARED-MEMORIES.md)         |
 | 17 · 22 Nov | [x] [`feat: introduce favourite campaign memories`](CAMPAIGN-MEMORY-GALLERY.md)      | [x] [`feat: build a party-wide memory gallery and filters`](CAMPAIGN-MEMORY-GALLERY.md)  |
 | 18 · 23 Nov | [x] [`feat: create notebook table of contents and chronology`](CHARACTER-JOURNAL.md) | [x] [`feat: add mood session character and secrecy filters`](CHARACTER-JOURNAL.md)       |
-| 19 · 24 Nov | [ ] `feat: add letters sketches handouts and keepsakes`                              | [ ] `feat: create accessible lightbox and print layouts for keepsakes`                   |
-| 20 · 25 Nov | [ ] `style: ship multiple parchment and handwriting moods`                           | [ ] `feat: adapt journal styling to narrator and emotional state`                        |
-| 21 · 26 Nov | [ ] `feat: add character epilogues and legacy pages`                                 | [ ] `release: ship QuestKeeper 1.2 character stories`                                    |
+| 19 · 26 Nov | [ ] `feat: add letters sketches handouts and keepsakes`                              | [ ] `feat: create accessible lightbox and print layouts for keepsakes`                   |
+| 20 · 27 Nov | [ ] `style: ship multiple parchment and handwriting moods`                           | [ ] `feat: adapt journal styling to narrator and emotional state`                        |
+| 21 · 28 Nov | [ ] `feat: add character epilogues and legacy pages`                                 | [ ] `review: prepare the Quest Log release candidate plan`                               |
+
+### 26 November recovery and critical Quest Log promotion
+
+Days 19 and 20 were not delivered on their original calendar dates. They remain
+unchecked and resume in sequence from 26 November; no missed task is marked
+complete or silently replaced. Every later unfinished delivery day moves by two
+calendar days, so the extended plan now closes on 6 January 2027.
+
+Field feedback on QuestKeeper 1.2.1 also exposed a missing core journey: there
+is no party-wide or character-personal quest tracker. The work is promoted as
+critical epic [#154](https://github.com/mtamagno/questkeeper-rpg-campaign-manager/issues/154)
+and uses the prioritized issue slot beside the recovered scheduled tasks:
+
+| Date   | Scheduled pair                        | Critical issue slice                                                                                                           |
+| ------ | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| 26 Nov | Day 19 keepsakes                      | [#154](https://github.com/mtamagno/questkeeper-rpg-campaign-manager/issues/154) contract, decomposition and re-plan            |
+| 27 Nov | Day 20 journal moods                  | [#155](https://github.com/mtamagno/questkeeper-rpg-campaign-manager/issues/155) quest data, derivation and portability         |
+| 28 Nov | Day 21 epilogues and release planning | [#156](https://github.com/mtamagno/questkeeper-rpg-campaign-manager/issues/156) complete manual Manager authoring              |
+| 29 Nov | Day 22 Game Night foundations         | [#157](https://github.com/mtamagno/questkeeper-rpg-campaign-manager/issues/157) party Quest Log                                |
+| 30 Nov | Day 23 catch-up views                 | [#158](https://github.com/mtamagno/questkeeper-rpg-campaign-manager/issues/158) personal character Quest Logs                  |
+| 01 Dec | Day 24 campaign search                | [#159](https://github.com/mtamagno/questkeeper-rpg-campaign-manager/issues/159) evidence-backed local/remote AI proposals      |
+| 02 Dec | Day 25 campaign timeline              | [#160](https://github.com/mtamagno/questkeeper-rpg-campaign-manager/issues/160) Game Night integration and cross-campaign gate |
+
+The issue slices do not borrow or erase the scheduled pair. If a critical slice
+cannot complete honestly in one day, it carries forward and the epic stays
+open. The shared data, UI and AI contract is documented in
+[Party and personal Quest Logs](QUEST-TRACKER.md).
 
 ## Week 4 — Game Night command centre
 
 | Day         | Commit 1                                                             | Commit 2                                                                   |
 | ----------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| 22 · 27 Nov | [ ] `feat: build game-night dashboard with party and location state` | [ ] `feat: add open threads pinned clues promises and quests`              |
-| 23 · 28 Nov | [ ] `feat: add five-minute campaign catch-up mode`                   | [ ] `feat: add previously-on presentation view for the table`              |
-| 24 · 29 Nov | [ ] `feat: deliver campaign-wide full-text search`                   | [ ] `feat: group results across sessions characters NPCs places and clues` |
-| 25 · 30 Nov | [ ] `feat: add campaign timeline with arcs and turning points`       | [ ] `feat: connect timeline events to every related page`                  |
-| 26 · 01 Dec | [ ] `feat: introduce bookmarks and personal reading lists`           | [ ] `feat: add history-aware continue-reading recommendations`             |
-| 27 · 02 Dec | [ ] `feat: create printable game-night packet`                       | [ ] `feat: add compact mobile table mode with wake-lock guidance`          |
-| 28 · 03 Dec | [ ] `feat: add campaign ending and epilogue experience`              | [ ] `release: ship QuestKeeper 1.3 game-night preview`                     |
+| 22 · 29 Nov | [ ] `feat: build game-night dashboard with party and location state` | [ ] `feat: surface canonical active quests clues and promises`             |
+| 23 · 30 Nov | [ ] `feat: add five-minute campaign catch-up mode`                   | [ ] `feat: add previously-on presentation view for the table`              |
+| 24 · 01 Dec | [ ] `feat: deliver campaign-wide full-text search`                   | [ ] `feat: group results across sessions characters NPCs places and clues` |
+| 25 · 02 Dec | [ ] `feat: add campaign timeline with arcs and turning points`       | [ ] `feat: connect timeline events to every related page`                  |
+| 26 · 03 Dec | [ ] `feat: introduce bookmarks and personal reading lists`           | [ ] `feat: add history-aware continue-reading recommendations`             |
+| 27 · 04 Dec | [ ] `feat: create printable game-night packet`                       | [ ] `feat: add compact mobile table mode with wake-lock guidance`          |
+| 28 · 05 Dec | [ ] `feat: add campaign ending and epilogue experience`              | [ ] `release: ship QuestKeeper 1.3 game-night preview`                     |
 
 ## Week 5 — A connected living world
 
 | Day         | Commit 1                                                            | Commit 2                                                             |
 | ----------- | ------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| 29 · 04 Dec | [ ] `feat: expand NPC dossiers with encounters motives and changes` | [ ] `feat: add public knowledge versus GM truth presentation`        |
-| 30 · 05 Dec | [ ] `feat: create interactive NPC relationship histories`           | [ ] `feat: connect NPC opinions to sessions and player choices`      |
-| 31 · 06 Dec | [ ] `feat: add annotated maps with discovered markers`              | [ ] `feat: connect map markers to sessions NPCs clues and galleries` |
-| 32 · 07 Dec | [ ] `feat: build clue board for evidence suspects and questions`    | [ ] `feat: add spoiler-aware connections and theory tracking`        |
-| 33 · 08 Dec | [ ] `feat: add quest promise and obligation tracker`                | [ ] `feat: show consequences and ownership without task-app clutter` |
-| 34 · 09 Dec | [ ] `feat: add story arcs chapter collections and completion state` | [ ] `feat: generate arc-level recaps and cast lists`                 |
-| 35 · 10 Dec | [ ] `feat: create world explorer linking every content type`        | [ ] `release: ship QuestKeeper 1.4 living-world preview`             |
+| 29 · 06 Dec | [ ] `feat: expand NPC dossiers with encounters motives and changes` | [ ] `feat: add public knowledge versus GM truth presentation`        |
+| 30 · 07 Dec | [ ] `feat: create interactive NPC relationship histories`           | [ ] `feat: connect NPC opinions to sessions and player choices`      |
+| 31 · 08 Dec | [ ] `feat: add annotated maps with discovered markers`              | [ ] `feat: connect map markers to sessions NPCs clues and galleries` |
+| 32 · 09 Dec | [ ] `feat: build clue board for evidence suspects and questions`    | [ ] `feat: add spoiler-aware connections and theory tracking`        |
+| 33 · 10 Dec | [ ] `feat: extend quests with promises and obligations`             | [ ] `feat: show consequences and ownership without task-app clutter` |
+| 34 · 11 Dec | [ ] `feat: add story arcs chapter collections and completion state` | [ ] `feat: generate arc-level recaps and cast lists`                 |
+| 35 · 12 Dec | [ ] `feat: create world explorer linking every content type`        | [ ] `release: ship QuestKeeper 1.4 living-world preview`             |
 
 ## Week 6 — The Game Master's creative studio
 
 | Day         | Commit 1                                                        | Commit 2                                                                |
 | ----------- | --------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| 36 · 11 Dec | [ ] `feat: rebuild onboarding as campaign creation journey`     | [ ] `feat: provide original campaign starters and guided examples`      |
-| 37 · 12 Dec | [ ] `feat: add campaign health dashboard and repair actions`    | [ ] `feat: explain missing translations images links and required data` |
-| 38 · 13 Dec | [ ] `feat: add live preview to character and NPC editors`       | [ ] `feat: add duplicate rename archive and bulk-update workflows`      |
-| 39 · 14 Dec | [ ] `feat: create visual session and story-arc editor`          | [ ] `feat: add reusable mystery journey social and battle structures`   |
-| 40 · 15 Dec | [ ] `feat: build media library for portraits maps and handouts` | [ ] `feat: add crop focal-point replacement and usage tracking`         |
-| 41 · 16 Dec | [ ] `feat: add visual theme studio with instant preview`        | [ ] `feat: guard readability with automatic contrast suggestions`       |
-| 42 · 17 Dec | [ ] `feat: add complete campaign import export and cloning`     | [ ] `feat: add preview-before-import and conflict resolution`           |
+| 36 · 13 Dec | [ ] `feat: rebuild onboarding as campaign creation journey`     | [ ] `feat: provide original campaign starters and guided examples`      |
+| 37 · 14 Dec | [ ] `feat: add campaign health dashboard and repair actions`    | [ ] `feat: explain missing translations images links and required data` |
+| 38 · 15 Dec | [ ] `feat: add live preview to character and NPC editors`       | [ ] `feat: add duplicate rename archive and bulk-update workflows`      |
+| 39 · 16 Dec | [ ] `feat: create visual session and story-arc editor`          | [ ] `feat: add reusable mystery journey social and battle structures`   |
+| 40 · 17 Dec | [ ] `feat: build media library for portraits maps and handouts` | [ ] `feat: add crop focal-point replacement and usage tracking`         |
+| 41 · 18 Dec | [ ] `feat: add visual theme studio with instant preview`        | [ ] `feat: guard readability with automatic contrast suggestions`       |
+| 42 · 19 Dec | [ ] `feat: add complete campaign import export and cloning`     | [ ] `feat: add preview-before-import and conflict resolution`           |
 
 ## Week 7 — Session Scribe and local creative AI
 
@@ -185,34 +212,34 @@ rather than introducing a second AI workflow.
 
 | Day         | Commit 1                                                          | Commit 2                                                                     |
 | ----------- | ----------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| 43 · 18 Dec | [ ] `feat: ship guided Discord Scribe setup and consent flow`     | [ ] `feat: add reliable launch status diagnostics and recovery`              |
-| 44 · 19 Dec | [ ] `feat: improve speaker identity and party-name mapping`       | [ ] `fix: filter silence repetition and common transcription hallucinations` |
-| 45 · 20 Dec | [ ] `feat: build transcript review desk with fast corrections`    | [ ] `feat: add speaker merge search highlights and chapter markers`          |
-| 46 · 21 Dec | [ ] `feat: suggest key moments quotes NPCs places and clues`      | [ ] `feat: show transcript evidence behind every suggestion`                 |
-| 47 · 22 Dec | [ ] `feat: draft quick full and GM-only recap variants`           | [ ] `feat: preserve narrator voice with reviewable tone profiles`            |
-| 48 · 23 Dec | [ ] `feat: import typed notes and photos of handwritten pages`    | [ ] `feat: merge multiple note sources into one review queue`                |
-| 49 · 24 Dec | [ ] `feat: apply approved archive suggestions as an atomic batch` | [ ] `feat: add draft discard cleanup and complete provenance history`        |
+| 43 · 20 Dec | [ ] `feat: ship guided Discord Scribe setup and consent flow`     | [ ] `feat: add reliable launch status diagnostics and recovery`              |
+| 44 · 21 Dec | [ ] `feat: improve speaker identity and party-name mapping`       | [ ] `fix: filter silence repetition and common transcription hallucinations` |
+| 45 · 22 Dec | [ ] `feat: build transcript review desk with fast corrections`    | [ ] `feat: add speaker merge search highlights and chapter markers`          |
+| 46 · 23 Dec | [ ] `feat: suggest key moments quotes NPCs places and clues`      | [ ] `feat: show transcript evidence behind every suggestion`                 |
+| 47 · 24 Dec | [ ] `feat: draft quick full and GM-only recap variants`           | [ ] `feat: preserve narrator voice with reviewable tone profiles`            |
+| 48 · 25 Dec | [ ] `feat: import typed notes and photos of handwritten pages`    | [ ] `feat: merge multiple note sources into one review queue`                |
+| 49 · 26 Dec | [ ] `feat: apply approved archive suggestions as an atomic batch` | [ ] `feat: add draft discard cleanup and complete provenance history`        |
 
 ## Week 8 — Collaboration, languages and longevity
 
 | Day         | Commit 1                                                          | Commit 2                                                             |
 | ----------- | ----------------------------------------------------------------- | -------------------------------------------------------------------- |
-| 50 · 25 Dec | [ ] `feat: add portable player contribution packages`             | [ ] `feat: build GM review inbox for journals memories and updates`  |
-| 51 · 26 Dec | [ ] `feat: separate interface and campaign translation workflows` | [ ] `feat: add completeness reports and translation review packages` |
-| 52 · 27 Dec | [ ] `feat: support custom system terminology and character facts` | [ ] `feat: add right-to-left foundations and broader script testing` |
-| 53 · 28 Dec | [ ] `feat: add automatic versioned campaign backups`              | [ ] `feat: create visual preview-before-restore workflow`            |
-| 54 · 29 Dec | [ ] `feat: add guided migrations for older campaign formats`      | [ ] `feat: validate complete transfer between machines and hosts`    |
-| 55 · 30 Dec | [ ] `feat: add local campaign consistency assistant`              | [ ] `feat: flag conflicting names dates heights and known facts`     |
-| 56 · 31 Dec | [ ] `feat: add original template and theme sharing format`        | [ ] `docs: publish creator legal accessibility and privacy guides`   |
+| 50 · 27 Dec | [ ] `feat: add portable player contribution packages`             | [ ] `feat: build GM review inbox for journals memories and updates`  |
+| 51 · 28 Dec | [ ] `feat: separate interface and campaign translation workflows` | [ ] `feat: add completeness reports and translation review packages` |
+| 52 · 29 Dec | [ ] `feat: support custom system terminology and character facts` | [ ] `feat: add right-to-left foundations and broader script testing` |
+| 53 · 30 Dec | [ ] `feat: add automatic versioned campaign backups`              | [ ] `feat: create visual preview-before-restore workflow`            |
+| 54 · 31 Dec | [ ] `feat: add guided migrations for older campaign formats`      | [ ] `feat: validate complete transfer between machines and hosts`    |
+| 55 · 01 Jan | [ ] `feat: add local campaign consistency assistant`              | [ ] `feat: flag conflicting names dates heights and known facts`     |
+| 56 · 02 Jan | [ ] `feat: add original template and theme sharing format`        | [ ] `docs: publish creator legal accessibility and privacy guides`   |
 
 ## Final four days — QuestKeeper 1.5 launch
 
 | Day         | Commit 1                                                           | Commit 2                                                             |
 | ----------- | ------------------------------------------------------------------ | -------------------------------------------------------------------- |
-| 57 · 01 Jan | [ ] `feat: rebuild Lantern Road as complete 1.5 showcase`          | [ ] `docs: capture new player GM Scribe and mobile demo journeys`    |
-| 58 · 02 Jan | [ ] `test: run full player GM recovery and accessibility journeys` | [ ] `perf: complete mobile offline gallery and large-campaign audit` |
-| 59 · 03 Jan | [ ] `fix: resolve release-candidate feedback and regressions`      | [ ] `docs: publish migration guide changelog and launch story`       |
-| 60 · 04 Jan | [ ] `release: publish QuestKeeper 1.5 Game Night Edition`          | [ ] `docs: open the 2027 public feedback and roadmap cycle`          |
+| 57 · 03 Jan | [ ] `feat: rebuild Lantern Road as complete 1.5 showcase`          | [ ] `docs: capture new player GM Scribe and mobile demo journeys`    |
+| 58 · 04 Jan | [ ] `test: run full player GM recovery and accessibility journeys` | [ ] `perf: complete mobile offline gallery and large-campaign audit` |
+| 59 · 05 Jan | [ ] `fix: resolve release-candidate feedback and regressions`      | [ ] `docs: publish migration guide changelog and launch story`       |
+| 60 · 06 Jan | [ ] `release: publish QuestKeeper 1.5 Game Night Edition`          | [ ] `docs: open the 2027 public feedback and roadmap cycle`          |
 
 ## Parallel AI-accelerated tracks
 

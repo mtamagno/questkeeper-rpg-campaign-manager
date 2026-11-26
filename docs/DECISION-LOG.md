@@ -2055,3 +2055,41 @@ boundary in #121.
 
 **Revisit when:** Account recovery, organization ownership or independently
 hosted authority services need a new schema version.
+
+### QK-076 — Quest progress is one evidence-linked narrative history
+
+**Date:** 26 November 2026
+
+**Status:** Active; delivery tracked by #154-#160
+
+**Decision:** Party and personal Quest Logs are projections over one versioned,
+manifested quest entity. Ordered updates own state and objective changes, and
+the current view is derived from the latest valid update. Personal ownership,
+audience, campaign locales and entity references remain explicit. Game Night,
+character profiles, search and later promise/obligation work consume this
+record instead of creating parallel trackers.
+
+Manual Manager authoring is the complete baseline. Optional local or remote AI
+may propose `create`, `append-update`, `link` or `close` operations only with a
+short evidence excerpt. Every proposal remains editable and uses the same
+validation/save path; it never mutates or publishes campaign canon by itself.
+
+**Why:** Sessions currently contain quest progress only as prose, so players
+cannot quickly recover shared goals or a character's personal motivations.
+Duplicating a current-status field across sessions, dashboards and profiles
+would drift, while a flat checklist would erase the campaign history that gives
+an objective meaning.
+
+**Consequences:** The critical epic is delivered in dependency order: portable
+data, manual Manager authoring, party reader, personal reader, AI proposals and
+Game Night integration. Legacy campaigns without quest files remain valid.
+Day 22 becomes a consumer of the new tracker; Day 33 extends its vocabulary and
+consequence presentation. The GM Preparation Assistant may read approved quest
+records later but cannot become their authority.
+
+**Source:** [Party and personal Quest Logs](QUEST-TRACKER.md) and
+[epic #154](https://github.com/mtamagno/questkeeper-rpg-campaign-manager/issues/154).
+
+**Revisit when:** Real campaign evidence requires branching/conditional quest
+histories that cannot be expressed as ordered updates, or a trusted remote
+authority changes how owner-only material is projected.

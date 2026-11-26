@@ -155,6 +155,22 @@ rendered inside the prose instead of collected in an unrelated gallery. The
 Game Master remains responsible for licenses, continuity, accessibility text
 and publication.
 
+### Planned Quest Log proposals
+
+Critical epic
+[#154](https://github.com/mtamagno/questkeeper-rpg-campaign-manager/issues/154)
+adds party and personal Quest Logs. Quest generation is **not available yet**;
+issue #159 owns the provider prompt and schema change.
+
+When it lands, every local or remote prose model will receive the same
+validated proposal contract. It may propose creating a quest or appending,
+linking or closing one only when the notes contain a short supporting excerpt.
+It must reuse supplied campaign IDs, return uncertainty as a review note and
+must not infer ownership, private goals, completion, failure, translations or
+rewards. Proposals remain unsaved review cards until the GM accepts them through
+the same validation path used by manual Quest Log authoring. The complete
+contract is in [Party and personal Quest Logs](QUEST-TRACKER.md).
+
 ## Import player characters and NPCs
 
 Manual entry remains available, but it is no longer required for every field.
