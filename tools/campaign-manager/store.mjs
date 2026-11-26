@@ -22,6 +22,7 @@ import {
   normalizeCampaignNarrativeMood,
   normalizeSessionNarrativeMood,
 } from './narrative-moods.mjs';
+import { validateQuest, validateQuestCollection } from './quest-contract.mjs';
 import storagePaths from '../storage-paths.cjs';
 
 const { createCampaignBackup, resolveStoragePaths } = storagePaths;
@@ -215,12 +216,13 @@ export async function getState(projectRoot) {
   const campaigns = [];
   for (const entry of manifest) {
     const base = dataRoot(projectRoot, entry.id);
-    const [campaign, characters, npcs, sessions, maps] = await Promise.all([
+    const [campaign, characters, npcs, sessions, maps, quests] = await Promise.all([
       readJson(join(base, 'campaign.json'), {}),
       readJson(join(base, 'characters', 'manifest.json'), []),
       readJson(join(base, 'npcs', 'manifest.json'), []),
       readJson(join(base, 'sessions', 'manifest.json'), []),
       readJson(join(base, 'maps.json'), []),
+      readJson(join(base, 'quests', 'manifest.json'), []),
     ]);
     campaigns.push({
       ...entry,
@@ -231,6 +233,7 @@ export async function getState(projectRoot) {
         npcs: npcs.length,
         sessions: sessions.length,
         maps: maps.length,
+        quests: quests.length,
       },
     });
   }
@@ -243,13 +246,14 @@ export async function getCampaign(projectRoot, campaignId) {
   const manifestEntry = manifest.find((entry) => entry.id === campaignId);
   if (!manifestEntry) throw new Error(`Campaign "${campaignId}" does not exist.`);
 
-  const [campaign, characters, npcs, sessions, maps, partyRelationships, npcRelationships] =
+  const [campaign, characters, npcs, sessions, maps, quests, partyRelationships, npcRelationships] =
     await Promise.all([
       readJson(join(root, 'campaign.json'), {}),
       loadManifested(join(root, 'characters')),
       loadManifested(join(root, 'npcs')),
       loadManifested(join(root, 'sessions')),
       readJson(join(root, 'maps.json'), []),
+      loadManifested(join(root, 'quests')),
       readJson(join(root, 'party-relationships.json'), []),
       readJson(join(root, 'npc-relationships.json'), []),
     ]);
@@ -265,6 +269,7 @@ export async function getCampaign(projectRoot, campaignId) {
     npcs,
     sessions,
     maps,
+    quests,
     partyRelationships,
     npcRelationships,
   };
@@ -292,6 +297,7 @@ export async function createCampaign(projectRoot, input) {
     mkdir(join(base, 'characters'), { recursive: true }),
     mkdir(join(base, 'npcs'), { recursive: true }),
     mkdir(join(base, 'sessions'), { recursive: true }),
+    mkdir(join(base, 'quests'), { recursive: true }),
     mkdir(join(root, 'images', 'group'), { recursive: true }),
     mkdir(join(root, 'images', 'characters'), { recursive: true }),
     mkdir(join(root, 'images', 'npcs'), { recursive: true }),
@@ -335,6 +341,7 @@ export async function createCampaign(projectRoot, input) {
     writeJson(join(base, 'characters', 'manifest.json'), []),
     writeJson(join(base, 'npcs', 'manifest.json'), []),
     writeJson(join(base, 'sessions', 'manifest.json'), []),
+    writeJson(join(base, 'quests', 'manifest.json'), []),
     writeJson(join(base, 'maps.json'), []),
     writeJson(join(base, 'party-relationships.json'), []),
     writeJson(join(base, 'npc-relationships.json'), []),
@@ -541,10 +548,10 @@ export async function deleteCampaign(projectRoot, campaignId, confirmation) {
 function validateEntity(type, entity) {
   if (!ENTITY_TYPE_SET.has(type)) throw new Error('Unsupported entity type.');
   if (entity?.id) validateId(entity.id, 'Entity ID');
-  const label = type === 'sessions' ? entity?.title : entity?.name;
+  const label = ['sessions', 'quests'].includes(type) ? entity?.title : entity?.name;
   if (typeof label !== 'string' && typeof label !== 'object') {
     throw new Error(
-      type === 'sessions' ? 'Session title is required.' : 'Entity name is required.',
+      ['sessions', 'quests'].includes(type) ? 'Localized title is required.' : 'Entity name is required.',
     );
   }
 }
@@ -554,12 +561,13 @@ export async function saveEntity(projectRoot, campaignId, type, entity, previous
   return withCampaignWrite(campaignId, async () => {
     const base = dataRoot(projectRoot, campaignId);
     const campaign = await getCampaign(projectRoot, campaignId);
-    const label = type === 'sessions' ? entity.title : entity.name;
+    const label = ['sessions', 'quests'].includes(type) ? entity.title : entity.name;
     const normalizedEntity = type === 'sessions' ? normalizeSessionNarrativeMood(entity) : entity;
     const prepared = {
       ...normalizedEntity,
       id: entity.id || generateEntityId(campaign, type, localizedIdentityLabel(label)),
     };
+    if (type === 'quests') validateQuest(prepared, campaign);
     validateId(prepared.id, 'Entity ID');
     assertEntityIdAvailable(campaign, type, prepared.id, previousId);
 
@@ -631,6 +639,16 @@ function localizedIdentityLabel(value) {
 export async function deleteEntity(projectRoot, campaignId, type, entityId) {
   validateId(entityId, 'Entity ID');
   if (!ENTITY_TYPE_SET.has(type)) throw new Error('Unsupported entity type.');
+  if (type !== 'quests') {
+    const referenceKind = { characters: 'character', npcs: 'npc', sessions: 'session', maps: 'location' }[type];
+    const campaign = await getCampaign(projectRoot, campaignId);
+    const blockingQuest = (campaign.quests ?? []).find((quest) =>
+      (type === 'characters' && quest.ownerCharacterIds?.includes(entityId)) ||
+      (quest.related ?? []).some((reference) => reference.kind === referenceKind && reference.id === entityId) ||
+      (quest.updates ?? []).some((update) => update.sessionId === entityId || (update.evidence ?? []).some((reference) => reference.kind === referenceKind && reference.id === entityId)),
+    );
+    if (blockingQuest) throw new Error(`Cannot remove "${entityId}" while quest "${blockingQuest.id}" references it. Update the quest first.`);
+  }
   const base = dataRoot(projectRoot, campaignId);
   if (type === 'maps') {
     const path = join(base, 'maps.json');
@@ -698,6 +716,7 @@ export async function importCampaign(projectRoot, bundle) {
     npcs: bundle.npcs ?? [],
     sessions: bundle.sessions ?? [],
     maps: bundle.maps ?? [],
+    quests: bundle.quests ?? [],
   });
   const id = validateId(bundle.manifestEntry?.id, 'Campaign ID');
   const localeRegistry = inspectCampaignLocales(bundle, id).registry;
@@ -725,6 +744,10 @@ export async function importCampaign(projectRoot, bundle) {
   for (const session of bundle.sessions ?? [])
     await saveEntity(projectRoot, id, 'sessions', session);
   for (const map of bundle.maps ?? []) await saveEntity(projectRoot, id, 'maps', map);
+  validateQuestCollection(bundle.quests ?? [], {
+    characters: bundle.characters ?? [], npcs: bundle.npcs ?? [], sessions: bundle.sessions ?? [], maps: bundle.maps ?? [],
+  });
+  for (const quest of bundle.quests ?? []) await saveEntity(projectRoot, id, 'quests', quest);
   const base = dataRoot(projectRoot, id);
   await Promise.all([
     writeJson(join(base, 'party-relationships.json'), bundle.partyRelationships ?? []),

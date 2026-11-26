@@ -25,6 +25,7 @@ import { type Session } from '@guild/models/session.model';
 import { type GameMap } from '@guild/models/map.model';
 import { type Relationship, type SharedRelationshipMemory } from '@guild/models/relationship.model';
 import { type Campaign } from '@guild/models/campaign.model';
+import { type Quest } from '@guild/models/quest.model';
 import { CampaignService } from '@guild/services/campaign.service';
 
 /**
@@ -104,6 +105,7 @@ export class DataService {
   private readonly _partyRelationships: WritableSignal<ReadonlyArray<Relationship>> = signal([]);
   private readonly _npcRelationships: WritableSignal<ReadonlyArray<Relationship>> = signal([]);
   private readonly _campaign: WritableSignal<Campaign | undefined> = signal(undefined);
+  private readonly _quests: WritableSignal<ReadonlyArray<Quest>> = signal([]);
 
   private readonly _state: WritableSignal<DataState> = signal({
     isLoading: false,
@@ -147,6 +149,9 @@ export class DataService {
 
   /** Campaign metadata. */
   readonly campaign: Signal<Campaign | undefined> = this._campaign.asReadonly();
+
+  /** Shared and character-owned quests. Legacy campaigns expose an empty list. */
+  readonly quests: Signal<ReadonlyArray<Quest>> = this._quests.asReadonly();
 
   /** Current loading state. */
   readonly state: Signal<DataState> = this._state.asReadonly();
@@ -286,6 +291,7 @@ export class DataService {
     this._partyRelationships.set([]);
     this._npcRelationships.set([]);
     this._campaign.set(undefined);
+    this._quests.set([]);
     this._state.set({ isLoading: false, isLoaded: false, error: undefined });
   }
 
@@ -312,6 +318,7 @@ export class DataService {
         `${basePath}/npc-relationships.json`,
       ),
       campaign: this.loadJson<Campaign>(`${basePath}/campaign.json`),
+      quests: this.loadFromManifest<Quest>(`${basePath}/quests`),
     }).subscribe({
       next: (data) => {
         this._characters.set(resolveImagePaths(data.characters, imagesBase));
@@ -321,6 +328,7 @@ export class DataService {
         this._partyRelationships.set(data.partyRelationships);
         this._npcRelationships.set(data.npcRelationships);
         this._campaign.set(resolveImagePaths(data.campaign, imagesBase));
+        this._quests.set(data.quests);
         this._state.set({ isLoading: false, isLoaded: true, error: undefined });
       },
       error: (err: unknown) => {

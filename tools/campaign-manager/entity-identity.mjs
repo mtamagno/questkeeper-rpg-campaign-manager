@@ -1,12 +1,13 @@
 const ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
-export const ENTITY_TYPES = Object.freeze(['characters', 'npcs', 'sessions', 'maps']);
+export const ENTITY_TYPES = Object.freeze(['characters', 'npcs', 'sessions', 'maps', 'quests']);
 
 const ENTITY_LABELS = Object.freeze({
   characters: 'player character',
   npcs: 'NPC',
   sessions: 'session',
   maps: 'map',
+  quests: 'quest',
 });
 
 function slugifyIdentity(value) {

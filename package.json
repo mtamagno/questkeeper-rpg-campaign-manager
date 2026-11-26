@@ -45,6 +45,7 @@
     "test:character-pdfs": "node scripts/verify-character-pdf-exports.cjs",
     "test:journal": "node scripts/verify-character-journal.cjs",
     "test:keepsakes": "node scripts/verify-character-keepsakes.cjs",
+    "test:quests": "node scripts/verify-quests.mjs",
     "test:lightbox-loading": "node scripts/verify-lightbox-loading.cjs",
     "test:map-gallery-quality": "node scripts/verify-map-gallery-quality.cjs",
     "test:level-comparison": "node scripts/verify-level-history-comparison.cjs",
