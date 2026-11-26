@@ -1,4 +1,3 @@
-<!-- NPC Relationships Page -->
 @if (isLoading()) {
   <div class="npc-relationships__loading">
     <app-dice-loader [label]="uiText.text('npcRelationships.loading')" [playSound]="false" />
@@ -41,6 +40,92 @@
       }
     </header>
 
+    @if (relationships().length > 0) {
+      <details class="npc-relationships__picker">
+        <summary>
+          <span>
+            <strong>{{ uiText.text('npcRelationships.picker.title') }}</strong>
+          </span>
+          <span class="npc-relationships__picker-count">
+            {{
+              uiText.text('npcRelationships.picker.count', {
+                selected: selectedNpcIds().size,
+                total: availableNpcs().length,
+              })
+            }}
+          </span>
+        </summary>
+
+        <div class="npc-relationships__picker-body">
+          <p class="npc-relationships__picker-help">
+            {{ uiText.text('npcRelationships.picker.help') }}
+          </p>
+
+          <div class="npc-relationships__picker-toolbar">
+            <label class="npc-relationships__search">
+              <span>{{ uiText.text('npcRelationships.picker.searchLabel') }}</span>
+              <input
+                type="search"
+                [value]="npcQuery()"
+                [placeholder]="uiText.text('npcRelationships.picker.searchPlaceholder')"
+                (input)="updateNpcQuery($event)"
+              />
+            </label>
+            @if (npcQuery()) {
+              <button
+                type="button"
+                class="npc-relationships__text-button"
+                (click)="clearNpcQuery()"
+              >
+                {{ uiText.text('npcRelationships.picker.clearSearch') }}
+              </button>
+            }
+          </div>
+
+          <div class="npc-relationships__picker-actions">
+            <button type="button" (click)="followLatestNpcs()">
+              {{ uiText.text('npcRelationships.picker.latest') }}
+            </button>
+            <button type="button" (click)="showAllNpcs()">
+              {{ uiText.text('npcRelationships.picker.showAll') }}
+            </button>
+            <button type="button" (click)="hideAllNpcs()">
+              {{ uiText.text('npcRelationships.picker.hideAll') }}
+            </button>
+          </div>
+
+          @if (npcGroups().length === 0) {
+            <p class="npc-relationships__picker-no-results">
+              {{ uiText.text('npcRelationships.picker.noResults') }}
+            </p>
+          } @else {
+            <div class="npc-relationships__location-groups">
+              @for (group of npcGroups(); track group.location) {
+                <fieldset>
+                  <legend>{{ group.location }}</legend>
+                  <div class="npc-relationships__npc-options">
+                    @for (npc of group.items; track npc.id) {
+                      <label [class.npc-relationships__npc-option--selected]="npc.selected">
+                        <input
+                          type="checkbox"
+                          [checked]="npc.selected"
+                          (change)="toggleNpc(npc.id, $event)"
+                        />
+                        <span>{{ npc.name }}</span>
+                        @if (npc.recent) {
+                          <small>{{ uiText.text('npcRelationships.picker.recentBadge') }}</small>
+                        }
+                      </label>
+                    }
+                  </div>
+                </fieldset>
+              }
+            </div>
+          }
+        </div>
+      </details>
+    }
+
     @if (relationships().length === 0) {
       <div class="empty-state npc-relationships__empty">
         <span class="empty-state__icon" aria-hidden="true">⌘</span>
@@ -54,7 +139,7 @@
     } @else {
       <app-relationship-graph
         [nodes]="nodes()"
-        [relationships]="relationships()"
+        [relationships]="visibleRelationships()"
         (edgeClick)="navigateToRelationship($event)"
         (nodeProfileNavigate)="navigateToCharacter($event)"
       />

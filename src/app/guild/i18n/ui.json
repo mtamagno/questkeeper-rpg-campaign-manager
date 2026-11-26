@@ -1218,7 +1218,8 @@
           "partyReading": "Party's reading",
           "legend": "Legend",
           "listSummary": "Open the accessible relationship list",
-          "listHelp": "The same connections in a non-spatial format, suitable for keyboard, touch and screen readers."
+          "listHelp": "The same connections in a non-spatial format, suitable for keyboard, touch and screen readers.",
+          "noVisibleBonds": "No bonds in this view. Add another NPC."
         },
         "partyRelationships": {
           "loading": "Weaving party bonds...",
@@ -1238,7 +1239,20 @@
           "playerCharacters": "Player characters",
           "npcs": "NPCs",
           "emptyTitle": "The web of connections is still hidden",
-          "emptyHelp": "As the party meets new people, alliances and conflicts will take shape here."
+          "emptyHelp": "As the party meets new people, alliances and conflicts will take shape here.",
+          "picker": {
+            "title": "Choose who appears",
+            "count": "{selected} of {total} NPCs",
+            "help": "The party stays visible. The latest two are the default; custom choices stay on this device for this campaign.",
+            "searchLabel": "Find an NPC or location",
+            "searchPlaceholder": "Search known faces...",
+            "clearSearch": "Clear search",
+            "latest": "Latest two",
+            "showAll": "Show all",
+            "hideAll": "Hide all NPCs",
+            "recentBadge": "Recent",
+            "noResults": "No known NPC or location matches this search."
+          }
         },
         "characterJournal": {
           "eyebrow": "Personal archive",
@@ -2531,7 +2545,8 @@
           "partyReading": "Lettura del gruppo",
           "legend": "Legenda",
           "listSummary": "Apri la lista accessibile delle relazioni",
-          "listHelp": "Gli stessi legami in un formato non spaziale, adatto a tastiera, touch e screen reader."
+          "listHelp": "Gli stessi legami in un formato non spaziale, adatto a tastiera, touch e screen reader.",
+          "noVisibleBonds": "Nessun legame in questa vista. Aggiungi un altro PNG."
         },
         "partyRelationships": {
           "loading": "Sto intrecciando i legami...",
@@ -2551,7 +2566,20 @@
           "playerCharacters": "Personaggi giocanti",
           "npcs": "PNG",
           "emptyTitle": "La rete di conoscenze è ancora nascosta",
-          "emptyHelp": "Quando la compagnia incontrerà nuovi personaggi, alleanze e conflitti prenderanno forma qui."
+          "emptyHelp": "Quando la compagnia incontrerà nuovi personaggi, alleanze e conflitti prenderanno forma qui.",
+          "picker": {
+            "title": "Scegli chi mostrare",
+            "count": "{selected} PNG su {total}",
+            "help": "Il party resta visibile. Gli ultimi due sono il default; le scelte restano su questo dispositivo per questa campagna.",
+            "searchLabel": "Cerca un PNG o un luogo",
+            "searchPlaceholder": "Cerca tra i volti conosciuti...",
+            "clearSearch": "Cancella ricerca",
+            "latest": "Ultimi due",
+            "showAll": "Mostra tutti",
+            "hideAll": "Nascondi tutti i PNG",
+            "recentBadge": "Recente",
+            "noResults": "Nessun PNG o luogo conosciuto corrisponde alla ricerca."
+          }
         },
         "characterJournal": {
           "eyebrow": "Archivio personale",

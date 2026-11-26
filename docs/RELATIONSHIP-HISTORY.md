@@ -26,3 +26,18 @@ out-of-range scores, invalid promise transitions and incomplete localized copy.
 
 Future shared-memory and party-gallery work must link to this same relationship
 and session evidence rather than creating a second bond store.
+
+## Reader-scaled NPC map
+
+The NPC relationship map is a view over the same canonical edges, not another
+relationship store. Every player character stays pinned to the map. On a first
+visit, QuestKeeper adds the two most recently encountered NPCs, using the latest
+session cited by authored relationship evidence and manifest order as a stable
+tie-breaker and legacy fallback.
+
+Readers can search known NPCs and locations, add or remove NPCs, show everyone,
+hide every NPC or return to the live “latest two” default. A custom selection is
+stored only on the current device and is scoped to the campaign. The spatial
+graph, network pulse and accessible linear list always receive the same filtered
+edges; hiding an NPC never deletes, rewrites or conceals the canonical data from
+other views.

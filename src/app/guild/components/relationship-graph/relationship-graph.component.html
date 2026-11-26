@@ -4,7 +4,7 @@
     <h2 class="relationship-graph__title">{{ graphTitle() }}</h2>
   }
 
-  @if (nodes().length === 0 || relationships().length === 0) {
+  @if (nodes().length === 0) {
     <p class="relationship-graph__empty">
       {{ uiText.text('relationshipGraph.empty') }}
     </p>
@@ -203,45 +203,55 @@
       }
     </div>
 
-    <div class="relationship-graph__legend">
-      <span class="relationship-graph__legend-title">
-        {{ uiText.text('relationshipGraph.legend') }}
-      </span>
-      @for (type of uniqueRelationshipTypes(); track type) {
-        <span class="relationship-graph__legend-item" [style.color]="getEdgeColor(type)">
-          {{ getEdgeEmoji(type) }} {{ formatRelationshipType(type) }}
+    @if (relationships().length > 0) {
+      <div class="relationship-graph__legend">
+        <span class="relationship-graph__legend-title">
+          {{ uiText.text('relationshipGraph.legend') }}
         </span>
-      }
-    </div>
+        @for (type of uniqueRelationshipTypes(); track type) {
+          <span class="relationship-graph__legend-item" [style.color]="getEdgeColor(type)">
+            {{ getEdgeEmoji(type) }} {{ formatRelationshipType(type) }}
+          </span>
+        }
+      </div>
+    } @else {
+      <p class="relationship-graph__empty">
+        {{ uiText.text('relationshipGraph.noVisibleBonds') }}
+      </p>
+    }
 
     <details class="relationship-graph__linear">
       <summary>{{ uiText.text('relationshipGraph.listSummary') }}</summary>
       <p>{{ uiText.text('relationshipGraph.listHelp') }}</p>
-      <ul>
-        @for (
-          relationship of relationships();
-          track relationship.sourceId + '-' + relationship.targetId
-        ) {
-          <li>
-            <button type="button" (click)="handleRelationshipClick(relationship)">
-              <strong>{{ relationshipParticipants(relationship) }}</strong>
-              <span>{{ formatRelationshipType(relationship.type) }}</span>
-              <small>{{ relationship.description | bilingual }}</small>
-              <span class="relationship-graph__linear-pulse">{{
-                uiText.text('relationshipGraph.edgePulse', {
-                  feelings: relationshipFeelingCount(relationship),
-                  moments: relationship.sharedEvents?.length ?? 0,
-                })
-              }}</span>
-              @if (latestRelationshipSession(relationship); as sessionId) {
-                <small>{{
-                  uiText.text('relationshipGraph.latestChange', { session: sessionId })
-                }}</small>
-              }
-            </button>
-          </li>
-        }
-      </ul>
+      @if (relationships().length === 0) {
+        <p>{{ uiText.text('relationshipGraph.noVisibleBonds') }}</p>
+      } @else {
+        <ul>
+          @for (
+            relationship of relationships();
+            track relationship.sourceId + '-' + relationship.targetId
+          ) {
+            <li>
+              <button type="button" (click)="handleRelationshipClick(relationship)">
+                <strong>{{ relationshipParticipants(relationship) }}</strong>
+                <span>{{ formatRelationshipType(relationship.type) }}</span>
+                <small>{{ relationship.description | bilingual }}</small>
+                <span class="relationship-graph__linear-pulse">{{
+                  uiText.text('relationshipGraph.edgePulse', {
+                    feelings: relationshipFeelingCount(relationship),
+                    moments: relationship.sharedEvents?.length ?? 0,
+                  })
+                }}</span>
+                @if (latestRelationshipSession(relationship); as sessionId) {
+                  <small>{{
+                    uiText.text('relationshipGraph.latestChange', { session: sessionId })
+                  }}</small>
+                }
+              </button>
+            </li>
+          }
+        </ul>
+      }
     </details>
   }
 </div>

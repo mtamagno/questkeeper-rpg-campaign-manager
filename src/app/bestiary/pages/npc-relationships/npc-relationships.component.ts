@@ -1,15 +1,25 @@
 /**
- * NPC relationships page — visual graph of NPC-to-party relationships.
- * Uses the shared RelationshipGraphComponent, combining NPC and PC nodes.
+ * NPC relationships page — a reader-controlled view of NPC-to-party relationships.
+ * The canonical relationship data stays untouched while each campaign remembers
+ * which NPCs the reader wants to include in the graph.
  */
 
-import { Component, ChangeDetectionStrategy, inject, computed, type Signal } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  inject,
+  computed,
+  signal,
+  type Signal,
+} from '@angular/core';
 import { Router } from '@angular/router';
 
 import { CampaignService } from '@guild/services/campaign.service';
 import { DataService } from '@guild/services/data.service';
 import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
+import { NpcGraphPreferencesService } from '@guild/services/npcGraphPreferences.service';
 import { UiTextService } from '@guild/services/uiText.service';
+import { type Npc } from '@guild/models/npc.model';
 import {
   type Relationship,
   type RelationshipNode,
@@ -19,11 +29,28 @@ import { getNpcDisplayName } from '@guild/utils/npcDisplay';
 import { RelationshipGraphComponent } from '@guild/components/relationship-graph/relationship-graph.component';
 import { LanguageToggleComponent } from '@guild/components/language-toggle/language-toggle.component';
 import { DiceLoaderComponent } from '@guild/components/dice-loader/dice-loader.component';
+import { latestNpcIds } from '@bestiary/utils/npcGraphVisibility';
 
-/**
- * Displays a visual graph of relationships between NPCs and party members.
- * Nodes include both PCs (gold rings) and NPCs (silver rings).
- */
+interface NpcPickerItem {
+  readonly id: string;
+  readonly name: string;
+  readonly selected: boolean;
+  readonly recent: boolean;
+}
+
+interface NpcPickerGroup {
+  readonly location: string;
+  readonly items: ReadonlyArray<NpcPickerItem>;
+}
+
+function normalizeSearchValue(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLocaleLowerCase()
+    .trim();
+}
+
 @Component({
   selector: 'app-npc-relationships',
   standalone: true,
@@ -37,43 +64,89 @@ export class NpcRelationshipsComponent {
   private readonly campaignService = inject(CampaignService);
   private readonly router = inject(Router);
   private readonly campaignLocale = inject(CampaignLocaleService);
+  private readonly graphPreferences = inject(NpcGraphPreferencesService);
   readonly uiText = inject(UiTextService);
 
-  /** Whether data is still loading. */
   readonly isLoading: Signal<boolean> = this.dataService.isLoading;
-
-  /** NPC-party relationships from the data service. */
   readonly relationships = this.dataService.npcRelationships;
+  readonly npcQuery = signal('');
 
-  /** Graph nodes — both PCs and NPCs involved in NPC relationships. */
-  readonly nodes: Signal<ReadonlyArray<RelationshipNode>> = computed(() => {
-    const rels = this.relationships();
-    const involvedIds = new Set<string>();
-    for (const rel of rels) {
-      involvedIds.add(rel.sourceId);
-      involvedIds.add(rel.targetId);
+  /** All non-minor NPCs known to the campaign and eligible for this map. */
+  readonly availableNpcs = computed(() => this.dataService.npcs().filter((npc) => !npc.isMinor));
+
+  /** Live default derived from the latest authored relationship evidence. */
+  readonly recentNpcIds = computed(() =>
+    latestNpcIds(this.availableNpcs(), this.relationships(), this.dataService.sessions()),
+  );
+
+  /** A custom view is campaign-scoped; without one, follow the latest two NPCs. */
+  readonly selectedNpcIds = computed<ReadonlySet<string>>(() => {
+    const availableIds = new Set(this.availableNpcs().map((npc) => npc.id));
+    const remembered = this.graphPreferences.selectionFor(this.campaignService.activeCampaignId());
+    return new Set((remembered ?? this.recentNpcIds()).filter((id) => availableIds.has(id)));
+  });
+
+  /** Only edges whose two endpoints are currently visible reach either graph view. */
+  readonly visibleRelationships = computed(() => {
+    const visibleIds = new Set([
+      ...this.dataService.characters().map((character) => character.id),
+      ...this.selectedNpcIds(),
+    ]);
+    return this.relationships().filter(
+      (relationship) =>
+        visibleIds.has(relationship.sourceId) && visibleIds.has(relationship.targetId),
+    );
+  });
+
+  /** Searchable NPC choices grouped by their localized known location. */
+  readonly npcGroups = computed<ReadonlyArray<NpcPickerGroup>>(() => {
+    const query = normalizeSearchValue(this.npcQuery());
+    const selectedIds = this.selectedNpcIds();
+    const recentIds = new Set(this.recentNpcIds());
+    const groups = new Map<string, NpcPickerItem[]>();
+
+    for (const npc of this.availableNpcs()) {
+      const name = this.npcName(npc);
+      const location =
+        this.campaignLocale.resolve(npc.profile.location) || this.uiText.text('common.other');
+      if (query.length > 0 && !normalizeSearchValue(`${name} ${location}`).includes(query)) {
+        continue;
+      }
+      const items = groups.get(location) ?? [];
+      items.push({
+        id: npc.id,
+        name,
+        selected: selectedIds.has(npc.id),
+        recent: recentIds.has(npc.id),
+      });
+      groups.set(location, items);
     }
 
+    return [...groups.entries()]
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([location, items]) => ({
+        location,
+        items: items.sort((left, right) => left.name.localeCompare(right.name)),
+      }));
+  });
+
+  /** The party is always present; selected NPCs are added around it. */
+  readonly nodes: Signal<ReadonlyArray<RelationshipNode>> = computed(() => {
     const pcNodes: ReadonlyArray<RelationshipNode> = this.dataService
       .characters()
-      .filter((c) => involvedIds.has(c.id))
-      .map((char): RelationshipNode => ({
-        id: char.id,
-        name: char.name,
-        avatarUrl: char.profileImageUrl,
+      .map((character): RelationshipNode => ({
+        id: character.id,
+        name: character.name,
+        avatarUrl: character.profileImageUrl,
         nodeType: NODE_TYPES.PC,
       }));
 
     const npcNodes: ReadonlyArray<RelationshipNode> = this.dataService
       .npcs()
-      .filter((n) => involvedIds.has(n.id))
+      .filter((npc) => this.selectedNpcIds().has(npc.id))
       .map((npc): RelationshipNode => ({
         id: npc.id,
-        name: getNpcDisplayName(
-          npc,
-          this.campaignLocale.currentLocale(),
-          this.campaignLocale.registry(),
-        ),
+        name: this.npcName(npc),
         avatarUrl: npc.profileImageUrl ?? npc.avatar.url,
         nodeType: NODE_TYPES.NPC,
       }));
@@ -81,10 +154,39 @@ export class NpcRelationshipsComponent {
     return [...pcNodes, ...npcNodes];
   });
 
-  /**
-   * Navigates to the relationship detail page when an edge is clicked.
-   * @param relationship - The clicked relationship.
-   */
+  updateNpcQuery(event: Event): void {
+    const target = event.target;
+    if (target instanceof HTMLInputElement) this.npcQuery.set(target.value);
+  }
+
+  clearNpcQuery(): void {
+    this.npcQuery.set('');
+  }
+
+  toggleNpc(npcId: string, event: Event): void {
+    const target = event.target;
+    if (!(target instanceof HTMLInputElement)) return;
+    const next = new Set(this.selectedNpcIds());
+    if (target.checked) next.add(npcId);
+    else next.delete(npcId);
+    this.graphPreferences.remember(this.campaignService.activeCampaignId(), [...next]);
+  }
+
+  showAllNpcs(): void {
+    this.graphPreferences.remember(
+      this.campaignService.activeCampaignId(),
+      this.availableNpcs().map((npc) => npc.id),
+    );
+  }
+
+  hideAllNpcs(): void {
+    this.graphPreferences.remember(this.campaignService.activeCampaignId(), []);
+  }
+
+  followLatestNpcs(): void {
+    this.graphPreferences.followLatest(this.campaignService.activeCampaignId());
+  }
+
   navigateToRelationship(relationship: Relationship): void {
     void this.router.navigate([
       '/',
@@ -95,13 +197,16 @@ export class NpcRelationshipsComponent {
     ]);
   }
 
-  /**
-   * Navigates to the character/NPC detail page when a node avatar is clicked.
-   * Routes to party/:id for PCs, npcs/:id for NPCs.
-   * @param node - The clicked graph node.
-   */
   navigateToCharacter(node: RelationshipNode): void {
     const basePath = node.nodeType === NODE_TYPES.PC ? 'party' : 'npcs';
     void this.router.navigate(['/', this.campaignService.activeCampaignId(), basePath, node.id]);
+  }
+
+  private npcName(npc: Npc): string {
+    return getNpcDisplayName(
+      npc,
+      this.campaignLocale.currentLocale(),
+      this.campaignLocale.registry(),
+    );
   }
 }
