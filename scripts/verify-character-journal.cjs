@@ -22,7 +22,7 @@ const diaryEntryTemplate = read(
 );
 const manager = read('tools/campaign-manager/public/app.js');
 
-for (const workspace of ['index', 'notebook', 'gallery', 'diary']) {
+for (const workspace of ['index', 'notebook', 'keepsakes', 'gallery', 'diary']) {
   assert.match(component, new RegExp(`'${workspace}'`), `${workspace} workspace is missing.`);
   assert.match(
     template,
@@ -50,12 +50,15 @@ assert.match(component, /visitedWorkspaces\.update/);
 assert.match(component, /workspaceForFragment/);
 assert.match(component, /hasNotebookReadingPosition/);
 assert.match(template, /hasVisited\('notebook'\)/);
+assert.match(template, /hasVisited\('keepsakes'\)/);
 assert.match(template, /hasVisited\('gallery'\)/);
 assert.match(template, /hasVisited\('diary'\)/);
 assert.match(template, /id="notebook"/);
+assert.match(template, /id="keepsakes"/);
 assert.match(template, /id="gallery"/);
 assert.match(template, /id="diary"/);
 assert.match(template, /app-character-notebook/);
+assert.match(template, /app-character-keepsakes/);
 assert.match(template, /app-image-gallery/);
 assert.match(template, /app-session-diary/);
 assert.match(styles, /grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/);

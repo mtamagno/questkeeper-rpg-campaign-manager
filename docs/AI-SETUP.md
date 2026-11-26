@@ -214,6 +214,21 @@ and returned to the still-open form as a draft. Review visible writing,
 chronology, character voice, art continuity, alt text and accidental spoilers.
 Nothing becomes character data until the Game Master chooses **Save**.
 
+## Propose letters, handouts and keepsakes
+
+Manual keepsake authoring is available in the character editor. Automatic AI
+proposal is not enabled yet. When a local or remote session workflow adds it,
+the model must return the exact editable contract in
+[Character keepsakes](CHARACTER-KEEPSAKES.md): kind, localized title and
+description, approved image plus alt text, stable published source and optional
+session/date.
+
+The model may propose an item only when supplied notes or approved media name
+both the object and its evidence. It must not infer private possessions from
+inventory, link protected notebook pages, invent missing dates or publish the
+proposal. Manual and AI-assisted paths must share the same validation and Game
+Master review step.
+
 ## Security and privacy boundaries
 
 - Campaign Manager binds to localhost and accepts local-provider URLs only on

@@ -130,6 +130,9 @@ Each character JSON contains:
   It has localized title and description, optional 2:3 front/back covers,
   ordered 3:2 interior spreads, and `styleDirectives` describing this specific
   owner's medium, palette, handwriting, symbols and emotional variation;
+- optional top-level `keepsakes`, a party-visible archive of letters, sketches,
+  handouts and mementos. Every item needs an image with alt text and a stable
+  published source; links to private notebook pages are invalid;
 - optional public-profile `quickFacts`, `signatureItems` and `favouriteMoments`.
   Every entry has a stable ID and localized copy. Signature items describe story
   meaning rather than inventory state; favourite moments require a typed public
@@ -173,6 +176,9 @@ statistics or equipment, and do not label an event as a favourite unless the
 character's writing, dialogue or player explicitly supports that preference.
 See [Character story highlights](CHARACTER-STORY-HIGHLIGHTS.md) for the full
 source and review contract.
+
+See [Character keepsakes](CHARACTER-KEEPSAKES.md) for the image, evidence,
+privacy, Manager, AI-proposal and print contract.
 
 ```json
 {
