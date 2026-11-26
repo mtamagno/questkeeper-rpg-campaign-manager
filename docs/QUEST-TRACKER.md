@@ -168,6 +168,17 @@ added to the public repository.
 6. [#160](https://github.com/mtamagno/questkeeper-rpg-campaign-manager/issues/160)
    integrates Game Night and completes cross-campaign quality evidence.
 
+## Implemented foundation (26 November 2026)
+
+Issues #155-#158 now share one implementation: optional manifested quest files,
+deterministic projections, actionable reference/chronology validation, lossless
+Manager backup/import, manual multi-locale authoring, a filterable party reader
+and character-owned readers behind the existing profile unlock boundary. Public
+offline packs include only `party`-scope, `party`-audience records. The original
+Lantern Road fixture demonstrates both shared and multi-owner personal threads;
+legacy campaigns remain valid with no quest folder. AI proposals and Game Night
+consumption remain isolated in #159/#160.
+
 ## Compatibility and proof
 
 The public Lantern Road campaign receives only original fixture quests.

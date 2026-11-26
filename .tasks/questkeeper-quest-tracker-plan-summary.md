@@ -2,7 +2,7 @@
 
 **Date:** 26 November 2026
 **Classification:** `shared`
-**Status:** Product contract and issue decomposition complete; implementation open
+**Status:** #155-#158 implemented and awaiting release; #159-#160 remain open
 
 ## Durable decisions
 
