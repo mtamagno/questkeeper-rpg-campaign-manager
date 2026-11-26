@@ -4,6 +4,7 @@ import { type Campaign } from '@guild/models/campaign.model';
 import { type Character } from '@guild/models/character.model';
 import { type Session } from '@guild/models/session.model';
 import { type BilingualText, type CampaignLocaleRegistry } from '@guild/models/language.model';
+import { type Quest } from '@guild/models/quest.model';
 import {
   type OfflineCampaignPack,
   type OfflineCharacterSnapshot,
@@ -19,6 +20,7 @@ interface PrepareOfflinePackInput {
   readonly campaign: Campaign | undefined;
   readonly characters: ReadonlyArray<Character>;
   readonly sessions: ReadonlyArray<Session>;
+  readonly quests: ReadonlyArray<Quest>;
   readonly selectedCharacterIds: ReadonlySet<string>;
   readonly contentLocale: string;
   readonly localeRegistry: CampaignLocaleRegistry;
@@ -183,6 +185,9 @@ export class OfflinePackService {
       preparedAt: new Date().toISOString(),
       characters,
       recaps,
+      quests: input.quests.filter(
+        (quest) => quest.scope === 'party' && quest.audience === 'party',
+      ),
     };
     const next = { ...this.storedPacks(), [input.campaignId]: pack };
 

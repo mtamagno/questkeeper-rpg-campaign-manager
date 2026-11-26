@@ -1,5 +1,6 @@
 import { type CharacterPublicProfile } from '@guild/models/character.model';
 import { type BilingualText, type CampaignLocaleRegistry } from '@guild/models/language.model';
+import { type Quest } from '@guild/models/quest.model';
 
 /** Public-only character identity saved for game-night reading. */
 export interface OfflineCharacterSnapshot {
@@ -36,6 +37,8 @@ export interface OfflineCampaignPack {
   readonly preparedAt: string;
   readonly characters: ReadonlyArray<OfflineCharacterSnapshot>;
   readonly recaps: ReadonlyArray<OfflineRecapSnapshot>;
+  /** Only whole-party, party-visible quests. Owner/GM material never enters the pack. */
+  readonly quests?: ReadonlyArray<Quest>;
 }
 
 export interface OfflinePreparationResult {

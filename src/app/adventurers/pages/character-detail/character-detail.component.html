@@ -317,6 +317,17 @@
       }
 
       <!-- Known history and its evidence sit together immediately before the session diary. -->
+      <section id="personal-quests" class="character-detail__section" [hidden]="!isTab('story')">
+        <app-accordion
+          [title]="uiText.text('questLog.personalTitle') + ' · ' + personalQuests().length"
+          icon="✦"
+          [startOpen]="personalQuests().length > 0"
+        >
+          <app-quest-list [quests]="personalQuests()" emptyTextKey="questLog.personalEmpty" />
+          <p><a [routerLink]="['/', campaignId() ?? '', 'campaign', 'quests']">{{ uiText.text('questLog.partyLink') }} →</a></p>
+        </app-accordion>
+      </section>
+
       @if (isRecorded(char.publicProfile.knownHistory)) {
         <section id="profile-memories" class="character-detail__section" [hidden]="!isTab('story')">
           <app-accordion

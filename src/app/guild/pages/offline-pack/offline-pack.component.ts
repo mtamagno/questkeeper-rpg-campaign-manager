@@ -103,6 +103,7 @@ export class OfflinePackComponent {
       campaign: this.data.campaign(),
       characters: this.characters(),
       sessions: this.data.sortedSessions(),
+      quests: this.data.quests(),
       selectedCharacterIds: this.selectedCharacterIds(),
       contentLocale: this.campaignLocale.currentLocale(),
       localeRegistry: this.campaignLocale.registry(),

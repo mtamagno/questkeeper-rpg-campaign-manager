@@ -46,6 +46,8 @@ import {
   type ProfileBondPreview,
 } from '../../components/character-bonds-carousel/character-bonds-carousel.component';
 import { CharacterQuotesComponent } from '../../components/character-quotes/character-quotes.component';
+import { QuestListComponent } from '@guild/components/quest-list/quest-list.component';
+import { PasswordService } from '@guild/services/password.service';
 
 type CharacterDetailTabId = 'overview' | 'story' | 'sheet' | 'journal';
 
@@ -75,6 +77,7 @@ interface CharacterDetailTab {
     CharacterStoryOverviewComponent,
     CharacterBondsCarouselComponent,
     CharacterQuotesComponent,
+    QuestListComponent,
     RouterLink,
     DiceLoaderComponent,
   ],
@@ -92,6 +95,7 @@ export class CharacterDetailComponent {
   private readonly campaignLocale = inject(CampaignLocaleService);
   private readonly document = inject(DOCUMENT);
   private readonly readingPosition = inject(CharacterReadingPositionService);
+  private readonly passwords = inject(PasswordService);
 
   /** Current display language for page chrome and section labels. */
   readonly lang = this.languageService.currentLanguage;
@@ -169,6 +173,19 @@ export class CharacterDetailComponent {
       return undefined;
     }
     return this.dataService.getCharacterById(id)();
+  });
+
+  /** Public personal threads plus owner-only threads after the established profile unlock. */
+  readonly personalQuests = computed(() => {
+    const character = this.character();
+    if (character === undefined) return [];
+    const unlocked = this.passwords.isUnlocked(character.id)();
+    return this.dataService.quests().filter(
+      (quest) =>
+        quest.scope === 'character' &&
+        quest.ownerCharacterIds.includes(character.id) &&
+        (quest.audience === 'party' || (quest.audience === 'owners' && unlocked)),
+    );
   });
 
   /** Reveals landmarks after both their owning tab and asynchronous character data are ready. */
