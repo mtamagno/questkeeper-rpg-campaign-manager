@@ -768,6 +768,7 @@ function renderCampaign() {
     ['npcs', `NPCs · ${data.npcs.length}`],
     ['sessions', `Sessions · ${data.sessions.length}`],
     ['maps', `Locations · ${data.maps.length}`],
+    ['quests', `Quest Log · ${(data.quests ?? []).length}`],
     [
       'relationships',
       `Relationships · ${(data.partyRelationships?.length ?? 0) + (data.npcRelationships?.length ?? 0)}`,
@@ -795,6 +796,8 @@ function renderTab() {
       return renderEntities('sessions', 'Session chronicles', 'Add session');
     case 'maps':
       return renderEntities('maps', 'Locations and maps', 'Add location');
+    case 'quests':
+      return renderEntities('quests', 'Quest Log', 'Add quest');
     case 'relationships':
       return renderRelationships();
     case 'translations':
@@ -991,7 +994,7 @@ function renderOverview() {
 }
 
 function entityName(type, item) {
-  if (type === 'sessions') return localized(item.title);
+  if (type === 'sessions' || type === 'quests') return localized(item.title);
   return localized(item.name);
 }
 
@@ -999,6 +1002,7 @@ function entityDescription(type, item) {
   if (type === 'characters') return localized(item.publicProfile?.backstory);
   if (type === 'npcs') return localized(item.profile?.description);
   if (type === 'sessions') return localized(item.summary);
+  if (type === 'quests') return localized(item.summary);
   return localized(item.description);
 }
 
@@ -1006,6 +1010,7 @@ function entityTags(type, item) {
   if (type === 'characters') return [item.sheet?.classType, `Level ${item.sheet?.level ?? 1}`];
   if (type === 'npcs') return [localized(item.profile?.role), item.allegiance];
   if (type === 'sessions') return [`Session ${item.sessionNumber}`, item.date];
+  if (type === 'quests') return [item.scope, item.updates?.at(-1)?.state, item.importance];
   return [localized(item.region), item.explorationStatus];
 }
 
@@ -2920,6 +2925,28 @@ function entityForm(type, item = {}) {
       ),
     ].join('');
   }
+  if (type === 'quests') {
+    const ownerChoices = (state.campaign?.characters ?? []).map((character) =>
+      `<label class="consent-check"><input type="checkbox" name="questOwners" value="${escapeHtml(character.id)}" ${(item.ownerCharacterIds ?? []).includes(character.id) ? 'checked' : ''} /> ${escapeHtml(character.name)}</label>`,
+    ).join('');
+    const updateRows = Object.fromEntries(languages.map((language) => [language,
+      (item.updates ?? []).map((update) => [update.id, update.recordedAt, update.sessionId ?? '', update.state, update.progress?.[language] ?? '', update.nextObjective?.[language] ?? '', (update.evidence ?? []).map((reference) => `${reference.kind}:${reference.id}`).join(',')].join(' | ')).join('\n'),
+    ]));
+    return [
+      ...common,
+      section('Quest identity'),
+      ...localizedFields('title', 'Title', item.title, languages, { required: true }),
+      ...localizedFields('summary', 'Summary', item.summary, languages, { type: 'textarea' }),
+      field('questScope', 'Scope', item.scope ?? 'party', { type: 'select', values: [['party', 'Party quest'], ['character', 'Personal quest']] }),
+      field('questAudience', 'Audience', item.audience ?? 'party', { type: 'select', values: [['party', 'Whole party'], ['owners', 'Owners after profile unlock'], ['gm', 'Game Master only']] }),
+      field('questImportance', 'Importance', item.importance ?? 'standard', { type: 'select', values: [['minor', 'Minor'], ['standard', 'Standard'], ['major', 'Major'], ['critical', 'Critical']] }),
+      field('questKind', 'Kind / theme', item.kind ?? '', { hint: 'Optional and system-agnostic, for example mystery, promise or faction.' }),
+      `<fieldset class="field field--wide"><legend>Personal quest owners</legend><div class="translation-targets">${ownerChoices || '<p>Add a character before assigning a personal quest.</p>'}</div><small>Party quests must have no owners. One personal quest may have several owners.</small></fieldset>`,
+      section('Evolution history'),
+      `<p class="field field--wide form-hint">One update per line: stable update ID | ISO date | session ID (optional) | state | progress | next objective | evidence kind:id comma list. Keep metadata and line order equal in every language; translate only progress and objective.</p>`,
+      ...languages.map((language) => field(`questUpdates__${language}`, `Evolution · ${languageName(language)} (${language})`, updateRows[language], { type: 'textarea', wide: true, required: true })),
+    ].join('');
+  }
   return [
     ...common,
     section('Location identity'),
@@ -2942,7 +2969,7 @@ function entityForm(type, item = {}) {
 }
 
 function openEntityEditor(type, item) {
-  const labels = { characters: 'Character', npcs: 'NPC', sessions: 'Session', maps: 'Location' };
+  const labels = { characters: 'Character', npcs: 'NPC', sessions: 'Session', maps: 'Location', quests: 'Quest' };
   openDialog({
     title: `${item ? 'Edit' : 'New'} ${labels[type].toLowerCase()}`,
     eyebrow: labels[type],
@@ -3787,6 +3814,35 @@ async function buildEntity(type, form, original = {}) {
           afterSection: Math.min(sceneCount - 1, Math.max(0, Number(image.afterSection) || 0)),
         })),
       ],
+    };
+  }
+  if (type === 'quests') {
+    const rowsByLanguage = Object.fromEntries(languages.map((language) => [language,
+      String(form.get(`questUpdates__${language}`) ?? '').split('\n').map((line) => line.trim()).filter(Boolean).map((line) => line.split('|').map((part) => part.trim())),
+    ]));
+    const primary = state.campaign?.manifestEntry?.defaultLanguage ?? languages[0];
+    const primaryRows = rowsByLanguage[primary] ?? [];
+    if (!primaryRows.length) throw new Error('A quest needs at least one evolution update.');
+    const updates = primaryRows.map((row, index) => {
+      if (row.length < 6) throw new Error(`Quest update ${index + 1} needs ID, date, session, state, progress and next objective.`);
+      const evidence = String(row[6] ?? '').split(',').map((value) => value.trim()).filter(Boolean).map((value) => { const [kind, ...idParts] = value.split(':'); return { kind, id: idParts.join(':') }; });
+      return {
+        id: row[0], recordedAt: row[1], ...(row[2] ? { sessionId: row[2] } : {}), state: row[3],
+        progress: Object.fromEntries(languages.map((language) => [language, rowsByLanguage[language]?.[index]?.[4] ?? row[4]])),
+        nextObjective: Object.fromEntries(languages.map((language) => [language, rowsByLanguage[language]?.[index]?.[5] ?? row[5]])),
+        ...(evidence.length ? { evidence } : {}),
+      };
+    });
+    return {
+      ...original, schemaVersion: 1, id,
+      scope: String(form.get('questScope') ?? 'party'),
+      ownerCharacterIds: form.getAll('questOwners').map(String),
+      audience: String(form.get('questAudience') ?? 'party'),
+      importance: String(form.get('questImportance') ?? 'standard'),
+      ...(String(form.get('questKind') ?? '').trim() ? { kind: String(form.get('questKind')).trim() } : {}),
+      title: localizedFormValue(form, 'title', '', languages),
+      summary: localizedFormValue(form, 'summary', '', languages),
+      updates,
     };
   }
   const image = await uploadSelectedImage('image', 'maps');
