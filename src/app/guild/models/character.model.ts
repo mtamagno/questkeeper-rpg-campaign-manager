@@ -65,6 +65,21 @@ export interface CharacterFavouriteMoment {
   readonly source: CharacterStoryReference;
 }
 
+/** Visual evidence or a meaningful object preserved in a character's public archive. */
+export type CharacterKeepsakeKind = 'letter' | 'sketch' | 'handout' | 'memento';
+
+export interface CharacterKeepsake {
+  readonly id: string;
+  readonly kind: CharacterKeepsakeKind;
+  readonly title: BilingualText;
+  readonly description: BilingualText;
+  readonly image: ImageRef;
+  /** Stable published evidence; private notebook pages are never valid public sources. */
+  readonly source: CharacterStoryReference;
+  readonly recordedAt?: string;
+  readonly sessionId?: string;
+}
+
 /** Public profile — lore the party knows about this character. */
 export interface CharacterPublicProfile {
   readonly backstory: BilingualText;
@@ -299,6 +314,8 @@ export interface Character {
   readonly playerName?: string;
   readonly avatar: ImageRef;
   readonly gallery: ReadonlyArray<ImageRef>;
+  /** Party-visible letters, sketches, handouts and mementos with published evidence links. */
+  readonly keepsakes?: ReadonlyArray<CharacterKeepsake>;
   /** Square face or bust image shown on the left side of the profile header. */
   readonly profileImageUrl: string;
   /** 2:3 full portrait shown on the right side of the profile header. */

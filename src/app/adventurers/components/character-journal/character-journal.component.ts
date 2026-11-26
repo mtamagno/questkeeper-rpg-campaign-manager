@@ -15,6 +15,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 
 import {
   type CharacterNotebook,
+  type CharacterKeepsake,
   type DiaryEntry,
   type ImageRef,
 } from '@guild/models/character.model';
@@ -25,9 +26,10 @@ import { UiTextService } from '@guild/services/uiText.service';
 import { BilingualTextPipe } from '@guild/components/bilingual-text/bilingual-text.pipe';
 import { ImageGalleryComponent } from '@guild/components/image-gallery/image-gallery.component';
 import { CharacterNotebookComponent } from '../character-notebook/character-notebook.component';
+import { CharacterKeepsakesComponent } from '../character-keepsakes/character-keepsakes.component';
 import { SessionDiaryComponent } from '../session-diary/session-diary.component';
 
-export type CharacterJournalWorkspace = 'index' | 'notebook' | 'gallery' | 'diary';
+export type CharacterJournalWorkspace = 'index' | 'notebook' | 'keepsakes' | 'gallery' | 'diary';
 
 interface CharacterJournalDestination {
   readonly id: CharacterJournalWorkspace;
@@ -43,6 +45,7 @@ interface CharacterJournalDestination {
   imports: [
     BilingualTextPipe,
     CharacterNotebookComponent,
+    CharacterKeepsakesComponent,
     ImageGalleryComponent,
     SessionDiaryComponent,
   ],
@@ -62,6 +65,7 @@ export class CharacterJournalComponent {
   readonly characterId = input.required<string>();
   readonly characterName = input.required<string>();
   readonly notebook = input<CharacterNotebook>();
+  readonly keepsakes = input<ReadonlyArray<CharacterKeepsake>>([]);
   readonly gallery = input.required<ReadonlyArray<ImageRef>>();
   readonly diary = input.required<ReadonlyArray<DiaryEntry>>();
 
@@ -71,6 +75,16 @@ export class CharacterJournalComponent {
   readonly latestDiaryEntry: Signal<DiaryEntry | undefined> = computed(() => {
     const entries = this.diary();
     return entries.length > 0 ? entries[entries.length - 1] : undefined;
+  });
+
+  readonly visibleKeepsakes = computed(() => {
+    const notebookPages = new Map(this.notebook()?.pages.map((page) => [page.id, page]) ?? []);
+    return this.keepsakes().filter((keepsake) => {
+      if (keepsake.source.kind !== 'notebook') return true;
+      if (keepsake.source.id === undefined) return false;
+      const page = notebookPages.get(keepsake.source.id);
+      return page?.secrecy === 'party' || page?.secrecy === 'public';
+    });
   });
 
   readonly hasNotebookReadingPosition = computed(() =>
@@ -98,6 +112,15 @@ export class CharacterJournalComponent {
         label: this.uiText.text('characterJournal.destinations.notebook.label'),
         description: this.uiText.text('characterJournal.destinations.notebook.description'),
         count: notebook.pages.length,
+      });
+    }
+    if (this.visibleKeepsakes().length > 0) {
+      destinations.push({
+        id: 'keepsakes',
+        icon: '✉',
+        label: this.uiText.text('characterJournal.destinations.keepsakes.label'),
+        description: this.uiText.text('characterJournal.destinations.keepsakes.description'),
+        count: this.visibleKeepsakes().length,
       });
     }
     if (this.gallery().length > 0) {
@@ -194,7 +217,13 @@ export class CharacterJournalComponent {
 
   private workspaceForFragment(fragment: string | null): CharacterJournalWorkspace | undefined {
     if (fragment === 'character-journal') return 'index';
-    if (fragment === 'notebook' || fragment === 'gallery' || fragment === 'diary') return fragment;
+    if (
+      fragment === 'notebook' ||
+      fragment === 'keepsakes' ||
+      fragment === 'gallery' ||
+      fragment === 'diary'
+    )
+      return fragment;
     return undefined;
   }
 }

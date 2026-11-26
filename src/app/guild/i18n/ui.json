@@ -1279,6 +1279,10 @@
               "label": "Notebook",
               "description": "Protected illustrated pages and private reflections."
             },
+            "keepsakes": {
+              "label": "Keepsakes",
+              "description": "Letters, sketches, handouts and objects tied to published memories."
+            },
             "gallery": {
               "label": "Gallery",
               "description": "Portraits, scenes and visual references."
@@ -1286,6 +1290,20 @@
             "diary": {
               "label": "Sessions",
               "description": "The public record, one session at a time."
+            }
+          },
+          "keepsakes": {
+            "eyebrow": "Evidence kept close",
+            "title": "Letters and keepsakes",
+            "help": "Every object points back to the published memory that gives it meaning. Open an image for the accessible fullscreen viewer or print this collection on its own.",
+            "cardHelp": "Objects and papers connected to the character's published journey.",
+            "print": "Print collection",
+            "enlarge": "Enlarge {title}",
+            "kinds": {
+              "letter": "Letter",
+              "sketch": "Sketch",
+              "handout": "Handout",
+              "memento": "Memento"
             }
           }
         },
@@ -2606,6 +2624,10 @@
               "label": "Taccuino",
               "description": "Pagine illustrate e pensieri protetti."
             },
+            "keepsakes": {
+              "label": "Ricordi materiali",
+              "description": "Lettere, schizzi, handout e oggetti legati alle memorie pubblicate."
+            },
             "gallery": {
               "label": "Galleria",
               "description": "Ritratti, scene e riferimenti visivi."
@@ -2613,6 +2635,20 @@
             "diary": {
               "label": "Sessioni",
               "description": "La memoria pubblica, sessione dopo sessione."
+            }
+          },
+          "keepsakes": {
+            "eyebrow": "Prove da custodire",
+            "title": "Lettere e ricordi materiali",
+            "help": "Ogni oggetto rimanda alla memoria pubblicata che gli dà significato. Apri un'immagine nel visualizzatore accessibile a tutto schermo oppure stampa soltanto questa raccolta.",
+            "cardHelp": "Oggetti e carte collegati al viaggio pubblicato del personaggio.",
+            "print": "Stampa raccolta",
+            "enlarge": "Ingrandisci {title}",
+            "kinds": {
+              "letter": "Lettera",
+              "sketch": "Schizzo",
+              "handout": "Handout",
+              "memento": "Ricordo"
             }
           }
         },

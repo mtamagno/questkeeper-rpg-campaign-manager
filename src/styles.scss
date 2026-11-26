@@ -1,2 +1,13 @@
 // Global styles entry point — imports the master SCSS file.
 @use 'styles/main';
+
+@media print {
+  body.questkeeper-print-keepsakes app-root {
+    display: none !important;
+  }
+
+  body.questkeeper-print-keepsakes .questkeeper-print-root {
+    display: block;
+    width: 100%;
+  }
+}

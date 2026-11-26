@@ -6,6 +6,34 @@
   "playerName": "Demo Player",
   "avatar": { "url": "images/characters/mira-profile.svg", "alt": "Profile of Mira Thorn" },
   "gallery": [],
+  "keepsakes": [
+    {
+      "id": "century-wet-letter",
+      "kind": "letter",
+      "title": {
+        "en": "The century-wet letter",
+        "it": "La lettera dall'inchiostro ancora fresco"
+      },
+      "description": {
+        "en": "The impossible delivery that joined Mira's road to Aria's lantern and the Glass Beacon.",
+        "it": "La consegna impossibile che ha unito la strada di Mira alla lanterna di Aria e al Faro di Vetro."
+      },
+      "image": {
+        "url": "images/characters/mira-keepsake-letter.svg",
+        "alt": "A weathered sealed letter resting on Mira's burgundy route map"
+      },
+      "source": {
+        "kind": "notebook",
+        "id": "the-north-road",
+        "label": {
+          "en": "Open The North Road notebook page",
+          "it": "Apri la pagina La strada del nord"
+        }
+      },
+      "recordedAt": "2026-01-01",
+      "sessionId": "session-1"
+    }
+  ],
   "profileImageUrl": "images/characters/mira-profile.svg",
   "portraitImageUrl": "images/characters/mira-portrait.svg",
   "loreChapters": [

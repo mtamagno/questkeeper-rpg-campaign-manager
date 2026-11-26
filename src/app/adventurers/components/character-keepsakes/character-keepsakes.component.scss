@@ -1,0 +1,195 @@
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+
+:host {
+  display: block;
+}
+
+.keepsakes {
+  display: grid;
+  gap: $spacing-lg;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    gap: $spacing-lg;
+    align-items: flex-start;
+
+    > div > span {
+      color: $color-gold;
+      font-size: $font-size-xs;
+      letter-spacing: $letter-spacing-wider;
+      text-transform: uppercase;
+    }
+
+    h3 {
+      margin: $spacing-xs 0;
+      color: $color-gold-light;
+      font-family: $font-family-heading;
+      font-size: $font-size-xl;
+    }
+
+    p {
+      max-width: 66ch;
+      margin: 0;
+      color: $color-text-secondary;
+      line-height: $line-height-relaxed;
+    }
+
+    @include respond-below(sm) {
+      align-items: stretch;
+      flex-direction: column;
+    }
+  }
+
+  &__print {
+    display: inline-flex;
+    gap: $spacing-xs;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: $spacing-xs $spacing-md;
+    border: $border-width-thin solid $color-border-accent;
+    border-radius: $border-radius-pill;
+    background: rgba($color-bg-deep, 0.64);
+    color: $color-parchment;
+    font: inherit;
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 3px solid rgba($color-gold, 0.72);
+      outline-offset: 2px;
+    }
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: $spacing-md;
+
+    @include respond-below(md) {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+.keepsake-card {
+  display: grid;
+  grid-template-columns: minmax(8rem, 36%) minmax(0, 1fr);
+  overflow: hidden;
+  border: $border-width-thin solid $color-border-default;
+  border-radius: $border-radius-md;
+  background: linear-gradient(145deg, rgba($color-bg-elevated, 0.92), rgba($color-bg-deep, 0.88));
+  break-inside: avoid;
+
+  &__image {
+    position: relative;
+    min-height: 13rem;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    background: $color-bg-void;
+    cursor: zoom-in;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    span {
+      position: absolute;
+      right: $spacing-xs;
+      bottom: $spacing-xs;
+      display: grid;
+      width: 2.25rem;
+      height: 2.25rem;
+      place-items: center;
+      border-radius: 50%;
+      background: rgba($color-bg-void, 0.82);
+      color: $color-parchment;
+    }
+
+    &:focus-visible {
+      outline: 3px solid $color-gold;
+      outline-offset: -4px;
+    }
+  }
+
+  &__copy {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+    padding: $spacing-md;
+
+    h4 {
+      margin: 0;
+      color: $color-parchment;
+      font-family: $font-family-heading;
+      font-size: $font-size-lg;
+    }
+
+    p {
+      margin: 0;
+      color: $color-text-secondary;
+      line-height: $line-height-relaxed;
+    }
+
+    a {
+      margin-top: auto;
+      color: $color-gold-light;
+      font-weight: $font-weight-semibold;
+    }
+  }
+
+  &__meta {
+    display: flex;
+    justify-content: space-between;
+    gap: $spacing-sm;
+    color: $color-text-muted;
+    font-size: $font-size-xs;
+    letter-spacing: $letter-spacing-wide;
+    text-transform: uppercase;
+
+    span {
+      color: $color-gold;
+    }
+  }
+
+  @include respond-below(sm) {
+    grid-template-columns: 1fr;
+
+    &__image {
+      min-height: 12rem;
+      max-height: 18rem;
+    }
+  }
+}
+
+@media print {
+  .keepsakes__print,
+  .keepsake-card__image span {
+    display: none;
+  }
+
+  .keepsakes__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8mm;
+  }
+
+  .keepsake-card {
+    border-color: #7c6338;
+    background: #fffdf6;
+    color: #21180f;
+    box-shadow: none;
+
+    &__copy {
+      h4,
+      p,
+      a,
+      .keepsake-card__meta,
+      .keepsake-card__meta span {
+        color: #21180f;
+      }
+    }
+  }
+}

@@ -77,6 +77,21 @@
             <b>{{ notebookData.pages.length }}</b>
           </button>
         }
+        @if (visibleKeepsakes().length > 0) {
+          <button
+            type="button"
+            class="journal-hub__index-card"
+            (click)="selectWorkspace('keepsakes')"
+          >
+            <span class="journal-hub__index-icon" aria-hidden="true">✉</span>
+            <span>
+              <small>{{ uiText.text('characterJournal.keepsakes.eyebrow') }}</small>
+              <strong>{{ uiText.text('characterJournal.destinations.keepsakes.label') }}</strong>
+              <span>{{ uiText.text('characterJournal.keepsakes.cardHelp') }}</span>
+            </span>
+            <b>{{ visibleKeepsakes().length }}</b>
+          </button>
+        }
         @if (gallery().length > 0) {
           <button
             type="button"
@@ -128,6 +143,20 @@
         [characterName]="characterName()"
         [notebook]="notebook()!"
       />
+    </section>
+  }
+
+  @if (visibleKeepsakes().length > 0 && hasVisited('keepsakes')) {
+    <section
+      class="journal-hub__workspace"
+      [hidden]="activeWorkspace() !== 'keepsakes'"
+      [id]="panelId('keepsakes')"
+      [attr.aria-labelledby]="tabId('keepsakes')"
+      role="tabpanel"
+      tabindex="0"
+    >
+      <span id="keepsakes" class="journal-hub__anchor" aria-hidden="true"></span>
+      <app-character-keepsakes [keepsakes]="visibleKeepsakes()" />
     </section>
   }
 

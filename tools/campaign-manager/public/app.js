@@ -1832,6 +1832,13 @@ const STORY_SOURCE_KINDS = [
   ['chronicle', 'Campaign chronicle'],
 ];
 
+const KEEPSAKE_KINDS = [
+  ['letter', 'Letter'],
+  ['sketch', 'Sketch'],
+  ['handout', 'Handout'],
+  ['memento', 'Memento'],
+];
+
 function storyLocalizedFields(prefix, label, value, languages, options = {}) {
   return languages
     .map((language) =>
@@ -1843,6 +1850,40 @@ function storyLocalizedFields(prefix, label, value, languages, options = {}) {
       ),
     )
     .join('');
+}
+
+function keepsakeEditor(keepsake = {}, languages = campaignLanguages(), index = 0) {
+  const sessions = state.campaign?.sessions ?? [];
+  const sessionOptions = [
+    ['', 'No direct session'],
+    ...sessions.map((session) => [session.id, `${session.sessionNumber ?? '—'} · ${session.id}`]),
+  ];
+  const source = keepsake.source ?? {};
+  return `<article class="notebook-page-card" data-keepsake>
+    <div class="notebook-page-card__header"><strong>Keepsake ${index + 1}</strong><button class="quiet-button" type="button" data-keepsake-remove>Remove keepsake</button></div>
+    <div class="form-grid">
+      ${field('keepsakeId', 'Stable ID', keepsake.id || `keepsake-${index + 1}`, { hint: 'Lowercase letters, numbers and hyphens. This ID remains stable when the title changes.' })}
+      ${field('keepsakeKind', 'Kind', keepsake.kind || 'memento', { type: 'select', values: KEEPSAKE_KINDS })}
+      ${field('keepsakeRecordedAt', 'Date recorded', keepsake.recordedAt || '', { type: 'date' })}
+      ${field('keepsakeSessionId', 'Session', keepsake.sessionId || '', { type: 'select', values: sessionOptions })}
+      ${storyLocalizedFields('keepsakeTitle', 'Title', keepsake.title, languages)}
+      ${storyLocalizedFields('keepsakeDescription', 'Why it matters', keepsake.description, languages, { type: 'textarea', wide: true })}
+      ${field('keepsakeImage', 'Image', '', { type: 'file', hint: 'PNG, JPEG, WebP or SVG. Uploading a file replaces the current image.' })}
+      ${field('keepsakeImageAlt', 'Accessibility text', keepsake.image?.alt || '', { wide: true })}
+      <input type="hidden" name="keepsakeImagePath" value="${escapeHtml(keepsake.image?.url || '')}" />
+      ${field('keepsakeSourceKind', 'Published source', source.kind || 'diary', { type: 'select', values: STORY_SOURCE_KINDS.filter(([value]) => value !== 'none') })}
+      ${field('keepsakeSourceId', 'Source ID', source.id || '', { hint: 'Required stable chapter, notebook page, session, quote or chronicle ID.' })}
+      ${storyLocalizedFields('keepsakeSourceLabel', 'Source link label', source.label, languages)}
+      ${keepsake.image?.url ? `<figure class="notebook-asset-preview field--wide"><img src="${escapeHtml(campaignAsset(keepsake.image.url))}" alt="${escapeHtml(keepsake.image.alt || '')}" /><figcaption>Current keepsake · upload a file only to replace it.</figcaption></figure>` : ''}
+    </div>
+  </article>`;
+}
+
+function keepsakesEditor(item = {}, languages = campaignLanguages()) {
+  return `<section class="notebook-editor field--wide" data-keepsakes-editor>
+    <div class="notebook-pages-heading"><div><strong>Letters and keepsakes</strong><small>Party-visible evidence only. Every item must point to a published source; private notebook pages are rejected.</small></div><button class="secondary-button" type="button" data-keepsake-add>Add keepsake</button></div>
+    <div class="notebook-page-list" data-keepsake-list>${(item.keepsakes ?? []).map((keepsake, index) => keepsakeEditor(keepsake, languages, index)).join('')}</div>
+  </section>`;
 }
 
 function diaryMultiSelect(
@@ -2753,6 +2794,8 @@ function entityForm(type, item = {}) {
       storyHighlightsEditor(item, languages),
       section('Session diary'),
       diaryEditor(item, languages),
+      section('Letters and keepsakes'),
+      keepsakesEditor(item, languages),
       section('Personal notebook'),
       notebookEditor(item, languages),
       section('Private notes'),
@@ -3200,6 +3243,70 @@ function storyLocalizedValue(card, prefix, languages) {
   );
 }
 
+async function buildKeepsakes(character, notebook) {
+  const languages = campaignLanguages();
+  const sessions = new Set((state.campaign?.sessions ?? []).map((session) => session.id));
+  const sourceIds = {
+    chapter: new Set((character.loreChapters ?? []).map((chapter) => chapter.id)),
+    notebook: new Set(
+      (notebook?.pages ?? [])
+        .filter((page) => page.secrecy === 'party' || page.secrecy === 'public')
+        .map((page) => page.id),
+    ),
+    diary: new Set((character.diary ?? []).map((entry) => entry.sessionId)),
+    quote: new Set((character.quotes ?? []).map((quote) => quote.sessionId)),
+    chronicle: sessions,
+  };
+  const ids = new Set();
+  const keepsakes = [];
+  for (const [index, card] of [...fields.querySelectorAll('[data-keepsake]')].entries()) {
+    const id = card.querySelector('[name="keepsakeId"]')?.value.trim();
+    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id)) {
+      throw new Error(`Keepsake ${index + 1} needs a stable lowercase ID.`);
+    }
+    if (ids.has(id)) throw new Error(`Keepsake ID “${id}” is used more than once.`);
+    ids.add(id);
+    const uploaded = await uploadImageFile(
+      card.querySelector('[name="keepsakeImage"]')?.files?.[0],
+      'characters',
+    );
+    const url = uploaded?.path || card.querySelector('[name="keepsakeImagePath"]')?.value.trim();
+    const alt = card.querySelector('[name="keepsakeImageAlt"]')?.value.trim();
+    if (!url || !alt)
+      throw new Error(`Keepsake ${index + 1} needs an image and accessibility text.`);
+    const sourceKind = card.querySelector('[name="keepsakeSourceKind"]')?.value;
+    const sourceId = card.querySelector('[name="keepsakeSourceId"]')?.value.trim();
+    if (!sourceIds[sourceKind]?.has(sourceId)) {
+      const privacyHint =
+        sourceKind === 'notebook' ? ' Public keepsakes cannot reveal private notebook pages.' : '';
+      throw new Error(
+        `Keepsake ${index + 1} must reference an existing published ${sourceKind}.${privacyHint}`,
+      );
+    }
+    const sessionId = card.querySelector('[name="keepsakeSessionId"]')?.value || undefined;
+    if (sessionId && !sessions.has(sessionId)) {
+      throw new Error(`Keepsake ${index + 1} links to an unknown session.`);
+    }
+    const title = storyLocalizedValue(card, 'keepsakeTitle', languages);
+    const description = storyLocalizedValue(card, 'keepsakeDescription', languages);
+    const sourceLabel = storyLocalizedValue(card, 'keepsakeSourceLabel', languages);
+    if (![title, description, sourceLabel].every((value) => Object.values(value).some(Boolean))) {
+      throw new Error(`Keepsake ${index + 1} needs a title, description and source label.`);
+    }
+    keepsakes.push({
+      id,
+      kind: card.querySelector('[name="keepsakeKind"]')?.value || 'memento',
+      title,
+      description,
+      image: { url, alt },
+      source: { kind: sourceKind, id: sourceId, label: sourceLabel },
+      recordedAt: card.querySelector('[name="keepsakeRecordedAt"]')?.value || undefined,
+      sessionId,
+    });
+  }
+  return keepsakes;
+}
+
 function buildStoryHighlights() {
   const editor = fields.querySelector('[data-story-highlights-editor]');
   const languages = campaignLanguages();
@@ -3524,6 +3631,9 @@ async function buildEntity(type, form, original = {}) {
     const notebook = await buildNotebook(item.notebook);
     if (notebook) item.notebook = notebook;
     else delete item.notebook;
+    const keepsakes = await buildKeepsakes(item, notebook);
+    if (keepsakes.length) item.keepsakes = keepsakes;
+    else delete item.keepsakes;
     const inventory = parseInventory(
       form.get('inventory')?.toString(),
       item.sheet?.inventory ?? [],
@@ -5218,6 +5328,20 @@ fields.addEventListener('click', (event) => {
   const removeDiaryEntry = event.target.closest('[data-diary-remove-entry]');
   if (removeDiaryEntry) {
     removeDiaryEntry.closest('[data-diary-entry]')?.remove();
+    return;
+  }
+  const addKeepsake = event.target.closest('[data-keepsake-add]');
+  if (addKeepsake) {
+    const list = fields.querySelector('[data-keepsake-list]');
+    const index = list.querySelectorAll('[data-keepsake]').length;
+    list.insertAdjacentHTML('beforeend', keepsakeEditor({}, campaignLanguages(), index));
+    window.managerI18n?.translateTree?.(list.lastElementChild);
+    list.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+  const removeKeepsake = event.target.closest('[data-keepsake-remove]');
+  if (removeKeepsake) {
+    removeKeepsake.closest('[data-keepsake]')?.remove();
     return;
   }
   const addNotebookPage = event.target.closest('[data-notebook-add-page]');

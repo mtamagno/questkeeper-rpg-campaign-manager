@@ -1,0 +1,60 @@
+<section class="keepsakes" [attr.aria-label]="uiText.text('characterJournal.keepsakes.title')">
+  <header class="keepsakes__header">
+    <div>
+      <span>{{ uiText.text('characterJournal.keepsakes.eyebrow') }}</span>
+      <h3>{{ uiText.text('characterJournal.keepsakes.title') }}</h3>
+      <p>{{ uiText.text('characterJournal.keepsakes.help') }}</p>
+    </div>
+    <button type="button" class="keepsakes__print" (click)="printArchive()">
+      <span aria-hidden="true">⤓</span>
+      {{ uiText.text('characterJournal.keepsakes.print') }}
+    </button>
+  </header>
+
+  <div class="keepsakes__grid">
+    @for (keepsake of keepsakes(); track keepsake.id; let index = $index) {
+      <article class="keepsake-card" [attr.data-kind]="keepsake.kind">
+        <button
+          type="button"
+          class="keepsake-card__image"
+          (click)="open(index)"
+          [attr.aria-label]="
+            uiText.text('characterJournal.keepsakes.enlarge', {
+              title: keepsake.title | bilingual,
+            })
+          "
+        >
+          <img [src]="keepsake.image.url" [alt]="keepsake.image.alt" loading="lazy" />
+          <span aria-hidden="true">⌕</span>
+        </button>
+        <div class="keepsake-card__copy">
+          <div class="keepsake-card__meta">
+            <span>{{ kindLabel(keepsake.kind) }}</span>
+            @if (keepsake.recordedAt) {
+              <time [attr.datetime]="keepsake.recordedAt">{{ keepsake.recordedAt }}</time>
+            }
+          </div>
+          <h4>{{ keepsake.title | bilingual }}</h4>
+          <p>{{ keepsake.description | bilingual }}</p>
+          <a
+            [routerLink]="sourceRoute(keepsake.source)"
+            [queryParams]="sourceTab(keepsake.source) ? { tab: sourceTab(keepsake.source) } : null"
+            [fragment]="sourceFragment(keepsake.source)"
+          >
+            <span aria-hidden="true">↗</span>
+            {{ keepsake.source.label | bilingual }}
+          </a>
+        </div>
+      </article>
+    }
+  </div>
+</section>
+
+@if (selectedIndex() !== undefined) {
+  <app-image-lightbox
+    [images]="images()"
+    [currentIndex]="selectedIndex() ?? 0"
+    (indexChange)="selectedIndex.set($event)"
+    (lightboxClose)="close()"
+  />
+}

@@ -47,7 +47,7 @@
 
   &__tabs {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
     gap: $spacing-xs;
     padding: $spacing-xs;
     border: $border-width-thin solid rgba($color-gold, 0.25);
