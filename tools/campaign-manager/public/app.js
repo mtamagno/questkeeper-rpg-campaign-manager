@@ -2926,25 +2926,78 @@ function entityForm(type, item = {}) {
     ].join('');
   }
   if (type === 'quests') {
-    const ownerChoices = (state.campaign?.characters ?? []).map((character) =>
-      `<label class="consent-check"><input type="checkbox" name="questOwners" value="${escapeHtml(character.id)}" ${(item.ownerCharacterIds ?? []).includes(character.id) ? 'checked' : ''} /> ${escapeHtml(character.name)}</label>`,
-    ).join('');
-    const updateRows = Object.fromEntries(languages.map((language) => [language,
-      (item.updates ?? []).map((update) => [update.id, update.recordedAt, update.sessionId ?? '', update.state, update.progress?.[language] ?? '', update.nextObjective?.[language] ?? '', (update.evidence ?? []).map((reference) => `${reference.kind}:${reference.id}`).join(',')].join(' | ')).join('\n'),
-    ]));
+    const ownerChoices = (state.campaign?.characters ?? [])
+      .map(
+        (character) =>
+          `<label class="consent-check"><input type="checkbox" name="questOwners" value="${escapeHtml(character.id)}" ${(item.ownerCharacterIds ?? []).includes(character.id) ? 'checked' : ''} /> ${escapeHtml(character.name)}</label>`,
+      )
+      .join('');
+    const updateRows = Object.fromEntries(
+      languages.map((language) => [
+        language,
+        (item.updates ?? [])
+          .map((update) =>
+            [
+              update.id,
+              update.recordedAt,
+              update.sessionId ?? '',
+              update.state,
+              update.progress?.[language] ?? '',
+              update.nextObjective?.[language] ?? '',
+              (update.evidence ?? [])
+                .map((reference) => `${reference.kind}:${reference.id}`)
+                .join(','),
+              update.image?.url ?? '',
+              update.image?.alt?.[language] ?? '',
+              update.image?.caption?.[language] ?? '',
+            ].join(' | '),
+          )
+          .join('\n'),
+      ]),
+    );
     return [
       ...common,
       section('Quest identity'),
       ...localizedFields('title', 'Title', item.title, languages, { required: true }),
       ...localizedFields('summary', 'Summary', item.summary, languages, { type: 'textarea' }),
-      field('questScope', 'Scope', item.scope ?? 'party', { type: 'select', values: [['party', 'Party quest'], ['character', 'Personal quest']] }),
-      field('questAudience', 'Audience', item.audience ?? 'party', { type: 'select', values: [['party', 'Whole party'], ['owners', 'Owners after profile unlock'], ['gm', 'Game Master only']] }),
-      field('questImportance', 'Importance', item.importance ?? 'standard', { type: 'select', values: [['minor', 'Minor'], ['standard', 'Standard'], ['major', 'Major'], ['critical', 'Critical']] }),
-      field('questKind', 'Kind / theme', item.kind ?? '', { hint: 'Optional and system-agnostic, for example mystery, promise or faction.' }),
+      field('questScope', 'Scope', item.scope ?? 'party', {
+        type: 'select',
+        values: [
+          ['party', 'Party quest'],
+          ['character', 'Personal quest'],
+        ],
+      }),
+      field('questAudience', 'Audience', item.audience ?? 'party', {
+        type: 'select',
+        values: [
+          ['party', 'Whole party'],
+          ['owners', 'Owners after profile unlock'],
+          ['gm', 'Game Master only'],
+        ],
+      }),
+      field('questImportance', 'Importance', item.importance ?? 'standard', {
+        type: 'select',
+        values: [
+          ['minor', 'Minor'],
+          ['standard', 'Standard'],
+          ['major', 'Major'],
+          ['critical', 'Critical'],
+        ],
+      }),
+      field('questKind', 'Kind / theme', item.kind ?? '', {
+        hint: 'Optional and system-agnostic, for example mystery, promise or faction.',
+      }),
       `<fieldset class="field field--wide"><legend>Personal quest owners</legend><div class="translation-targets">${ownerChoices || '<p>Add a character before assigning a personal quest.</p>'}</div><small>Party quests must have no owners. One personal quest may have several owners.</small></fieldset>`,
       section('Evolution history'),
-      `<p class="field field--wide form-hint">One update per line: stable update ID | ISO date | session ID (optional) | state | progress | next objective | evidence kind:id comma list. Keep metadata and line order equal in every language; translate only progress and objective.</p>`,
-      ...languages.map((language) => field(`questUpdates__${language}`, `Evolution · ${languageName(language)} (${language})`, updateRows[language], { type: 'textarea', wide: true, required: true })),
+      `<p class="field field--wide form-hint">One update per line: stable update ID | ISO date | session ID (optional) | state | progress | next objective | evidence kind:id comma list | campaign-relative image path (optional) | image alt | image caption. Keep metadata and line order equal in every language; translate progress, objective, alt and caption.</p>`,
+      ...languages.map((language) =>
+        field(
+          `questUpdates__${language}`,
+          `Evolution · ${languageName(language)} (${language})`,
+          updateRows[language],
+          { type: 'textarea', wide: true, required: true },
+        ),
+      ),
     ].join('');
   }
   return [
@@ -2969,7 +3022,13 @@ function entityForm(type, item = {}) {
 }
 
 function openEntityEditor(type, item) {
-  const labels = { characters: 'Character', npcs: 'NPC', sessions: 'Session', maps: 'Location', quests: 'Quest' };
+  const labels = {
+    characters: 'Character',
+    npcs: 'NPC',
+    sessions: 'Session',
+    maps: 'Location',
+    quests: 'Quest',
+  };
   openDialog({
     title: `${item ? 'Edit' : 'New'} ${labels[type].toLowerCase()}`,
     eyebrow: labels[type],
@@ -3817,29 +3876,81 @@ async function buildEntity(type, form, original = {}) {
     };
   }
   if (type === 'quests') {
-    const rowsByLanguage = Object.fromEntries(languages.map((language) => [language,
-      String(form.get(`questUpdates__${language}`) ?? '').split('\n').map((line) => line.trim()).filter(Boolean).map((line) => line.split('|').map((part) => part.trim())),
-    ]));
+    const rowsByLanguage = Object.fromEntries(
+      languages.map((language) => [
+        language,
+        String(form.get(`questUpdates__${language}`) ?? '')
+          .split('\n')
+          .map((line) => line.trim())
+          .filter(Boolean)
+          .map((line) => line.split('|').map((part) => part.trim())),
+      ]),
+    );
     const primary = state.campaign?.manifestEntry?.defaultLanguage ?? languages[0];
     const primaryRows = rowsByLanguage[primary] ?? [];
     if (!primaryRows.length) throw new Error('A quest needs at least one evolution update.');
     const updates = primaryRows.map((row, index) => {
-      if (row.length < 6) throw new Error(`Quest update ${index + 1} needs ID, date, session, state, progress and next objective.`);
-      const evidence = String(row[6] ?? '').split(',').map((value) => value.trim()).filter(Boolean).map((value) => { const [kind, ...idParts] = value.split(':'); return { kind, id: idParts.join(':') }; });
+      if (row.length < 6)
+        throw new Error(
+          `Quest update ${index + 1} needs ID, date, session, state, progress and next objective.`,
+        );
+      const evidence = String(row[6] ?? '')
+        .split(',')
+        .map((value) => value.trim())
+        .filter(Boolean)
+        .map((value) => {
+          const [kind, ...idParts] = value.split(':');
+          return { kind, id: idParts.join(':') };
+        });
+      const imageUrl = String(row[7] ?? '').trim();
       return {
-        id: row[0], recordedAt: row[1], ...(row[2] ? { sessionId: row[2] } : {}), state: row[3],
-        progress: Object.fromEntries(languages.map((language) => [language, rowsByLanguage[language]?.[index]?.[4] ?? row[4]])),
-        nextObjective: Object.fromEntries(languages.map((language) => [language, rowsByLanguage[language]?.[index]?.[5] ?? row[5]])),
+        id: row[0],
+        recordedAt: row[1],
+        ...(row[2] ? { sessionId: row[2] } : {}),
+        state: row[3],
+        progress: Object.fromEntries(
+          languages.map((language) => [language, rowsByLanguage[language]?.[index]?.[4] ?? row[4]]),
+        ),
+        nextObjective: Object.fromEntries(
+          languages.map((language) => [language, rowsByLanguage[language]?.[index]?.[5] ?? row[5]]),
+        ),
         ...(evidence.length ? { evidence } : {}),
+        ...(imageUrl
+          ? {
+              image: {
+                url: imageUrl,
+                alt: Object.fromEntries(
+                  languages.map((language) => [
+                    language,
+                    rowsByLanguage[language]?.[index]?.[8] ?? row[8] ?? '',
+                  ]),
+                ),
+                ...(String(row[9] ?? '').trim()
+                  ? {
+                      caption: Object.fromEntries(
+                        languages.map((language) => [
+                          language,
+                          rowsByLanguage[language]?.[index]?.[9] ?? row[9] ?? '',
+                        ]),
+                      ),
+                    }
+                  : {}),
+              },
+            }
+          : {}),
       };
     });
     return {
-      ...original, schemaVersion: 1, id,
+      ...original,
+      schemaVersion: 1,
+      id,
       scope: String(form.get('questScope') ?? 'party'),
       ownerCharacterIds: form.getAll('questOwners').map(String),
       audience: String(form.get('questAudience') ?? 'party'),
       importance: String(form.get('questImportance') ?? 'standard'),
-      ...(String(form.get('questKind') ?? '').trim() ? { kind: String(form.get('questKind')).trim() } : {}),
+      ...(String(form.get('questKind') ?? '').trim()
+        ? { kind: String(form.get('questKind')).trim() }
+        : {}),
       title: localizedFormValue(form, 'title', '', languages),
       summary: localizedFormValue(form, 'summary', '', languages),
       updates,

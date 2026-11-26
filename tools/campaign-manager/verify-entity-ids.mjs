@@ -23,7 +23,13 @@ async function loadCampaign(campaignId) {
       continue;
     }
     const folder = join(dataRoot, type);
-    const manifest = await readJson(join(folder, 'manifest.json'));
+    let manifest;
+    try {
+      manifest = await readJson(join(folder, 'manifest.json'));
+    } catch (error) {
+      if (type === 'quests' && error.code === 'ENOENT') manifest = [];
+      else throw error;
+    }
     collections[type] = await Promise.all(
       manifest.map(async (fileName) => {
         const source = join(folder, fileName);
@@ -48,5 +54,5 @@ for (const campaign of manifest) {
 }
 
 console.log(
-  `Campaign entity IDs verified across characters, NPCs, sessions and maps for ${manifest.length} campaign(s).`,
+  `Campaign entity IDs verified across characters, NPCs, sessions, maps and quests for ${manifest.length} campaign(s).`,
 );

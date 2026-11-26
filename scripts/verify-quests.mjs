@@ -19,6 +19,7 @@ for (const campaign of campaigns) {
     return Promise.all(files.map((file) => json(join(folder, file))));
   };
   const bundle = {
+    manifestEntry: campaign,
     characters: await loadManifest('characters'),
     npcs: await loadManifest('npcs'),
     sessions: await loadManifest('sessions'),
@@ -26,6 +27,11 @@ for (const campaign of campaigns) {
   };
   const quests = await loadManifest('quests');
   validateQuestCollection(quests, bundle);
+  for (const quest of quests) {
+    for (const update of quest.updates ?? []) {
+      if (update.image?.url) await stat(join(root, campaign.id, update.image.url));
+    }
+  }
   count += quests.length;
 }
 console.log(`Quest contract verified across ${campaigns.length} campaign(s) and ${count} quest(s).`);

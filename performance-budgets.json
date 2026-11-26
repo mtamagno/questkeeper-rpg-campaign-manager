@@ -1,6 +1,6 @@
 {
   "distDirectory": "dist/campaign-companion/browser",
-  "initialBytes": 513000,
+  "initialBytes": 517000,
   "initialRequests": 15,
   "largestInitialAssetBytes": 370000,
   "largestDeferredScriptBytes": 500000,

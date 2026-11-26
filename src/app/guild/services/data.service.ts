@@ -328,7 +328,7 @@ export class DataService {
         this._partyRelationships.set(data.partyRelationships);
         this._npcRelationships.set(data.npcRelationships);
         this._campaign.set(resolveImagePaths(data.campaign, imagesBase));
-        this._quests.set(data.quests);
+        this._quests.set(resolveImagePaths(data.quests, imagesBase));
         this._state.set({ isLoading: false, isLoaded: true, error: undefined });
       },
       error: (err: unknown) => {

@@ -24,7 +24,12 @@
             })
           "
         >
-          <img [src]="keepsake.image.url" [alt]="keepsake.image.alt" loading="lazy" />
+          <img
+            [src]="keepsake.image.url"
+            [alt]="keepsake.image.alt"
+            loading="lazy"
+            decoding="async"
+          />
           <span aria-hidden="true">⌕</span>
         </button>
         <div class="keepsake-card__copy">

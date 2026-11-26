@@ -65,15 +65,45 @@ test('round-trips party and personal quests through the portable bundle', async 
   const root = await fixture(t);
   await createCampaign(root, campaignInput);
   await saveEntity(root, campaignInput.id, 'characters', {
-    id: 'aria', name: 'Aria', sheet: { level: 1 }, publicProfile: {}, privateProfile: {}, diary: [], quotes: [], gallery: [],
+    id: 'aria',
+    name: 'Aria',
+    sheet: { level: 1 },
+    publicProfile: {},
+    privateProfile: {},
+    diary: [],
+    quotes: [],
+    gallery: [],
   });
   const quest = {
-    schemaVersion: 1, id: 'find-the-lantern', scope: 'character', ownerCharacterIds: ['aria'], audience: 'party', importance: 'major', kind: 'mystery',
-    title: { en: 'Find the lantern', it: 'Trova la lanterna' }, summary: { en: 'A light is missing.', it: 'Manca una luce.' },
-    updates: [{ id: 'heard-the-rumour', recordedAt: '2026-10-14', state: 'rumour', progress: { en: 'A clue surfaced.', it: 'È emerso un indizio.' }, nextObjective: { en: 'Ask the keeper.', it: 'Chiedi al custode.' } }],
+    schemaVersion: 1,
+    id: 'find-the-lantern',
+    scope: 'character',
+    ownerCharacterIds: ['aria'],
+    audience: 'party',
+    importance: 'major',
+    kind: 'mystery',
+    title: { en: 'Find the lantern', it: 'Trova la lanterna' },
+    summary: { en: 'A light is missing.', it: 'Manca una luce.' },
+    updates: [
+      {
+        id: 'heard-the-rumour',
+        recordedAt: '2026-10-14',
+        state: 'rumour',
+        progress: { en: 'A clue surfaced.', it: 'È emerso un indizio.' },
+        nextObjective: { en: 'Ask the keeper.', it: 'Chiedi al custode.' },
+        image: {
+          url: 'images/quests/lantern-rumour.webp',
+          alt: { en: 'A lantern clue', it: 'Un indizio sulla lanterna' },
+          caption: { en: 'The first trace.', it: 'La prima traccia.' },
+        },
+      },
+    ],
   };
   await saveEntity(root, campaignInput.id, 'quests', quest);
-  await assert.rejects(deleteEntity(root, campaignInput.id, 'characters', 'aria'), /quest "find-the-lantern" references it/);
+  await assert.rejects(
+    deleteEntity(root, campaignInput.id, 'characters', 'aria'),
+    /quest "find-the-lantern" references it/,
+  );
   const exported = await exportCampaign(root, campaignInput.id);
   assert.deepEqual(exported.quests, [quest]);
   exported.manifestEntry = { ...exported.manifestEntry, id: 'imported-lantern' };

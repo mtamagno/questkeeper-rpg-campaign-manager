@@ -16,27 +16,52 @@
         </header>
         <p>{{ text(projection.quest.summary) }}</p>
         @if (projection.quest.ownerCharacterIds.length > 0) {
-          <p class="quest-card__owners"><strong>{{ uiText.text('questLog.owners') }}:</strong> {{ ownerNames(projection.quest.ownerCharacterIds) }}</p>
+          <p class="quest-card__owners">
+            <strong>{{ uiText.text('questLog.owners') }}:</strong>
+            {{ ownerNames(projection.quest.ownerCharacterIds) }}
+          </p>
         }
         <section class="quest-card__objective">
           <h3>{{ uiText.text('questLog.currentObjective') }}</h3>
           <p>{{ text(projection.current.nextObjective) }}</p>
         </section>
         <details>
-          <summary>{{ uiText.text('questLog.history') }} · {{ projection.quest.updates.length }}</summary>
+          <summary>
+            {{ uiText.text('questLog.history') }} · {{ projection.quest.updates.length }}
+          </summary>
           <ol class="quest-history">
             @for (update of updates(projection.quest); track update.id) {
               <li>
-                <div><time [attr.datetime]="update.recordedAt">{{ update.recordedAt }}</time><span>{{ stateLabel(update.state) }}</span></div>
+                <div>
+                  <time [attr.datetime]="update.recordedAt">{{ update.recordedAt }}</time
+                  ><span>{{ stateLabel(update.state) }}</span>
+                </div>
+                @if (update.image; as image) {
+                  <figure class="quest-history__image">
+                    <img
+                      [src]="image.url"
+                      [alt]="text(image.alt)"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    @if (image.caption) {
+                      <figcaption>{{ text(image.caption) }}</figcaption>
+                    }
+                  </figure>
+                }
                 <p>{{ text(update.progress) }}</p>
                 @if (update.evidence?.length) {
                   <nav [attr.aria-label]="uiText.text('questLog.related')">
                     @for (reference of update.evidence; track reference.kind + ':' + reference.id) {
-                      <a [routerLink]="referenceRoute(reference)">{{ referenceLabel(reference) }}</a>
+                      <a [routerLink]="referenceRoute(reference)">{{
+                        referenceLabel(reference)
+                      }}</a>
                     }
                   </nav>
                 } @else if (update.sessionId) {
-                  <a [routerLink]="referenceRoute({ kind: 'session', id: update.sessionId })">{{ uiText.text('questLog.openSession') }}</a>
+                  <a [routerLink]="referenceRoute({ kind: 'session', id: update.sessionId })">{{
+                    uiText.text('questLog.openSession')
+                  }}</a>
                 }
               </li>
             }
@@ -46,4 +71,3 @@
     }
   </div>
 }
-

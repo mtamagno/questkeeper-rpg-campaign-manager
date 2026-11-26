@@ -52,7 +52,12 @@ The first persisted version follows this shape:
       "state": "active",
       "summary": { "en": "Rowan asked the party to follow the trail." },
       "objective": { "en": "Reach the eastern milestones." },
-      "evidence": [{ "kind": "session", "id": "session-2", "note": "Key event 2" }]
+      "evidence": [{ "kind": "session", "id": "session-2", "note": "Key event 2" }],
+      "image": {
+        "url": "images/quests/find-the-lost-cartographer-01.webp",
+        "alt": { "en": "The party studies Rowan's marked milestones" },
+        "caption": { "en": "The first reliable trail into the eastern hills." }
+      }
     }
   ]
 }
@@ -69,6 +74,9 @@ The exact schema lands in #155, but these invariants are fixed:
 - initial narrative states are `rumour`, `active`, `paused`, `completed`,
   `failed` and `abandoned`;
 - update order is explicit and each update has a stable ID;
+- every update may carry one campaign-relative illustration with localized alt
+  text and caption; illustrated updates are validated for safe paths, required
+  default-locale alt text and an existing asset during repository checks;
 - current state and objective are derived from the latest valid update rather
   than copied into another file;
 - a manual update may explicitly identify itself as unsourced; an AI proposal

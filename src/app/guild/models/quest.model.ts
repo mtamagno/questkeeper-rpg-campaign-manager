@@ -11,6 +11,12 @@ export interface QuestReference {
   readonly id: string;
 }
 
+export interface QuestUpdateImage {
+  readonly url: string;
+  readonly alt: LocalizedText;
+  readonly caption?: LocalizedText;
+}
+
 export interface QuestUpdate {
   readonly id: string;
   readonly recordedAt: string;
@@ -19,6 +25,7 @@ export interface QuestUpdate {
   readonly progress: LocalizedText;
   readonly nextObjective: LocalizedText;
   readonly evidence?: ReadonlyArray<QuestReference>;
+  readonly image?: QuestUpdateImage;
 }
 
 export interface Quest {
@@ -54,9 +61,4 @@ export function projectQuest(quest: Quest): QuestProjection | undefined {
   return current === undefined ? undefined : { quest, current };
 }
 
-export const ACTIVE_QUEST_STATES: ReadonlySet<QuestState> = new Set([
-  'rumour',
-  'active',
-  'paused',
-]);
-
+export const ACTIVE_QUEST_STATES: ReadonlySet<QuestState> = new Set(['rumour', 'active', 'paused']);
