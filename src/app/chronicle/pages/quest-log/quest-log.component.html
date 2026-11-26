@@ -1,0 +1,10 @@
+<article class="quest-log">
+  <header><div><span>✦</span><h1>{{ uiText.text('questLog.title') }}</h1><p>{{ uiText.text('questLog.subtitle') }}</p></div><app-language-toggle /></header>
+  <div class="quest-log__filters" role="group" [attr.aria-label]="uiText.text('questLog.title')">
+    <button type="button" [class.is-active]="filter() === 'active'" (click)="filter.set('active')">{{ uiText.text('questLog.active') }}</button>
+    <button type="button" [class.is-active]="filter() === 'archive'" (click)="filter.set('archive')">{{ uiText.text('questLog.archive') }}</button>
+    <button type="button" [class.is-active]="filter() === 'all'" (click)="filter.set('all')">{{ uiText.text('questLog.all') }}</button>
+  </div>
+  <app-quest-list [quests]="quests()" />
+</article>
+

@@ -98,6 +98,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'campaign/quests',
+        loadComponent: () =>
+          import('./chronicle/pages/quest-log/quest-log.component').then(
+            (m) => m.QuestLogComponent,
+          ),
+      },
+      {
         path: 'campaign/story-so-far',
         loadComponent: () =>
           import('./chronicle/pages/story-so-far/story-so-far.component').then(

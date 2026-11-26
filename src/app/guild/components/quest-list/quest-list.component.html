@@ -1,0 +1,49 @@
+@if (projections().length === 0) {
+  <section class="quest-empty" role="status">
+    <h2>{{ uiText.text('questLog.emptyTitle') }}</h2>
+    <p>{{ uiText.text(emptyTextKey()) }}</p>
+  </section>
+} @else {
+  <div class="quest-list">
+    @for (projection of projections(); track projection.quest.id) {
+      <article class="quest-card" [attr.data-state]="projection.current.state">
+        <header>
+          <div>
+            <span class="quest-card__state">{{ stateLabel(projection.current.state) }}</span>
+            <h2>{{ text(projection.quest.title) }}</h2>
+          </div>
+          <span class="quest-card__importance">{{ projection.quest.importance }}</span>
+        </header>
+        <p>{{ text(projection.quest.summary) }}</p>
+        @if (projection.quest.ownerCharacterIds.length > 0) {
+          <p class="quest-card__owners"><strong>{{ uiText.text('questLog.owners') }}:</strong> {{ ownerNames(projection.quest.ownerCharacterIds) }}</p>
+        }
+        <section class="quest-card__objective">
+          <h3>{{ uiText.text('questLog.currentObjective') }}</h3>
+          <p>{{ text(projection.current.nextObjective) }}</p>
+        </section>
+        <details>
+          <summary>{{ uiText.text('questLog.history') }} · {{ projection.quest.updates.length }}</summary>
+          <ol class="quest-history">
+            @for (update of updates(projection.quest); track update.id) {
+              <li>
+                <div><time [attr.datetime]="update.recordedAt">{{ update.recordedAt }}</time><span>{{ stateLabel(update.state) }}</span></div>
+                <p>{{ text(update.progress) }}</p>
+                @if (update.evidence?.length) {
+                  <nav [attr.aria-label]="uiText.text('questLog.related')">
+                    @for (reference of update.evidence; track reference.kind + ':' + reference.id) {
+                      <a [routerLink]="referenceRoute(reference)">{{ referenceLabel(reference) }}</a>
+                    }
+                  </nav>
+                } @else if (update.sessionId) {
+                  <a [routerLink]="referenceRoute({ kind: 'session', id: update.sessionId })">{{ uiText.text('questLog.openSession') }}</a>
+                }
+              </li>
+            }
+          </ol>
+        </details>
+      </article>
+    }
+  </div>
+}
+

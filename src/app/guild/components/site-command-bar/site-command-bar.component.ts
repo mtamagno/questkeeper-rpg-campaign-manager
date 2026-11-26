@@ -45,6 +45,7 @@ const ROUTE_LABEL_KEYS: Readonly<Record<string, string>> = {
   relationships: 'relationships',
   npcs: 'npcs',
   campaign: 'campaign',
+  quests: 'quests',
   'story-so-far': 'storySoFar',
   'table-moments': 'tableMoments',
   story: 'story',
@@ -308,6 +309,15 @@ export class SiteCommandBarComponent {
         detail: commandCopy('chronicles', 'detail'),
         url: `${prefix}/campaign`,
         keywords: 'campaign briefing sessioni sessions events eventi chronicle cronache',
+        scope: 'current',
+      },
+      {
+        id: 'current-quests',
+        icon: '\u2726',
+        title: commandCopy('quests', 'title'),
+        detail: commandCopy('quests', 'detail'),
+        url: `${prefix}/campaign/quests`,
+        keywords: 'quest quests missioni obiettivi objectives goals',
         scope: 'current',
       },
       {

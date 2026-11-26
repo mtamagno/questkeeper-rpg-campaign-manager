@@ -14,6 +14,11 @@
           "other": "Other",
           "loading": "Loading"
         },
+        "questLog": {
+          "title": "Quest Log", "subtitle": "The party's living objectives and the evidence behind every change.", "active": "Active threads", "archive": "Past threads", "all": "All",
+          "emptyTitle": "No quests recorded yet", "emptyDescription": "The campaign remains valid; the Game Master can add the first thread from Campaign Manager.", "currentObjective": "Current objective", "history": "Evolution", "owners": "Owners", "related": "Related evidence", "openSession": "Open supporting session", "personalTitle": "Personal Quest Log", "personalEmpty": "No personal thread is recorded for this character.", "partyLink": "Open the party Quest Log", "unauthorized": "This thread belongs to another character or to the Game Master.",
+          "states": { "rumour": "Rumour", "active": "Active", "paused": "Paused", "completed": "Completed", "failed": "Failed", "abandoned": "Abandoned" }
+        },
         "interfaceLabels": {
           "partyQuote": "Party quote",
           "quickStats": "Key statistics",
@@ -620,6 +625,7 @@
               "detail": "Connections between known figures"
             },
             "chronicles": { "title": "Session chronicles", "detail": "Briefing and key events" },
+            "quests": { "title": "Quest Log", "detail": "Current objectives and their history" },
             "story": { "title": "The story so far", "detail": "Catch up with the adventure" },
             "tableMoments": {
               "title": "Around the Table",
@@ -1350,6 +1356,11 @@
           "other": "Altro",
           "loading": "Caricamento"
         },
+        "questLog": {
+          "title": "Registro delle missioni", "subtitle": "Gli obiettivi vivi del gruppo e le prove dietro ogni cambiamento.", "active": "Trame attive", "archive": "Trame concluse", "all": "Tutte",
+          "emptyTitle": "Nessuna missione registrata", "emptyDescription": "La campagna resta valida; il Master può aggiungere la prima trama dal Campaign Manager.", "currentObjective": "Obiettivo attuale", "history": "Evoluzione", "owners": "Responsabili", "related": "Riferimenti collegati", "openSession": "Apri la sessione di riferimento", "personalTitle": "Registro personale", "personalEmpty": "Non è ancora stata registrata una trama personale per questo personaggio.", "partyLink": "Apri il registro del gruppo", "unauthorized": "Questa trama appartiene a un altro personaggio o al Master.",
+          "states": { "rumour": "Voce", "active": "Attiva", "paused": "In pausa", "completed": "Completata", "failed": "Fallita", "abandoned": "Abbandonata" }
+        },
         "interfaceLabels": {
           "partyQuote": "Citazione della compagnia",
           "quickStats": "Statistiche principali",
@@ -1965,6 +1976,7 @@
               "title": "Cronache delle sessioni",
               "detail": "Briefing ed eventi chiave"
             },
+            "quests": { "title": "Registro delle missioni", "detail": "Obiettivi attuali e loro evoluzione" },
             "story": { "title": "La storia fin qui", "detail": "Riprendi il filo dell'avventura" },
             "tableMoments": {
               "title": "Momenti al tavolo",

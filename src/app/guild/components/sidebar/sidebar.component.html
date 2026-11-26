@@ -168,6 +168,14 @@
       <!-- Campaign & Maps links -->
       <section class="sidebar__section">
         <h2 class="sidebar__section-title">📜 {{ uiText.text('sidebar.campaign') }}</h2>
+        <a
+          class="sidebar__section-link"
+          [routerLink]="['/', activeCampaignId(), 'campaign', 'quests']"
+          routerLinkActive="sidebar__section-link--active"
+          (click)="close()"
+        >
+          ✦ {{ uiText.text('questLog.title') }}
+        </a>
 
         <a
           class="sidebar__section-link"

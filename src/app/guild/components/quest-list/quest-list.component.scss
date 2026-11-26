@@ -1,0 +1,16 @@
+.quest-list { display: grid; gap: 1rem; }
+.quest-card, .quest-empty { border: 1px solid var(--color-border); border-radius: 1rem; padding: clamp(1rem, 3vw, 1.5rem); background: var(--color-surface); color: var(--color-text); }
+.quest-card > header { display: flex; align-items: start; justify-content: space-between; gap: 1rem; }
+.quest-card h2, .quest-card h3, .quest-empty h2 { margin: 0; color: var(--color-heading); }
+.quest-card__state, .quest-card__importance { display: inline-block; font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; color: var(--color-text-muted); }
+.quest-card__objective { margin: 1rem 0; padding: 1rem; border-inline-start: .25rem solid var(--color-accent); background: color-mix(in srgb, var(--color-surface) 80%, var(--color-accent) 20%); }
+.quest-card__objective p { margin-block-end: 0; }
+.quest-card details { border-top: 1px solid var(--color-border); padding-top: .75rem; }
+.quest-card summary { cursor: pointer; min-height: 2.75rem; display: flex; align-items: center; font-weight: 700; }
+.quest-history { display: grid; gap: 1rem; padding-inline-start: 1.4rem; }
+.quest-history li > div { display: flex; flex-wrap: wrap; gap: .75rem; color: var(--color-text-muted); font-size: .88rem; }
+.quest-history nav { display: flex; flex-wrap: wrap; gap: .5rem; }
+.quest-history a { color: var(--color-link); }
+@media (max-width: 30rem) { .quest-card > header { flex-direction: column; } }
+@media print { .quest-card { break-inside: avoid; } .quest-card details > * { display: block !important; } }
+
