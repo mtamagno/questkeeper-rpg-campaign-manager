@@ -136,6 +136,25 @@ export type CharacterNotebookText = string | BilingualText;
 /** Intended audience of one notebook spread after the notebook itself is unlocked. */
 export type CharacterNotebookSecrecy = 'private' | 'party' | 'public';
 
+/** Reader-safe material and handwriting choices for one character-owned notebook. */
+export type CharacterNotebookPaperStyle =
+  | 'classic'
+  | 'weathered'
+  | 'moonlit'
+  | 'ash'
+  | 'botanical';
+export type CharacterNotebookHandwritingStyle =
+  | 'measured'
+  | 'flowing'
+  | 'compact'
+  | 'angular'
+  | 'ornate';
+
+export interface CharacterNotebookPresentation {
+  readonly paper?: CharacterNotebookPaperStyle;
+  readonly handwriting?: CharacterNotebookHandwritingStyle;
+}
+
 /** One complete illustrated two-page spread from a character's notebook. */
 export interface CharacterNotebookPage {
   readonly id: string;
@@ -160,6 +179,8 @@ export interface CharacterNotebook {
   readonly password: string;
   /** Per-character art direction used by manual authors and AI draft tools. */
   readonly styleDirectives?: string;
+  /** Semantic reader styling; absent values preserve the classic legacy appearance. */
+  readonly presentation?: CharacterNotebookPresentation;
   /** Optional 2:3 portrait covers shown before and after the spreads. */
   readonly frontCover?: ImageRef;
   readonly backCover?: ImageRef;

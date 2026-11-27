@@ -58,6 +58,19 @@ metadata supplies chronology, mood, linked session, related people and intended
 audience. Missing metadata remains valid and is shown as undated/private rather
 than inferred from prose or artwork.
 
+### Reader materials and handwriting
+
+An optional notebook-level `presentation` selects a semantic `paper` and
+`handwriting` style. The supported paper surfaces are `classic`, `weathered`,
+`moonlit`, `ash` and `botanical`; handwriting may be `measured`, `flowing`,
+`compact`, `angular` or `ornate`. Missing values preserve the classic/measured
+legacy rendering. These choices style only the reader frame and reflection copy:
+they never recolour, reinterpret or replace the authored spread image.
+
+Campaign Manager exposes both fields as constrained selects and stores the
+choice with the notebook. Every handwriting stack uses local system fallbacks,
+keeps text selectable and preserves readable contrast at phone sizes.
+
 ## Performance and future growth
 
 The index must not decode gallery images or initialize the notebook reader.

@@ -425,6 +425,12 @@
     'Notebook title': 'Titolo del taccuino',
     'Short description': 'Descrizione breve',
     'Notebook password': 'Password del taccuino',
+    'Paper mood': 'Atmosfera della carta',
+    'Handwriting mood': 'Atmosfera della grafia',
+    'Changes the reader surface without recolouring the authored artwork.':
+      'Cambia la superficie del lettore senza ricolorare le illustrazioni originali.',
+    'Uses readable system-font fallbacks; the page image remains authoritative.':
+      'Usa alternative di sistema leggibili; l’immagine della pagina resta autorevole.',
     'Character-specific art direction': 'Direzione artistica specifica del personaggio',
     'Describe this owner’s medium, palette, handwriting, recurring symbols and how mood should alter the pages.':
       'Descrivi tecnica, palette, grafia, simboli ricorrenti e come l’umore del proprietario deve trasformare le pagine.',

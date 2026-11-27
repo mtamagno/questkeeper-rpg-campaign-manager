@@ -1746,6 +1746,15 @@ const NOTEBOOK_MOODS = [
   'music',
   'renewal',
 ];
+const NOTEBOOK_PAPER_STYLES = ['classic', 'weathered', 'moonlit', 'ash', 'botanical'];
+const NOTEBOOK_HANDWRITING_STYLES = ['measured', 'flowing', 'compact', 'angular', 'ornate'];
+
+function notebookStyleOptions(values) {
+  return values.map((value) => [
+    value,
+    value.charAt(0).toUpperCase() + value.slice(1),
+  ]);
+}
 
 function notebookLocalizedFields(prefix, label, value, languages, options = {}) {
   return languages
@@ -1813,6 +1822,8 @@ function notebookEditor(item = {}, languages = campaignLanguages()) {
         ${notebookLocalizedFields('title', 'Notebook title', notebook.title, languages)}
         ${notebookLocalizedFields('description', 'Short description', notebook.description, languages, { type: 'textarea', wide: true })}
         ${field('notebookPassword', 'Notebook password', notebook.password || 'cambiami', { hint: 'Discourages casual spoilers; this is not encryption.' })}
+        ${field('notebookPaperStyle', 'Paper mood', notebook.presentation?.paper || 'classic', { type: 'select', values: notebookStyleOptions(NOTEBOOK_PAPER_STYLES), hint: 'Changes the reader surface without recolouring the authored artwork.' })}
+        ${field('notebookHandwritingStyle', 'Handwriting mood', notebook.presentation?.handwriting || 'measured', { type: 'select', values: notebookStyleOptions(NOTEBOOK_HANDWRITING_STYLES), hint: 'Uses readable system-font fallbacks; the page image remains authoritative.' })}
         ${field('notebookStyleDirectives', 'Character-specific art direction', notebook.styleDirectives || '', { type: 'textarea', wide: true, hint: 'Describe this owner’s medium, palette, handwriting, recurring symbols and how mood should alter the pages.' })}
       </div>
       <div class="notebook-cover-grid">${covers
@@ -3269,6 +3280,11 @@ async function buildNotebook(original = {}) {
     title: localizedNotebookValue(editor, 'title', languages),
     description: localizedNotebookValue(editor, 'description', languages),
     password: editor.querySelector('[name="notebookPassword"]')?.value.trim() || 'cambiami',
+    presentation: {
+      paper: editor.querySelector('[name="notebookPaperStyle"]')?.value || 'classic',
+      handwriting:
+        editor.querySelector('[name="notebookHandwritingStyle"]')?.value || 'measured',
+    },
     styleDirectives: editor.querySelector('[name="notebookStyleDirectives"]')?.value.trim() || '',
   };
   for (const key of ['front', 'back']) {

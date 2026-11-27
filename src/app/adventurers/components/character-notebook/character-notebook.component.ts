@@ -14,8 +14,10 @@ import {
 
 import {
   type CharacterNotebook,
+  type CharacterNotebookHandwritingStyle,
   type CharacterNotebookMood,
   type CharacterNotebookPage,
+  type CharacterNotebookPaperStyle,
   type CharacterNotebookSecrecy,
   type CharacterNotebookText,
   type ImageRef,
@@ -85,6 +87,13 @@ export class CharacterNotebookComponent {
   readonly selectedCharacterId = signal('all');
   readonly selectedSecrecy = signal<CharacterNotebookSecrecy | 'all'>('all');
   readonly chronologyOrder = signal<NotebookOrder>('authored');
+
+  readonly paperStyle: Signal<CharacterNotebookPaperStyle> = computed(
+    () => this.notebook().presentation?.paper ?? 'classic',
+  );
+  readonly handwritingStyle: Signal<CharacterNotebookHandwritingStyle> = computed(
+    () => this.notebook().presentation?.handwriting ?? 'measured',
+  );
 
   private readonly accessId: Signal<string> = computed(() => `${this.characterId()}:notebook`);
 

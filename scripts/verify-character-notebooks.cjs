@@ -21,9 +21,18 @@ const allowedMoods = new Set([
   'renewal',
 ]);
 const allowedSecrecy = new Set(['private', 'party', 'public']);
+const allowedPaperStyles = new Set(['classic', 'weathered', 'moonlit', 'ash', 'botanical']);
+const allowedHandwritingStyles = new Set([
+  'measured',
+  'flowing',
+  'compact',
+  'angular',
+  'ornate',
+]);
 const failures = [];
 let notebookCount = 0;
 let enrichedPageCount = 0;
+let styledNotebookCount = 0;
 
 function assert(condition, message) {
   if (!condition) failures.push(message);
@@ -76,6 +85,17 @@ for (const campaign of campaigns) {
       typeof notebook.styleDirectives === 'string' && notebook.styleDirectives.trim().length >= 20,
       `${label} needs character-specific style directives.`,
     );
+    if (notebook.presentation !== undefined) {
+      assert(
+        allowedPaperStyles.has(notebook.presentation.paper),
+        `${label} uses unsupported paper style ${notebook.presentation.paper}.`,
+      );
+      assert(
+        allowedHandwritingStyles.has(notebook.presentation.handwriting),
+        `${label} uses unsupported handwriting style ${notebook.presentation.handwriting}.`,
+      );
+      styledNotebookCount += 1;
+    }
     assert(Array.isArray(notebook.pages), `${label} pages must be an array.`);
     assertAsset(campaignRoot, notebook.frontCover, `${label} front cover`);
     assertAsset(campaignRoot, notebook.backCover, `${label} back cover`);
@@ -165,6 +185,8 @@ for (const token of [
   'selectedCharacterId',
   'selectedSecrecy',
   'notebook-tools__contents',
+  'data-paper',
+  'data-handwriting',
 ]) {
   assert(componentContract.includes(token), `Notebook reader is missing ${token}.`);
 }
@@ -177,6 +199,8 @@ for (const fieldName of [
   'notebookPageSessionId',
   'notebookPageCharacters',
   'notebookPageSecrecy',
+  'notebookPaperStyle',
+  'notebookHandwritingStyle',
 ]) {
   assert(managerSource.includes(fieldName), `Campaign Manager is missing ${fieldName}.`);
 }
@@ -188,11 +212,12 @@ assert(
   enrichedPageCount > 0,
   'At least one notebook page must exercise chronology and filter metadata.',
 );
+assert(styledNotebookCount > 0, 'At least one notebook must exercise semantic reader styling.');
 
 if (failures.length) {
   console.error(failures.map((failure) => `- ${failure}`).join('\n'));
   process.exit(1);
 }
 console.log(
-  `Character notebook contract verified across ${campaigns.length} campaign(s), ${notebookCount} notebook(s) and ${enrichedPageCount} enriched page(s).`,
+  `Character notebook contract verified across ${campaigns.length} campaign(s), ${notebookCount} notebook(s), ${styledNotebookCount} styled notebook(s) and ${enrichedPageCount} enriched page(s).`,
 );

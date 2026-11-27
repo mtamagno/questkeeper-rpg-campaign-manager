@@ -298,10 +298,64 @@
 }
 
 .notebook-book {
+  --notebook-paper: #d8c89f;
+  --notebook-paper-deep: #b89a67;
+  --notebook-ink: #241c16;
+  --notebook-ink-muted: #5f5042;
+  --notebook-hand: #{$font-family-body};
+  --notebook-hand-spacing: 0.01em;
   position: relative;
   max-width: 1240px;
   margin: 0 auto;
   outline: none;
+
+  &[data-paper='weathered'] {
+    --notebook-paper: #c9ad7a;
+    --notebook-paper-deep: #8f6841;
+    --notebook-ink: #27190f;
+    --notebook-ink-muted: #62462f;
+  }
+
+  &[data-paper='moonlit'] {
+    --notebook-paper: #c5c8d1;
+    --notebook-paper-deep: #858da0;
+    --notebook-ink: #191b29;
+    --notebook-ink-muted: #44495c;
+  }
+
+  &[data-paper='ash'] {
+    --notebook-paper: #c2b9ad;
+    --notebook-paper-deep: #82766d;
+    --notebook-ink: #211c1a;
+    --notebook-ink-muted: #514944;
+  }
+
+  &[data-paper='botanical'] {
+    --notebook-paper: #c8c9a9;
+    --notebook-paper-deep: #89906a;
+    --notebook-ink: #1d2418;
+    --notebook-ink-muted: #47513b;
+  }
+
+  &[data-handwriting='flowing'] {
+    --notebook-hand: 'Segoe Print', 'Bradley Hand', #{$font-family-body};
+    --notebook-hand-spacing: 0.015em;
+  }
+
+  &[data-handwriting='compact'] {
+    --notebook-hand: 'Arial Narrow', 'Aptos Narrow', #{$font-family-body};
+    --notebook-hand-spacing: 0.025em;
+  }
+
+  &[data-handwriting='angular'] {
+    --notebook-hand: 'Trebuchet MS', #{$font-family-body};
+    --notebook-hand-spacing: 0.045em;
+  }
+
+  &[data-handwriting='ornate'] {
+    --notebook-hand: 'Palatino Linotype', 'Book Antiqua', #{$font-family-body};
+    --notebook-hand-spacing: 0.025em;
+  }
 
   &:focus-visible &__stage {
     box-shadow: $shadow-xl, $shadow-glow-gold-strong;
@@ -461,8 +515,19 @@
     gap: $spacing-lg;
     margin-top: $spacing-sm;
     padding: $spacing-md $spacing-lg $spacing-sm;
+    border: 1px solid color-mix(in srgb, var(--notebook-paper-deep) 72%, #20160e);
     border-top: 3px solid $color-gold-dark;
-    background: linear-gradient(90deg, rgba($color-bg-void, 0.32), transparent 70%);
+    border-radius: 0 0 $border-radius-sm $border-radius-sm;
+    background:
+      linear-gradient(90deg, rgba(#fff, 0.16), transparent 36%),
+      repeating-linear-gradient(
+        0deg,
+        transparent 0,
+        transparent 25px,
+        color-mix(in srgb, var(--notebook-ink) 8%, transparent) 26px
+      ),
+      var(--notebook-paper);
+    box-shadow: inset 0 0 28px color-mix(in srgb, var(--notebook-paper-deep) 28%, transparent);
 
     &[data-mood='uneasy'],
     &[data-mood='fractured'],
@@ -482,7 +547,7 @@
 
     h3 {
       margin: $spacing-2xs 0 0;
-      color: $color-parchment-light;
+      color: var(--notebook-ink);
       font-family: $font-family-heading;
       font-size: clamp($font-size-lg, 2vw, $font-size-xl);
     }
@@ -492,20 +557,23 @@
       padding: 0;
       border: 0;
       background: transparent;
-      color: $color-text-secondary;
+      color: var(--notebook-ink);
+      font-family: var(--notebook-hand);
       font-style: italic;
+      font-weight: $font-weight-medium;
+      letter-spacing: var(--notebook-hand-spacing);
       line-height: $line-height-relaxed;
     }
   }
 
   &__number {
-    color: rgba($color-parchment-light, 0.42);
+    color: var(--notebook-ink-muted);
     font-family: $font-family-heading;
     font-size: $font-size-2xl;
   }
 
   &__era {
-    color: $color-gold;
+    color: var(--notebook-ink-muted);
     font-size: $font-size-xs;
     font-weight: $font-weight-semibold;
     letter-spacing: $letter-spacing-wide;
@@ -522,7 +590,8 @@
       padding: 2px $spacing-xs;
       border: $border-width-thin solid $color-border-strong;
       border-radius: $border-radius-pill;
-      color: $color-text-muted;
+      border-color: color-mix(in srgb, var(--notebook-ink-muted) 48%, transparent);
+      color: var(--notebook-ink-muted);
       font-size: $font-size-xs;
     }
   }
