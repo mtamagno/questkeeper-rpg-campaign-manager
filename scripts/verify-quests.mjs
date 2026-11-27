@@ -48,6 +48,9 @@ const questLogMarkup = await readFile(
   join(readerRoot, 'chronicle', 'pages', 'quest-log', 'quest-log.component.html'),
   'utf8',
 );
+const uiCatalog = JSON.parse(
+  await readFile(join(readerRoot, 'guild', 'i18n', 'ui.json'), 'utf8'),
+);
 
 for (const selector of [
   'quest-card__state',
@@ -62,6 +65,11 @@ for (const selector of [
 }
 if (!questLogMarkup.includes('quest-log__filters')) {
   throw new Error('Quest Log is missing its state filters.');
+}
+for (const locale of Object.values(uiCatalog.locales)) {
+  if (!locale.texts.commandBar.routeLabels.quests) {
+    throw new Error(`Quest Log breadcrumb is missing for ${locale.label}.`);
+  }
 }
 if (/var\(--color-/.test(questListStyles)) {
   throw new Error('Quest reader uses undefined legacy color tokens.');
