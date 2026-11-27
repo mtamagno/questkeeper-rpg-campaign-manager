@@ -15,9 +15,44 @@
           "loading": "Loading"
         },
         "questLog": {
-          "title": "Quest Log", "subtitle": "The party's living objectives and the evidence behind every change.", "active": "Active threads", "archive": "Past threads", "all": "All",
-          "emptyTitle": "No quests recorded yet", "emptyDescription": "The campaign remains valid; the Game Master can add the first thread from Campaign Manager.", "currentObjective": "Current objective", "history": "Evolution", "owners": "Owners", "related": "Related evidence", "openSession": "Open supporting session", "personalTitle": "Personal Quest Log", "personalEmpty": "No personal thread is recorded for this character.", "partyLink": "Open the party Quest Log", "unauthorized": "This thread belongs to another character or to the Game Master.",
-          "states": { "rumour": "Rumour", "active": "Active", "paused": "Paused", "completed": "Completed", "failed": "Failed", "abandoned": "Abandoned" }
+          "eyebrow": "Campaign objectives",
+          "title": "Quest Log",
+          "subtitle": "The party's living objectives and the evidence behind every change.",
+          "filtersLabel": "Filter quests by progress",
+          "active": "Active threads",
+          "archive": "Past threads",
+          "all": "All",
+          "emptyTitle": "No quests recorded yet",
+          "emptyDescription": "The campaign remains valid; the Game Master can add the first thread from Campaign Manager.",
+          "currentObjective": "Current objective",
+          "history": "Evolution",
+          "historyHint": "Open the recorded milestones",
+          "milestones": "{count} milestones",
+          "importanceLabel": "Importance",
+          "owners": "Owners",
+          "related": "Related evidence",
+          "openSession": "Open supporting session",
+          "personalEyebrow": "Character objective",
+          "personalTitle": "Personal Quest Log",
+          "personalDescription": "Promises, unresolved threads and turning points that belong specifically to this adventurer, tracked without mixing them into the biography.",
+          "personalCount": "{count} personal quests",
+          "personalEmpty": "No personal thread is recorded for this character.",
+          "partyLink": "Open the party Quest Log",
+          "unauthorized": "This thread belongs to another character or to the Game Master.",
+          "states": {
+            "rumour": "Rumour",
+            "active": "Active",
+            "paused": "Paused",
+            "completed": "Completed",
+            "failed": "Failed",
+            "abandoned": "Abandoned"
+          },
+          "importance": {
+            "minor": "Minor",
+            "standard": "Standard",
+            "major": "Major",
+            "critical": "Critical"
+          }
         },
         "interfaceLabels": {
           "partyQuote": "Party quote",
@@ -86,6 +121,8 @@
               "profileDescription": "Identity, traits and essential details at a glance.",
               "story": "Story & bonds",
               "storyDescription": "Personal chapters, relationships, quotes and what the party knows.",
+              "quests": "Quests",
+              "questsDescription": "Personal objectives, their evolution and the evidence gathered along the road.",
               "sheet": "Sheet",
               "sheetDescription": "Stats, resources, inventory, rules, levels and PDF download.",
               "journal": "Journal",
@@ -1357,9 +1394,44 @@
           "loading": "Caricamento"
         },
         "questLog": {
-          "title": "Registro delle missioni", "subtitle": "Gli obiettivi vivi del gruppo e le prove dietro ogni cambiamento.", "active": "Trame attive", "archive": "Trame concluse", "all": "Tutte",
-          "emptyTitle": "Nessuna missione registrata", "emptyDescription": "La campagna resta valida; il Master può aggiungere la prima trama dal Campaign Manager.", "currentObjective": "Obiettivo attuale", "history": "Evoluzione", "owners": "Responsabili", "related": "Riferimenti collegati", "openSession": "Apri la sessione di riferimento", "personalTitle": "Registro personale", "personalEmpty": "Non è ancora stata registrata una trama personale per questo personaggio.", "partyLink": "Apri il registro del gruppo", "unauthorized": "Questa trama appartiene a un altro personaggio o al Master.",
-          "states": { "rumour": "Voce", "active": "Attiva", "paused": "In pausa", "completed": "Completata", "failed": "Fallita", "abandoned": "Abbandonata" }
+          "eyebrow": "Obiettivi della campagna",
+          "title": "Registro delle missioni",
+          "subtitle": "Gli obiettivi vivi del gruppo e le prove dietro ogni cambiamento.",
+          "filtersLabel": "Filtra le missioni per avanzamento",
+          "active": "Trame attive",
+          "archive": "Trame concluse",
+          "all": "Tutte",
+          "emptyTitle": "Nessuna missione registrata",
+          "emptyDescription": "La campagna resta valida; il Master può aggiungere la prima trama dal Campaign Manager.",
+          "currentObjective": "Obiettivo attuale",
+          "history": "Evoluzione",
+          "historyHint": "Apri le tappe registrate",
+          "milestones": "{count} tappe",
+          "importanceLabel": "Importanza",
+          "owners": "Responsabili",
+          "related": "Riferimenti collegati",
+          "openSession": "Apri la sessione di riferimento",
+          "personalEyebrow": "Obiettivo del personaggio",
+          "personalTitle": "Registro personale",
+          "personalDescription": "Promesse, fili irrisolti e svolte che appartengono a questo avventuriero, senza confonderli con la sua biografia.",
+          "personalCount": "{count} missioni personali",
+          "personalEmpty": "Non è ancora stata registrata una trama personale per questo personaggio.",
+          "partyLink": "Apri il registro del gruppo",
+          "unauthorized": "Questa trama appartiene a un altro personaggio o al Master.",
+          "states": {
+            "rumour": "Voce",
+            "active": "Attiva",
+            "paused": "In pausa",
+            "completed": "Completata",
+            "failed": "Fallita",
+            "abandoned": "Abbandonata"
+          },
+          "importance": {
+            "minor": "Minore",
+            "standard": "Standard",
+            "major": "Maggiore",
+            "critical": "Critica"
+          }
         },
         "interfaceLabels": {
           "partyQuote": "Citazione della compagnia",
@@ -1428,6 +1500,8 @@
               "profileDescription": "Identità, tratti e dettagli essenziali a colpo d'occhio.",
               "story": "Storia e legami",
               "storyDescription": "Capitoli personali, relazioni, citazioni e ciò che il gruppo conosce.",
+              "quests": "Missioni",
+              "questsDescription": "Obiettivi personali, la loro evoluzione e le prove raccolte lungo il cammino.",
               "sheet": "Scheda",
               "sheetDescription": "Statistiche, risorse, inventario, regole, livelli e download PDF.",
               "journal": "Diario",
@@ -1976,7 +2050,10 @@
               "title": "Cronache delle sessioni",
               "detail": "Briefing ed eventi chiave"
             },
-            "quests": { "title": "Registro delle missioni", "detail": "Obiettivi attuali e loro evoluzione" },
+            "quests": {
+              "title": "Registro delle missioni",
+              "detail": "Obiettivi attuali e loro evoluzione"
+            },
             "story": { "title": "La storia fin qui", "detail": "Riprendi il filo dell'avventura" },
             "tableMoments": {
               "title": "Momenti al tavolo",

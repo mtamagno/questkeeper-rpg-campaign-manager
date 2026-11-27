@@ -83,8 +83,7 @@ async function main() {
   );
   assert.match(commandBar, /@if \(canInstall\(\)\)/);
   assert.match(commandBar, /installCompanion\(\)/);
-  assert.match(commandBar, /Installa/);
-  assert.match(commandBar, /Install/);
+  assert.match(commandBar, /uiText\.text\('commandBar\.install'\)/);
 
   const distRoot = path.join(root, 'dist');
   if (fs.existsSync(distRoot)) {

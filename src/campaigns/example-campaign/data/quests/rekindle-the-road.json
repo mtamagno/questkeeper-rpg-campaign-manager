@@ -7,16 +7,28 @@
   "importance": "major",
   "kind": "mystery",
   "title": { "en": "Rekindle the Lantern Road", "it": "Riaccendere la Via delle Lanterne" },
-  "summary": { "en": "The valley's beacons are failing one by one.", "it": "I fari della valle si stanno spegnendo uno dopo l'altro." },
+  "summary": {
+    "en": "The valley's beacons are failing one by one.",
+    "it": "I fari della valle si stanno spegnendo uno dopo l'altro."
+  },
   "updates": [
     {
       "id": "embercross-beacon",
       "recordedAt": "2026-10-14",
       "sessionId": "session-1",
       "state": "active",
-      "progress": { "en": "The party found tool marks inside Embercross's cold beacon.", "it": "Il gruppo ha trovato segni di attrezzi dentro il faro spento di Crocebrace." },
-      "nextObjective": { "en": "Follow the missing light toward the Glass Beacon.", "it": "Seguire la luce scomparsa verso il Faro di Vetro." },
-      "evidence": [{ "kind": "session", "id": "session-1" }, { "kind": "location", "id": "embercross" }]
+      "progress": {
+        "en": "The party found tool marks inside Embercross's cold beacon.",
+        "it": "Il gruppo ha trovato segni di attrezzi dentro il faro spento di Crocebrace."
+      },
+      "nextObjective": {
+        "en": "Follow the missing light toward the Glass Beacon.",
+        "it": "Seguire la luce scomparsa verso il Faro di Vetro."
+      },
+      "evidence": [
+        { "kind": "session", "id": "session-1" },
+        { "kind": "location", "id": "embercross" }
+      ]
     }
   ]
 }

@@ -35,8 +35,8 @@ for (const phrase of ["scope: 'memory'", 'favoritePages()', 'recentPages()', 'co
 }
 for (const phrase of [
   '[attr.aria-pressed]="isCurrentFavorite()"',
-  'Continue reading:',
-  'Continua a leggere:',
+  "uiText.text('commandBar.continueReading'",
+  "uiText.text('commandBar.continue')",
 ]) {
   assert.ok(commandBar.includes(phrase), `Command-bar memory action is missing: ${phrase}`);
 }

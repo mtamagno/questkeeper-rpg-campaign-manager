@@ -89,8 +89,11 @@ assert(
   'the brief must retain both catalog-backed locale labels',
 );
 assert(
-  commandBar.includes('Briefing ed eventi chiave') &&
-    commandBar.includes('Briefing and key events'),
+  commandBar.includes("commandCopy('chronicles', 'detail')") &&
+    catalog.locales.en.texts.commandBar.commands.chronicles.detail ===
+      'Briefing and key events' &&
+    catalog.locales.it.texts.commandBar.commands.chronicles.detail ===
+      'Briefing ed eventi chiave',
   'the command palette must explain what the chronicle contains',
 );
 

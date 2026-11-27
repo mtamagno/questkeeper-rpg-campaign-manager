@@ -48,7 +48,11 @@ assert(
 );
 assert(commandBar.includes('current-table-moments'), 'global command is missing');
 assert(
-  commandBar.includes('Battute e ricordi fuori personaggio'),
+  commandBar.includes("commandCopy('tableMoments', 'detail')") &&
+    catalog.locales.en.texts.commandBar.commands.tableMoments.detail ===
+      'Out-of-character jokes and memories' &&
+    catalog.locales.it.texts.commandBar.commands.tableMoments.detail ===
+      'Battute e ricordi fuori personaggio',
   'command must identify the OOC boundary',
 );
 

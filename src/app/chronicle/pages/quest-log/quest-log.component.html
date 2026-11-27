@@ -1,10 +1,47 @@
 <article class="quest-log">
-  <header><div><span>✦</span><h1>{{ uiText.text('questLog.title') }}</h1><p>{{ uiText.text('questLog.subtitle') }}</p></div><app-language-toggle /></header>
-  <div class="quest-log__filters" role="group" [attr.aria-label]="uiText.text('questLog.title')">
-    <button type="button" [class.is-active]="filter() === 'active'" (click)="filter.set('active')">{{ uiText.text('questLog.active') }}</button>
-    <button type="button" [class.is-active]="filter() === 'archive'" (click)="filter.set('archive')">{{ uiText.text('questLog.archive') }}</button>
-    <button type="button" [class.is-active]="filter() === 'all'" (click)="filter.set('all')">{{ uiText.text('questLog.all') }}</button>
-  </div>
-  <app-quest-list [quests]="quests()" />
-</article>
+  <header class="quest-log__hero">
+    <div class="quest-log__heading">
+      <span class="quest-log__sigil" aria-hidden="true">🧭</span>
+      <div>
+        <p class="quest-log__eyebrow">{{ uiText.text('questLog.eyebrow') }}</p>
+        <h1>{{ uiText.text('questLog.title') }}</h1>
+        <p class="quest-log__subtitle">{{ uiText.text('questLog.subtitle') }}</p>
+      </div>
+    </div>
+    <app-language-toggle />
+  </header>
 
+  <nav class="quest-log__filters" [attr.aria-label]="uiText.text('questLog.filtersLabel')">
+    <button
+      type="button"
+      [class.is-active]="filter() === 'active'"
+      [attr.aria-pressed]="filter() === 'active'"
+      (click)="filter.set('active')"
+    >
+      <span>{{ uiText.text('questLog.active') }}</span>
+      <strong>{{ counts().active }}</strong>
+    </button>
+    <button
+      type="button"
+      [class.is-active]="filter() === 'archive'"
+      [attr.aria-pressed]="filter() === 'archive'"
+      (click)="filter.set('archive')"
+    >
+      <span>{{ uiText.text('questLog.archive') }}</span>
+      <strong>{{ counts().archive }}</strong>
+    </button>
+    <button
+      type="button"
+      [class.is-active]="filter() === 'all'"
+      [attr.aria-pressed]="filter() === 'all'"
+      (click)="filter.set('all')"
+    >
+      <span>{{ uiText.text('questLog.all') }}</span>
+      <strong>{{ counts().all }}</strong>
+    </button>
+  </nav>
+
+  <section class="quest-log__results" aria-live="polite">
+    <app-quest-list [quests]="quests()" />
+  </section>
+</article>

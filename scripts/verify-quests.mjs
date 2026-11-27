@@ -34,5 +34,46 @@ for (const campaign of campaigns) {
   }
   count += quests.length;
 }
+
+const readerRoot = join(process.cwd(), 'src', 'app');
+const questListMarkup = await readFile(
+  join(readerRoot, 'guild', 'components', 'quest-list', 'quest-list.component.html'),
+  'utf8',
+);
+const questListStyles = await readFile(
+  join(readerRoot, 'guild', 'components', 'quest-list', 'quest-list.component.scss'),
+  'utf8',
+);
+const questLogMarkup = await readFile(
+  join(readerRoot, 'chronicle', 'pages', 'quest-log', 'quest-log.component.html'),
+  'utf8',
+);
+
+for (const selector of [
+  'quest-card__state',
+  'quest-card__importance',
+  'quest-card__objective',
+  'quest-card__history',
+  'quest-history__marker',
+]) {
+  if (!questListMarkup.includes(selector)) {
+    throw new Error(`Quest reader is missing the ${selector} hierarchy.`);
+  }
+}
+if (!questLogMarkup.includes('quest-log__filters')) {
+  throw new Error('Quest Log is missing its state filters.');
+}
+if (/var\(--color-/.test(questListStyles)) {
+  throw new Error('Quest reader uses undefined legacy color tokens.');
+}
+for (const token of [
+  '--qk-color-surface',
+  '--qk-color-surface-raised',
+  '--qk-color-border-strong',
+]) {
+  if (!questListStyles.includes(token)) {
+    throw new Error(`Quest reader is missing semantic token ${token}.`);
+  }
+}
 console.log(`Quest contract verified across ${campaigns.length} campaign(s) and ${count} quest(s).`);
 

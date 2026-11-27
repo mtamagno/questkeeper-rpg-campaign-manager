@@ -208,7 +208,7 @@
 
   &__tabs {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: $spacing-sm;
   }
 
@@ -288,6 +288,94 @@
 
     @include respond-below(md) {
       padding: $spacing-md;
+    }
+  }
+
+  &__personal-quests {
+    border-color: color-mix(
+      in srgb,
+      var(--campaign-accent, #{$color-gold}) 30%,
+      #{$color-border-default}
+    );
+    background:
+      linear-gradient(145deg, rgba($color-bg-surface, 0.88), rgba($color-bg-void, 0.62)),
+      var(--qk-color-surface-raised);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.05),
+      $shadow-md;
+  }
+
+  &__quest-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $spacing-md;
+    padding-bottom: $spacing-md;
+    border-bottom: $border-width-thin solid $color-border-default;
+
+    > div {
+      display: flex;
+      align-items: center;
+      gap: $spacing-md;
+    }
+
+    > div > span {
+      display: grid;
+      width: 3rem;
+      height: 3rem;
+      place-items: center;
+      border: $border-width-thin solid var(--campaign-accent, #{$color-gold});
+      border-radius: 50%;
+      background: rgba($color-bg-void, 0.3);
+      font-size: $font-size-xl;
+    }
+
+    p {
+      margin: 0 0 $spacing-2xs;
+      color: $color-text-muted;
+      font-family: $font-family-heading;
+      font-size: $font-size-xs;
+      letter-spacing: $letter-spacing-wide;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      margin: 0;
+      color: var(--campaign-accent-light, #{$color-gold-light});
+      font-family: $font-family-heading;
+      font-size: $font-size-2xl;
+    }
+
+    > strong {
+      display: grid;
+      min-width: 2.6rem;
+      height: 2.6rem;
+      place-items: center;
+      border-radius: 50%;
+      color: $color-bg-deep;
+      background: var(--campaign-accent-light, #{$color-gold-light});
+      font-family: $font-family-heading;
+    }
+  }
+
+  &__quest-intro {
+    max-width: 48rem;
+    margin: $spacing-md 0 $spacing-xl;
+    color: $color-text-secondary;
+    line-height: $line-height-relaxed;
+  }
+
+  &__quest-party-link {
+    margin: $spacing-xl 0 0;
+
+    a {
+      display: inline-flex;
+      align-items: center;
+      gap: $spacing-sm;
+      min-height: 44px;
+      color: var(--campaign-accent-light, #{$color-gold-light});
+      font-family: $font-family-heading;
+      font-weight: $font-weight-semibold;
     }
   }
 

@@ -1,9 +1,17 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
-import { type Quest, type QuestReference, orderedQuestUpdates, projectQuest } from '@guild/models/quest.model';
+import {
+  type Quest,
+  type QuestImportance,
+  type QuestReference,
+  type QuestState,
+  orderedQuestUpdates,
+  projectQuest,
+} from '@guild/models/quest.model';
 import { DataService } from '@guild/services/data.service';
 import { CampaignService } from '@guild/services/campaign.service';
+import { toDisplayUrl } from '@guild/services/imageUrl.service';
 import { UiTextService } from '@guild/services/uiText.service';
 
 @Component({
@@ -17,27 +25,42 @@ import { UiTextService } from '@guild/services/uiText.service';
 export class QuestListComponent {
   readonly quests = input.required<ReadonlyArray<Quest>>();
   readonly emptyTextKey = input('questLog.emptyDescription');
+  readonly variant = input<'campaign' | 'personal'>('campaign');
   readonly uiText = inject(UiTextService);
   private readonly data = inject(DataService);
   private readonly campaigns = inject(CampaignService);
 
-  readonly projections = computed(() => this.quests().flatMap((quest) => {
-    const projection = projectQuest(quest);
-    return projection === undefined ? [] : [projection];
-  }));
+  readonly projections = computed(() =>
+    this.quests().flatMap((quest) => {
+      const projection = projectQuest(quest);
+      return projection === undefined ? [] : [projection];
+    }),
+  );
 
   text(value: Readonly<Record<string, string | undefined>>): string {
     return this.uiText.localized(value);
   }
 
-  stateLabel(state: string): string {
+  stateLabel(state: QuestState): string {
     return this.uiText.text(`questLog.states.${state}`);
   }
 
-  updates(quest: Quest) { return orderedQuestUpdates(quest); }
+  importanceLabel(importance: QuestImportance): string {
+    return this.uiText.text(`questLog.importance.${importance}`);
+  }
+
+  displayImageUrl(url: string): string {
+    return toDisplayUrl(url);
+  }
+
+  updates(quest: Quest) {
+    return orderedQuestUpdates(quest);
+  }
 
   ownerNames(ids: ReadonlyArray<string>): string {
-    return ids.map((id) => this.data.characters().find((item) => item.id === id)?.name ?? id).join(', ');
+    return ids
+      .map((id) => this.data.characters().find((item) => item.id === id)?.name ?? id)
+      .join(', ');
   }
 
   referenceLabel(reference: QuestReference): string {
@@ -63,4 +86,3 @@ export class QuestListComponent {
     return ['/', campaignId, 'maps', reference.id];
   }
 }
-

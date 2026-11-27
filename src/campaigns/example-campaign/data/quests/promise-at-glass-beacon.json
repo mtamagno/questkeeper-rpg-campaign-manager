@@ -7,16 +7,28 @@
   "importance": "standard",
   "kind": "promise",
   "title": { "en": "A Promise at the Glass Beacon", "it": "Una promessa al Faro di Vetro" },
-  "summary": { "en": "Aria and Mira agreed that neither would face the reflected flame alone.", "it": "Aria e Mira hanno promesso che nessuna delle due affronterà da sola la fiamma riflessa." },
+  "summary": {
+    "en": "Aria and Mira agreed that neither would face the reflected flame alone.",
+    "it": "Aria e Mira hanno promesso che nessuna delle due affronterà da sola la fiamma riflessa."
+  },
   "updates": [
     {
       "id": "shared-vow",
       "recordedAt": "2026-10-21",
       "sessionId": "session-2",
       "state": "active",
-      "progress": { "en": "The promise was made beneath the broken lens.", "it": "La promessa è stata stretta sotto la lente infranta." },
-      "nextObjective": { "en": "Discover why the flame casts its shadow north.", "it": "Scoprire perché la fiamma proietta la propria ombra verso nord." },
-      "evidence": [{ "kind": "session", "id": "session-2" }, { "kind": "location", "id": "glass-beacon" }]
+      "progress": {
+        "en": "The promise was made beneath the broken lens.",
+        "it": "La promessa è stata stretta sotto la lente infranta."
+      },
+      "nextObjective": {
+        "en": "Discover why the flame casts its shadow north.",
+        "it": "Scoprire perché la fiamma proietta la propria ombra verso nord."
+      },
+      "evidence": [
+        { "kind": "session", "id": "session-2" },
+        { "kind": "location", "id": "glass-beacon" }
+      ]
     }
   ]
 }

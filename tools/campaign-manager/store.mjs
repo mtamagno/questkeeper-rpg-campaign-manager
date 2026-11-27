@@ -551,7 +551,9 @@ function validateEntity(type, entity) {
   const label = ['sessions', 'quests'].includes(type) ? entity?.title : entity?.name;
   if (typeof label !== 'string' && typeof label !== 'object') {
     throw new Error(
-      ['sessions', 'quests'].includes(type) ? 'Localized title is required.' : 'Entity name is required.',
+      ['sessions', 'quests'].includes(type)
+        ? 'Localized title is required.'
+        : 'Entity name is required.',
     );
   }
 }
@@ -640,14 +642,31 @@ export async function deleteEntity(projectRoot, campaignId, type, entityId) {
   validateId(entityId, 'Entity ID');
   if (!ENTITY_TYPE_SET.has(type)) throw new Error('Unsupported entity type.');
   if (type !== 'quests') {
-    const referenceKind = { characters: 'character', npcs: 'npc', sessions: 'session', maps: 'location' }[type];
+    const referenceKind = {
+      characters: 'character',
+      npcs: 'npc',
+      sessions: 'session',
+      maps: 'location',
+    }[type];
     const campaign = await getCampaign(projectRoot, campaignId);
-    const blockingQuest = (campaign.quests ?? []).find((quest) =>
-      (type === 'characters' && quest.ownerCharacterIds?.includes(entityId)) ||
-      (quest.related ?? []).some((reference) => reference.kind === referenceKind && reference.id === entityId) ||
-      (quest.updates ?? []).some((update) => update.sessionId === entityId || (update.evidence ?? []).some((reference) => reference.kind === referenceKind && reference.id === entityId)),
+    const blockingQuest = (campaign.quests ?? []).find(
+      (quest) =>
+        (type === 'characters' && quest.ownerCharacterIds?.includes(entityId)) ||
+        (quest.related ?? []).some(
+          (reference) => reference.kind === referenceKind && reference.id === entityId,
+        ) ||
+        (quest.updates ?? []).some(
+          (update) =>
+            update.sessionId === entityId ||
+            (update.evidence ?? []).some(
+              (reference) => reference.kind === referenceKind && reference.id === entityId,
+            ),
+        ),
     );
-    if (blockingQuest) throw new Error(`Cannot remove "${entityId}" while quest "${blockingQuest.id}" references it. Update the quest first.`);
+    if (blockingQuest)
+      throw new Error(
+        `Cannot remove "${entityId}" while quest "${blockingQuest.id}" references it. Update the quest first.`,
+      );
   }
   const base = dataRoot(projectRoot, campaignId);
   if (type === 'maps') {
@@ -745,7 +764,10 @@ export async function importCampaign(projectRoot, bundle) {
     await saveEntity(projectRoot, id, 'sessions', session);
   for (const map of bundle.maps ?? []) await saveEntity(projectRoot, id, 'maps', map);
   validateQuestCollection(bundle.quests ?? [], {
-    characters: bundle.characters ?? [], npcs: bundle.npcs ?? [], sessions: bundle.sessions ?? [], maps: bundle.maps ?? [],
+    characters: bundle.characters ?? [],
+    npcs: bundle.npcs ?? [],
+    sessions: bundle.sessions ?? [],
+    maps: bundle.maps ?? [],
   });
   for (const quest of bundle.quests ?? []) await saveEntity(projectRoot, id, 'quests', quest);
   const base = dataRoot(projectRoot, id);

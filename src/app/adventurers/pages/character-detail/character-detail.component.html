@@ -316,16 +316,41 @@
         </section>
       }
 
-      <!-- Known history and its evidence sit together immediately before the session diary. -->
-      <section id="personal-quests" class="character-detail__section" [hidden]="!isTab('story')">
-        <app-accordion
-          [title]="uiText.text('questLog.personalTitle') + ' · ' + personalQuests().length"
-          icon="✦"
-          [startOpen]="personalQuests().length > 0"
-        >
-          <app-quest-list [quests]="personalQuests()" emptyTextKey="questLog.personalEmpty" />
-          <p><a [routerLink]="['/', campaignId() ?? '', 'campaign', 'quests']">{{ uiText.text('questLog.partyLink') }} →</a></p>
-        </app-accordion>
+      <!-- Personal quests are a first-class profile workspace, separate from biography. -->
+      <section
+        id="personal-quests"
+        class="character-detail__section character-detail__personal-quests"
+        [hidden]="!isTab('quests')"
+      >
+        <header class="character-detail__quest-heading">
+          <div>
+            <span aria-hidden="true">🧭</span>
+            <div>
+              <p>{{ uiText.text('questLog.personalEyebrow') }}</p>
+              <h2>{{ uiText.text('questLog.personalTitle') }}</h2>
+            </div>
+          </div>
+          <strong
+            [attr.aria-label]="
+              uiText.text('questLog.personalCount', { count: personalQuests().length })
+            "
+          >
+            {{ personalQuests().length }}
+          </strong>
+        </header>
+        <p class="character-detail__quest-intro">
+          {{ uiText.text('questLog.personalDescription') }}
+        </p>
+        <app-quest-list
+          [quests]="personalQuests()"
+          emptyTextKey="questLog.personalEmpty"
+          variant="personal"
+        />
+        <p class="character-detail__quest-party-link">
+          <a [routerLink]="['/', campaignId() ?? '', 'campaign', 'quests']">
+            {{ uiText.text('questLog.partyLink') }} <span aria-hidden="true">→</span>
+          </a>
+        </p>
       </section>
 
       @if (isRecorded(char.publicProfile.knownHistory)) {

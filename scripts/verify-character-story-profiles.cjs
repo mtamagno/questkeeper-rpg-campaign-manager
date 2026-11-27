@@ -120,7 +120,9 @@ for (const marker of [
 }
 
 assert(
-  component.includes("type CharacterDetailTabId = 'overview' | 'story' | 'sheet' | 'journal'") &&
+  component.includes(
+    "type CharacterDetailTabId = 'overview' | 'story' | 'quests' | 'sheet' | 'journal'",
+  ) &&
     component.includes("params.get('tab')") &&
     component.includes('onTabKeydown') &&
     component.includes('tabForFragment'),
@@ -129,6 +131,7 @@ assert(
 assert(
   template.includes('[hidden]="!isTab(\'overview\')"') &&
     template.includes('[hidden]="!isTab(\'story\')"') &&
+    template.includes('[hidden]="!isTab(\'quests\')"') &&
     template.includes('[hidden]="!isTab(\'sheet\')"') &&
     template.includes('[hidden]="!isTab(\'journal\')"') &&
     template.includes('id="private-profile"') &&
@@ -138,6 +141,13 @@ assert(
     journalTemplate.includes('id="gallery"') &&
     journalTemplate.includes('id="diary"'),
   'Every heavy profile surface must belong to one discoverable task tab.',
+);
+assert(
+  template.includes('id="personal-quests"') &&
+    template.includes('variant="personal"') &&
+    component.includes("fragment === 'personal-quests'") &&
+    component.includes("id: 'quests'"),
+  'Personal quests need a dedicated, deep-linkable profile tab and visual variant.',
 );
 
 const storyStart = template.indexOf('<!-- Public profile:');

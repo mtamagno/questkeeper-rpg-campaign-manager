@@ -185,9 +185,7 @@ export class OfflinePackService {
       preparedAt: new Date().toISOString(),
       characters,
       recaps,
-      quests: input.quests.filter(
-        (quest) => quest.scope === 'party' && quest.audience === 'party',
-      ),
+      quests: input.quests.filter((quest) => quest.scope === 'party' && quest.audience === 'party'),
     };
     const next = { ...this.storedPacks(), [input.campaignId]: pack };
 

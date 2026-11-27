@@ -4,65 +4,112 @@
     <p>{{ uiText.text(emptyTextKey()) }}</p>
   </section>
 } @else {
-  <div class="quest-list">
+  <div class="quest-list" [attr.data-variant]="variant()">
     @for (projection of projections(); track projection.quest.id) {
       <article class="quest-card" [attr.data-state]="projection.current.state">
-        <header>
-          <div>
-            <span class="quest-card__state">{{ stateLabel(projection.current.state) }}</span>
+        <header class="quest-card__header">
+          <div class="quest-card__identity">
+            <span class="quest-card__state" [attr.data-state]="projection.current.state">
+              <i aria-hidden="true"></i>
+              <strong>{{ stateLabel(projection.current.state) }}</strong>
+            </span>
             <h2>{{ text(projection.quest.title) }}</h2>
           </div>
-          <span class="quest-card__importance">{{ projection.quest.importance }}</span>
+          <span class="quest-card__importance" [attr.data-importance]="projection.quest.importance">
+            <small>{{ uiText.text('questLog.importanceLabel') }}</small>
+            <strong>{{ importanceLabel(projection.quest.importance) }}</strong>
+          </span>
         </header>
-        <p>{{ text(projection.quest.summary) }}</p>
-        @if (projection.quest.ownerCharacterIds.length > 0) {
-          <p class="quest-card__owners">
-            <strong>{{ uiText.text('questLog.owners') }}:</strong>
-            {{ ownerNames(projection.quest.ownerCharacterIds) }}
-          </p>
-        }
+
+        <p class="quest-card__summary">{{ text(projection.quest.summary) }}</p>
+
+        <div class="quest-card__meta">
+          <span>
+            <i aria-hidden="true">◆</i>
+            {{ uiText.text('questLog.milestones', { count: projection.quest.updates.length }) }}
+          </span>
+          @if (projection.quest.ownerCharacterIds.length > 0) {
+            <span>
+              <i aria-hidden="true">♟</i>
+              <strong>{{ uiText.text('questLog.owners') }}:</strong>
+              {{ ownerNames(projection.quest.ownerCharacterIds) }}
+            </span>
+          }
+        </div>
+
         <section class="quest-card__objective">
-          <h3>{{ uiText.text('questLog.currentObjective') }}</h3>
-          <p>{{ text(projection.current.nextObjective) }}</p>
+          <span class="quest-card__objective-mark" aria-hidden="true"></span>
+          <div>
+            <h3>{{ uiText.text('questLog.currentObjective') }}</h3>
+            <p>{{ text(projection.current.nextObjective) }}</p>
+          </div>
         </section>
-        <details>
+
+        <details class="quest-card__history">
           <summary>
-            {{ uiText.text('questLog.history') }} · {{ projection.quest.updates.length }}
+            <span class="quest-card__history-icon" aria-hidden="true">⌛</span>
+            <span>
+              <strong>{{ uiText.text('questLog.history') }}</strong>
+              <small>{{ uiText.text('questLog.historyHint') }}</small>
+            </span>
+            <span class="quest-card__history-count">{{ projection.quest.updates.length }}</span>
+            <span class="quest-card__history-chevron" aria-hidden="true">⌄</span>
           </summary>
           <ol class="quest-history">
-            @for (update of updates(projection.quest); track update.id) {
-              <li>
-                <div>
-                  <time [attr.datetime]="update.recordedAt">{{ update.recordedAt }}</time
-                  ><span>{{ stateLabel(update.state) }}</span>
-                </div>
-                @if (update.image; as image) {
-                  <figure class="quest-history__image">
-                    <img
-                      [src]="image.url"
-                      [alt]="text(image.alt)"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                    @if (image.caption) {
-                      <figcaption>{{ text(image.caption) }}</figcaption>
+            @for (
+              update of updates(projection.quest);
+              track update.id;
+              let milestoneIndex = $index
+            ) {
+              <li [attr.data-state]="update.state">
+                <span class="quest-history__marker" aria-hidden="true">
+                  {{ milestoneIndex + 1 }}
+                </span>
+                <article class="quest-history__entry">
+                  <header>
+                    <time [attr.datetime]="update.recordedAt">{{ update.recordedAt }}</time>
+                    <span [attr.data-state]="update.state">{{ stateLabel(update.state) }}</span>
+                  </header>
+                  <div class="quest-history__content" [class.has-image]="update.image">
+                    @if (update.image; as image) {
+                      <figure class="quest-history__image">
+                        <img
+                          [src]="displayImageUrl(image.url)"
+                          [alt]="text(image.alt)"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                        @if (image.caption) {
+                          <figcaption>{{ text(image.caption) }}</figcaption>
+                        }
+                      </figure>
                     }
-                  </figure>
-                }
-                <p>{{ text(update.progress) }}</p>
-                @if (update.evidence?.length) {
-                  <nav [attr.aria-label]="uiText.text('questLog.related')">
-                    @for (reference of update.evidence; track reference.kind + ':' + reference.id) {
-                      <a [routerLink]="referenceRoute(reference)">{{
-                        referenceLabel(reference)
-                      }}</a>
-                    }
-                  </nav>
-                } @else if (update.sessionId) {
-                  <a [routerLink]="referenceRoute({ kind: 'session', id: update.sessionId })">{{
-                    uiText.text('questLog.openSession')
-                  }}</a>
-                }
+                    <div class="quest-history__copy">
+                      <p>{{ text(update.progress) }}</p>
+                      @if (update.evidence?.length) {
+                        <nav [attr.aria-label]="uiText.text('questLog.related')">
+                          <span>{{ uiText.text('questLog.related') }}</span>
+                          @for (
+                            reference of update.evidence;
+                            track reference.kind + ':' + reference.id
+                          ) {
+                            <a [routerLink]="referenceRoute(reference)">{{
+                              referenceLabel(reference)
+                            }}</a>
+                          }
+                        </nav>
+                      } @else if (update.sessionId) {
+                        <a
+                          class="quest-history__session-link"
+                          [routerLink]="referenceRoute({ kind: 'session', id: update.sessionId })"
+                        >
+                          {{ uiText.text('questLog.openSession') }}
+                          <span aria-hidden="true">→</span>
+                        </a>
+                      }
+                    </div>
+                  </div>
+                </article>
               </li>
             }
           </ol>

@@ -49,7 +49,7 @@ import { CharacterQuotesComponent } from '../../components/character-quotes/char
 import { QuestListComponent } from '@guild/components/quest-list/quest-list.component';
 import { PasswordService } from '@guild/services/password.service';
 
-type CharacterDetailTabId = 'overview' | 'story' | 'sheet' | 'journal';
+type CharacterDetailTabId = 'overview' | 'story' | 'quests' | 'sheet' | 'journal';
 
 interface CharacterDetailTab {
   readonly id: CharacterDetailTabId;
@@ -141,6 +141,12 @@ export class CharacterDetailComponent {
         description: this.uiText.text('characterUi.detail.tabs.storyDescription'),
       },
       {
+        id: 'quests',
+        icon: '🧭',
+        label: this.uiText.text('characterUi.detail.tabs.quests'),
+        description: this.uiText.text('characterUi.detail.tabs.questsDescription'),
+      },
+      {
         id: 'sheet',
         icon: '⚔',
         label: this.uiText.text('characterUi.detail.tabs.sheet'),
@@ -180,12 +186,14 @@ export class CharacterDetailComponent {
     const character = this.character();
     if (character === undefined) return [];
     const unlocked = this.passwords.isUnlocked(character.id)();
-    return this.dataService.quests().filter(
-      (quest) =>
-        quest.scope === 'character' &&
-        quest.ownerCharacterIds.includes(character.id) &&
-        (quest.audience === 'party' || (quest.audience === 'owners' && unlocked)),
-    );
+    return this.dataService
+      .quests()
+      .filter(
+        (quest) =>
+          quest.scope === 'character' &&
+          quest.ownerCharacterIds.includes(character.id) &&
+          (quest.audience === 'party' || (quest.audience === 'owners' && unlocked)),
+      );
   });
 
   /** Reveals landmarks after both their owning tab and asynchronous character data are ready. */
@@ -408,7 +416,11 @@ export class CharacterDetailComponent {
   }
 
   private normalizeTab(value: string | undefined): CharacterDetailTabId | undefined {
-    return value === 'overview' || value === 'story' || value === 'sheet' || value === 'journal'
+    return value === 'overview' ||
+      value === 'story' ||
+      value === 'quests' ||
+      value === 'sheet' ||
+      value === 'journal'
       ? value
       : undefined;
   }
@@ -424,6 +436,7 @@ export class CharacterDetailComponent {
     ) {
       return 'story';
     }
+    if (fragment === 'personal-quests') return 'quests';
     if (
       fragment === 'private-profile' ||
       fragment === 'character-sheet' ||
