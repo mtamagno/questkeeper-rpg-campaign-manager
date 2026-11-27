@@ -44,6 +44,11 @@ test('notebook planning is owner-specific and excludes protected character field
     },
     brief: 'Remember the rain-soaked northern road.',
     styleDirectives: 'Graphite, burgundy ink, route lines and paper birds.',
+    presentation: {
+      paper: 'weathered',
+      handwriting: 'flowing',
+      narrator: 'chronicler',
+    },
     language: 'English',
     pageCount: 3,
   });
@@ -53,6 +58,8 @@ test('notebook planning is owner-specific and excludes protected character field
   assert.doesNotMatch(prompt, /NEVER-SHARE-THIS/);
   assert.match(prompt, /2:3 portrait/);
   assert.match(prompt, /3:2 landscape/);
+  assert.match(prompt, /"narrator":"chronicler"/);
+  assert.match(prompt, /never infer a new emotion/i);
 });
 
 test('does not recommend local image generation without enough VRAM', () => {

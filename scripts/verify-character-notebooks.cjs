@@ -22,12 +22,13 @@ const allowedMoods = new Set([
 ]);
 const allowedSecrecy = new Set(['private', 'party', 'public']);
 const allowedPaperStyles = new Set(['classic', 'weathered', 'moonlit', 'ash', 'botanical']);
-const allowedHandwritingStyles = new Set([
-  'measured',
-  'flowing',
-  'compact',
-  'angular',
-  'ornate',
+const allowedHandwritingStyles = new Set(['measured', 'flowing', 'compact', 'angular', 'ornate']);
+const allowedNarratorStyles = new Set([
+  'observer',
+  'chronicler',
+  'scholar',
+  'confessor',
+  'cartographer',
 ]);
 const failures = [];
 let notebookCount = 0;
@@ -93,6 +94,10 @@ for (const campaign of campaigns) {
       assert(
         allowedHandwritingStyles.has(notebook.presentation.handwriting),
         `${label} uses unsupported handwriting style ${notebook.presentation.handwriting}.`,
+      );
+      assert(
+        allowedNarratorStyles.has(notebook.presentation.narrator),
+        `${label} uses unsupported narrator style ${notebook.presentation.narrator}.`,
       );
       styledNotebookCount += 1;
     }
@@ -187,6 +192,8 @@ for (const token of [
   'notebook-tools__contents',
   'data-paper',
   'data-handwriting',
+  'data-narrator',
+  'data-emotion',
 ]) {
   assert(componentContract.includes(token), `Notebook reader is missing ${token}.`);
 }
@@ -201,6 +208,7 @@ for (const fieldName of [
   'notebookPageSecrecy',
   'notebookPaperStyle',
   'notebookHandwritingStyle',
+  'notebookNarratorStyle',
 ]) {
   assert(managerSource.includes(fieldName), `Campaign Manager is missing ${fieldName}.`);
 }

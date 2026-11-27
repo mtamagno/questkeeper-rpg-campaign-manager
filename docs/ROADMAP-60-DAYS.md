@@ -134,7 +134,7 @@ the current lazy Journal workspace.
 | 17 · 22 Nov | [x] [`feat: introduce favourite campaign memories`](CAMPAIGN-MEMORY-GALLERY.md)      | [x] [`feat: build a party-wide memory gallery and filters`](CAMPAIGN-MEMORY-GALLERY.md)          |
 | 18 · 23 Nov | [x] [`feat: create notebook table of contents and chronology`](CHARACTER-JOURNAL.md) | [x] [`feat: add mood session character and secrecy filters`](CHARACTER-JOURNAL.md)               |
 | 19 · 26 Nov | [x] [`feat: add letters sketches handouts and keepsakes`](CHARACTER-KEEPSAKES.md)    | [x] [`feat: create accessible lightbox and print layouts for keepsakes`](CHARACTER-KEEPSAKES.md) |
-| 20 · 27 Nov | [ ] `style: ship multiple parchment and handwriting moods`                           | [ ] `feat: adapt journal styling to narrator and emotional state`                                |
+| 20 · 27 Nov | [x] `style: ship multiple parchment and handwriting moods`                           | [x] `feat: adapt journal styling to narrator and emotional state`                                |
 | 21 · 28 Nov | [ ] `feat: add character epilogues and legacy pages`                                 | [ ] `review: prepare the Quest Log release candidate plan`                                       |
 
 ### 26 November recovery and critical Quest Log promotion

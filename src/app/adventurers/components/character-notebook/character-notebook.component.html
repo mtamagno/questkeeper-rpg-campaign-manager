@@ -129,8 +129,10 @@
     @if (slides().length > 0) {
       <section
         class="notebook-book"
-      [attr.data-paper]="paperStyle()"
-      [attr.data-handwriting]="handwritingStyle()"
+        [attr.data-paper]="paperStyle()"
+        [attr.data-handwriting]="handwritingStyle()"
+        [attr.data-narrator]="narratorStyle()"
+        [attr.data-emotion]="emotionalState()"
         tabindex="0"
         (keydown)="onBookKeydown($event)"
         [attr.aria-label]="

@@ -357,6 +357,51 @@
     --notebook-hand-spacing: 0.025em;
   }
 
+  &[data-emotion='luminous'] {
+    --notebook-emotion-accent: #7d6c22;
+    --notebook-emotion-wash: rgba(#fff7b8, 0.2);
+  }
+
+  &[data-emotion='reflective'] {
+    --notebook-emotion-accent: var(--notebook-ink-muted);
+    --notebook-emotion-wash: rgba(#fff, 0.08);
+  }
+
+  &[data-emotion='veiled'] {
+    --notebook-emotion-accent: #594d78;
+    --notebook-emotion-wash: rgba(#655a83, 0.16);
+  }
+
+  &[data-emotion='tense'] {
+    --notebook-emotion-accent: #875a20;
+    --notebook-emotion-wash: rgba(#a6651e, 0.14);
+  }
+
+  &[data-emotion='broken'] {
+    --notebook-emotion-accent: #7a3434;
+    --notebook-emotion-wash: rgba(#7a3434, 0.12);
+  }
+
+  &[data-narrator='observer'] {
+    --notebook-narrator-mark: '✦';
+  }
+
+  &[data-narrator='chronicler'] {
+    --notebook-narrator-mark: '¶';
+  }
+
+  &[data-narrator='scholar'] {
+    --notebook-narrator-mark: '⌁';
+  }
+
+  &[data-narrator='confessor'] {
+    --notebook-narrator-mark: '❧';
+  }
+
+  &[data-narrator='cartographer'] {
+    --notebook-narrator-mark: '⌖';
+  }
+
   &:focus-visible &__stage {
     box-shadow: $shadow-xl, $shadow-glow-gold-strong;
   }
@@ -516,10 +561,15 @@
     margin-top: $spacing-sm;
     padding: $spacing-md $spacing-lg $spacing-sm;
     border: 1px solid color-mix(in srgb, var(--notebook-paper-deep) 72%, #20160e);
-    border-top: 3px solid $color-gold-dark;
+    border-top: 3px solid var(--notebook-emotion-accent, #{$color-gold-dark});
     border-radius: 0 0 $border-radius-sm $border-radius-sm;
     background:
       linear-gradient(90deg, rgba(#fff, 0.16), transparent 36%),
+      radial-gradient(
+        circle at 88% 18%,
+        var(--notebook-emotion-wash, transparent),
+        transparent 34%
+      ),
       repeating-linear-gradient(
         0deg,
         transparent 0,
@@ -529,20 +579,21 @@
       var(--notebook-paper);
     box-shadow: inset 0 0 28px color-mix(in srgb, var(--notebook-paper-deep) 28%, transparent);
 
-    &[data-mood='uneasy'],
-    &[data-mood='fractured'],
-    &[data-mood='wary'] {
-      border-top-color: $color-warning;
+    &::after {
+      position: absolute;
+      top: $spacing-sm;
+      right: $spacing-md;
+      color: var(--notebook-emotion-accent, var(--notebook-ink-muted));
+      content: var(--notebook-narrator-mark, '✦');
+      font-family: $font-family-heading;
+      font-size: $font-size-lg;
+      line-height: 1;
+      opacity: 0.56;
     }
 
-    &[data-mood='grief'],
-    &[data-mood='guilt'] {
-      border-top-color: $color-danger;
-    }
-
-    &[data-mood='renewal'],
-    &[data-mood='hopeful'] {
-      border-top-color: $color-success;
+    :host-context([dir='rtl']) &::after {
+      right: auto;
+      left: $spacing-md;
     }
 
     h3 {

@@ -475,6 +475,7 @@ export function buildNotebookPromptPlan({
   character,
   brief,
   styleDirectives,
+  presentation,
   language,
   pageCount,
 }) {
@@ -501,6 +502,8 @@ export function buildNotebookPromptPlan({
     `Public character context: ${JSON.stringify(publicCharacter)}`,
     `Notebook subject supplied by the Game Master: ${String(brief || '').trim()}`,
     `Per-character notebook art direction: ${String(styleDirectives || '').trim()}`,
+    `Approved reader presentation: ${JSON.stringify(presentation || { paper: 'classic', handwriting: 'measured', narrator: 'observer' })}`,
+    'Use the approved narrator mode only as a voice and composition cue. Use each explicit page mood to vary spacing, pressure and visual rhythm; never infer a new emotion, event or secret from the narrator mode.',
     `Required JSON schema: ${JSON.stringify(NOTEBOOK_DRAFT_SCHEMA)}`,
   ].join('\n\n');
 }
@@ -873,6 +876,7 @@ export async function generateNotebookDraftWithText({
   character,
   brief,
   styleDirectives,
+  presentation,
   language,
   pageCount,
   selection,
@@ -891,6 +895,7 @@ export async function generateNotebookDraftWithText({
       character,
       brief: safeBrief,
       styleDirectives: safeStyle,
+      presentation,
       language,
       pageCount,
     }),

@@ -63,13 +63,22 @@ than inferred from prose or artwork.
 An optional notebook-level `presentation` selects a semantic `paper` and
 `handwriting` style. The supported paper surfaces are `classic`, `weathered`,
 `moonlit`, `ash` and `botanical`; handwriting may be `measured`, `flowing`,
-`compact`, `angular` or `ornate`. Missing values preserve the classic/measured
+`compact`, `angular` or `ornate`. A narrator mode may be `observer`,
+`chronicler`, `scholar`, `confessor` or `cartographer`. Missing values preserve
+the classic/measured/observer
 legacy rendering. These choices style only the reader frame and reflection copy:
 they never recolour, reinterpret or replace the authored spread image.
 
 Campaign Manager exposes both fields as constrained selects and stores the
 choice with the notebook. Every handwriting stack uses local system fallbacks,
 keeps text selectable and preserves readable contrast at phone sizes.
+
+The page's already-authored `mood` maps to one of five visual states:
+`luminous`, `reflective`, `veiled`, `tense` or `broken`. This mapping changes a
+restrained accent, paper wash and mark density around the reflection. It does
+not infer emotion from prose, expose private evidence or change the page image.
+Narrator mode adds a quiet recurring mark and voice rhythm; emotional state
+always comes from the explicit page mood selected by the author.
 
 ## Performance and future growth
 

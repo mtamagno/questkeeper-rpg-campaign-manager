@@ -16,6 +16,7 @@ import {
   type CharacterNotebook,
   type CharacterNotebookHandwritingStyle,
   type CharacterNotebookMood,
+  type CharacterNotebookNarratorStyle,
   type CharacterNotebookPage,
   type CharacterNotebookPaperStyle,
   type CharacterNotebookSecrecy,
@@ -35,6 +36,7 @@ import { UiTextService } from '@guild/services/uiText.service';
 import { DataService } from '@guild/services/data.service';
 
 type NotebookOrder = 'authored' | 'oldest' | 'newest';
+type NotebookEmotionalState = 'luminous' | 'reflective' | 'veiled' | 'tense' | 'broken';
 
 interface IndexedNotebookPage {
   readonly page: CharacterNotebookPage;
@@ -93,6 +95,9 @@ export class CharacterNotebookComponent {
   );
   readonly handwritingStyle: Signal<CharacterNotebookHandwritingStyle> = computed(
     () => this.notebook().presentation?.handwriting ?? 'measured',
+  );
+  readonly narratorStyle: Signal<CharacterNotebookNarratorStyle> = computed(
+    () => this.notebook().presentation?.narrator ?? 'observer',
   );
 
   private readonly accessId: Signal<string> = computed(() => `${this.characterId()}:notebook`);
@@ -170,6 +175,11 @@ export class CharacterNotebookComponent {
   readonly currentSlide: Signal<NotebookSlide | undefined> = computed(
     () => this.slides()[this.currentSlideIndex()],
   );
+  readonly emotionalState: Signal<NotebookEmotionalState> = computed(() => {
+    const slide = this.currentSlide();
+    if (!slide || slide.kind === 'cover') return 'reflective';
+    return this.emotionalStateFor(slide.page.mood);
+  });
   readonly tableOfContents = computed(() =>
     this.filteredPages().map(({ page, originalIndex }) => ({
       page,
@@ -270,6 +280,14 @@ export class CharacterNotebookComponent {
 
   moodLabel(mood: CharacterNotebookMood): string {
     return this.uiText.text(`characterUi.notebook.moods.${mood}`);
+  }
+
+  private emotionalStateFor(mood: CharacterNotebookMood): NotebookEmotionalState {
+    if (['joyful', 'hopeful', 'renewal'].includes(mood)) return 'luminous';
+    if (mood === 'mysterious') return 'veiled';
+    if (['wary', 'uneasy'].includes(mood)) return 'tense';
+    if (['fractured', 'grief', 'guilt'].includes(mood)) return 'broken';
+    return 'reflective';
   }
 
   secrecyLabel(secrecy: CharacterNotebookSecrecy): string {

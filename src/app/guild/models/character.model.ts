@@ -137,22 +137,16 @@ export type CharacterNotebookText = string | BilingualText;
 export type CharacterNotebookSecrecy = 'private' | 'party' | 'public';
 
 /** Reader-safe material and handwriting choices for one character-owned notebook. */
-export type CharacterNotebookPaperStyle =
-  | 'classic'
-  | 'weathered'
-  | 'moonlit'
-  | 'ash'
-  | 'botanical';
+export type CharacterNotebookPaperStyle = 'classic' | 'weathered' | 'moonlit' | 'ash' | 'botanical';
 export type CharacterNotebookHandwritingStyle =
-  | 'measured'
-  | 'flowing'
-  | 'compact'
-  | 'angular'
-  | 'ornate';
+  'measured' | 'flowing' | 'compact' | 'angular' | 'ornate';
+export type CharacterNotebookNarratorStyle =
+  'observer' | 'chronicler' | 'scholar' | 'confessor' | 'cartographer';
 
 export interface CharacterNotebookPresentation {
   readonly paper?: CharacterNotebookPaperStyle;
   readonly handwriting?: CharacterNotebookHandwritingStyle;
+  readonly narrator?: CharacterNotebookNarratorStyle;
 }
 
 /** One complete illustrated two-page spread from a character's notebook. */
