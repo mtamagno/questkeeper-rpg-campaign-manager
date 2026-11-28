@@ -20,13 +20,14 @@ import { HttpClient } from '@angular/common/http';
 import { type Observable, forkJoin, catchError, of, switchMap } from 'rxjs';
 
 import { type Character } from '@guild/models/character.model';
-import { type Npc } from '@guild/models/npc.model';
+import { localizeNpc, type Npc, type NpcSource } from '@guild/models/npc.model';
 import { type Session } from '@guild/models/session.model';
 import { type GameMap } from '@guild/models/map.model';
 import { type Relationship, type SharedRelationshipMemory } from '@guild/models/relationship.model';
 import { type Campaign } from '@guild/models/campaign.model';
 import { type Quest } from '@guild/models/quest.model';
 import { CampaignService } from '@guild/services/campaign.service';
+import { CampaignLocaleService } from '@guild/services/campaignLocale.service';
 
 /**
  * Campaign JSON is not fingerprinted like the compiled application bundles.
@@ -97,9 +98,10 @@ function resolveImagePaths<T>(data: T, imagesBasePath: string): T {
 export class DataService {
   private readonly http = inject(HttpClient);
   private readonly campaignService = inject(CampaignService);
+  private readonly campaignLocale = inject(CampaignLocaleService);
 
   private readonly _characters: WritableSignal<ReadonlyArray<Character>> = signal([]);
-  private readonly _npcs: WritableSignal<ReadonlyArray<Npc>> = signal([]);
+  private readonly _npcs: WritableSignal<ReadonlyArray<NpcSource>> = signal([]);
   private readonly _sessions: WritableSignal<ReadonlyArray<Session>> = signal([]);
   private readonly _maps: WritableSignal<ReadonlyArray<GameMap>> = signal([]);
   private readonly _partyRelationships: WritableSignal<ReadonlyArray<Relationship>> = signal([]);
@@ -116,8 +118,10 @@ export class DataService {
   /** All player characters. */
   readonly characters: Signal<ReadonlyArray<Character>> = this._characters.asReadonly();
 
-  /** All non-player characters. */
-  readonly npcs: Signal<ReadonlyArray<Npc>> = this._npcs.asReadonly();
+  /** All non-player characters with labels in the active campaign language. */
+  readonly npcs: Signal<ReadonlyArray<Npc>> = computed(() =>
+    this._npcs().map((npc) => localizeNpc(npc, (value) => this.campaignLocale.resolve(value))),
+  );
 
   /** All campaign sessions. */
   readonly sessions: Signal<ReadonlyArray<Session>> = this._sessions.asReadonly();
@@ -188,7 +192,7 @@ export class DataService {
    * @returns The matching NPC, or undefined if not found.
    */
   getNpcById(id: string): Signal<Npc | undefined> {
-    return computed(() => this._npcs().find((n) => n.id === id));
+    return computed(() => this.npcs().find((n) => n.id === id));
   }
 
   /**
@@ -308,7 +312,7 @@ export class DataService {
 
     forkJoin({
       characters: this.loadFromManifest<Character>(`${basePath}/characters`),
-      npcs: this.loadFromManifest<Npc>(`${basePath}/npcs`),
+      npcs: this.loadFromManifest<NpcSource>(`${basePath}/npcs`),
       sessions: this.loadFromManifest<Session>(`${basePath}/sessions`),
       maps: this.loadJson<ReadonlyArray<GameMap>>(`${basePath}/maps.json`),
       partyRelationships: this.loadJson<ReadonlyArray<Relationship>>(

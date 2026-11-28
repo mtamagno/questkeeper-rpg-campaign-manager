@@ -129,6 +129,20 @@ async function verifyLegacyManifestFallback() {
     }),
     explicitRegistry,
   );
+
+  const { localizeNpc } = await import(
+    pathToFileURL(path.join(root, 'src/app/guild/models/npc.model.ts')).href
+  );
+  const guide = { id: 'guide', name: { en: 'The guide', it: 'La guida' }, title: { en: 'Scout' } };
+  const resolveNpc = (npc, locale) =>
+    localizeNpc(npc, (value) => model.resolveLocalizedText(value, locale, inferred).value);
+
+  assert.equal(resolveNpc(guide, 'en').name, 'The guide');
+  assert.equal(resolveNpc(guide, 'it').name, 'La guida');
+  assert.equal(resolveNpc(guide, 'it').title, 'Scout');
+  const legacy = resolveNpc({ id: 'legacy', name: 'Mira' }, 'it');
+  assert.equal(legacy.name, 'Mira');
+  assert.equal(legacy.title, undefined);
 }
 
 verifyLegacyManifestFallback()
