@@ -25,9 +25,12 @@ const password = read('src/app/guild/components/password-dialog/password-dialog.
 const passwordCode = read('src/app/guild/components/password-dialog/password-dialog.component.ts');
 const lightbox = read('src/app/guild/components/image-lightbox/image-lightbox.component.html');
 const lightboxCode = read('src/app/guild/components/image-lightbox/image-lightbox.component.ts');
+const questReader = read('src/app/guild/components/quest-list/quest-list.component.html');
+const questReaderCode = read('src/app/guild/components/quest-list/quest-list.component.ts');
 const modalContracts = [
   ['password dialog', password, passwordCode],
   ['image lightbox', lightbox, lightboxCode],
+  ['quest reader', questReader, questReaderCode],
 ];
 const dmLoginTemplate = 'src/app/sanctum/components/dm-login-dialog/dm-login-dialog.component.html';
 const dmLoginCode = 'src/app/sanctum/components/dm-login-dialog/dm-login-dialog.component.ts';

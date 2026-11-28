@@ -27,6 +27,9 @@ for (const campaign of campaigns) {
   };
   const quests = await loadManifest('quests');
   validateQuestCollection(quests, bundle);
+  if (quests.length > 0) {
+    await stat(join(root, campaign.id, 'images', 'quests', 'quest-log-empty-party.png'));
+  }
   for (const quest of quests) {
     for (const update of quest.updates ?? []) {
       if (update.image?.url) await stat(join(root, campaign.id, update.image.url));
@@ -53,18 +56,22 @@ const uiCatalog = JSON.parse(
 );
 
 for (const selector of [
-  'quest-card__state',
-  'quest-card__importance',
-  'quest-card__objective',
-  'quest-card__history',
+  'quest-launcher__open',
+  'quest-reader__sidebar',
+  'quest-reader__detail',
+  'quest-reader__empty-selection',
+  'quest-detail__objective',
   'quest-history__marker',
 ]) {
   if (!questListMarkup.includes(selector)) {
     throw new Error(`Quest reader is missing the ${selector} hierarchy.`);
   }
 }
-if (!questLogMarkup.includes('quest-log__filters')) {
-  throw new Error('Quest Log is missing its state filters.');
+if (!questListMarkup.includes('aria-modal="true"')) {
+  throw new Error('Quest reader must open as a modal workspace.');
+}
+if (!questListMarkup.includes('visibleProjections()')) {
+  throw new Error('Quest reader is missing its title-only filtered sidebar.');
 }
 for (const locale of Object.values(uiCatalog.locales)) {
   if (!locale.texts.commandBar.routeLabels.quests) {

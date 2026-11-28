@@ -89,70 +89,6 @@
   line-height: 1.65;
 }
 
-.quest-log__filters {
-  position: sticky;
-  top: 5.4rem;
-  z-index: 4;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.55rem;
-  margin-bottom: 1.25rem;
-  padding: 0.55rem;
-  border: 1px solid var(--qk-color-border);
-  border-radius: 1rem;
-  background: color-mix(in srgb, var(--qk-color-surface) 92%, transparent);
-  box-shadow: 0 0.55rem 1.4rem color-mix(in srgb, black 15%, transparent);
-  backdrop-filter: blur(14px);
-}
-
-.quest-log__filters button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.65rem;
-  min-height: 2.9rem;
-  padding: 0.55rem 1rem;
-  border: 1px solid transparent;
-  border-radius: 0.72rem;
-  background: transparent;
-  color: var(--qk-color-text-muted);
-  font: inherit;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.quest-log__filters button strong {
-  display: grid;
-  min-width: 1.7rem;
-  height: 1.7rem;
-  place-items: center;
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--qk-color-text-muted) 13%, transparent);
-  font-size: 0.74rem;
-}
-
-.quest-log__filters button:hover {
-  color: var(--qk-color-accent-text);
-  background: color-mix(in srgb, var(--qk-color-accent) 8%, transparent);
-}
-
-.quest-log__filters button:focus-visible {
-  outline: 2px solid var(--qk-color-accent);
-  outline-offset: 2px;
-}
-
-.quest-log__filters button.is-active {
-  border-color: color-mix(in srgb, var(--qk-color-accent) 65%, var(--qk-color-border));
-  color: var(--qk-color-accent-text);
-  background: color-mix(in srgb, var(--qk-color-surface) 78%, var(--qk-color-accent) 22%);
-  box-shadow: inset 0 -2px 0 var(--qk-color-accent);
-}
-
-.quest-log__filters button.is-active strong {
-  color: var(--qk-color-surface);
-  background: var(--qk-color-accent);
-}
-
 .quest-log__results {
   min-width: 0;
 }
@@ -169,13 +105,5 @@
   }
   .quest-log__sigil {
     margin-bottom: 0.8rem;
-  }
-  .quest-log__filters {
-    top: 4.9rem;
-  }
-  .quest-log__filters button {
-    flex-direction: column;
-    gap: 0.2rem;
-    padding-inline: 0.35rem;
   }
 }

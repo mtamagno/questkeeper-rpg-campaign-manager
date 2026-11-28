@@ -6,7 +6,7 @@
  *
  * Incremental: only regenerates a thumbnail when the source file is newer
  * than the existing thumbnail (compares mtime). Skips non-image files and
- * existing `thumbs/` directories during the scan.
+ * generated `thumbs/`, `display/` and `placeholders/` directories during the scan.
  *
  * Usage: node scripts/generate-thumbnails.cjs
  */
@@ -17,6 +17,7 @@ const sharp = require('sharp');
 
 const CAMPAIGNS_ROOT = path.join(__dirname, '..', 'src', 'campaigns');
 const THUMB_DIR_NAME = 'thumbs';
+const SKIP_DIRS = new Set(['thumbs', 'display', 'placeholders']);
 const THUMB_WIDTH = 300;
 const JPEG_QUALITY = 80;
 const WEBP_QUALITY = 80;
@@ -25,7 +26,7 @@ const IMAGE_EXTENSIONS = new Set(['.png', '.jpg', '.jpeg', '.webp']);
 
 /**
  * Recursively collects all image file paths under the given directory,
- * skipping `thumbs/` subdirectories.
+ * skipping generated derivative and placeholder subdirectories.
  * @param {string} dir - Directory to scan.
  * @returns {string[]} Array of absolute image file paths.
  */
@@ -34,7 +35,7 @@ function collectImagePaths(dir) {
   const entries = fs.readdirSync(dir, { withFileTypes: true });
 
   for (const entry of entries) {
-    if (entry.name === THUMB_DIR_NAME) {
+    if (SKIP_DIRS.has(entry.name)) {
       continue;
     }
 
